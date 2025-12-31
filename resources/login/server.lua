@@ -661,28 +661,33 @@ setTimer(function()
                     local velocityX, velocityY, velocityZ = getElementVelocity(player)
                     
                     -- Detectar vuelo basándose en velocidad vertical y altura
-                    -- Si está subiendo (velocidad Z positiva) o flotando (velocidad Z casi 0 pero alto)
-                    if velocityZ > 0.05 then
-                        -- Está subiendo, forzar caída inmediata
-                        setElementVelocity(player, velocityX, velocityY, -0.3)
-                    elseif velocityZ > -0.05 and velocityZ < 0.05 and z > 5.0 then
-                        -- Está flotando a cierta altura, forzar caída
-                        setElementVelocity(player, velocityX, velocityY, -0.2)
+                    -- PREVENCIÓN AGRESIVA: Cualquier velocidad hacia arriba o flotación = vuelo
+                    if velocityZ > 0.02 then
+                        -- Está subiendo (incluso ligeramente), forzar caída inmediata y agresiva
+                        setElementVelocity(player, velocityX * 0.5, velocityY * 0.5, -0.8)
+                    elseif velocityZ > -0.02 and velocityZ < 0.02 and z > 3.0 then
+                        -- Está flotando a cualquier altura, forzar caída
+                        setElementVelocity(player, velocityX * 0.7, velocityY * 0.7, -0.5)
+                    end
+                    
+                    -- Si está alto (más de 3 unidades), forzar caída agresiva
+                    if z > 3.0 and velocityZ >= -0.1 then
+                        setElementVelocity(player, velocityX * 0.6, velocityY * 0.6, -0.6)
                     end
                     
                     -- Si está extremadamente alto (probablemente volando), teletransportar hacia abajo
-                    if z > 50.0 then
-                        setElementPosition(player, x, y, z - 30.0)
+                    if z > 10.0 then
+                        setElementPosition(player, x, y, z - 8.0)
                         outputChatBox("Vuelo deshabilitado - Solo administradores pueden volar", player, 255, 0, 0)
-                    elseif z > 20.0 and velocityZ >= 0 then
-                        -- Si está alto y no está cayendo, forzar caída más agresiva
-                        setElementVelocity(player, velocityX, velocityY, -0.5)
+                    elseif z > 5.0 and velocityZ >= -0.05 then
+                        -- Si está alto y no está cayendo rápidamente, forzar caída muy agresiva
+                        setElementVelocity(player, velocityX * 0.4, velocityY * 0.4, -1.0)
                     end
                 end
             end
         end
     end
-end, 200, 0) -- Verificar cada 200ms (más frecuente para prevenir mejor)
+end, 100, 0) -- Verificar cada 100ms (muy frecuente para prevenir mejor)
 
 -- Prevenir que los jugadores normales obtengan jetpack mediante comandos
 addEventHandler("onPlayerCommand", root, function(command)

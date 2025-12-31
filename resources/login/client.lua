@@ -727,21 +727,25 @@ function startFlightPrevention()
                 local distanceToGround = z - groundZ
                 local velocityX, velocityY, velocityZ = getElementVelocity(localPlayer)
                 
-                -- Solo prevenir vuelo si está claramente volando (alto y subiendo o flotando)
-                -- Permitir saltos normales (distancia pequeña y velocidad hacia arriba es normal)
-                if distanceToGround > 2.0 then
-                    -- Si está subiendo (velocidad Z positiva y significativa) y está alto
-                    if velocityZ > 0.15 then
-                        -- Está volando, forzar caída
-                        setElementVelocity(localPlayer, velocityX, velocityY, -0.1)
-                    elseif velocityZ > -0.05 and velocityZ < 0.05 and distanceToGround > 3.0 then
-                        -- Está flotando a cierta altura, forzar caída suave
-                        setElementVelocity(localPlayer, velocityX, velocityY, -0.05)
+                -- PREVENCIÓN AGRESIVA: Cualquier vuelo detectado = forzar caída inmediata
+                if distanceToGround > 1.5 then
+                    -- Si está subiendo (incluso ligeramente), forzar caída agresiva
+                    if velocityZ > 0.02 then
+                        -- Está volando, forzar caída inmediata
+                        setElementVelocity(localPlayer, velocityX * 0.5, velocityY * 0.5, -0.8)
+                    elseif velocityZ > -0.02 and velocityZ < 0.02 and distanceToGround > 2.0 then
+                        -- Está flotando, forzar caída
+                        setElementVelocity(localPlayer, velocityX * 0.7, velocityY * 0.7, -0.5)
                     end
                     
-                    -- Si está demasiado alto, forzar caída más agresiva
+                    -- Si está alto, siempre forzar caída
+                    if distanceToGround > 3.0 then
+                        setElementVelocity(localPlayer, velocityX * 0.6, velocityY * 0.6, -0.6)
+                    end
+                    
+                    -- Si está muy alto, caída muy agresiva
                     if distanceToGround > 5.0 then
-                        setElementVelocity(localPlayer, velocityX, velocityY, -0.5)
+                        setElementVelocity(localPlayer, velocityX * 0.4, velocityY * 0.4, -1.0)
                     end
                 end
                 
@@ -749,7 +753,7 @@ function startFlightPrevention()
                 lastGroundZ = groundZ
             end
         end
-    end, 50, 0) -- Verificar cada 50ms para respuesta rápida
+    end, 30, 0) -- Verificar cada 30ms para respuesta muy rápida
 end
 
 function stopFlightPrevention()
@@ -770,15 +774,15 @@ addEventHandler("onClientKey", root, function(button, press)
             local distanceToGround = z - groundZ
             local velocityX, velocityY, velocityZ = getElementVelocity(localPlayer)
             
-            -- Solo cancelar si está volando (alto y subiendo), no durante saltos normales
-            -- Un salto normal tiene distancia < 2.0 y velocidad hacia arriba es normal
-            if distanceToGround > 2.0 and velocityZ > 0.1 then
-                -- Está volando, cancelar el evento para prevenir vuelo
+            -- PREVENCIÓN AGRESIVA: Cancelar Shift si está en el aire (incluso en saltos normales)
+            -- Esto previene completamente el vuelo tipo superman
+            if distanceToGround > 0.3 then
+                -- Está en el aire, cancelar el evento para prevenir vuelo
                 cancelEvent()
                 
-                -- Forzar caída inmediata
+                -- Forzar caída inmediata y agresiva
                 if velocityZ > 0 then
-                    setElementVelocity(localPlayer, velocityX, velocityY, -0.2)
+                    setElementVelocity(localPlayer, velocityX * 0.5, velocityY * 0.5, -0.5)
                 end
             end
         end
