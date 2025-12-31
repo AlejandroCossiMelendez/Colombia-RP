@@ -29,23 +29,30 @@ local inventoryItems = {}  -- Tabla de items: {slot = {id, name, quantity, icon}
 -- Cargar imágenes de items
 local waterFullImage = nil
 local waterEmptyImage = nil
+local hamburgerImage = nil
 
 -- Items consumibles (debe coincidir con el servidor)
 local consumableItems = {
     ["Agua Llena"] = true,
-    ["Agua"] = true
+    ["Agua"] = true,
+    ["Hamburguesa"] = true,
+    ["Comida"] = true
 }
 
 -- Cargar imágenes al iniciar
 addEventHandler("onClientResourceStart", resourceRoot, function()
     waterFullImage = dxCreateTexture("images/agua-lleno.png", "argb", true, "clamp")
     waterEmptyImage = dxCreateTexture("images/agua-vacio.png", "argb", true, "clamp")
+    hamburgerImage = dxCreateTexture("images/bollo-de-hamburguesa.png", "argb", true, "clamp")
     
     if not waterFullImage then
         outputChatBox("⚠ No se pudo cargar la imagen agua-lleno.png", 255, 165, 0)
     end
     if not waterEmptyImage then
         outputChatBox("⚠ No se pudo cargar la imagen agua-vacio.png", 255, 165, 0)
+    end
+    if not hamburgerImage then
+        outputChatBox("⚠ No se pudo cargar la imagen bollo-de-hamburguesa.png", 255, 165, 0)
     end
 end)
 
@@ -55,6 +62,8 @@ function getItemImage(itemName, itemId)
         return waterFullImage
     elseif itemName == "Agua Vacía" or itemName == "Botella Vacía" or itemId == 2001 then
         return waterEmptyImage
+    elseif itemName == "Hamburguesa" or itemName == "Comida" or itemId == 3000 then
+        return hamburgerImage
     end
     return nil
 end

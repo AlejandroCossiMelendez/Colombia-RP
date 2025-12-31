@@ -206,6 +206,18 @@ local consumableItems = {
         restore = 30,
         consumedName = "Botella Vacía",
         consumedId = 2001
+    },
+    ["Hamburguesa"] = {
+        type = "hunger",
+        restore = 30,  -- Restaura 30% de hambre
+        consumedName = nil,  -- Se elimina después de consumir
+        consumedId = nil
+    },
+    ["Comida"] = {
+        type = "hunger",
+        restore = 30,
+        consumedName = nil,
+        consumedId = nil
     }
 }
 
@@ -353,6 +365,8 @@ addCommandHandler("daritem", function(player, cmd, targetPlayer, itemName, quant
         itemId = 2000  -- ID para agua llena
     elseif itemName == "Agua Vacía" or itemName == "Botella Vacía" then
         itemId = 2001  -- ID para agua vacía
+    elseif itemName == "Hamburguesa" or itemName == "Comida" then
+        itemId = 3000  -- ID para hamburguesa/comida
     end
     
     if addItemToInventory(characterId, emptySlot, itemId, itemName, quantity, "") then

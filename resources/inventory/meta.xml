@@ -4,5 +4,6 @@
     <script src="server.lua" type="server" />
     <file src="images/agua-lleno.png" />
     <file src="images/agua-vacio.png" />
+    <file src="images/bollo-de-hamburguesa.png" />
 </meta>
 
