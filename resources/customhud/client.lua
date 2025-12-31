@@ -164,22 +164,31 @@ local bogotaYear = 2024
 -- Evento para recibir hora de Bogotá del servidor
 addEvent("onBogotaTimeReceived", true)
 addEventHandler("onBogotaTimeReceived", root, function(hour, minute, second, day, month, year)
-    bogotaHour = hour
-    bogotaMinute = minute
-    bogotaSecond = second
-    bogotaDay = day
-    bogotaMonth = month
-    bogotaYear = year
+    -- Asegurar que los valores sean números
+    bogotaHour = tonumber(hour) or 0
+    bogotaMinute = tonumber(minute) or 0
+    bogotaSecond = tonumber(second) or 0
+    bogotaDay = tonumber(day) or 1
+    bogotaMonth = tonumber(month) or 1
+    bogotaYear = tonumber(year) or 2024
+    
+    -- Debug: mostrar en consola (comentar en producción)
+    -- outputChatBox("Hora recibida: " .. bogotaHour .. ":" .. bogotaMinute .. ":" .. bogotaSecond)
 end)
 
 -- Solicitar hora al servidor cuando el recurso inicia
 addEventHandler("onClientResourceStart", resourceRoot, function()
     -- Solicitar hora inmediatamente
-    triggerServerEvent("onRequestBogotaTime", localPlayer)
-    -- Y luego cada 5 segundos para mantener sincronizado
     setTimer(function()
         triggerServerEvent("onRequestBogotaTime", localPlayer)
-    end, 5000, 0)
+    end, 500, 1)  -- Pequeño delay para asegurar que el servidor esté listo
+    
+    -- Y luego cada segundo para mantener sincronizado (más frecuente)
+    setTimer(function()
+        if isElement(localPlayer) then
+            triggerServerEvent("onRequestBogotaTime", localPlayer)
+        end
+    end, 1000, 0)  -- Cada segundo
 end)
 
 -- Función para obtener hora de Bogotá, Colombia (UTC-5)

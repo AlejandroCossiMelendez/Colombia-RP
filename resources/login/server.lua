@@ -1037,14 +1037,38 @@ end, true, "high") -- Alta prioridad para ejecutar antes que otros handlers
 -- Función para obtener hora de Bogotá (UTC-5) correctamente
 function getBogotaTime()
     local time = getRealTime()
-    -- getRealTime() en servidor devuelve hora local del servidor
-    -- Necesitamos obtener UTC real y luego convertir a Bogotá
     
-    -- Calcular hora UTC: si el servidor está en UTC, usar directamente
-    -- Si está en otra zona, necesitamos el offset
-    -- Por ahora, asumimos que el servidor está en UTC (común en servidores Linux)
-    local utcHour = time.hour
-    local utcMinute = time.minute
+    -- getRealTime() devuelve la hora local del servidor
+    -- Para obtener UTC, necesitamos saber el offset del servidor
+    -- Como no lo sabemos directamente, vamos a usar un método que funcione
+    
+    -- Método 1: Intentar usar os.time() y os.date() para obtener UTC
+    local success, utcTime = pcall(function()
+        local timestamp = os.time()
+        return os.date("!*t", timestamp)  -- ! significa UTC
+    end)
+    
+    local utcHour, utcMinute, utcSecond
+    if success and utcTime then
+        utcHour = utcTime.hour
+        utcMinute = utcTime.min
+        utcSecond = utcTime.sec
+    else
+        -- Método 2: Si os.date no funciona, asumir que getRealTime() devuelve UTC
+        -- (común en servidores Linux configurados en UTC)
+        utcHour = time.hour
+        utcMinute = time.minute
+        utcSecond = time.second
+        
+        -- Si esto muestra hora incorrecta, el servidor NO está en UTC
+        -- En ese caso, necesitamos ajustar manualmente
+        -- Si el servidor muestra 9:56 y Colombia es 14:57, entonces:
+        -- - El servidor está 5 horas atrás de Colombia
+        -- - Si Colombia es UTC-5, entonces el servidor está en UTC-10 o similar
+        -- - O el servidor está en otra zona horaria
+        
+        -- Por ahora, asumimos UTC y convertimos a Bogotá
+    end
     
     -- Convertir UTC a hora de Bogotá (UTC-5)
     local bogotaHour = utcHour - 5
@@ -1052,7 +1076,7 @@ function getBogotaTime()
         bogotaHour = bogotaHour + 24
     end
     
-    return bogotaHour, utcMinute, time.second, time.monthday, time.month + 1, time.year + 1900
+    return bogotaHour, utcMinute, utcSecond, time.monthday, time.month + 1, time.year + 1900
 end
 
 -- Función para sincronizar el tiempo del juego con la hora de Bogotá
@@ -1073,8 +1097,18 @@ end)
 -- Enviar hora a todos los clientes cada segundo
 setTimer(function()
     local hour, minute, second, day, month, year = getBogotaTime()
+    -- Asegurar que los valores sean válidos
+    hour = tonumber(hour) or 0
+    minute = tonumber(minute) or 0
+    second = tonumber(second) or 0
+    day = tonumber(day) or 1
+    month = tonumber(month) or 1
+    year = tonumber(year) or 2024
+    
     for _, player in ipairs(getElementsByType("player")) do
-        triggerClientEvent(player, "onBogotaTimeReceived", player, hour, minute, second, day, month, year)
+        if isElement(player) then
+            triggerClientEvent(player, "onBogotaTimeReceived", player, hour, minute, second, day, month, year)
+        end
     end
 end, 1000, 0)  -- Cada segundo
 
