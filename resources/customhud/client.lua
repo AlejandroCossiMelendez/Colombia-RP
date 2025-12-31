@@ -69,8 +69,8 @@ local iconSize = 24  -- Tamaño para iconos de hambre, sed y oxígeno
 local cardPadding = 18
 local cardSpacing = 10
 
--- Ocultar HUD por defecto de MTA
-addEventHandler("onClientResourceStart", resourceRoot, function()
+-- Función para ocultar todos los componentes del HUD nativo
+function hideNativeHUD()
     setPlayerHudComponentVisible("money", false)
     setPlayerHudComponentVisible("health", false)
     setPlayerHudComponentVisible("armour", false)
@@ -81,6 +81,20 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
     setPlayerHudComponentVisible("clock", false)  -- Ocultar reloj nativo del juego
     setPlayerHudComponentVisible("radar", false)  -- Opcional: ocultar radar también
     setPlayerHudComponentVisible("breath", false)  -- Ocultar respiración nativa
+end
+
+-- Ocultar HUD inmediatamente al iniciar el recurso
+hideNativeHUD()
+
+-- Ocultar HUD por defecto de MTA (cada vez que el recurso se inicia o reinicia)
+addEventHandler("onClientResourceStart", resourceRoot, function()
+    -- Ocultar inmediatamente
+    hideNativeHUD()
+    
+    -- También ocultar después de un pequeño delay para asegurar
+    setTimer(function()
+        hideNativeHUD()
+    end, 100, 3)  -- Ejecutar 3 veces con 100ms de intervalo
     
     -- Cargar imágenes
     healthImage = dxCreateTexture("images/health_icon.png", "argb", true, "clamp")
@@ -598,6 +612,13 @@ end
 
 -- Renderizar el HUD cada frame
 addEventHandler("onClientRender", root, drawCustomHUD)
+
+-- Timer para asegurar que el HUD nativo siempre esté oculto
+setTimer(function()
+    if getElementData(localPlayer, "characterSelected") then
+        hideNativeHUD()
+    end
+end, 1000, 0)  -- Verificar cada segundo
 
 -- Actualizar cuando cambia el dinero
 addEventHandler("onClientPlayerMoneyChange", localPlayer, function(newAmount, oldAmount, instant)
