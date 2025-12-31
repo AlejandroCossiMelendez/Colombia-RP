@@ -717,7 +717,7 @@ function startFlightPrevention()
         killTimer(flightPreventionTimer)
     end
     
-    -- Monitorear y prevenir vuelo tipo superman (solo si está extremadamente alto)
+    -- Monitorear y prevenir vuelo tipo superman (solo si está volando hacia arriba, NO interferir con caídas)
     flightPreventionTimer = setTimer(function()
         if playerRole ~= "admin" then
             -- Solo prevenir si el jugador está en el juego y no está en un vehículo
@@ -727,28 +727,26 @@ function startFlightPrevention()
                 local distanceToGround = z - groundZ
                 local velocityX, velocityY, velocityZ = getElementVelocity(localPlayer)
                 
-                -- Solo prevenir si está MUY alto (más de 10 unidades) para no interferir con saltos normales
-                -- Los saltos normales no superan 2-3 unidades de altura
-                if distanceToGround > 10.0 then
-                    -- Si está subiendo a gran altura con velocidad alta, forzar caída suave
+                -- Solo prevenir si está MUY alto (más de 15 unidades) Y está subiendo o flotando
+                -- NO interferir si está cayendo (velocityZ negativo = cayendo normalmente)
+                if distanceToGround > 15.0 then
+                    -- Solo prevenir si está subiendo (velocidad positiva) o flotando (velocidad casi 0)
+                    -- Si está cayendo (velocityZ negativo), NO interferir para evitar daño extra
                     if velocityZ > 0.3 then
-                        setElementVelocity(localPlayer, velocityX, velocityY, -0.2)
-                    elseif velocityZ > -0.1 and velocityZ < 0.1 and distanceToGround > 15.0 then
-                        -- Flotando a gran altura, forzar caída suave
-                        setElementVelocity(localPlayer, velocityX, velocityY, -0.3)
+                        -- Está subiendo a gran altura = vuelo, detener ascenso y dejar caer naturalmente
+                        setElementVelocity(localPlayer, velocityX, velocityY, 0)
+                    elseif velocityZ > -0.1 and velocityZ < 0.1 and distanceToGround > 20.0 then
+                        -- Flotando a gran altura, iniciar caída suave
+                        setElementVelocity(localPlayer, velocityX, velocityY, -0.1)
                     end
-                    
-                    -- Si está extremadamente alto, forzar caída más agresiva
-                    if distanceToGround > 20.0 then
-                        setElementVelocity(localPlayer, velocityX, velocityY, -0.5)
-                    end
+                    -- NO hacer nada si velocityZ es negativo (está cayendo normalmente)
                 end
                 
                 lastPosition = {x = x, y = y, z = z}
                 lastGroundZ = groundZ
             end
         end
-    end, 100, 0) -- Verificar cada 100ms (menos frecuente para no interferir con saltos)
+    end, 150, 0) -- Verificar cada 150ms (menos frecuente para no interferir con caídas normales)
 end
 
 function stopFlightPrevention()

@@ -655,26 +655,28 @@ setTimer(function()
                     outputChatBox("Jetpack desactivado - Solo disponible para administradores", player, 255, 0, 0)
                 end
                 
-                -- Prevenir vuelo tipo superman (solo si está extremadamente alto, no en saltos normales)
+                -- Prevenir vuelo tipo superman (solo si está volando hacia arriba, NO interferir con caídas)
                 if not isPedInVehicle(player) then
                     local x, y, z = getElementPosition(player)
                     local velocityX, velocityY, velocityZ = getElementVelocity(player)
                     
-                    -- Solo prevenir si está MUY alto (más de 10 unidades) para no interferir con saltos normales
-                    -- Los saltos normales no superan 2-3 unidades de altura
-                    if z > 10.0 then
-                        -- Si está subiendo a gran altura, forzar caída suave
+                    -- Solo prevenir si está MUY alto (más de 15 unidades) Y está subiendo o flotando
+                    -- NO interferir si está cayendo (velocityZ negativo = cayendo normalmente)
+                    if z > 15.0 then
+                        -- Solo prevenir si está subiendo (velocidad positiva) o flotando (velocidad casi 0)
+                        -- Si está cayendo (velocityZ negativo), NO interferir para evitar daño extra
                         if velocityZ > 0.2 then
-                            setElementVelocity(player, velocityX, velocityY, -0.2)
+                            -- Está subiendo a gran altura = vuelo, forzar caída suave
+                            setElementVelocity(player, velocityX, velocityY, 0) -- Detener ascenso, dejar que caiga naturalmente
+                        elseif velocityZ > -0.1 and velocityZ < 0.1 and z > 20.0 then
+                            -- Flotando a gran altura, iniciar caída suave
+                            setElementVelocity(player, velocityX, velocityY, -0.1)
                         end
                         
                         -- Si está extremadamente alto, teletransportar hacia abajo
                         if z > 50.0 then
                             setElementPosition(player, x, y, z - 30.0)
                             outputChatBox("Vuelo deshabilitado - Solo administradores pueden volar", player, 255, 0, 0)
-                        elseif z > 20.0 and velocityZ > -0.1 and velocityZ < 0.1 then
-                            -- Flotando a gran altura, forzar caída suave
-                            setElementVelocity(player, velocityX, velocityY, -0.3)
                         end
                     end
                 end
