@@ -1514,11 +1514,12 @@ addEventHandler("onRequestSpawnVehicle", root, function(vehicleModel)
     local spawnY = y - (math.cos(radians) * distance)
     local spawnZ = z
     
-    -- Obtener altura del suelo en la posición de spawn
-    local groundZ = getGroundPosition(spawnX, spawnY, spawnZ)
-    if groundZ then
-        spawnZ = groundZ + 0.5
+    -- Obtener altura del suelo en la posición de spawn usando processLineOfSight
+    local hit, hitX, hitY, hitZ, hitElement = processLineOfSight(spawnX, spawnY, spawnZ + 10, spawnX, spawnY, spawnZ - 50)
+    if hit and hitZ then
+        spawnZ = hitZ + 0.5
     else
+        -- Si no se detecta suelo, usar la posición Z del jugador con un pequeño offset
         spawnZ = z + 0.5
     end
     
