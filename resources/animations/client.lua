@@ -47,15 +47,17 @@ function startSmoking()
     -- Crear objeto de cigarrillo
     local x, y, z = getElementPosition(localPlayer)
     smokeObject = createObject(3027, x, y, z) -- ID 3027 es un cigarrillo
-    setObjectScale(smokeObject, 0.8)
+    setObjectScale(smokeObject, 0.5) -- Más pequeño y discreto
     
-    -- Adjuntar cigarrillo a la mano del jugador
-    attachElements(smokeObject, localPlayer, 0.05, 0.05, 0.55, 0, 0, 0)
+    -- Adjuntar cigarrillo a la mano del jugador usando bone (hueso de la mano)
+    -- Bone 12 es la mano derecha, esto hace que siga la animación correctamente
+    attachElementToBone(smokeObject, localPlayer, 12, 0.05, 0.02, 0.05, 0, 0, 0)
     
-    -- Crear efecto de humo usando partículas
-    smokeEffect = createEffect("smoke30lit", x, y, z)
+    -- Crear efecto de humo más sutil (usar "smoke" en lugar de "smoke30lit" que es más intenso)
+    smokeEffect = createEffect("smoke", x, y, z)
     if smokeEffect then
-        attachElements(smokeEffect, localPlayer, 0.05, 0.05, 0.55, 0, 0, 0)
+        -- Adjuntar al mismo bone para que siga la mano
+        attachElementToBone(smokeEffect, localPlayer, 12, 0.05, 0.02, 0.05, 0, 0, 0)
     end
     
     outputChatBox("Presiona X para dejar de fumar.", 0, 255, 0)
@@ -90,15 +92,16 @@ function startSmoking2()
     -- Crear objeto de cigarrillo
     local x, y, z = getElementPosition(localPlayer)
     smokeObject = createObject(3027, x, y, z)
-    setObjectScale(smokeObject, 0.8)
+    setObjectScale(smokeObject, 0.5) -- Más pequeño y discreto
     
-    -- Adjuntar cigarrillo a la mano del jugador (posición diferente)
-    attachElements(smokeObject, localPlayer, 0.08, 0.03, 0.5, 0, 0, 0)
+    -- Adjuntar cigarrillo a la mano usando bone para que siga la animación
+    attachElementToBone(smokeObject, localPlayer, 12, 0.05, 0.02, 0.05, 0, 0, 0)
     
-    -- Crear efecto de humo usando partículas
-    smokeEffect = createEffect("smoke30lit", x, y, z)
+    -- Crear efecto de humo más sutil
+    smokeEffect = createEffect("smoke", x, y, z)
     if smokeEffect then
-        attachElements(smokeEffect, localPlayer, 0.08, 0.03, 0.5, 0, 0, 0)
+        -- Adjuntar al mismo bone para que siga la mano
+        attachElementToBone(smokeEffect, localPlayer, 12, 0.05, 0.02, 0.05, 0, 0, 0)
     end
     
     outputChatBox("Presiona X para dejar de fumar.", 0, 255, 0)
