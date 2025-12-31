@@ -722,6 +722,11 @@ function startFlightPrevention()
         if playerRole ~= "admin" then
             -- Solo prevenir si el jugador está en el juego y no está en un vehículo
             if not isPedInVehicle(localPlayer) then
+                -- NO interferir si el jugador está en el agua (nadando)
+                if isElementInWater(localPlayer) then
+                    return -- Salir inmediatamente si está en el agua
+                end
+                
                 local x, y, z = getElementPosition(localPlayer)
                 local groundZ = getGroundPosition(x, y, z)
                 local distanceToGround = z - groundZ

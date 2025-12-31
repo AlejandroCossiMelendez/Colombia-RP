@@ -702,26 +702,31 @@ setTimer(function()
                 
                 -- Prevenir vuelo tipo superman (solo si está volando hacia arriba, NO interferir con caídas)
                 if not isPedInVehicle(player) then
-                    local x, y, z = getElementPosition(player)
-                    local velocityX, velocityY, velocityZ = getElementVelocity(player)
-                    
-                    -- Solo prevenir si está MUY alto (más de 15 unidades) Y está subiendo o flotando
-                    -- NO interferir si está cayendo (velocityZ negativo = cayendo normalmente)
-                    if z > 15.0 then
-                        -- Solo prevenir si está subiendo (velocidad positiva) o flotando (velocidad casi 0)
-                        -- Si está cayendo (velocityZ negativo), NO interferir para evitar daño extra
-                        if velocityZ > 0.2 then
-                            -- Está subiendo a gran altura = vuelo, forzar caída suave
-                            setElementVelocity(player, velocityX, velocityY, 0) -- Detener ascenso, dejar que caiga naturalmente
-                        elseif velocityZ > -0.1 and velocityZ < 0.1 and z > 20.0 then
-                            -- Flotando a gran altura, iniciar caída suave
-                            setElementVelocity(player, velocityX, velocityY, -0.1)
-                        end
+                    -- NO interferir si el jugador está en el agua (nadando)
+                    if isElementInWater(player) then
+                        -- Continuar al siguiente jugador sin hacer nada
+                    else
+                        local x, y, z = getElementPosition(player)
+                        local velocityX, velocityY, velocityZ = getElementVelocity(player)
                         
-                        -- Si está extremadamente alto, teletransportar hacia abajo
-                        if z > 50.0 then
-                            setElementPosition(player, x, y, z - 30.0)
-                            outputChatBox("Vuelo deshabilitado - Solo administradores pueden volar", player, 255, 0, 0)
+                        -- Solo prevenir si está MUY alto (más de 15 unidades) Y está subiendo o flotando
+                        -- NO interferir si está cayendo (velocityZ negativo = cayendo normalmente)
+                        if z > 15.0 then
+                            -- Solo prevenir si está subiendo (velocidad positiva) o flotando (velocidad casi 0)
+                            -- Si está cayendo (velocityZ negativo), NO interferir para evitar daño extra
+                            if velocityZ > 0.2 then
+                                -- Está subiendo a gran altura = vuelo, forzar caída suave
+                                setElementVelocity(player, velocityX, velocityY, 0) -- Detener ascenso, dejar que caiga naturalmente
+                            elseif velocityZ > -0.1 and velocityZ < 0.1 and z > 20.0 then
+                                -- Flotando a gran altura, iniciar caída suave
+                                setElementVelocity(player, velocityX, velocityY, -0.1)
+                            end
+                            
+                            -- Si está extremadamente alto, teletransportar hacia abajo
+                            if z > 50.0 then
+                                setElementPosition(player, x, y, z - 30.0)
+                                outputChatBox("Vuelo deshabilitado - Solo administradores pueden volar", player, 255, 0, 0)
+                            end
                         end
                     end
                 end
