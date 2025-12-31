@@ -1,7 +1,14 @@
 <meta>
     <info author="Colombia RP" version="1.0" name="Custom Skins" description="Skins personalizadas para Colombia RP" />
     <script src="client.lua" type="client" />
+    <script src="server.lua" type="server" />
+    
+    <!-- Archivos de la skin 58 -->
     <file src="skin58.dff" />
     <file src="skin58.txd" />
+    
+    <!-- Archivos del vehículo 400 (Landstalker) -->
+    <file src="vehicle400.dff" />
+    <file src="vehicle400.txd" />
 </meta>
 

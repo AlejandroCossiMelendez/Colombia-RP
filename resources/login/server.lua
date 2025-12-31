@@ -647,6 +647,13 @@ addEventHandler("onPlayerSelectCharacter", root, function(charId)
     
     triggerClientEvent(client, "onCharacterSelectResult", client, true, "Personaje seleccionado: " .. selectedChar.name .. " " .. selectedChar.surname)
     
+    -- Aplicar efecto de velocidad después de seleccionar personaje
+    setTimer(function()
+        if isElement(client) and getElementData(client, "characterSelected") then
+            applySpeedEffect(client, speedEffectEnabled)
+        end
+    end, 1000, 1)
+    
     -- Dar dinero al jugador
     setPlayerMoney(client, tonumber(selectedChar.money))
     
@@ -1646,6 +1653,75 @@ addCommandHandler("setrole", function(player, cmd, targetUsername, newRole)
         outputChatBox("Error al actualizar el rol. Usuario no encontrado.", player, 255, 0, 0)
     end
 end)
+
+-- ==================== SISTEMA DE CONTROL DE VELOCIDAD ====================
+-- Variable global para controlar si el efecto de velocidad está habilitado
+local speedEffectEnabled = true  -- Por defecto habilitado
+
+-- Función para aplicar/remover efecto de velocidad a un jugador
+function applySpeedEffect(player, enabled)
+    if enabled then
+        -- Habilitar velocidad normal (stat 21 = velocidad de carrera)
+        setPedStat(player, 21, 1000)  -- 1000 es el valor máximo (velocidad normal)
+        setElementData(player, "speedEffectEnabled", true)
+    else
+        -- Deshabilitar velocidad (reducir stat)
+        setPedStat(player, 21, 0)  -- 0 desactiva el efecto de velocidad
+        setElementData(player, "speedEffectEnabled", false)
+    end
+end
+
+-- Aplicar efecto de velocidad a todos los jugadores según el estado global
+function updateAllPlayersSpeed()
+    for _, player in ipairs(getElementsByType("player")) do
+        if isElement(player) and getElementData(player, "characterSelected") then
+            applySpeedEffect(player, speedEffectEnabled)
+        end
+    end
+end
+
+-- Comando para habilitar/deshabilitar efecto de velocidad (solo admins)
+addCommandHandler("velocidad", function(player, cmd, action)
+    if not isPlayerAdmin(player) then
+        outputChatBox("No tienes permisos para usar este comando", player, 255, 0, 0)
+        return
+    end
+    
+    if not action then
+        local status = speedEffectEnabled and "HABILITADO" or "DESHABILITADO"
+        outputChatBox("Estado del efecto de velocidad: " .. status, player, 255, 255, 0)
+        outputChatBox("Uso: /velocidad [on|off]", player, 255, 255, 0)
+        return
+    end
+    
+    action = string.lower(action)
+    
+    if action == "on" or action == "activar" or action == "enable" then
+        speedEffectEnabled = true
+        updateAllPlayersSpeed()
+        outputChatBox("✓ Efecto de velocidad HABILITADO para todos los jugadores", player, 0, 255, 0)
+        outputChatBox("El efecto de velocidad ha sido habilitado", root, 0, 255, 0)
+    elseif action == "off" or action == "desactivar" or action == "disable" then
+        speedEffectEnabled = false
+        updateAllPlayersSpeed()
+        outputChatBox("✓ Efecto de velocidad DESHABILITADO para todos los jugadores", player, 255, 165, 0)
+        outputChatBox("El efecto de velocidad ha sido deshabilitado", root, 255, 165, 0)
+    else
+        outputChatBox("Uso: /velocidad [on|off]", player, 255, 255, 0)
+    end
+end)
+
+-- Aplicar efecto de velocidad cuando un jugador spawnea/selecciona personaje
+addEventHandler("onPlayerSpawn", root, function()
+    if getElementData(source, "characterSelected") then
+        setTimer(function()
+            if isElement(source) then
+                applySpeedEffect(source, speedEffectEnabled)
+            end
+        end, 200, 1)
+    end
+end)
+
 
 -- Comando para ver tu rol
 addCommandHandler("myrole", function(player)
