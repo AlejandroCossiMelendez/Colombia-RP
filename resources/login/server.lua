@@ -13,7 +13,7 @@ local MYSQL_PORT = 3306             -- Puerto de MySQL (default: 3306)
 -- Es CRÍTICO registrar los eventos ANTES de cualquier otra cosa
 -- Estos eventos DEBEN estar al inicio del archivo para estar disponibles inmediatamente
 addEvent("onPlayerRegister", true)
-addEvent("onPlayerLogin", true)
+addEvent("onPlayerCustomLogin", true)  -- Renombrado para evitar conflicto con evento nativo onPlayerLogin de MTA
 addEvent("onPlayerCreateCharacter", true)
 addEvent("onPlayerSelectCharacter", true)
 addEvent("onRequestCharacters", true)
@@ -21,6 +21,9 @@ addEvent("onPlayerSavePosition", true)
 
 -- Verificar que los eventos estén registrados (esto se ejecuta cuando el script se carga)
 -- Los eventos están disponibles inmediatamente después de addEvent
+
+-- Evento para confirmar al cliente que el servidor está listo
+addEvent("onLoginServerReady", true)
 
 -- ==================== BASE DE DATOS MySQL ====================
 function initDatabase()
@@ -255,8 +258,34 @@ addEventHandler("onPlayerRegister", root, function(username, password, email)
     end
 end)
 
--- Evento de login
-addEventHandler("onPlayerLogin", root, function(username, password)
+-- Bloquear el comando de login nativo de MTA para forzar uso del panel personalizado
+addCommandHandler("login", function(player, cmd, username, password)
+    -- Cancelar el login nativo
+    cancelEvent()
+    
+    -- Informar al jugador que debe usar el panel
+    outputChatBox("═══════════════════════════════════════", player, 255, 255, 0)
+    outputChatBox("El comando /login está DESHABILITADO", player, 255, 0, 0)
+    outputChatBox("Por favor usa el PANEL DE LOGIN que aparece en pantalla", player, 255, 255, 0)
+    outputChatBox("Si no ves el panel, presiona F8 y escribe: /restart login", player, 255, 255, 0)
+    outputChatBox("═══════════════════════════════════════", player, 255, 255, 0)
+    
+    -- Asegurar que el panel esté visible
+    triggerClientEvent(player, "onPlayerMustLogin", player)
+end, true, false) -- true = bloquear, false = no restringir
+
+-- Bloquear también el evento nativo de login de MTA
+addEventHandler("onPlayerLogin", getRootElement(), function(previousAccount, currentAccount)
+    -- Si el jugador no ha usado nuestro sistema personalizado, cancelar
+    if not getElementData(source, "loggedIn") then
+        cancelEvent()
+        outputChatBox("Debes usar el panel de login personalizado, no el sistema nativo", source, 255, 0, 0)
+        triggerClientEvent(source, "onPlayerMustLogin", source)
+    end
+end, true, "high")
+
+-- Evento de login personalizado (del panel)
+addEventHandler("onPlayerCustomLogin", root, function(username, password)
     if not client then 
         outputServerLog("[Login] ERROR: onPlayerLogin llamado sin client")
         return 
@@ -699,6 +728,24 @@ addEventHandler("onPlayerJoin", root, function()
     fadeCamera(source, false, 0)
     setCameraTarget(source, nil)
     
+    -- Ocultar el mensaje de "has joined the game" enviando un mensaje vacío
+    -- Esto sobrescribe el mensaje del sistema
+    setTimer(function()
+        if isElement(source) then
+            -- Enviar mensaje personalizado en lugar del mensaje del sistema
+            outputChatBox(" ", source, 0, 0, 0, true) -- Mensaje invisible
+            outputChatBox("═══════════════════════════════════════", source, 0, 150, 255)
+            outputChatBox("Bienvenido a Colombia RP", source, 0, 150, 255)
+            outputChatBox("Por favor inicia sesión para continuar", source, 255, 255, 255)
+            outputChatBox("═══════════════════════════════════════", source, 0, 150, 255)
+        end
+    end, 100, 1)
+    
+    -- Notificar al cliente que el servidor está listo (si la BD está inicializada)
+    if db then
+        triggerClientEvent(source, "onLoginServerReady", source)
+    end
+    
     -- Prevenir cualquier spawn automático
     setTimer(function()
         -- Verificar si el jugador spawneó sin autorización
@@ -746,7 +793,7 @@ end, true, "high") -- Alta prioridad para ejecutar antes que otros handlers
 
 -- Cargar base de datos al iniciar el recurso
 addEventHandler("onResourceStart", resourceRoot, function()
-    -- IMPORTANTE: Los eventos ya están registrados al inicio del archivo (líneas 14-19)
+    -- IMPORTANTE: Los eventos ya están registrados al inicio del archivo (líneas 15-20)
     -- Por lo tanto están disponibles inmediatamente cuando el recurso inicia
     
     outputServerLog("[Login] Recurso iniciado - eventos disponibles inmediatamente")
@@ -754,17 +801,19 @@ addEventHandler("onResourceStart", resourceRoot, function()
     if initDatabase() then
         outputServerLog("[Login] Sistema de autenticación iniciado (MySQL)")
         
-        -- Para jugadores ya conectados, asegurar que no estén spawneados sin login
-        -- Usar un timer para dar tiempo a que todo esté completamente inicializado
+        -- Notificar a todos los clientes que el servidor está listo
         setTimer(function()
             for _, player in ipairs(getElementsByType("player")) do
+                -- Confirmar que el servidor está listo
+                triggerClientEvent(player, "onLoginServerReady", player)
+                
                 if not getElementData(player, "characterSelected") then
                     fadeCamera(player, false)
                     setCameraTarget(player, nil)
                     triggerClientEvent(player, "onPlayerMustLogin", player)
                 end
             end
-        end, 500, 1) -- Pequeño delay para asegurar que todo esté listo
+        end, 100, 1) -- Delay muy corto para notificar rápidamente
     else
         outputServerLog("[Login] ERROR: No se pudo inicializar la base de datos")
     end

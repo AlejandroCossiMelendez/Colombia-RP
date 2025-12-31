@@ -3,6 +3,7 @@ local screenWidth, screenHeight = guiGetScreenSize()
 local loginWindow = nil
 local characterWindow = nil
 local isLoginMode = true -- true = login, false = registro
+local serverReady = false -- Flag para saber si el servidor está listo
 
 -- Colores del tema
 local colors = {
@@ -158,23 +159,29 @@ function handleMainButtonClick()
     end
     
     if isLoginMode then
-        -- Login - Verificar que el recurso esté listo
+        -- Login - Verificar que el servidor esté listo
+        if not serverReady then
+            showMessage("El servidor aún no está listo. Por favor espera un momento...", true)
+            -- Reintentar después de un segundo
+            setTimer(function()
+                if serverReady then
+                    handleMainButtonClick() -- Reintentar
+                else
+                    showMessage("Error: El servidor no responde. Intenta reconectarte.", true)
+                end
+            end, 1000, 1)
+            return
+        end
+        
+        -- Verificar que el recurso esté corriendo
         local loginResource = getResourceFromName("login")
         if not loginResource or getResourceState(loginResource) ~= "running" then
             showMessage("El sistema de login no está disponible. Por favor espera un momento.", true)
             return
         end
         
-        -- Esperar un momento para asegurar que el servidor esté completamente listo
-        -- Esto es especialmente importante cuando el recurso se reinicia
-        setTimer(function()
-            local loginResource = getResourceFromName("login")
-            if loginResource and getResourceState(loginResource) == "running" then
-                triggerServerEvent("onPlayerLogin", localPlayer, username, password)
-            else
-                showMessage("El sistema de login no está disponible. Intenta de nuevo en un momento.", true)
-            end
-        end, 300, 1) -- Aumentado a 300ms para dar más tiempo al servidor
+        -- Activar el evento directamente ya que el servidor está listo
+        triggerServerEvent("onPlayerCustomLogin", localPlayer, username, password)
     else
         -- Registro
         local confirmPassword = guiGetText(confirmPassEdit)
@@ -259,6 +266,13 @@ function destroyLoginWindow()
         guiSetInputEnabled(false)
     end
 end
+
+-- Evento del servidor para confirmar que está listo
+addEvent("onLoginServerReady", true)
+addEventHandler("onLoginServerReady", root, function()
+    serverReady = true
+    -- No mostrar mensaje para no molestar, solo activar el flag
+end)
 
 -- Evento del servidor para forzar login
 addEvent("onPlayerMustLogin", true)
