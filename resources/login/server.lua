@@ -123,6 +123,7 @@ function initDatabase()
             lastLogin DATETIME,
             hunger INT NOT NULL DEFAULT 100,
             thirst INT NOT NULL DEFAULT 100,
+            health FLOAT DEFAULT 100.0,
             INDEX idx_username (username),
             INDEX idx_char_id (id),
             FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
@@ -132,6 +133,14 @@ function initDatabase()
     if query2 then
         dbPoll(query2, -1)
         outputServerLog("[Login] Tabla 'characters' verificada/creada")
+        
+        -- Agregar columna de salud si no existe (para tablas existentes)
+        local checkHealth = dbQuery(db, "SHOW COLUMNS FROM characters LIKE 'health'")
+        local healthResult = dbPoll(checkHealth, -1)
+        if not healthResult or #healthResult == 0 then
+            dbExec(db, "ALTER TABLE characters ADD COLUMN health FLOAT DEFAULT 100.0")
+            outputServerLog("[Login] Columna 'health' agregada a la tabla 'characters'")
+        end
     else
         local errorMsg = dbError(db)
         outputServerLog("[Login] ERROR al crear tabla characters: " .. tostring(errorMsg))
@@ -594,12 +603,25 @@ addEventHandler("onPlayerSelectCharacter", root, function(charId)
         time.year + 1900, time.month + 1, time.monthday, time.hour, time.minute, time.second)
     dbExec(db, "UPDATE characters SET lastLogin = ? WHERE id = ?", lastLogin, selectedChar.id)
     
+    -- Obtener salud guardada
+    local savedHealth = tonumber(selectedChar.health) or 100.0
+    if savedHealth < 1 then savedHealth = 1 end  -- Mínimo 1 de salud
+    if savedHealth > 100 then savedHealth = 100 end  -- Máximo 100 de salud
+    
     -- Spawnear al jugador en su última posición
     -- Primero desactivar cámara, luego spawnear
     fadeCamera(client, false, 0)
     spawnPlayer(client, posX, posY, posZ, rotation, tonumber(selectedChar.skin))
     setElementInterior(client, interior)
     setElementDimension(client, dimension)
+    
+    -- Restaurar salud guardada después de spawnear
+    setTimer(function()
+        if isElement(client) then
+            setElementHealth(client, savedHealth)
+            setElementData(client, "characterHealth", savedHealth)
+        end
+    end, 100, 1)
     
     -- Activar cámara después de un pequeño delay
     setTimer(function()
@@ -745,12 +767,13 @@ addEventHandler("onPlayerSavePosition", root, function()
     local playerMoney = getPlayerMoney(client)
     local playerHunger = getElementData(client, "characterHunger") or 100
     local playerThirst = getElementData(client, "characterThirst") or 100
+    local playerHealth = getElementHealth(client)
     
     dbExec(db, [[
         UPDATE characters 
-        SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
+        SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ?, health = ? 
         WHERE id = ?
-    ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
+    ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, playerHealth, charId)
 end)
 
 -- Guardar dinero cuando cambia
@@ -789,12 +812,13 @@ addEventHandler("onPlayerQuit", root, function()
             local playerMoney = getPlayerMoney(source)
             local playerHunger = getElementData(source, "characterHunger") or 100
             local playerThirst = getElementData(source, "characterThirst") or 100
+            local playerHealth = getElementHealth(source)
             
             dbExec(db, [[
                 UPDATE characters 
-                SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
+                SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ?, health = ? 
                 WHERE id = ?
-            ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
+            ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, playerHealth, charId)
         end
     end
 end)
@@ -812,12 +836,13 @@ setTimer(function()
                 local playerMoney = getPlayerMoney(player)
                 local playerHunger = getElementData(player, "characterHunger") or 100
                 local playerThirst = getElementData(player, "characterThirst") or 100
+                local playerHealth = getElementHealth(player)
                 
                 dbExec(db, [[
                     UPDATE characters 
-                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
+                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ?, health = ? 
                     WHERE id = ?
-                ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
+                ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, playerHealth, charId)
             end
         end
     end
@@ -1008,14 +1033,20 @@ addEventHandler("onPlayerSpawn", root, function(spawnpoint)
     -- (Este código se ejecuta después de verificar que tiene personaje)
     local charId = getElementData(source, "characterId")
     if charId then
-        -- Restaurar skin del personaje desde la base de datos
-        local query = dbQuery(db, "SELECT skin FROM characters WHERE id = ?", charId)
+        -- Restaurar skin y salud del personaje desde la base de datos
+        local query = dbQuery(db, "SELECT skin, health FROM characters WHERE id = ?", charId)
         local result = dbPoll(query, -1)
         if result and #result > 0 then
             local skin = tonumber(result[1].skin) or 0
+            local savedHealth = tonumber(result[1].health) or 100.0
+            if savedHealth < 1 then savedHealth = 1 end
+            if savedHealth > 100 then savedHealth = 100 end
+            
             setTimer(function()
                 if isElement(source) then
                     setElementModel(source, skin)
+                    setElementHealth(source, savedHealth)
+                    setElementData(source, "characterHealth", savedHealth)
                 end
             end, 100, 1)
         end
@@ -1214,12 +1245,13 @@ addEventHandler("onResourceStop", resourceRoot, function()
                 local playerMoney = getPlayerMoney(player)
                 local playerHunger = getElementData(player, "characterHunger") or 100
                 local playerThirst = getElementData(player, "characterThirst") or 100
+                local playerHealth = getElementHealth(player)
                 
                 dbExec(db, [[
                     UPDATE characters 
-                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
+                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ?, health = ? 
                     WHERE id = ?
-                ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
+                ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, playerHealth, charId)
             end
         end
         
