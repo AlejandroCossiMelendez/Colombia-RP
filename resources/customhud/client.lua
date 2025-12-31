@@ -43,7 +43,7 @@ local colors = {
 }
 
 -- Tamaños
-local healthImageSize = 64
+local healthImageSize = 48  -- Reducido para que se vea mejor
 local moneyImageSize = 32
 local cardPadding = 16
 local cardSpacing = 12
@@ -111,6 +111,39 @@ function drawProgressBar(x, y, width, height, progress, color, bgColor)
     end
 end
 
+-- Función para obtener hora de Bogotá, Colombia (UTC-5)
+function getBogotaTime()
+    local time = getRealTime()
+    local hour = time.hour - 5  -- UTC-5 para Bogotá
+    if hour < 0 then
+        hour = hour + 24
+    end
+    local minute = time.minute
+    local second = time.second
+    
+    -- Formatear con ceros a la izquierda
+    local hourStr = string.format("%02d", hour)
+    local minuteStr = string.format("%02d", minute)
+    local secondStr = string.format("%02d", second)
+    
+    return hourStr, minuteStr, secondStr, time.monthday, time.month + 1, time.year + 1900
+end
+
+-- Función para obtener nombre del día y mes
+function getDayName(day, month, year)
+    local days = {"Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"}
+    local months = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
+                    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"}
+    
+    -- Obtener día de la semana usando getRealTime
+    local time = getRealTime()
+    -- weekdayday en MTA: 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+    local wday = time.weekday
+    if wday < 0 or wday > 6 then wday = 0 end
+    
+    return days[wday + 1] or "Domingo", months[month] or "Enero"
+end
+
 -- Función principal para dibujar el HUD
 function drawCustomHUD()
     if not getElementData(localPlayer, "characterSelected") then
@@ -129,10 +162,41 @@ function drawCustomHUD()
     characterSurname = charSurname
     playerID = getElementData(localPlayer, "playerID") or 0
     
-    -- Posición del HUD (esquina superior izquierda)
-    local hudX = 20
-    local hudY = 20
+    -- Posición del HUD (esquina superior derecha para no interferir con el chat)
     local cardWidth = 320
+    local hudX = screenWidth - cardWidth - 20
+    local hudY = 20
+    
+    -- ========== TARJETA DE RELOJ (BOGOTÁ, COLOMBIA) ==========
+    local clockCardHeight = 80
+    drawCard(hudX, hudY, cardWidth, clockCardHeight, colors.bgCard)
+    
+    -- Línea de acento superior
+    dxDrawRectangle(hudX, hudY, cardWidth, 3,
+        tocolor(colors.accent[1], colors.accent[2], colors.accent[3], colors.accent[4]))
+    
+    -- Obtener hora de Bogotá
+    local hour, minute, second, day, month, year = getBogotaTime()
+    local dayName, monthName = getDayName(day, month, year)
+    
+    -- Hora grande
+    local timeText = hour .. ":" .. minute .. ":" .. second
+    dxDrawModernText(timeText, hudX + cardPadding, hudY + 12, hudX + cardWidth - cardPadding, hudY + 40,
+        tocolor(colors.textPrimary[1], colors.textPrimary[2], colors.textPrimary[3], colors.textPrimary[4]),
+        1.1, "default-bold", "left", "top")
+    
+    -- Fecha y ubicación
+    local dateText = dayName .. ", " .. day .. " de " .. monthName .. " " .. year
+    dxDrawModernText(dateText, hudX + cardPadding, hudY + 38, hudX + cardWidth - cardPadding, hudY + 55,
+        tocolor(colors.textSecondary[1], colors.textSecondary[2], colors.textSecondary[3], colors.textSecondary[4]),
+        0.6, "default", "left", "top")
+    
+    -- Ubicación
+    dxDrawModernText("🕐 Bogotá, Colombia (UTC-5)", hudX + cardPadding, hudY + 55, hudX + cardWidth - cardPadding, hudY + 75,
+        tocolor(colors.textMuted[1], colors.textMuted[2], colors.textMuted[3], colors.textMuted[4]),
+        0.55, "default", "left", "top")
+    
+    local currentY = hudY + clockCardHeight + cardSpacing
     
     -- ========== TARJETA DE INFORMACIÓN DEL JUGADOR ==========
     local playerCardHeight = 70
@@ -195,7 +259,7 @@ function drawCustomHUD()
     currentY = currentY + moneyCardHeight + cardSpacing
     
     -- ========== TARJETA DE SALUD ==========
-    local healthCardHeight = 90
+    local healthCardHeight = 75  -- Reducido porque la imagen es más pequeña
     drawCard(hudX, currentY, cardWidth, healthCardHeight, colors.bgCard)
     
     -- Línea de acento izquierda
@@ -245,20 +309,20 @@ function drawCustomHUD()
     end
     
     -- Información de salud a la derecha
-    local healthInfoX = healthImageX + healthImageSize + 15
-    dxDrawModernText("SALUD", healthInfoX, currentY + 15, hudX + cardWidth - cardPadding, currentY + 30,
+    local healthInfoX = healthImageX + healthImageSize + 12
+    dxDrawModernText("SALUD", healthInfoX, currentY + 12, hudX + cardWidth - cardPadding, currentY + 26,
         tocolor(colors.textMuted[1], colors.textMuted[2], colors.textMuted[3], colors.textMuted[4]),
         0.6, "default", "left", "top")
     
-    dxDrawModernText(math.floor(healthPercent) .. "%", healthInfoX, currentY + 35, hudX + cardWidth - cardPadding, currentY + 55,
+    dxDrawModernText(math.floor(healthPercent) .. "%", healthInfoX, currentY + 28, hudX + cardWidth - cardPadding, currentY + 48,
         tocolor(healthColor[1], healthColor[2], healthColor[3], healthColor[4]),
-        1.0, "default-bold", "left", "top")
+        0.95, "default-bold", "left", "top")
     
     -- Barra de salud debajo
-    local barY = currentY + healthCardHeight - 20
-    local barWidth = cardWidth - (cardPadding * 2) - healthImageSize - 15
+    local barY = currentY + healthCardHeight - 18
+    local barWidth = cardWidth - (cardPadding * 2) - healthImageSize - 12
     local barX = healthInfoX
-    drawProgressBar(barX, barY, barWidth, 6, healthPercent, healthColor, {40, 40, 50, 255})
+    drawProgressBar(barX, barY, barWidth, 5, healthPercent, healthColor, {40, 40, 50, 255})
     
     currentY = currentY + healthCardHeight + cardSpacing
     
