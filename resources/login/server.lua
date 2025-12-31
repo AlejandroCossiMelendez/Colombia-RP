@@ -1514,13 +1514,13 @@ addEventHandler("onRequestSpawnVehicle", root, function(vehicleModel)
     local spawnY = y - (math.cos(radians) * distance)
     local spawnZ = z
     
-    -- Obtener altura del suelo en la posición de spawn usando processLineOfSight
-    local hit, hitX, hitY, hitZ, hitElement = processLineOfSight(spawnX, spawnY, spawnZ + 10, spawnX, spawnY, spawnZ - 50)
-    if hit and hitZ then
-        spawnZ = hitZ + 0.5
-    else
-        -- Si no se detecta suelo, usar la posición Z del jugador con un pequeño offset
-        spawnZ = z + 0.5
+    -- Usar la posición Z del jugador con un pequeño offset
+    -- Si el jugador está en el suelo, el vehículo aparecerá ligeramente más alto
+    spawnZ = z + 0.5
+    
+    -- Si el jugador está bajo el agua, ajustar la posición
+    if z < 0.5 then
+        spawnZ = 1.0  -- Posición segura sobre el agua
     end
     
     -- Crear el vehículo
