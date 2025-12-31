@@ -1135,14 +1135,19 @@ addEventHandler("onPlayerWasted", root, function(ammo, attacker, weapon, bodypar
         -- Respawnear después de un pequeño delay
         setTimer(function()
             if isElement(source) and getElementData(source, "characterSelected") then
-                -- Respawnear en la posición guardada
+                -- Desactivar cámara de muerte primero
+                fadeCamera(source, false, 0)
+                setCameraTarget(source, nil)
+                
+                -- Usar spawnPlayer para revivir al jugador correctamente
                 spawnPlayer(source, posX, posY, posZ, rotation, skin)
                 setElementInterior(source, interior)
                 setElementDimension(source, dimension)
                 
-                -- Restaurar salud después de spawnear
+                -- Restaurar datos después de spawnear
                 setTimer(function()
-                    if isElement(source) then
+                    if isElement(source) and getElementData(source, "characterSelected") then
+                        -- Restaurar salud
                         setElementHealth(source, savedHealth)
                         setElementData(source, "characterHealth", savedHealth)
                         
@@ -1158,11 +1163,15 @@ addEventHandler("onPlayerWasted", root, function(ammo, attacker, weapon, bodypar
                             setPlayerName(source, characterFullName)
                         end
                         
-                        -- Activar cámara
-                        setCameraTarget(source, source)
-                        fadeCamera(source, true, 1.0)
+                        -- Activar cámara correctamente
+                        setTimer(function()
+                            if isElement(source) then
+                                setCameraTarget(source, source)
+                                fadeCamera(source, true, 1.5)
+                            end
+                        end, 100, 1)
                     end
-                end, 100, 1)
+                end, 500, 1)
             end
         end, 2000, 1) -- Esperar 2 segundos antes de respawnear
     end
