@@ -1032,12 +1032,42 @@ addEventHandler("onPlayerSpawn", root, function(spawnpoint)
     end
 end, true, "high") -- Alta prioridad para ejecutar antes que otros handlers
 
+-- ==================== SISTEMA DE TIEMPO DEL JUEGO (BOGOTÁ, COLOMBIA) ====================
+-- Función para obtener hora de Bogotá (UTC-5)
+function getBogotaTime()
+    local time = getRealTime()
+    local hour = time.hour - 5  -- UTC-5 para Bogotá
+    if hour < 0 then
+        hour = hour + 24
+    end
+    return hour, time.minute
+end
+
+-- Función para sincronizar el tiempo del juego con la hora de Bogotá
+function syncGameTime()
+    local hour, minute = getBogotaTime()
+    setTime(hour, minute)
+    setMinuteDuration(60000)  -- 1 minuto real = 1 minuto en el juego (tiempo real)
+end
+
+-- Sincronizar tiempo cada minuto
+setTimer(function()
+    syncGameTime()
+end, 60000, 0)  -- Cada 60 segundos (1 minuto)
+
+-- Sincronizar tiempo al iniciar el recurso
+syncGameTime()
+
 -- Cargar base de datos al iniciar el recurso
 addEventHandler("onResourceStart", resourceRoot, function()
     -- IMPORTANTE: Los eventos ya están registrados al inicio del archivo (líneas 15-20)
     -- Por lo tanto están disponibles inmediatamente cuando el recurso inicia
     
     outputServerLog("[Login] Recurso iniciado - eventos disponibles inmediatamente")
+    
+    -- Sincronizar tiempo del juego con Bogotá
+    syncGameTime()
+    outputServerLog("[Login] Tiempo del juego sincronizado con hora de Bogotá, Colombia (UTC-5)")
     
     if initDatabase() then
         outputServerLog("[Login] Sistema de autenticación iniciado (MySQL)")

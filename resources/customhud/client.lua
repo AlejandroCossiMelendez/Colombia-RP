@@ -57,6 +57,8 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
     setPlayerHudComponentVisible("weapon", false)
     setPlayerHudComponentVisible("area_name", false)
     setPlayerHudComponentVisible("vehicle_name", false)
+    setPlayerHudComponentVisible("clock", false)  -- Ocultar reloj nativo del juego
+    setPlayerHudComponentVisible("radar", false)  -- Opcional: ocultar radar también
     
     -- Cargar imágenes
     healthImage = dxCreateTexture("images/health_icon.png", "argb", true, "clamp")
@@ -81,33 +83,36 @@ end
 
 -- Función para dibujar texto con sombra suave
 function dxDrawModernText(text, x, y, w, h, color, scale, font, alignX, alignY, clip, wordBreak, postGUI)
+    postGUI = postGUI or true  -- Por defecto dibujar encima de todo
     local shadowColor = tocolor(0, 0, 0, 150)
     dxDrawText(text, x + 1, y + 1, w + 1, h + 1, shadowColor, scale, font, alignX, alignY, clip, wordBreak, postGUI)
     dxDrawText(text, x, y, w, h, color, scale, font, alignX, alignY, clip, wordBreak, postGUI)
 end
 
 -- Función para dibujar tarjeta con sombra
-function drawCard(x, y, width, height, color)
+function drawCard(x, y, width, height, color, postGUI)
+    postGUI = postGUI or true  -- Por defecto dibujar encima de todo
     -- Sombra
-    dxDrawRectangle(x + 2, y + 2, width, height, tocolor(0, 0, 0, 100))
+    dxDrawRectangle(x + 2, y + 2, width, height, tocolor(0, 0, 0, 100), postGUI)
     -- Tarjeta
-    dxDrawRectangle(x, y, width, height, tocolor(color[1], color[2], color[3], color[4]))
+    dxDrawRectangle(x, y, width, height, tocolor(color[1], color[2], color[3], color[4]), postGUI)
     -- Borde superior sutil
-    dxDrawRectangle(x, y, width, 1, tocolor(255, 255, 255, 30))
+    dxDrawRectangle(x, y, width, 1, tocolor(255, 255, 255, 30), postGUI)
 end
 
 -- Función para dibujar barra de progreso moderna
-function drawProgressBar(x, y, width, height, progress, color, bgColor)
+function drawProgressBar(x, y, width, height, progress, color, bgColor, postGUI)
+    postGUI = postGUI or true
     progress = math.max(0, math.min(100, progress))
     local barWidth = (width * progress) / 100
     
     -- Fondo
-    dxDrawRectangle(x, y, width, height, tocolor(bgColor[1], bgColor[2], bgColor[3], bgColor[4] or 200))
+    dxDrawRectangle(x, y, width, height, tocolor(bgColor[1], bgColor[2], bgColor[3], bgColor[4] or 200), postGUI)
     -- Barra
     if barWidth > 0 then
-        dxDrawRectangle(x, y, barWidth, height, tocolor(color[1], color[2], color[3], color[4] or 255))
+        dxDrawRectangle(x, y, barWidth, height, tocolor(color[1], color[2], color[3], color[4] or 255), postGUI)
         -- Brillo superior
-        dxDrawRectangle(x, y, barWidth, 1, tocolor(255, 255, 255, 80))
+        dxDrawRectangle(x, y, barWidth, 1, tocolor(255, 255, 255, 80), postGUI)
     end
 end
 
@@ -168,12 +173,13 @@ function drawCustomHUD()
     local hudY = 20
     
     -- ========== TARJETA DE RELOJ (BOGOTÁ, COLOMBIA) ==========
+    -- Dibujar con postGUI = true para que se vea delante de todo
     local clockCardHeight = 80
-    drawCard(hudX, hudY, cardWidth, clockCardHeight, colors.bgCard)
+    drawCard(hudX, hudY, cardWidth, clockCardHeight, colors.bgCard, true)
     
     -- Línea de acento superior
     dxDrawRectangle(hudX, hudY, cardWidth, 3,
-        tocolor(colors.accent[1], colors.accent[2], colors.accent[3], colors.accent[4]))
+        tocolor(colors.accent[1], colors.accent[2], colors.accent[3], colors.accent[4]), true)
     
     -- Obtener hora de Bogotá
     local hour, minute, second, day, month, year = getBogotaTime()
@@ -183,32 +189,32 @@ function drawCustomHUD()
     local timeText = hour .. ":" .. minute .. ":" .. second
     dxDrawModernText(timeText, hudX + cardPadding, hudY + 12, hudX + cardWidth - cardPadding, hudY + 40,
         tocolor(colors.textPrimary[1], colors.textPrimary[2], colors.textPrimary[3], colors.textPrimary[4]),
-        1.1, "default-bold", "left", "top")
+        1.1, "default-bold", "left", "top", false, false, true)
     
     -- Fecha y ubicación
     local dateText = dayName .. ", " .. day .. " de " .. monthName .. " " .. year
     dxDrawModernText(dateText, hudX + cardPadding, hudY + 38, hudX + cardWidth - cardPadding, hudY + 55,
         tocolor(colors.textSecondary[1], colors.textSecondary[2], colors.textSecondary[3], colors.textSecondary[4]),
-        0.6, "default", "left", "top")
+        0.6, "default", "left", "top", false, false, true)
     
     -- Ubicación
     dxDrawModernText("🕐 Bogotá, Colombia (UTC-5)", hudX + cardPadding, hudY + 55, hudX + cardWidth - cardPadding, hudY + 75,
         tocolor(colors.textMuted[1], colors.textMuted[2], colors.textMuted[3], colors.textMuted[4]),
-        0.55, "default", "left", "top")
+        0.55, "default", "left", "top", false, false, true)
     
     local currentY = hudY + clockCardHeight + cardSpacing
     
     -- ========== TARJETA DE INFORMACIÓN DEL JUGADOR ==========
     local playerCardHeight = 70
-    drawCard(hudX, hudY, cardWidth, playerCardHeight, colors.bgCard)
+    drawCard(hudX, currentY, cardWidth, playerCardHeight, colors.bgCard, true)
     
     -- Línea de acento superior
-    dxDrawRectangle(hudX, hudY, cardWidth, 3, tocolor(colors.accent[1], colors.accent[2], colors.accent[3], colors.accent[4]))
+    dxDrawRectangle(hudX, currentY, cardWidth, 3, tocolor(colors.accent[1], colors.accent[2], colors.accent[3], colors.accent[4]), true)
     
     -- Título del servidor
-    dxDrawModernText("COLOMBIA RP", hudX + cardPadding, hudY + 12, hudX + cardWidth - cardPadding, hudY + 30,
+    dxDrawModernText("COLOMBIA RP", hudX + cardPadding, currentY + 12, hudX + cardWidth - cardPadding, currentY + 30,
         tocolor(colors.textPrimary[1], colors.textPrimary[2], colors.textPrimary[3], colors.textPrimary[4]),
-        0.85, "default-bold", "left", "top")
+        0.85, "default-bold", "left", "top", false, false, true)
     
     -- Información del jugador
     local playerInfo = ""
@@ -219,23 +225,23 @@ function drawCustomHUD()
     end
     playerInfo = playerInfo .. " • ID: " .. playerID
     
-    dxDrawModernText(playerInfo, hudX + cardPadding, hudY + 35, hudX + cardWidth - cardPadding, hudY + 55,
+    dxDrawModernText(playerInfo, hudX + cardPadding, currentY + 35, hudX + cardWidth - cardPadding, currentY + 55,
         tocolor(colors.textSecondary[1], colors.textSecondary[2], colors.textSecondary[3], colors.textSecondary[4]),
-        0.65, "default", "left", "top")
+        0.65, "default", "left", "top", false, false, true)
     
     -- Divisor
-    dxDrawRectangle(hudX + cardPadding, hudY + playerCardHeight - 1, cardWidth - (cardPadding * 2), 1,
-        tocolor(colors.divider[1], colors.divider[2], colors.divider[3], colors.divider[4]))
+    dxDrawRectangle(hudX + cardPadding, currentY + playerCardHeight - 1, cardWidth - (cardPadding * 2), 1,
+        tocolor(colors.divider[1], colors.divider[2], colors.divider[3], colors.divider[4]), true)
     
-    local currentY = hudY + playerCardHeight + cardSpacing
+    currentY = currentY + playerCardHeight + cardSpacing
     
     -- ========== TARJETA DE DINERO ==========
     local moneyCardHeight = 60
-    drawCard(hudX, currentY, cardWidth, moneyCardHeight, colors.bgCard)
+    drawCard(hudX, currentY, cardWidth, moneyCardHeight, colors.bgCard, true)
     
     -- Línea de acento izquierda
     dxDrawRectangle(hudX, currentY, 3, moneyCardHeight,
-        tocolor(colors.money[1], colors.money[2], colors.money[3], colors.money[4]))
+        tocolor(colors.money[1], colors.money[2], colors.money[3], colors.money[4]), true)
     
     -- Imagen del dólar
     local moneyImageX = hudX + cardPadding
@@ -243,30 +249,30 @@ function drawCustomHUD()
     
     if moneyImageLoaded and moneyImage then
         dxDrawImage(moneyImageX, moneyImageY, moneyImageSize, moneyImageSize, moneyImage, 0, 0, 0,
-            tocolor(255, 255, 255, 255))
+            tocolor(255, 255, 255, 255), true)
     end
     
     -- Texto del dinero
     local moneyTextX = moneyImageX + moneyImageSize + 12
     dxDrawModernText("DINERO", moneyTextX, currentY + 10, hudX + cardWidth - cardPadding, currentY + 25,
         tocolor(colors.textMuted[1], colors.textMuted[2], colors.textMuted[3], colors.textMuted[4]),
-        0.6, "default", "left", "top")
+        0.6, "default", "left", "top", false, false, true)
     
     dxDrawModernText("$" .. formatNumber(money), moneyTextX, currentY + 28, hudX + cardWidth - cardPadding, currentY + 50,
         tocolor(colors.money[1], colors.money[2], colors.money[3], colors.money[4]),
-        0.9, "default-bold", "left", "top")
+        0.9, "default-bold", "left", "top", false, false, true)
     
     currentY = currentY + moneyCardHeight + cardSpacing
     
     -- ========== TARJETA DE SALUD ==========
     local healthCardHeight = 75  -- Reducido porque la imagen es más pequeña
-    drawCard(hudX, currentY, cardWidth, healthCardHeight, colors.bgCard)
+    drawCard(hudX, currentY, cardWidth, healthCardHeight, colors.bgCard, true)
     
     -- Línea de acento izquierda
     local healthPercent = math.max(0, math.min(100, health))
     local healthColor = healthPercent > 30 and colors.healthGood or colors.health
     dxDrawRectangle(hudX, currentY, 3, healthCardHeight,
-        tocolor(healthColor[1], healthColor[2], healthColor[3], healthColor[4]))
+        tocolor(healthColor[1], healthColor[2], healthColor[3], healthColor[4]), true)
     
     -- Imagen de salud
     local healthImageX = hudX + cardPadding
@@ -275,7 +281,7 @@ function drawCustomHUD()
     if healthImageLoaded and healthImage then
         -- Imagen
         dxDrawImage(healthImageX, healthImageY, healthImageSize, healthImageSize, healthImage, 0, 0, 0,
-            tocolor(255, 255, 255, 255))
+            tocolor(255, 255, 255, 255), true)
         
         -- Borde circular de salud
         local borderThickness = 5
@@ -290,7 +296,7 @@ function drawCustomHUD()
             local y1 = centerY + (radius * math.sin(angle))
             local x2 = centerX + ((radius + borderThickness) * math.cos(angle))
             local y2 = centerY + ((radius + borderThickness) * math.sin(angle))
-            dxDrawLine(x1, y1, x2, y2, tocolor(30, 30, 40, 200), borderThickness)
+            dxDrawLine(x1, y1, x2, y2, tocolor(30, 30, 40, 200), borderThickness, true)
         end
         
         -- Borde de salud (color dinámico)
@@ -304,7 +310,7 @@ function drawCustomHUD()
             local y2 = centerY + ((radius + borderThickness) * math.sin(angle))
             dxDrawLine(x1, y1, x2, y2,
                 tocolor(healthColor[1], healthColor[2], healthColor[3], healthColor[4]),
-                borderThickness)
+                borderThickness, true)
         end
     end
     
@@ -312,17 +318,17 @@ function drawCustomHUD()
     local healthInfoX = healthImageX + healthImageSize + 12
     dxDrawModernText("SALUD", healthInfoX, currentY + 12, hudX + cardWidth - cardPadding, currentY + 26,
         tocolor(colors.textMuted[1], colors.textMuted[2], colors.textMuted[3], colors.textMuted[4]),
-        0.6, "default", "left", "top")
+        0.6, "default", "left", "top", false, false, true)
     
     dxDrawModernText(math.floor(healthPercent) .. "%", healthInfoX, currentY + 28, hudX + cardWidth - cardPadding, currentY + 48,
         tocolor(healthColor[1], healthColor[2], healthColor[3], healthColor[4]),
-        0.95, "default-bold", "left", "top")
+        0.95, "default-bold", "left", "top", false, false, true)
     
     -- Barra de salud debajo
     local barY = currentY + healthCardHeight - 18
     local barWidth = cardWidth - (cardPadding * 2) - healthImageSize - 12
     local barX = healthInfoX
-    drawProgressBar(barX, barY, barWidth, 5, healthPercent, healthColor, {40, 40, 50, 255})
+    drawProgressBar(barX, barY, barWidth, 5, healthPercent, healthColor, {40, 40, 50, 255}, true)
     
     currentY = currentY + healthCardHeight + cardSpacing
     
@@ -331,25 +337,25 @@ function drawCustomHUD()
         local armorCardHeight = 60
         local armorPercent = math.max(0, math.min(100, armor))
         
-        drawCard(hudX, currentY, cardWidth, armorCardHeight, colors.bgCard)
+        drawCard(hudX, currentY, cardWidth, armorCardHeight, colors.bgCard, true)
         
         -- Línea de acento izquierda
         dxDrawRectangle(hudX, currentY, 3, armorCardHeight,
-            tocolor(colors.armor[1], colors.armor[2], colors.armor[3], colors.armor[4]))
+            tocolor(colors.armor[1], colors.armor[2], colors.armor[3], colors.armor[4]), true)
         
         -- Texto de armadura
         dxDrawModernText("ARMADURA", hudX + cardPadding, currentY + 10, hudX + cardWidth - cardPadding, currentY + 25,
             tocolor(colors.textMuted[1], colors.textMuted[2], colors.textMuted[3], colors.textMuted[4]),
-            0.6, "default", "left", "top")
+            0.6, "default", "left", "top", false, false, true)
         
         dxDrawModernText(math.floor(armorPercent) .. "%", hudX + cardPadding, currentY + 28, hudX + cardWidth - cardPadding, currentY + 50,
             tocolor(colors.armor[1], colors.armor[2], colors.armor[3], colors.armor[4]),
-            0.9, "default-bold", "left", "top")
+            0.9, "default-bold", "left", "top", false, false, true)
         
         -- Barra de armadura
         local armorBarY = currentY + armorCardHeight - 15
         local armorBarWidth = cardWidth - (cardPadding * 2)
-        drawProgressBar(hudX + cardPadding, armorBarY, armorBarWidth, 6, armorPercent, colors.armor, {40, 40, 50, 255})
+        drawProgressBar(hudX + cardPadding, armorBarY, armorBarWidth, 6, armorPercent, colors.armor, {40, 40, 50, 255}, true)
     end
 end
 
