@@ -4,6 +4,14 @@ local charactersFile = "characters.xml"
 local usersData = {}
 local charactersData = {} -- Estructura: charactersData[usernameLower] = {char1, char2, ...}
 
+-- ==================== REGISTRAR EVENTOS PRIMERO ====================
+-- Es importante registrar todos los eventos al inicio para que estén disponibles
+addEvent("onPlayerRegister", true)
+addEvent("onPlayerLogin", true)
+addEvent("onPlayerCreateCharacter", true)
+addEvent("onPlayerSelectCharacter", true)
+addEvent("onRequestCharacters", true)
+
 -- Cargar usuarios desde el archivo XML
 function loadUsers()
     local xmlFile = xmlLoadFile(usersFile)
@@ -196,8 +204,8 @@ function isValidEmail(email)
     return true
 end
 
+-- ==================== MANEJADORES DE EVENTOS ====================
 -- Evento de registro
-addEvent("onPlayerRegister", true)
 addEventHandler("onPlayerRegister", root, function(username, password, email)
     if not client then return end
     
@@ -253,7 +261,6 @@ addEventHandler("onPlayerRegister", root, function(username, password, email)
 end)
 
 -- Evento de login
-addEvent("onPlayerLogin", true)
 addEventHandler("onPlayerLogin", root, function(username, password)
     if not client then return end
     
@@ -303,7 +310,6 @@ function getUserCharacters(username)
 end
 
 -- Crear nuevo personaje
-addEvent("onPlayerCreateCharacter", true)
 addEventHandler("onPlayerCreateCharacter", root, function(name, surname, age, gender, skin)
     if not client then return end
     
@@ -378,7 +384,6 @@ addEventHandler("onPlayerCreateCharacter", root, function(name, surname, age, ge
 end)
 
 -- Seleccionar personaje
-addEvent("onPlayerSelectCharacter", true)
 addEventHandler("onPlayerSelectCharacter", root, function(charId)
     if not client then return end
     
@@ -429,7 +434,6 @@ addEventHandler("onPlayerSelectCharacter", root, function(charId)
 end)
 
 -- Evento para solicitar personajes
-addEvent("onRequestCharacters", true)
 addEventHandler("onRequestCharacters", root, function()
     if not client then return end
     

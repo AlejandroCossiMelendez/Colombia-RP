@@ -158,7 +158,11 @@ function handleMainButtonClick()
     end
     
     if isLoginMode then
-        -- Login
+        -- Login - Verificar que el recurso esté listo
+        if not getResourceFromName("login") or getResourceState(getResourceFromName("login")) ~= "running" then
+            showMessage("El sistema de login no está disponible. Por favor espera un momento.", true)
+            return
+        end
         triggerServerEvent("onPlayerLogin", localPlayer, username, password)
     else
         -- Registro
@@ -175,6 +179,11 @@ function handleMainButtonClick()
             return
         end
         
+        -- Verificar que el recurso esté listo
+        if not getResourceFromName("login") or getResourceState(getResourceFromName("login")) ~= "running" then
+            showMessage("El sistema de registro no está disponible. Por favor espera un momento.", true)
+            return
+        end
         triggerServerEvent("onPlayerRegister", localPlayer, username, password, email)
     end
 end
@@ -238,11 +247,25 @@ function destroyLoginWindow()
     end
 end
 
--- Mostrar ventana cuando el jugador se conecta
+-- Mostrar ventana cuando el jugador se conecta o cuando el recurso inicia
 addEventHandler("onClientResourceStart", resourceRoot, function()
+    -- Esperar un poco para asegurar que el servidor esté listo
     setTimer(function()
-        createLoginWindow()
-    end, 1000, 1)
+        if not getElementData(localPlayer, "loggedIn") then
+            createLoginWindow()
+        end
+    end, 1500, 1)
+end)
+
+-- También mostrar cuando el jugador se une al juego
+addEventHandler("onClientPlayerJoin", root, function()
+    if source == localPlayer then
+        setTimer(function()
+            if not getElementData(localPlayer, "loggedIn") then
+                createLoginWindow()
+            end
+        end, 2000, 1)
+    end
 end)
 
 -- ==================== PANEL DE SELECCIÓN DE PERSONAJES ====================
