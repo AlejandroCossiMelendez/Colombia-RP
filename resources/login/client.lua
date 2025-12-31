@@ -717,7 +717,7 @@ function startFlightPrevention()
         killTimer(flightPreventionTimer)
     end
     
-    -- Monitorear y prevenir vuelo tipo superman
+    -- Monitorear y prevenir vuelo tipo superman (solo si está extremadamente alto)
     flightPreventionTimer = setTimer(function()
         if playerRole ~= "admin" then
             -- Solo prevenir si el jugador está en el juego y no está en un vehículo
@@ -727,22 +727,19 @@ function startFlightPrevention()
                 local distanceToGround = z - groundZ
                 local velocityX, velocityY, velocityZ = getElementVelocity(localPlayer)
                 
-                -- Solo prevenir vuelo si está MUY alto (más de 3 unidades) Y tiene velocidad vertical alta
-                -- Esto permite saltos normales que no superan 2-3 unidades
-                if distanceToGround > 3.0 then
-                    -- Si está subiendo con velocidad muy alta (vuelo, no salto normal)
-                    -- Los saltos normales tienen velocidad Z inicial de ~0.3-0.5 y luego caen
-                    -- El vuelo tipo superman tiene velocidad Z constante y alta
+                -- Solo prevenir si está MUY alto (más de 10 unidades) para no interferir con saltos normales
+                -- Los saltos normales no superan 2-3 unidades de altura
+                if distanceToGround > 10.0 then
+                    -- Si está subiendo a gran altura con velocidad alta, forzar caída suave
                     if velocityZ > 0.3 then
-                        -- Velocidad muy alta hacia arriba = vuelo, forzar caída
-                        setElementVelocity(localPlayer, velocityX, velocityY, -0.1)
-                    elseif velocityZ > -0.05 and velocityZ < 0.05 and distanceToGround > 5.0 then
-                        -- Flotando a gran altura = vuelo, forzar caída
                         setElementVelocity(localPlayer, velocityX, velocityY, -0.2)
+                    elseif velocityZ > -0.1 and velocityZ < 0.1 and distanceToGround > 15.0 then
+                        -- Flotando a gran altura, forzar caída suave
+                        setElementVelocity(localPlayer, velocityX, velocityY, -0.3)
                     end
                     
                     -- Si está extremadamente alto, forzar caída más agresiva
-                    if distanceToGround > 10.0 then
+                    if distanceToGround > 20.0 then
                         setElementVelocity(localPlayer, velocityX, velocityY, -0.5)
                     end
                 end
@@ -751,7 +748,7 @@ function startFlightPrevention()
                 lastGroundZ = groundZ
             end
         end
-    end, 50, 0) -- Verificar cada 50ms para respuesta rápida
+    end, 100, 0) -- Verificar cada 100ms (menos frecuente para no interferir con saltos)
 end
 
 function stopFlightPrevention()
@@ -761,38 +758,16 @@ function stopFlightPrevention()
     end
 end
 
--- Prevenir vuelo cuando se presiona Shift (doble salto activa vuelo en gamemode play)
+-- Prevenir jetpack si lo tiene (ya no necesitamos prevenir Shift porque el gamemode play está deshabilitado)
 addEventHandler("onClientKey", root, function(button, press)
     if playerRole ~= "admin" then
-        -- Prevenir doble Shift que activa el vuelo tipo superman
-        -- Solo prevenir si está MUY alto (más de 2 unidades), para permitir saltos normales
-        if (button == "lshift" or button == "rshift") and press then
-            local x, y, z = getElementPosition(localPlayer)
-            local groundZ = getGroundPosition(x, y, z)
-            local distanceToGround = z - groundZ
-            local velocityX, velocityY, velocityZ = getElementVelocity(localPlayer)
-            
-            -- Solo prevenir si está alto Y tiene velocidad vertical alta (vuelo, no salto normal)
-            if distanceToGround > 2.0 and velocityZ > 0.2 then
-                -- Está volando, cancelar el evento para prevenir más vuelo
-                cancelEvent()
-                
-                -- Forzar caída inmediata
-                if velocityZ > 0 then
-                    setElementVelocity(localPlayer, velocityX, velocityY, -0.2)
-                end
-            end
-        end
-        
         -- Prevenir jetpack si lo tiene
-        if button == "lshift" or button == "rshift" then
-            if press then
-                setTimer(function()
-                    if doesPedHaveJetPack(localPlayer) then
-                        triggerServerEvent("onClientCheckJetpack", localPlayer)
-                    end
-                end, 50, 1)
-            end
+        if (button == "lshift" or button == "rshift") and press then
+            setTimer(function()
+                if doesPedHaveJetPack(localPlayer) then
+                    triggerServerEvent("onClientCheckJetpack", localPlayer)
+                end
+            end, 50, 1)
         end
     end
 end)
