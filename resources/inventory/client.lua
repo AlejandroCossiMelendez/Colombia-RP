@@ -26,6 +26,18 @@ local SLOT_SPACING = 5  -- Espacio entre slots
 -- Datos del inventario
 local inventoryItems = {}  -- Tabla de items: {slot = {id, name, quantity, icon}}
 
+-- Variable para detectar si se está presionando S
+local isSPressed = false
+
+-- Detectar tecla S
+bindKey("s", "down", function()
+    isSPressed = true
+end)
+
+bindKey("s", "up", function()
+    isSPressed = false
+end)
+
 -- Cargar imágenes de items
 local waterFullImage = nil
 local waterEmptyImage = nil
@@ -132,13 +144,20 @@ function openInventory(items)
             setElementData(slot, "slotIndex", slotIndex)
             slots[slotIndex] = slot
             
-            -- Agregar evento de clic (doble clic para consumir)
+            -- Agregar evento de clic (doble clic para consumir, S+clic para botar)
             local lastClickTime = {}
             addEventHandler("onClientGUIClick", slot, function(button, state)
                 if button == "left" and state == "up" then
                     local slotIdx = getElementData(source, "slotIndex")
                     if inventoryItems[slotIdx] then
                         local item = inventoryItems[slotIdx]
+                        
+                        -- Si se presiona S + clic, botar el item
+                        if isSPressed then
+                            triggerServerEvent("onInventoryItemDrop", localPlayer, slotIdx)
+                            return
+                        end
+                        
                         local currentTime = getTickCount()
                         
                         -- Verificar si es un doble clic (dentro de 500ms)
@@ -152,15 +171,22 @@ function openInventory(items)
                             lastClickTime[slotIdx] = nil
                         else
                             -- Clic simple - mostrar información
-                            outputChatBox("Item: " .. item.name .. " x" .. item.quantity .. " (Doble clic para consumir)", 0, 255, 0)
+                            outputChatBox("Item: " .. item.name .. " x" .. item.quantity .. " (Doble clic: consumir | S+Clic: botar)", 0, 255, 0)
                             lastClickTime[slotIdx] = currentTime
                         end
                     end
                 elseif button == "right" and state == "up" then
-                    -- Clic derecho - consumir directamente si es consumible
                     local slotIdx = getElementData(source, "slotIndex")
                     if inventoryItems[slotIdx] then
                         local item = inventoryItems[slotIdx]
+                        
+                        -- Si se presiona S + clic derecho, botar el item
+                        if isSPressed then
+                            triggerServerEvent("onInventoryItemDrop", localPlayer, slotIdx)
+                            return
+                        end
+                        
+                        -- Clic derecho - consumir directamente si es consumible
                         if consumableItems[item.name] then
                             triggerServerEvent("onInventoryItemUse", localPlayer, slotIdx)
                         else
@@ -319,10 +345,91 @@ addEventHandler("onInventoryUpdated", root, function(items)
     -- La visualización se actualiza automáticamente en el render
 end)
 
--- Renderizar inventario cada frame
+-- ==================== SISTEMA DE RECOGER ITEMS DEL SUELO ====================
+
+-- Renderizar marcadores sobre items botados
 addEventHandler("onClientRender", root, function()
+    -- Dibujar inventario si está abierto
     if inventoryOpen then
         drawInventory()
+    end
+    
+    -- Buscar objetos botados cerca del jugador
+    local playerX, playerY, playerZ = getElementPosition(localPlayer)
+    local objects = getElementsByType("object")
+    
+    for _, obj in ipairs(objects) do
+        if getElementData(obj, "droppedItem") then
+            local objX, objY, objZ = getElementPosition(obj)
+            local dx, dy, dz = objX - playerX, objY - playerY, objZ - playerZ
+            local distance = math.sqrt(dx*dx + dy*dy + dz*dz)
+            
+            -- Si está a menos de 5 metros, mostrar información
+            if distance < 5.0 then
+                local itemName = getElementData(obj, "itemName") or "Item"
+                local itemQuantity = getElementData(obj, "itemQuantity") or 1
+                
+                -- Calcular posición en pantalla
+                local screenX, screenY = getScreenFromWorldPosition(objX, objY, objZ + 0.5)
+                
+                if screenX and screenY then
+                    -- Fondo del texto
+                    local text = itemName .. " x" .. itemQuantity
+                    local textWidth = dxGetTextWidth(text, 0.8, "default-bold")
+                    dxDrawRectangle(screenX - textWidth/2 - 5, screenY - 15, textWidth + 10, 20, 
+                        tocolor(0, 0, 0, 150), true)
+                    
+                    -- Texto del item
+                    dxDrawText(text, screenX, screenY - 10, screenX, screenY + 10,
+                        tocolor(255, 255, 255, 255), 0.8, "default-bold", "center", "center", false, false, true)
+                    
+                    -- Texto de instrucción si está cerca
+                    if distance < 2.0 then
+                        local instruction = "Presiona F para recoger"
+                        local instWidth = dxGetTextWidth(instruction, 0.6, "default")
+                        dxDrawRectangle(screenX - instWidth/2 - 5, screenY + 10, instWidth + 10, 18, 
+                            tocolor(0, 150, 0, 150), true)
+                        dxDrawText(instruction, screenX, screenY + 19, screenX, screenY + 28,
+                            tocolor(255, 255, 255, 255), 0.6, "default", "center", "center", false, false, true)
+                    end
+                end
+            end
+        end
+    end
+end)
+
+-- Función para recoger item del suelo
+function pickupDroppedItem(object)
+    if not object or not getElementData(object, "droppedItem") then
+        return false
+    end
+    
+    local itemName = getElementData(object, "itemName")
+    local itemId = getElementData(object, "itemId")
+    local itemQuantity = getElementData(object, "itemQuantity")
+    
+    -- Enviar al servidor para recoger
+    triggerServerEvent("onInventoryItemPickup", localPlayer, object)
+    
+    return true
+end
+
+-- Detectar cuando el jugador presiona F cerca de un objeto
+bindKey("f", "down", function()
+    local playerX, playerY, playerZ = getElementPosition(localPlayer)
+    local objects = getElementsByType("object")
+    
+    for _, obj in ipairs(objects) do
+        if getElementData(obj, "droppedItem") then
+            local objX, objY, objZ = getElementPosition(obj)
+            local dx, dy, dz = objX - playerX, objY - playerY, objZ - playerZ
+            local distance = math.sqrt(dx*dx + dy*dy + dz*dz)
+            
+            if distance < 2.0 then
+                pickupDroppedItem(obj)
+                break
+            end
+        end
     end
 end)
 

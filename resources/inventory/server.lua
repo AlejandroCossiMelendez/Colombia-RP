@@ -14,6 +14,8 @@ addEvent("onRequestInventory", true)
 addEvent("onInventoryItemAdd", true)
 addEvent("onInventoryItemRemove", true)
 addEvent("onInventoryItemUse", true)  -- Evento para consumir items
+addEvent("onInventoryItemDrop", true)  -- Evento para botar items al suelo
+addEvent("onInventoryItemPickup", true)  -- Evento para recoger items del suelo
 
 -- ==================== BASE DE DATOS ====================
 function initInventoryDatabase()
@@ -321,6 +323,177 @@ addEventHandler("onInventoryItemUse", root, function(slot)
         local inventory = getCharacterInventory(characterId)
         triggerClientEvent(source, "onInventoryUpdated", source, inventory)
     end
+end)
+
+-- ==================== SISTEMA DE BOTAR ITEMS ====================
+
+-- Tabla de modelos de objetos para cada item
+local itemModels = {
+    ["Agua Vacía"] = 1543,  -- Botella vacía
+    ["Botella Vacía"] = 1543,
+    ["Agua Llena"] = 1543,  -- Botella llena
+    ["Agua"] = 1543,
+    ["Hamburguesa"] = 2880,  -- Modelo de comida/hamburguesa
+    ["Comida"] = 2880
+}
+
+-- Función para botar un item al suelo
+function dropItemToGround(player, characterId, slot)
+    if not db or not characterId or not slot then
+        return false
+    end
+    
+    -- Obtener el item del slot
+    local query = dbQuery(db, "SELECT item_id, item_name, quantity FROM inventory WHERE character_id = ? AND slot = ?", characterId, slot)
+    local result = dbPoll(query, -1)
+    
+    if not result or #result == 0 then
+        outputChatBox("No hay ningún item en ese slot", player, 255, 0, 0)
+        return false
+    end
+    
+    local itemName = result[1].item_name
+    local itemId = tonumber(result[1].item_id)
+    local quantity = tonumber(result[1].quantity)
+    
+    -- Obtener posición del jugador
+    local x, y, z = getElementPosition(player)
+    local rotation = getPedRotation(player)
+    
+    -- Calcular posición delante del jugador (a 1.5 metros de distancia)
+    local distance = 1.5
+    local radians = math.rad(rotation)
+    local dropX = x + (math.sin(radians) * distance)
+    local dropY = y - (math.cos(radians) * distance)
+    local dropZ = z - 0.5  -- Ligeramente más bajo para que esté en el suelo
+    
+    -- Obtener modelo del objeto según el item
+    local objectModel = itemModels[itemName] or 1271  -- Modelo por defecto (caja)
+    
+    -- Crear objeto en el suelo
+    local object = createObject(objectModel, dropX, dropY, dropZ, 0, 0, rotation)
+    
+    if not object then
+        outputChatBox("Error al botar el item", player, 255, 0, 0)
+        return false
+    end
+    
+    -- Guardar información del item en el objeto
+    setElementData(object, "droppedItem", true)
+    setElementData(object, "itemId", itemId)
+    setElementData(object, "itemName", itemName)
+    setElementData(object, "itemQuantity", quantity)
+    setElementData(object, "droppedBy", getPlayerName(player))
+    setElementData(object, "characterId", characterId)
+    
+    -- Hacer el objeto recogible (marcador flotante)
+    setElementFrozen(object, true)  -- Evitar que se mueva
+    
+    -- Remover el item del inventario
+    if quantity > 1 then
+        -- Si hay más de 1, solo reducir cantidad
+        dbExec(db, "UPDATE inventory SET quantity = quantity - 1 WHERE character_id = ? AND slot = ?", characterId, slot)
+        outputChatBox("Has botado 1x " .. itemName .. " (Quedan " .. (quantity - 1) .. ")", player, 0, 255, 0)
+    else
+        -- Si solo hay 1, eliminar completamente
+        dbExec(db, "DELETE FROM inventory WHERE character_id = ? AND slot = ?", characterId, slot)
+        outputChatBox("Has botado: " .. itemName, player, 0, 255, 0)
+    end
+    
+    -- Actualizar inventario del cliente
+    local inventory = getCharacterInventory(characterId)
+    triggerClientEvent(player, "onInventoryUpdated", player, inventory)
+    
+    -- Notificar a otros jugadores cercanos
+    local players = getElementsWithinRange(dropX, dropY, dropZ, 20, "player")
+    for _, nearbyPlayer in ipairs(players) do
+        if nearbyPlayer ~= player then
+            outputChatBox(getPlayerName(player) .. " ha botado: " .. itemName, nearbyPlayer, 200, 200, 200)
+        end
+    end
+    
+    return true
+end
+
+-- Evento para botar item
+addEventHandler("onInventoryItemDrop", root, function(slot)
+    if not isElement(source) then return end
+    
+    local characterId = getElementData(source, "characterId")
+    if not characterId then
+        outputChatBox("No tienes un personaje seleccionado", source, 255, 0, 0)
+        return
+    end
+    
+    if dropItemToGround(source, characterId, slot) then
+        -- El item ya fue removido y el objeto creado
+    end
+end)
+
+-- Función para recoger item del suelo
+function pickupItemFromGround(player, object)
+    if not isElement(player) or not isElement(object) then
+        return false
+    end
+    
+    if not getElementData(object, "droppedItem") then
+        outputChatBox("Este objeto no es un item botado", player, 255, 0, 0)
+        return false
+    end
+    
+    -- Verificar distancia
+    local px, py, pz = getElementPosition(player)
+    local ox, oy, oz = getElementPosition(object)
+    local distance = getDistanceBetweenPoints3D(px, py, pz, ox, oy, oz)
+    
+    if distance > 3.0 then
+        outputChatBox("Estás muy lejos del item", player, 255, 0, 0)
+        return false
+    end
+    
+    local characterId = getElementData(player, "characterId")
+    if not characterId then
+        outputChatBox("No tienes un personaje seleccionado", player, 255, 0, 0)
+        return false
+    end
+    
+    -- Obtener datos del item
+    local itemId = getElementData(object, "itemId")
+    local itemName = getElementData(object, "itemName")
+    local itemQuantity = getElementData(object, "itemQuantity") or 1
+    
+    -- Buscar slot vacío
+    local emptySlot = findEmptySlot(characterId, 30)
+    
+    if not emptySlot then
+        outputChatBox("Tu inventario está lleno", player, 255, 0, 0)
+        return false
+    end
+    
+    -- Agregar item al inventario
+    if addItemToInventory(characterId, emptySlot, itemId, itemName, itemQuantity, "") then
+        outputChatBox("✓ Has recogido: " .. itemName .. " x" .. itemQuantity, player, 0, 255, 0)
+        
+        -- Eliminar objeto del mundo
+        destroyElement(object)
+        
+        -- Actualizar inventario del cliente
+        local inventory = getCharacterInventory(characterId)
+        triggerClientEvent(player, "onInventoryUpdated", player, inventory)
+        
+        return true
+    else
+        outputChatBox("Error al recoger el item", player, 255, 0, 0)
+        return false
+    end
+end
+
+-- Evento para recoger item del suelo
+addEventHandler("onInventoryItemPickup", root, function(object)
+    if not isElement(source) then return end
+    if not isElement(object) then return end
+    
+    pickupItemFromGround(source, object)
 end)
 
 -- Agregar item (comando de admin para testing)
