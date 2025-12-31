@@ -26,16 +26,16 @@ local SLOT_SPACING = 5  -- Espacio entre slots
 -- Datos del inventario
 local inventoryItems = {}  -- Tabla de items: {slot = {id, name, quantity, icon}}
 
--- Variable para detectar si se está presionando S
+-- Variable para detectar si S está presionada
 local isSPressed = false
 
--- Detectar tecla S
-bindKey("s", "down", function()
-    isSPressed = true
-end)
-
-bindKey("s", "up", function()
-    isSPressed = false
+-- Detectar tecla S (funciona incluso con GUI abierto)
+bindKey("s", "both", function(key, keyState)
+    if keyState == "down" then
+        isSPressed = true
+    else
+        isSPressed = false
+    end
 end)
 
 -- Cargar imágenes de items
@@ -144,7 +144,7 @@ function openInventory(items)
             setElementData(slot, "slotIndex", slotIndex)
             slots[slotIndex] = slot
             
-            -- Agregar evento de clic (doble clic para consumir, S+clic para botar)
+            -- Agregar evento de clic (doble clic para consumir, S+clic o clic derecho para botar)
             local lastClickTime = {}
             addEventHandler("onClientGUIClick", slot, function(button, state)
                 if button == "left" and state == "up" then
@@ -152,8 +152,12 @@ function openInventory(items)
                     if inventoryItems[slotIdx] then
                         local item = inventoryItems[slotIdx]
                         
+                        -- Verificar si S está presionada (verificar en el momento del clic)
+                        local sKeyPressed = getKeyState("s")
+                        
                         -- Si se presiona S + clic, botar el item
-                        if isSPressed then
+                        if sKeyPressed or isSPressed then
+                            outputChatBox("Botando item: " .. item.name, 0, 255, 0)
                             triggerServerEvent("onInventoryItemDrop", localPlayer, slotIdx)
                             return
                         end
@@ -171,7 +175,7 @@ function openInventory(items)
                             lastClickTime[slotIdx] = nil
                         else
                             -- Clic simple - mostrar información
-                            outputChatBox("Item: " .. item.name .. " x" .. item.quantity .. " (Doble clic: consumir | S+Clic: botar)", 0, 255, 0)
+                            outputChatBox("Item: " .. item.name .. " x" .. item.quantity .. " (Doble clic: consumir | S+Clic o Clic derecho: botar)", 0, 255, 0)
                             lastClickTime[slotIdx] = currentTime
                         end
                     end
@@ -180,18 +184,9 @@ function openInventory(items)
                     if inventoryItems[slotIdx] then
                         local item = inventoryItems[slotIdx]
                         
-                        -- Si se presiona S + clic derecho, botar el item
-                        if isSPressed then
-                            triggerServerEvent("onInventoryItemDrop", localPlayer, slotIdx)
-                            return
-                        end
-                        
-                        -- Clic derecho - consumir directamente si es consumible
-                        if consumableItems[item.name] then
-                            triggerServerEvent("onInventoryItemUse", localPlayer, slotIdx)
-                        else
-                            outputChatBox("Este item no se puede consumir", 255, 165, 0)
-                        end
+                        -- Clic derecho = botar item directamente (más fácil que S+clic)
+                        outputChatBox("Botando item: " .. item.name, 0, 255, 0)
+                        triggerServerEvent("onInventoryItemDrop", localPlayer, slotIdx)
                     end
                 end
             end, false)
