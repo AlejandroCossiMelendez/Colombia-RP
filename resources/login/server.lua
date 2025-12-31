@@ -66,18 +66,29 @@ function initDatabase()
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ]])
     
-    -- Agregar columna 'role' si la tabla ya existe pero no tiene el campo
-    dbExec(db, "ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'user'")
-    dbExec(db, "ALTER TABLE users ADD INDEX IF NOT EXISTS idx_role (role)")
-    
     if query1 then
         dbPoll(query1, -1)
         outputServerLog("[Login] Tabla 'users' verificada/creada")
         
-        -- Agregar columna 'role' si la tabla ya existía sin este campo
-        -- Esto es seguro porque usa IF NOT EXISTS
-        dbExec(db, "ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'user'")
-        dbExec(db, "ALTER TABLE users ADD INDEX IF NOT EXISTS idx_role (role)")
+        -- Verificar si la columna 'role' existe y agregarla si no existe
+        -- MySQL no soporta IF NOT EXISTS en ALTER TABLE, así que verificamos primero
+        local checkQuery = dbQuery(db, "SHOW COLUMNS FROM users LIKE 'role'")
+        local checkResult = dbPoll(checkQuery, -1)
+        
+        if not checkResult or #checkResult == 0 then
+            -- La columna no existe, agregarla
+            dbExec(db, "ALTER TABLE users ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'user'")
+            outputServerLog("[Login] Columna 'role' agregada a la tabla 'users'")
+            
+            -- Agregar índice
+            local indexQuery = dbQuery(db, "SHOW INDEX FROM users WHERE Key_name = 'idx_role'")
+            local indexResult = dbPoll(indexQuery, -1)
+            if not indexResult or #indexResult == 0 then
+                dbExec(db, "ALTER TABLE users ADD INDEX idx_role (role)")
+            end
+        else
+            outputServerLog("[Login] Columna 'role' ya existe en la tabla 'users'")
+        end
         
         -- Actualizar usuarios existentes sin rol
         dbExec(db, "UPDATE users SET role = 'user' WHERE role IS NULL OR role = ''")
@@ -583,8 +594,10 @@ addEventHandler("onPlayerSelectCharacter", root, function(charId)
     
     -- Activar cámara después de un pequeño delay
     setTimer(function()
-        setCameraTarget(client, client)
-        fadeCamera(client, true, 1.0)
+        if isElement(client) then
+            setCameraTarget(client, client)
+            fadeCamera(client, true, 1.0)
+        end
     end, 500, 1)
     
     triggerClientEvent(client, "onCharacterSelectResult", client, true, "Personaje seleccionado: " .. selectedChar.name .. " " .. selectedChar.surname)
@@ -597,9 +610,20 @@ addEventHandler("onPlayerSelectCharacter", root, function(charId)
         removePedJetPack(client)
     end
     
+    -- Enviar el rol del jugador al cliente para que configure los controles apropiadamente
+    local userRole = getPlayerRole(client)
+    triggerClientEvent(client, "onPlayerRoleSet", client, userRole)
+    
     -- Notificar al jugador sobre el cambio de nombre
     outputChatBox("Tu nombre ahora es: " .. selectedChar.name .. " " .. selectedChar.surname, client, 0, 255, 0)
     outputChatBox("Este nombre aparecerá en el scoreboard (TAB)", client, 255, 255, 255)
+    
+    -- Informar sobre permisos de vuelo
+    if userRole == "admin" then
+        outputChatBox("Tienes permisos de administrador - Puedes usar jetpack", client, 0, 255, 0)
+    else
+        outputChatBox("Vuelo deshabilitado - Solo administradores pueden volar", client, 255, 200, 0)
+    end
 end)
 
 -- ==================== SISTEMA DE ROLES ====================
@@ -618,20 +642,46 @@ function getPlayerRole(player)
     return getElementData(player, "userRole") or "user"
 end
 
--- ==================== PREVENIR JETPACK Y VUELO ====================
+-- ==================== PREVENIR JETPACK Y VUELO TIPO SUPERMAN ====================
 -- Monitorear y remover jetpack constantemente (solo para usuarios normales)
 setTimer(function()
     for _, player in ipairs(getElementsByType("player")) do
         if isElement(player) and getElementData(player, "characterSelected") then
-            -- Solo remover jetpack si NO es admin
+            -- Solo prevenir vuelo si NO es admin
             if not isPlayerAdmin(player) then
+                -- Remover jetpack si lo tiene
                 if doesPedHaveJetPack(player) then
                     removePedJetPack(player)
+                    outputChatBox("Jetpack desactivado - Solo disponible para administradores", player, 255, 0, 0)
+                end
+                
+                -- Prevenir vuelo tipo superman (detectar si está volando sin vehículo)
+                if not isPedInVehicle(player) then
+                    local x, y, z = getElementPosition(player)
+                    local groundZ = getGroundPosition(x, y, z)
+                    local distanceToGround = z - groundZ
+                    
+                    -- Si está volando (más de 2 unidades del suelo)
+                    if distanceToGround > 2.0 then
+                        local velocityX, velocityY, velocityZ = getElementVelocity(player)
+                        
+                        -- Si está subiendo o flotando, forzar caída
+                        if velocityZ > 0.05 or (velocityZ > -0.05 and velocityZ < 0.05 and distanceToGround > 3.0) then
+                            -- Forzar caída
+                            setElementVelocity(player, velocityX, velocityY, -0.3)
+                            
+                            -- Si está muy alto, teletransportar al suelo
+                            if distanceToGround > 10.0 then
+                                setElementPosition(player, x, y, groundZ + 1.0)
+                                outputChatBox("Vuelo deshabilitado - Solo administradores pueden volar", player, 255, 0, 0)
+                            end
+                        end
+                    end
                 end
             end
         end
     end
-end, 500, 0) -- Verificar cada medio segundo
+end, 200, 0) -- Verificar cada 200ms (más frecuente para prevenir mejor)
 
 -- Prevenir que los jugadores normales obtengan jetpack mediante comandos
 addEventHandler("onPlayerCommand", root, function(command)
@@ -639,6 +689,27 @@ addEventHandler("onPlayerCommand", root, function(command)
         if not isPlayerAdmin(source) then
             cancelEvent()
             outputChatBox("El comando /jetpack solo está disponible para administradores", source, 255, 0, 0)
+            removePedJetPack(source) -- Asegurar que se quite inmediatamente
+        end
+    end
+end)
+
+-- Prevenir jetpack del gamemode freeroam (doble Shift)
+addEventHandler("onPlayerWeaponSwitch", root, function(previousWeapon, currentWeapon)
+    if not isPlayerAdmin(source) then
+        if doesPedHaveJetPack(source) then
+            removePedJetPack(source)
+        end
+    end
+end)
+
+-- Evento del cliente para verificar jetpack
+addEvent("onClientCheckJetpack", true)
+addEventHandler("onClientCheckJetpack", root, function()
+    if not isPlayerAdmin(source) then
+        if doesPedHaveJetPack(source) then
+            removePedJetPack(source)
+            outputChatBox("Jetpack desactivado - Solo disponible para administradores", source, 255, 0, 0)
         end
     end
 end)

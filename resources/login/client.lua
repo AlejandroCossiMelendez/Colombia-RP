@@ -591,6 +591,9 @@ addEventHandler("onCharacterCreateResult", root, function(success, message, newC
     end
 end)
 
+-- Variable para almacenar el rol del jugador
+local playerRole = "user"
+
 addEvent("onCharacterSelectResult", true)
 addEventHandler("onCharacterSelectResult", root, function(success, message)
     if success then
@@ -607,22 +610,47 @@ addEventHandler("onCharacterSelectResult", root, function(success, message)
         toggleControl("fire", true)
         toggleControl("action", true)
         
-        -- Desactivar controles de vuelo/jetpack
-        toggleControl("jump", true) -- Permitir saltar normalmente
-        -- No hay control directo para jetpack, se maneja desde el servidor
+        -- El control de salto se configurará según el rol cuando se reciba onPlayerRoleSet
+        toggleControl("jump", true) -- Permitir saltar normalmente por ahora
         
         -- Asegurar que la cámara esté activada después de seleccionar personaje
         setTimer(function()
             fadeCamera(true, 1.0)
             setCameraTarget(localPlayer, localPlayer)
             
-            -- Desactivar jetpack si lo tiene
-            if doesPedHaveJetPack(localPlayer) then
+            -- Desactivar jetpack si lo tiene y no es admin
+            if doesPedHaveJetPack(localPlayer) and playerRole ~= "admin" then
                 removePedJetPack(localPlayer)
             end
         end, 500, 1)
+        
+        -- Iniciar monitoreo continuo del jetpack y prevención de vuelo (solo si no es admin)
+        if playerRole ~= "admin" then
+            startJetpackMonitoring()
+            startFlightPrevention()
+        else
+            stopJetpackMonitoring()
+            stopFlightPrevention()
+        end
     else
         outputChatBox(message or "Error al seleccionar el personaje", 255, 0, 0)
+    end
+end)
+
+-- Evento para recibir el rol del jugador desde el servidor
+addEvent("onPlayerRoleSet", true)
+addEventHandler("onPlayerRoleSet", root, function(role)
+    playerRole = role or "user"
+    
+    -- Si no es admin, iniciar prevención de vuelo tipo superman
+    if playerRole ~= "admin" then
+        -- Iniciar sistema de prevención de vuelo
+        startFlightPrevention()
+        startJetpackMonitoring()
+    else
+        -- Si es admin, detener cualquier prevención
+        stopFlightPrevention()
+        stopJetpackMonitoring()
     end
 end)
 
@@ -653,5 +681,119 @@ addEventHandler("onClientKey", root, function(key, press)
             cancelEvent()
         end
     end
+end)
+
+-- ==================== PREVENCIÓN DE VUELO TIPO SUPERMAN ====================
+local jetpackMonitorTimer = nil
+local flightPreventionTimer = nil
+local lastPosition = {x = 0, y = 0, z = 0}
+local lastGroundZ = 0
+
+function startJetpackMonitoring()
+    -- Detener el timer anterior si existe
+    if jetpackMonitorTimer then
+        killTimer(jetpackMonitorTimer)
+    end
+    
+    -- Monitorear jetpack cada 100ms (solo para usuarios no-admin)
+    jetpackMonitorTimer = setTimer(function()
+        if playerRole ~= "admin" and doesPedHaveJetPack(localPlayer) then
+            -- Verificar con el servidor y quitar jetpack
+            triggerServerEvent("onClientCheckJetpack", localPlayer)
+        end
+    end, 100, 0)
+end
+
+function stopJetpackMonitoring()
+    if jetpackMonitorTimer then
+        killTimer(jetpackMonitorTimer)
+        jetpackMonitorTimer = nil
+    end
+end
+
+function startFlightPrevention()
+    -- Detener el timer anterior si existe
+    if flightPreventionTimer then
+        killTimer(flightPreventionTimer)
+    end
+    
+    -- Monitorear y prevenir vuelo tipo superman
+    flightPreventionTimer = setTimer(function()
+        if playerRole ~= "admin" then
+            -- Solo prevenir si el jugador está en el juego y no está en un vehículo
+            if not isPedInVehicle(localPlayer) then
+                local x, y, z = getElementPosition(localPlayer)
+                local groundZ = getGroundPosition(x, y, z)
+                local distanceToGround = z - groundZ
+                
+                -- Si está volando (más de 1.5 unidades del suelo y subiendo)
+                if distanceToGround > 1.5 then
+                    local velocityX, velocityY, velocityZ = getElementVelocity(localPlayer)
+                    
+                    -- Si está subiendo (velocidad Z positiva y significativa)
+                    if velocityZ > 0.1 then
+                        -- Forzar caída cancelando la velocidad vertical hacia arriba
+                        setElementVelocity(localPlayer, velocityX, velocityY, -0.1)
+                    end
+                    
+                    -- Si está demasiado alto, forzar caída más agresiva
+                    if distanceToGround > 5.0 then
+                        setElementVelocity(localPlayer, velocityX, velocityY, -0.5)
+                    end
+                end
+                
+                lastPosition = {x = x, y = y, z = z}
+                lastGroundZ = groundZ
+            end
+        end
+    end, 50, 0) -- Verificar cada 50ms para respuesta rápida
+end
+
+function stopFlightPrevention()
+    if flightPreventionTimer then
+        killTimer(flightPreventionTimer)
+        flightPreventionTimer = nil
+    end
+end
+
+-- Prevenir vuelo cuando se presiona Shift (doble salto activa vuelo en gamemode play)
+addEventHandler("onClientKey", root, function(button, press)
+    if playerRole ~= "admin" then
+        -- Prevenir doble Shift que activa el vuelo tipo superman
+        if (button == "lshift" or button == "rshift") and press then
+            -- Si el jugador está en el aire, prevenir el vuelo
+            local x, y, z = getElementPosition(localPlayer)
+            local groundZ = getGroundPosition(x, y, z)
+            local distanceToGround = z - groundZ
+            
+            if distanceToGround > 0.5 then
+                -- Está en el aire, cancelar el evento para prevenir vuelo
+                cancelEvent()
+                
+                -- Forzar caída inmediata
+                local velocityX, velocityY, velocityZ = getElementVelocity(localPlayer)
+                if velocityZ > 0 then
+                    setElementVelocity(localPlayer, velocityX, velocityY, -0.2)
+                end
+            end
+        end
+        
+        -- Prevenir jetpack si lo tiene
+        if button == "lshift" or button == "rshift" then
+            if press then
+                setTimer(function()
+                    if doesPedHaveJetPack(localPlayer) then
+                        triggerServerEvent("onClientCheckJetpack", localPlayer)
+                    end
+                end, 50, 1)
+            end
+        end
+    end
+end)
+
+-- Detener monitoreo cuando el jugador se desconecta
+addEventHandler("onClientResourceStop", resourceRoot, function()
+    stopJetpackMonitoring()
+    stopFlightPrevention()
 end)
 
