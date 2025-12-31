@@ -1475,37 +1475,9 @@ addEventHandler("onRequestVehicleList", root, function()
         return
     end
     
-    -- Obtener todos los vehículos del servidor
-    local vehicles = {}
-    local allVehicles = getElementsByType("vehicle")
-    
-    for _, vehicle in ipairs(allVehicles) do
-        if isElement(vehicle) then
-            local x, y, z = getElementPosition(vehicle)
-            local model = getElementModel(vehicle)
-            local vehicleName = getVehicleNameFromModel(model)
-            local driver = getVehicleController(vehicle)
-            local driverName = nil
-            
-            if driver then
-                driverName = getPlayerName(driver)
-            end
-            
-            table.insert(vehicles, {
-                id = getElementID(vehicle) or "N/A",
-                model = model,
-                name = vehicleName,
-                x = x,
-                y = y,
-                z = z,
-                driver = driverName
-            })
-        end
-    end
-    
-    -- Enviar lista al cliente
-    triggerClientEvent(client, "onVehicleListReceived", client, vehicles)
-    outputChatBox("Lista de vehículos cargada: " .. #vehicles .. " vehículos encontrados", client, 0, 255, 0)
+    -- Enviar confirmación al cliente para abrir el panel (el cliente generará la lista de modelos)
+    triggerClientEvent(client, "onVehicleListReceived", client)
+    outputChatBox("Panel de creación de vehículos abierto", client, 0, 255, 0)
 end)
 
 -- Evento para generar vehículo (solo para admins)

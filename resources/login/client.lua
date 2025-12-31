@@ -5,6 +5,27 @@ local characterWindow = nil
 local isLoginMode = true -- true = login, false = registro
 local serverReady = false -- Flag para saber si el servidor está listo
 
+-- Función para guardar credenciales
+function saveCredentials(username, password)
+    if username and password and username ~= "" and password ~= "" then
+        setElementData(localPlayer, "savedUsername", username)
+        setElementData(localPlayer, "savedPassword", password)
+    end
+end
+
+-- Función para cargar credenciales guardadas
+function loadCredentials()
+    local username = getElementData(localPlayer, "savedUsername")
+    local password = getElementData(localPlayer, "savedPassword")
+    return username, password
+end
+
+-- Función para eliminar credenciales guardadas
+function clearCredentials()
+    setElementData(localPlayer, "savedUsername", nil)
+    setElementData(localPlayer, "savedPassword", nil)
+end
+
 -- Colores del tema
 local colors = {
     primary = {41, 128, 185, 255},      -- Azul principal
@@ -51,6 +72,25 @@ function createLoginWindow()
     guiEditSetMasked(passEdit, true)
     guiSetProperty(passEdit, "NormalTextColour", "FF" .. string.format("%02X%02X%02X", colors.text[1], colors.text[2], colors.text[3]))
     
+    -- Cargar credenciales guardadas si existen (solo en modo login)
+    if isLoginMode then
+        local savedUsername, savedPassword = loadCredentials()
+        if savedUsername and savedPassword then
+            guiSetText(userEdit, savedUsername)
+            guiSetText(passEdit, savedPassword)
+        end
+    end
+    
+    -- Checkbox para recordar usuario y contraseña (solo en modo login)
+    local rememberCheckbox = nil
+    if isLoginMode then
+        local savedUsername, savedPassword = loadCredentials()
+        local isChecked = (savedUsername and savedPassword) and true or false
+        rememberCheckbox = guiCreateCheckBox(30, 225, windowWidth - 60, 20, "Recordar usuario y contraseña", isChecked, false, loginWindow)
+        guiLabelSetColor(rememberCheckbox, colors.text[1], colors.text[2], colors.text[3])
+        setElementData(loginWindow, "rememberCheckbox", rememberCheckbox)
+    end
+    
     -- Campo de confirmar contraseña (solo en modo registro)
     local confirmPassLabel = nil
     local confirmPassEdit = nil
@@ -73,7 +113,7 @@ function createLoginWindow()
     end
     
     -- Botón principal (Login o Registrar)
-    local buttonY = isLoginMode and 250 or 380
+    local buttonY = isLoginMode and 260 or 380
     local mainButton = guiCreateButton(30, buttonY, windowWidth - 60, 45, isLoginMode and "INICIAR SESIÓN" or "CREAR CUENTA", false, loginWindow)
     guiSetFont(mainButton, "default-bold")
     
@@ -178,6 +218,14 @@ function handleMainButtonClick()
         if not loginResource or getResourceState(loginResource) ~= "running" then
             showMessage("El sistema de login no está disponible. Por favor espera un momento.", true)
             return
+        end
+        
+        -- Guardar credenciales si el checkbox está marcado
+        local rememberCheckbox = getElementData(loginWindow, "rememberCheckbox")
+        if rememberCheckbox and guiCheckBoxGetSelected(rememberCheckbox) then
+            saveCredentials(username, password)
+        else
+            clearCredentials()
         end
         
         -- Activar el evento directamente ya que el servidor está listo
@@ -658,8 +706,8 @@ function getVehicleNameFromModel(model)
     return vehicleNames[model] or "Vehículo " .. model
 end
 
--- Función para mostrar el panel de vehículos
-function showVehiclePanel(vehicles)
+-- Función para mostrar el panel de vehículos (con todos los modelos disponibles)
+function showVehiclePanel()
     if vehicleWindow then
         destroyElement(vehicleWindow)
     end
@@ -675,36 +723,22 @@ function showVehiclePanel(vehicles)
     guiSetVisible(vehicleWindow, true)
     
     -- Título
-    local titleLabel = guiCreateLabel(20, 30, windowWidth - 40, 30, "VEHÍCULOS EN EL SERVIDOR (" .. #vehicles .. ")", false, vehicleWindow)
+    local titleLabel = guiCreateLabel(20, 30, windowWidth - 40, 30, "CREAR VEHÍCULO - SELECCIONA UN MODELO", false, vehicleWindow)
     guiSetFont(titleLabel, "default-bold")
     guiLabelSetHorizontalAlign(titleLabel, "center", true)
     guiLabelSetColor(titleLabel, colors.text[1], colors.text[2], colors.text[3])
     
-    -- Gridlist para mostrar vehículos
+    -- Gridlist para mostrar modelos de vehículos disponibles
     local vehicleList = guiCreateGridList(20, 70, windowWidth - 40, 450, false, vehicleWindow)
-    guiGridListAddColumn(vehicleList, "ID", 0.08)
     guiGridListAddColumn(vehicleList, "Modelo", 0.15)
-    guiGridListAddColumn(vehicleList, "Nombre", 0.2)
-    guiGridListAddColumn(vehicleList, "Posición X", 0.12)
-    guiGridListAddColumn(vehicleList, "Posición Y", 0.12)
-    guiGridListAddColumn(vehicleList, "Posición Z", 0.12)
-    guiGridListAddColumn(vehicleList, "Conductor", 0.21)
+    guiGridListAddColumn(vehicleList, "Nombre", 0.85)
     
-    -- Llenar la lista con vehículos
-    if #vehicles > 0 then
-        for _, vehicle in ipairs(vehicles) do
-            local row = guiGridListAddRow(vehicleList)
-            guiGridListSetItemText(vehicleList, row, 1, tostring(vehicle.id), false, false)
-            guiGridListSetItemText(vehicleList, row, 2, tostring(vehicle.model), false, false)
-            guiGridListSetItemText(vehicleList, row, 3, vehicle.name, false, false)
-            guiGridListSetItemText(vehicleList, row, 4, string.format("%.2f", vehicle.x), false, false)
-            guiGridListSetItemText(vehicleList, row, 5, string.format("%.2f", vehicle.y), false, false)
-            guiGridListSetItemText(vehicleList, row, 6, string.format("%.2f", vehicle.z), false, false)
-            guiGridListSetItemText(vehicleList, row, 7, vehicle.driver or "Ninguno", false, false)
-        end
-    else
+    -- Llenar la lista con todos los modelos disponibles (400-611)
+    for model = 400, 611 do
+        local vehicleName = getVehicleNameFromModel(model)
         local row = guiGridListAddRow(vehicleList)
-        guiGridListSetItemText(vehicleList, row, 1, "No hay vehículos", false, false)
+        guiGridListSetItemText(vehicleList, row, 1, tostring(model), false, false)
+        guiGridListSetItemText(vehicleList, row, 2, vehicleName, false, false)
     end
     
     -- Botón de generar vehículo
@@ -727,13 +761,11 @@ function showVehiclePanel(vehicles)
         if button == "left" and state == "up" then
             local selectedRow = guiGridListGetSelectedItem(vehicleList)
             if selectedRow >= 0 then
-                local vehicleId = guiGridListGetItemText(vehicleList, selectedRow, 1)
-                local vehicleModel = guiGridListGetItemText(vehicleList, selectedRow, 2)
-                local vehicleName = guiGridListGetItemText(vehicleList, selectedRow, 3)
+                local vehicleModel = guiGridListGetItemText(vehicleList, selectedRow, 1)
+                local vehicleName = guiGridListGetItemText(vehicleList, selectedRow, 2)
                 
-                if vehicleId and vehicleId ~= "No hay vehículos" then
+                if vehicleModel then
                     selectedVehicle = {
-                        id = vehicleId,
                         model = tonumber(vehicleModel),
                         name = vehicleName
                     }
@@ -762,10 +794,10 @@ function showVehiclePanel(vehicles)
     end, false)
 end
 
--- Evento para recibir la lista de vehículos del servidor
+-- Evento para recibir confirmación del servidor (ya no necesitamos recibir lista)
 addEvent("onVehicleListReceived", true)
-addEventHandler("onVehicleListReceived", root, function(vehicles)
-    showVehiclePanel(vehicles)
+addEventHandler("onVehicleListReceived", root, function()
+    showVehiclePanel()
 end)
 
 -- Comando para abrir el panel de vehículos (solo para admins)
