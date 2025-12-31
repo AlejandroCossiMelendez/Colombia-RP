@@ -82,24 +82,30 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
     setPlayerHudComponentVisible("radar", false)  -- Opcional: ocultar radar también
     setPlayerHudComponentVisible("breath", false)  -- Ocultar respiración nativa
     
-    -- Deshabilitar el recurso speedometer si está activo
-    local speedometerResource = getResourceFromName("speedometer")
-    if speedometerResource and getResourceState(speedometerResource) == "running" then
-        stopResource(speedometerResource)
-    end
-    
-    -- Cargar imágenes
+    -- Cargar imágenes (ruta relativa al recurso)
     healthImage = dxCreateTexture("images/health_icon.png", "argb", true, "clamp")
     healthImageLoaded = healthImage ~= nil
+    if not healthImageLoaded then
+        outputChatBox("⚠ Error al cargar health_icon.png - Verifica que el archivo existe en resources/customhud/images/", 255, 165, 0)
+    end
     
     moneyImage = dxCreateTexture("images/dolar.png", "argb", true, "clamp")
     moneyImageLoaded = moneyImage ~= nil
+    if not moneyImageLoaded then
+        outputChatBox("⚠ Error al cargar dolar.png - Verifica que el archivo existe en resources/customhud/images/", 255, 165, 0)
+    end
     
     waterImage = dxCreateTexture("images/botella-de-agua.png", "argb", true, "clamp")
     waterImageLoaded = waterImage ~= nil
+    if not waterImageLoaded then
+        outputChatBox("⚠ Error al cargar botella-de-agua.png - Verifica que el archivo existe en resources/customhud/images/", 255, 165, 0)
+    end
     
     foodImage = dxCreateTexture("images/hamburguesa-con-queso.png", "argb", true, "clamp")
     foodImageLoaded = foodImage ~= nil
+    if not foodImageLoaded then
+        outputChatBox("⚠ Error al cargar hamburguesa-con-queso.png - Verifica que el archivo existe en resources/customhud/images/", 255, 165, 0)
+    end
     
     playerID = getElementData(localPlayer, "playerID") or 0
     
@@ -108,10 +114,16 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
     thirst = getElementData(localPlayer, "characterThirst") or 100
 end)
 
--- Timer para asegurar que el HUD nativo siempre esté oculto
+-- Timer para asegurar que el HUD nativo siempre esté oculto y deshabilitar speedometer
 setTimer(function()
     if getElementData(localPlayer, "characterSelected") then
         setPlayerHudComponentVisible("breath", false)  -- Ocultar respiración nativa siempre
+        
+        -- Deshabilitar el recurso speedometer si está activo
+        local speedometerResource = getResourceFromName("speedometer")
+        if speedometerResource and getResourceState(speedometerResource) == "running" then
+            stopResource(speedometerResource)
+        end
     end
 end, 500, 0)  -- Verificar cada 500ms
 
