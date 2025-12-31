@@ -21,14 +21,40 @@ function configureVehicle400(vehicle)
     setVehicleHandling(vehicle, "engineInertia", 50.0)  -- Inercia del motor
     setVehicleHandling(vehicle, "driveType", "awd")  -- Tracción en las 4 ruedas para mejor control
     
-    -- Mejorar el manejo general
-    setVehicleHandling(vehicle, "tractionMultiplier", 1.2)
-    setVehicleHandling(vehicle, "tractionLoss", 0.8)
+    -- Mejorar el manejo general y estabilidad
+    setVehicleHandling(vehicle, "tractionMultiplier", 1.5)  -- Aumentado para más tracción
+    setVehicleHandling(vehicle, "tractionLoss", 0.6)  -- Reducido para menos pérdida de tracción
     setVehicleHandling(vehicle, "tractionBias", 0.5)
+    
+    -- Mejorar estabilidad
+    setVehicleHandling(vehicle, "mass", 2000.0)  -- Masa del vehículo
+    setVehicleHandling(vehicle, "turnMass", 4000.0)  -- Masa de giro (mayor = más estable)
+    setVehicleHandling(vehicle, "dragCoeff", 0.3)  -- Coeficiente de arrastre
+    
+    -- Suspensión mejorada para más estabilidad
+    setVehicleHandling(vehicle, "suspensionForceLevel", 2.0)  -- Fuerza de suspensión
+    setVehicleHandling(vehicle, "suspensionDamping", 0.3)  -- Amortiguación
+    setVehicleHandling(vehicle, "suspensionHighSpeedDamping", 0.0)
+    setVehicleHandling(vehicle, "suspensionUpperLimit", 0.3)
+    setVehicleHandling(vehicle, "suspensionLowerLimit", -0.1)
+    setVehicleHandling(vehicle, "suspensionFrontRearBias", 0.5)
+    setVehicleHandling(vehicle, "suspensionAntiDiveMultiplier", 0.3)
+    
+    -- Centro de masa más bajo para mejor estabilidad
+    setVehicleHandling(vehicle, "centerOfMassX", 0.0)
+    setVehicleHandling(vehicle, "centerOfMassY", 0.0)
+    setVehicleHandling(vehicle, "centerOfMassZ", -0.3)  -- Más bajo = más estable
+    
+    -- Mejorar frenos
+    setVehicleHandling(vehicle, "brakeDeceleration", 8.0)
+    setVehicleHandling(vehicle, "brakeBias", 0.5)
     
     -- Configurar transmisión
     setVehicleHandling(vehicle, "numberOfGears", 5)
     setVehicleHandling(vehicle, "maxVelocity", maxVelocity)
+    
+    -- Reducir derrape
+    setVehicleHandling(vehicle, "steeringLock", 35.0)  -- Bloqueo de dirección
 end
 
 -- Aplicar configuración cuando se crea un vehículo 400

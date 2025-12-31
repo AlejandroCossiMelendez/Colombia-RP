@@ -82,6 +82,12 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
     setPlayerHudComponentVisible("radar", false)  -- Opcional: ocultar radar también
     setPlayerHudComponentVisible("breath", false)  -- Ocultar respiración nativa
     
+    -- Deshabilitar el recurso speedometer si está activo
+    local speedometerResource = getResourceFromName("speedometer")
+    if speedometerResource and getResourceState(speedometerResource) == "running" then
+        stopResource(speedometerResource)
+    end
+    
     -- Cargar imágenes
     healthImage = dxCreateTexture("images/health_icon.png", "argb", true, "clamp")
     healthImageLoaded = healthImage ~= nil
@@ -108,6 +114,75 @@ setTimer(function()
         setPlayerHudComponentVisible("breath", false)  -- Ocultar respiración nativa siempre
     end
 end, 500, 0)  -- Verificar cada 500ms
+
+-- Función para obtener velocidad del vehículo en km/h
+function getVehicleSpeed(vehicle)
+    if not vehicle or not isElement(vehicle) then return 0 end
+    local vx, vy, vz = getElementVelocity(vehicle)
+    local speed = math.sqrt(vx*vx + vy*vy + vz*vz) * 180  -- Convertir a km/h (aproximado)
+    return math.floor(speed)
+end
+
+-- Función para obtener nombre del vehículo desde el modelo
+function getVehicleNameFromModel(model)
+    local vehicleNames = {
+        [400] = "Landstalker", [401] = "Bravura", [402] = "Buffalo", [403] = "Linerunner",
+        [404] = "Perennial", [405] = "Sentinel", [406] = "Dumper", [407] = "Firetruck",
+        [408] = "Trashmaster", [409] = "Stretch", [410] = "Manana", [411] = "Infernus",
+        [412] = "Voodoo", [413] = "Pony", [414] = "Mule", [415] = "Cheetah",
+        [416] = "Ambulance", [417] = "Leviathan", [418] = "Moonbeam", [419] = "Esperanto",
+        [420] = "Taxi", [421] = "Washington", [422] = "Bobcat", [423] = "Mr Whoopee",
+        [424] = "BF Injection", [425] = "Hunter", [426] = "Premier", [427] = "Enforcer",
+        [428] = "Securicar", [429] = "Banshee", [430] = "Predator", [431] = "Bus",
+        [432] = "Rhino", [433] = "Barracks", [434] = "Hotknife", [435] = "Trailer",
+        [436] = "Previon", [437] = "Coach", [438] = "Cabbie", [439] = "Stallion",
+        [440] = "Rumpo", [441] = "RC Bandit", [442] = "Romero", [443] = "Packer",
+        [444] = "Monster", [445] = "Admiral", [446] = "Squalo", [447] = "Seasparrow",
+        [448] = "Pizzaboy", [449] = "Tram", [450] = "Trailer", [451] = "Turismo",
+        [452] = "Speeder", [453] = "Reefer", [454] = "Tropic", [455] = "Flatbed",
+        [456] = "Yankee", [457] = "Caddy", [458] = "Solair", [459] = "Berkley's RC Van",
+        [460] = "Skimmer", [461] = "PCJ-600", [462] = "Faggio", [463] = "Freeway",
+        [464] = "RC Baron", [465] = "RC Raider", [466] = "Glendale", [467] = "Oceanic",
+        [468] = "Sanchez", [469] = "Sparrow", [470] = "Patriot", [471] = "Quad",
+        [472] = "Coastguard", [473] = "Dinghy", [474] = "Hermes", [475] = "Sabre",
+        [476] = "Rustler", [477] = "ZR-350", [478] = "Walton", [479] = "Regina",
+        [480] = "Comet", [481] = "BMX", [482] = "Burrito", [483] = "Camper",
+        [484] = "Marquis", [485] = "Baggage", [486] = "Dozer", [487] = "Maverick",
+        [488] = "News Chopper", [489] = "Rancher", [490] = "FBI Rancher", [491] = "Virgo",
+        [492] = "Greenwood", [493] = "Jetmax", [494] = "Hotring", [495] = "Sandking",
+        [496] = "Blista Compact", [497] = "Police Maverick", [498] = "Boxville", [499] = "Benson",
+        [500] = "Mesa", [501] = "RC Goblin", [502] = "Hotring Racer A", [503] = "Hotring Racer B",
+        [504] = "Bloodring Banger", [505] = "Rancher", [506] = "Super GT", [507] = "Elegant",
+        [508] = "Journey", [509] = "Bike", [510] = "Mountain Bike", [511] = "Beagle",
+        [512] = "Cropduster", [513] = "Stunt", [514] = "Tanker", [515] = "Roadtrain",
+        [516] = "Nebula", [517] = "Majestic", [518] = "Buccaneer", [519] = "Shamal",
+        [520] = "Hydra", [521] = "FCR-900", [522] = "NRG-500", [523] = "HPV1000",
+        [524] = "Cement Truck", [525] = "Tow Truck", [526] = "Fortune", [527] = "Cadrona",
+        [528] = "FBI Truck", [529] = "Willard", [530] = "Forklift", [531] = "Tractor",
+        [532] = "Combine", [533] = "Feltzer", [534] = "Remington", [535] = "Slamvan",
+        [536] = "Blade", [537] = "Freight", [538] = "Streak", [539] = "Vortex",
+        [540] = "Vincent", [541] = "Bullet", [542] = "Clover", [543] = "Sadler",
+        [544] = "Firetruck LA", [545] = "Hustler", [546] = "Intruder", [547] = "Primo",
+        [548] = "Cargobob", [549] = "Tampa", [550] = "Sunrise", [551] = "Merit",
+        [552] = "Utility", [553] = "Nevada", [554] = "Yosemite", [555] = "Windsor",
+        [556] = "Monster A", [557] = "Monster B", [558] = "Uranus", [559] = "Jester",
+        [560] = "Sultan", [561] = "Stratum", [562] = "Elegy", [563] = "Raindance",
+        [564] = "RC Tiger", [565] = "Flash", [566] = "Tahoma", [567] = "Savanna",
+        [568] = "Bandito", [569] = "Freight Flat", [570] = "Streak Car", [571] = "Kart",
+        [572] = "Mower", [573] = "Dune", [574] = "Sweeper", [575] = "Broadway",
+        [576] = "Tornado", [577] = "AT-400", [578] = "DFT-30", [579] = "Huntley",
+        [580] = "Stafford", [581] = "BF-400", [582] = "News Van", [583] = "Tug",
+        [584] = "Petrol Trailer", [585] = "Emperor", [586] = "Wayfarer", [587] = "Euros",
+        [588] = "Hotdog", [589] = "Club", [590] = "Freight Box", [591] = "Article Trailer",
+        [592] = "Andromada", [593] = "Dodo", [594] = "RC Cam", [595] = "Launch",
+        [596] = "Police Car (LSPD)", [597] = "Police Car (SFPD)", [598] = "Police Car (LVPD)",
+        [599] = "Police Ranger", [600] = "Picador", [601] = "SWAT Tank", [602] = "Alpha",
+        [603] = "Phoenix", [604] = "Glendale", [605] = "Sadler", [606] = "Luggage Trailer A",
+        [607] = "Luggage Trailer B", [608] = "Stair Trailer", [609] = "Boxville", [610] = "Farm Plow",
+        [611] = "Utility Trailer"
+    }
+    return vehicleNames[model] or "Vehículo " .. model
+end
 
 -- Función para formatear números
 function formatNumber(num)
@@ -306,6 +381,72 @@ function drawCustomHUD()
         oxygen = math.max(0, math.min(100, (pedOxygen / 1000) * 100))
     else
         oxygen = 100
+    end
+    
+    -- Obtener datos del vehículo si está en uno
+    local vehicle = getPedOccupiedVehicle(localPlayer)
+    local vehicleSpeed = 0
+    local vehicleName = ""
+    if vehicle then
+        vehicleSpeed = getVehicleSpeed(vehicle)
+        local model = getElementModel(vehicle)
+        vehicleName = getVehicleNameFromModel(model) or "Vehículo"
+    end
+    
+    -- ========== VELOCÍMETRO A LA IZQUIERDA (solo si está en vehículo) ==========
+    if vehicle then
+        local speedoX = 20
+        local speedoY = screenHeight - 180
+        local speedoWidth = 200
+        local speedoHeight = 160
+        
+        -- Fondo del velocímetro con efecto de profundidad
+        drawCard(speedoX, speedoY, speedoWidth, speedoHeight, colors.bgCard, true, colors.accentGlow)
+        
+        -- Línea de acento superior
+        dxDrawRectangle(speedoX, speedoY, speedoWidth, 4, tocolor(colors.accent[1], colors.accent[2], colors.accent[3], colors.accent[4]), true)
+        dxDrawRectangle(speedoX, speedoY, speedoWidth, 2, tocolor(255, 255, 255, 60), true)
+        
+        -- Velocidad grande en el centro
+        local speedColor = vehicleSpeed > 200 and colors.health or (vehicleSpeed > 100 and colors.hunger or colors.healthGood)
+        local speedText = tostring(vehicleSpeed)
+        local speedTextSize = 1.8
+        if vehicleSpeed >= 100 then
+            speedTextSize = 1.6
+        end
+        
+        dxDrawModernText(speedText, speedoX + 20, speedoY + 20, speedoX + speedoWidth - 20, speedoY + 80,
+            tocolor(speedColor[1], speedColor[2], speedColor[3], speedColor[4]),
+            speedTextSize, "default-bold", "center", "top", false, false, true)
+        
+        -- Texto "KM/H"
+        dxDrawModernText("KM/H", speedoX + 20, speedoY + 75, speedoX + speedoWidth - 20, speedoY + 95,
+            tocolor(colors.textMuted[1], colors.textMuted[2], colors.textMuted[3], colors.textMuted[4]),
+            0.65, "default", "center", "top", false, false, true)
+        
+        -- Nombre del vehículo
+        dxDrawModernText(vehicleName, speedoX + 20, speedoY + 100, speedoX + speedoWidth - 20, speedoY + 120,
+            tocolor(colors.textSecondary[1], colors.textSecondary[2], colors.textSecondary[3], colors.textSecondary[4]),
+            0.55, "default", "center", "top", false, false, true)
+        
+        -- Barra de velocidad (indicador visual)
+        local speedPercent = math.min(100, (vehicleSpeed / 380) * 100)  -- Máximo 380 km/h
+        local speedBarY = speedoY + speedoHeight - 25
+        local speedBarWidth = speedoWidth - 40
+        local speedBarX = speedoX + 20
+        drawProgressBar(speedBarX, speedBarY, speedBarWidth, 8, speedPercent, speedColor, {25, 25, 35, 255}, true, speedColor)
+        
+        -- Indicadores de velocidad (marcas)
+        local markY = speedBarY - 12
+        for i = 0, 4 do
+            local markX = speedBarX + (speedBarWidth / 4) * i
+            local markValue = i * 95  -- 0, 95, 190, 285, 380
+            local markColor = markValue <= vehicleSpeed and speedColor or colors.textMuted
+            dxDrawLine(markX, markY, markX, markY + 8, tocolor(markColor[1], markColor[2], markColor[3], markColor[4]), 2, true)
+            dxDrawModernText(tostring(markValue), markX - 15, markY + 10, markX + 15, markY + 25,
+                tocolor(colors.textMuted[1], colors.textMuted[2], colors.textMuted[3], colors.textMuted[4]),
+                0.4, "default", "center", "top", false, false, true)
+        end
     end
     
     -- ========== PARTE SUPERIOR: VIDA, RESPIRACIÓN, COMIDA, AGUA Y DINERO ==========
