@@ -1,7 +1,0 @@
-<meta>
-    <info author="Colombia RP" version="1.0" name="Scoreboard Custom" description="Scoreboard mejorado con IDs y diseño profesional" />
-    <script src="server.lua" type="server" />
-    <script src="client.lua" type="client" />
-    <file src="scoreboard.png" />
-</meta>
-
