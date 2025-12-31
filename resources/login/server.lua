@@ -20,6 +20,9 @@ addEvent("onPlayerSavePosition", true)
 -- ==================== BASE DE DATOS MySQL ====================
 function initDatabase()
     -- Conectar a la base de datos MySQL
+    outputServerLog("[Login] Intentando conectar a MySQL...")
+    outputServerLog("[Login] Host: " .. MYSQL_HOST .. ", DB: " .. MYSQL_DB .. ", User: " .. MYSQL_USER)
+    
     db = dbConnect("mysql", 
         "dbname=" .. MYSQL_DB .. ";host=" .. MYSQL_HOST .. ";port=" .. MYSQL_PORT,
         MYSQL_USER, 
@@ -27,17 +30,21 @@ function initDatabase()
     )
     
     if not db then
+        local errorMsg = dbError()
         outputServerLog("[Login] ERROR: No se pudo conectar a la base de datos MySQL")
+        outputServerLog("[Login] Error: " .. tostring(errorMsg))
         outputServerLog("[Login] Verifica la configuración en server.lua (MYSQL_HOST, MYSQL_USER, MYSQL_PASS, MYSQL_DB)")
         return false
     end
+    
+    outputServerLog("[Login] Conexión a MySQL establecida correctamente")
     
     -- Crear base de datos si no existe (solo si tienes permisos)
     -- dbExec(db, "CREATE DATABASE IF NOT EXISTS " .. MYSQL_DB)
     -- dbExec(db, "USE " .. MYSQL_DB)
     
     -- Crear tabla de usuarios si no existe
-    dbExec(db, [[
+    local query1 = dbQuery(db, [[
         CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
             username VARCHAR(20) UNIQUE NOT NULL,
@@ -49,8 +56,16 @@ function initDatabase()
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ]])
     
+    if query1 then
+        dbPoll(query1, -1)
+        outputServerLog("[Login] Tabla 'users' verificada/creada")
+    else
+        local errorMsg = dbError(db)
+        outputServerLog("[Login] ERROR al crear tabla users: " .. tostring(errorMsg))
+    end
+    
     -- Crear tabla de personajes si no existe (con campos de posición)
-    dbExec(db, [[
+    local query2 = dbQuery(db, [[
         CREATE TABLE IF NOT EXISTS characters (
             id INT AUTO_INCREMENT PRIMARY KEY,
             username VARCHAR(20) NOT NULL,
@@ -73,6 +88,44 @@ function initDatabase()
             FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ]])
+    
+    if query2 then
+        dbPoll(query2, -1)
+        outputServerLog("[Login] Tabla 'characters' verificada/creada")
+    else
+        local errorMsg = dbError(db)
+        outputServerLog("[Login] ERROR al crear tabla characters: " .. tostring(errorMsg))
+        -- Si falla por la foreign key, intentar sin ella
+        if errorMsg and string.find(string.lower(tostring(errorMsg)), "foreign key") then
+            outputServerLog("[Login] Intentando crear tabla sin foreign key...")
+            local query3 = dbQuery(db, [[
+                CREATE TABLE IF NOT EXISTS characters (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    username VARCHAR(20) NOT NULL,
+                    name VARCHAR(20) NOT NULL,
+                    surname VARCHAR(20) NOT NULL,
+                    age INT NOT NULL DEFAULT 18,
+                    gender INT NOT NULL DEFAULT 0,
+                    skin INT NOT NULL DEFAULT 0,
+                    money INT NOT NULL DEFAULT 5000,
+                    created DATETIME NOT NULL,
+                    posX FLOAT DEFAULT 1959.55,
+                    posY FLOAT DEFAULT -1714.46,
+                    posZ FLOAT DEFAULT 10.0,
+                    rotation FLOAT DEFAULT 0.0,
+                    interior INT DEFAULT 0,
+                    dimension INT DEFAULT 0,
+                    lastLogin DATETIME,
+                    INDEX idx_username (username),
+                    INDEX idx_char_id (id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+            ]])
+            if query3 then
+                dbPoll(query3, -1)
+                outputServerLog("[Login] Tabla 'characters' creada sin foreign key")
+            end
+        end
+    end
     
     outputServerLog("[Login] Base de datos MySQL inicializada correctamente")
     return true
@@ -154,20 +207,46 @@ addEventHandler("onPlayerRegister", root, function(username, password, email)
         return
     end
     
+    -- Verificar que la conexión a la base de datos esté activa
+    if not db then
+        outputServerLog("[Login] ERROR: Base de datos no conectada al intentar registrar usuario")
+        triggerClientEvent(client, "onRegisterResult", client, false, "Error de conexión con la base de datos. Contacta a un administrador.")
+        return
+    end
+    
     -- Crear nuevo usuario
     local hashedPassword = hashPassword(password)
     local time = getRealTime()
     local registerDate = string.format("%04d-%02d-%02d %02d:%02d:%02d", 
         time.year + 1900, time.month + 1, time.monthday, time.hour, time.minute, time.second)
     
-    local success = dbExec(db, "INSERT INTO users (username, password, email, registerDate) VALUES (?, ?, ?, ?)", 
+    -- Usar dbQuery y dbPoll para obtener mejor información de errores
+    local query = dbQuery(db, "INSERT INTO users (username, password, email, registerDate) VALUES (?, ?, ?, ?)", 
         username, hashedPassword, email, registerDate)
     
-    if success then
+    if not query then
+        outputServerLog("[Login] ERROR: No se pudo crear la consulta de inserción")
+        triggerClientEvent(client, "onRegisterResult", client, false, "Error al crear la consulta. Intenta de nuevo.")
+        return
+    end
+    
+    local result = dbPoll(query, -1)
+    
+    if result then
         outputServerLog("[Login] Nuevo usuario registrado: " .. username .. " (" .. email .. ")")
         triggerClientEvent(client, "onRegisterResult", client, true, "¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.")
     else
-        triggerClientEvent(client, "onRegisterResult", client, false, "Error al crear la cuenta. Intenta de nuevo.")
+        -- Obtener el error de MySQL
+        local errorMsg = dbError(db)
+        outputServerLog("[Login] ERROR al registrar usuario: " .. tostring(errorMsg))
+        outputServerLog("[Login] Usuario: " .. username .. ", Email: " .. email)
+        
+        -- Mensaje más específico según el error
+        if errorMsg and string.find(string.lower(tostring(errorMsg)), "duplicate") then
+            triggerClientEvent(client, "onRegisterResult", client, false, "Este usuario o email ya está registrado")
+        else
+            triggerClientEvent(client, "onRegisterResult", client, false, "Error al crear la cuenta: " .. tostring(errorMsg))
+        end
     end
 end)
 
