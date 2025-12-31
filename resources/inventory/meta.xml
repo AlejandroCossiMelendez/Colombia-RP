@@ -1,0 +1,6 @@
+<meta>
+    <info author="Colombia RP" version="1.0" name="Inventory System" description="Sistema de inventario para Colombia RP" />
+    <script src="client.lua" type="client" />
+    <script src="server.lua" type="server" />
+</meta>
+
