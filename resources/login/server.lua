@@ -10,12 +10,16 @@ local MYSQL_DB = "mta_login"        -- Nombre de la base de datos
 local MYSQL_PORT = 3306             -- Puerto de MySQL (default: 3306)
 
 -- ==================== REGISTRAR EVENTOS PRIMERO ====================
+-- Es CRÍTICO registrar los eventos ANTES de cualquier otra cosa
 addEvent("onPlayerRegister", true)
 addEvent("onPlayerLogin", true)
 addEvent("onPlayerCreateCharacter", true)
 addEvent("onPlayerSelectCharacter", true)
 addEvent("onRequestCharacters", true)
 addEvent("onPlayerSavePosition", true)
+
+-- Log para verificar que los eventos están registrados
+outputServerLog("[Login] Eventos registrados: onPlayerRegister, onPlayerLogin, onPlayerCreateCharacter, onPlayerSelectCharacter, onRequestCharacters, onPlayerSavePosition")
 
 -- ==================== BASE DE DATOS MySQL ====================
 function initDatabase()
@@ -252,10 +256,21 @@ end)
 
 -- Evento de login
 addEventHandler("onPlayerLogin", root, function(username, password)
-    if not client then return end
+    if not client then 
+        outputServerLog("[Login] ERROR: onPlayerLogin llamado sin client")
+        return 
+    end
+    
+    -- Verificar que la base de datos esté conectada
+    if not db then
+        outputServerLog("[Login] ERROR: Base de datos no conectada al intentar login")
+        triggerClientEvent(client, "onLoginResult", client, false, "Error de conexión con la base de datos. Contacta a un administrador.")
+        return
+    end
     
     -- Asegurar que el jugador no esté ya logueado
     if getElementData(client, "loggedIn") then
+        outputServerLog("[Login] Usuario " .. getPlayerName(client) .. " ya está logueado")
         return
     end
     
@@ -494,11 +509,17 @@ addEventHandler("onPlayerSelectCharacter", root, function(charId)
     dbExec(db, "UPDATE characters SET lastLogin = ? WHERE id = ?", lastLogin, selectedChar.id)
     
     -- Spawnear al jugador en su última posición
+    -- Primero desactivar cámara, luego spawnear
+    fadeCamera(client, false, 0)
     spawnPlayer(client, posX, posY, posZ, rotation, tonumber(selectedChar.skin))
     setElementInterior(client, interior)
     setElementDimension(client, dimension)
-    setCameraTarget(client, client)
-    fadeCamera(client, true)
+    
+    -- Activar cámara después de un pequeño delay
+    setTimer(function()
+        setCameraTarget(client, client)
+        fadeCamera(client, true, 1.0)
+    end, 500, 1)
     
     triggerClientEvent(client, "onCharacterSelectResult", client, true, "Personaje seleccionado: " .. selectedChar.name .. " " .. selectedChar.surname)
     
@@ -666,10 +687,45 @@ addCommandHandler("changechar", function(player)
     triggerClientEvent(player, "onShowCharacterSelection", player, userCharacters)
 end)
 
+-- ==================== PREVENIR SPAWN ANTES DE LOGIN ====================
+-- Cuando un jugador se conecta, asegurar que no spawnee hasta hacer login
+addEventHandler("onPlayerJoin", root, function()
+    -- Desactivar cámara y spawn automático
+    fadeCamera(source, false)
+    setCameraTarget(source, nil)
+    
+    -- Asegurar que el jugador no esté logueado al conectarse
+    setElementData(source, "loggedIn", false)
+    setElementData(source, "characterSelected", false)
+    
+    -- Enviar evento al cliente para mostrar login
+    triggerClientEvent(source, "onPlayerMustLogin", source)
+end)
+
+-- Prevenir spawn automático del gamemode
+addEventHandler("onPlayerSpawn", root, function()
+    -- Si el jugador no ha seleccionado un personaje, cancelar el spawn
+    if not getElementData(source, "characterSelected") then
+        outputServerLog("[Login] Spawn cancelado para " .. getPlayerName(source) .. " - debe hacer login primero")
+        fadeCamera(source, false)
+        setCameraTarget(source, nil)
+        -- No hacer nada más, el cliente mostrará el login
+    end
+end)
+
 -- Cargar base de datos al iniciar el recurso
 addEventHandler("onResourceStart", resourceRoot, function()
     if initDatabase() then
         outputServerLog("[Login] Sistema de autenticación iniciado (MySQL)")
+        
+        -- Para jugadores ya conectados, asegurar que no estén spawneados sin login
+        for _, player in ipairs(getElementsByType("player")) do
+            if not getElementData(player, "characterSelected") then
+                fadeCamera(player, false)
+                setCameraTarget(player, nil)
+                triggerClientEvent(player, "onPlayerMustLogin", player)
+            end
+        end
     else
         outputServerLog("[Login] ERROR: No se pudo inicializar la base de datos")
     end

@@ -159,11 +159,16 @@ function handleMainButtonClick()
     
     if isLoginMode then
         -- Login - Verificar que el recurso esté listo
-        if not getResourceFromName("login") or getResourceState(getResourceFromName("login")) ~= "running" then
+        local loginResource = getResourceFromName("login")
+        if not loginResource or getResourceState(loginResource) ~= "running" then
             showMessage("El sistema de login no está disponible. Por favor espera un momento.", true)
             return
         end
-        triggerServerEvent("onPlayerLogin", localPlayer, username, password)
+        
+        -- Pequeño delay para asegurar que el servidor esté completamente listo
+        setTimer(function()
+            triggerServerEvent("onPlayerLogin", localPlayer, username, password)
+        end, 100, 1)
     else
         -- Registro
         local confirmPassword = guiGetText(confirmPassEdit)
@@ -247,13 +252,32 @@ function destroyLoginWindow()
     end
 end
 
+-- Evento del servidor para forzar login
+addEvent("onPlayerMustLogin", true)
+addEventHandler("onPlayerMustLogin", root, function()
+    -- Asegurar que la cámara esté desactivada
+    fadeCamera(false)
+    setCameraTarget(localPlayer, nil)
+    
+    -- Mostrar login
+    if not loginWindow or not guiGetVisible(loginWindow) then
+        createLoginWindow()
+    end
+end)
+
 -- Mostrar ventana cuando el jugador se conecta o cuando el recurso inicia
 -- SIEMPRE mostrar login primero, sin importar si hay datos guardados
 addEventHandler("onClientResourceStart", resourceRoot, function()
+    -- Asegurar que la cámara esté desactivada
+    fadeCamera(false)
+    setCameraTarget(localPlayer, nil)
+    
     -- Esperar un poco para asegurar que el servidor esté listo
     setTimer(function()
         -- Siempre mostrar login, el servidor verificará si ya está logueado
-        createLoginWindow()
+        if not loginWindow or not guiGetVisible(loginWindow) then
+            createLoginWindow()
+        end
     end, 1500, 1)
 end)
 
@@ -532,6 +556,12 @@ addEventHandler("onCharacterSelectResult", root, function(success, message)
         destroyCharacterWindow()
         showCursor(false)
         guiSetInputEnabled(false)
+        
+        -- Asegurar que la cámara esté activada después de seleccionar personaje
+        setTimer(function()
+            fadeCamera(true, 1.0)
+            setCameraTarget(localPlayer, localPlayer)
+        end, 500, 1)
     else
         outputChatBox(message or "Error al seleccionar el personaje", 255, 0, 0)
     end
