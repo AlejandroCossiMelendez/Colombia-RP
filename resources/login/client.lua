@@ -165,10 +165,16 @@ function handleMainButtonClick()
             return
         end
         
-        -- Pequeño delay para asegurar que el servidor esté completamente listo
+        -- Esperar un momento para asegurar que el servidor esté completamente listo
+        -- Esto es especialmente importante cuando el recurso se reinicia
         setTimer(function()
-            triggerServerEvent("onPlayerLogin", localPlayer, username, password)
-        end, 100, 1)
+            local loginResource = getResourceFromName("login")
+            if loginResource and getResourceState(loginResource) == "running" then
+                triggerServerEvent("onPlayerLogin", localPlayer, username, password)
+            else
+                showMessage("El sistema de login no está disponible. Intenta de nuevo en un momento.", true)
+            end
+        end, 300, 1) -- Aumentado a 300ms para dar más tiempo al servidor
     else
         -- Registro
         local confirmPassword = guiGetText(confirmPassEdit)
@@ -256,8 +262,16 @@ end
 addEvent("onPlayerMustLogin", true)
 addEventHandler("onPlayerMustLogin", root, function()
     -- Asegurar que la cámara esté desactivada
-    fadeCamera(false)
+    fadeCamera(false, 0)
     setCameraTarget(localPlayer, nil)
+    
+    -- Prevenir cualquier movimiento o acción
+    toggleControl("forwards", false)
+    toggleControl("backwards", false)
+    toggleControl("left", false)
+    toggleControl("right", false)
+    toggleControl("fire", false)
+    toggleControl("action", false)
     
     -- Mostrar login
     if not loginWindow or not guiGetVisible(loginWindow) then
@@ -284,12 +298,24 @@ end)
 -- También mostrar cuando el jugador se une al juego
 addEventHandler("onClientPlayerJoin", root, function()
     if source == localPlayer then
+        -- Desactivar cámara inmediatamente
+        fadeCamera(false, 0)
+        setCameraTarget(localPlayer, nil)
+        
+        -- Prevenir controles
+        toggleControl("forwards", false)
+        toggleControl("backwards", false)
+        toggleControl("left", false)
+        toggleControl("right", false)
+        toggleControl("fire", false)
+        toggleControl("action", false)
+        
         setTimer(function()
             -- Siempre mostrar login primero
             if not loginWindow or not guiGetVisible(loginWindow) then
                 createLoginWindow()
             end
-        end, 2000, 1)
+        end, 500, 1) -- Reducido a 500ms para mostrar más rápido
     end
 end)
 
@@ -556,6 +582,14 @@ addEventHandler("onCharacterSelectResult", root, function(success, message)
         destroyCharacterWindow()
         showCursor(false)
         guiSetInputEnabled(false)
+        
+        -- Reactivar controles
+        toggleControl("forwards", true)
+        toggleControl("backwards", true)
+        toggleControl("left", true)
+        toggleControl("right", true)
+        toggleControl("fire", true)
+        toggleControl("action", true)
         
         -- Asegurar que la cámara esté activada después de seleccionar personaje
         setTimer(function()

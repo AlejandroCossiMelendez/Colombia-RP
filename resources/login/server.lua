@@ -690,42 +690,78 @@ end)
 -- ==================== PREVENIR SPAWN ANTES DE LOGIN ====================
 -- Cuando un jugador se conecta, asegurar que no spawnee hasta hacer login
 addEventHandler("onPlayerJoin", root, function()
-    -- Desactivar cámara y spawn automático
-    fadeCamera(source, false)
-    setCameraTarget(source, nil)
-    
     -- Asegurar que el jugador no esté logueado al conectarse
     setElementData(source, "loggedIn", false)
     setElementData(source, "characterSelected", false)
     
-    -- Enviar evento al cliente para mostrar login
-    triggerClientEvent(source, "onPlayerMustLogin", source)
+    -- Desactivar cámara inmediatamente
+    fadeCamera(source, false, 0)
+    setCameraTarget(source, nil)
+    
+    -- Prevenir cualquier spawn automático
+    setTimer(function()
+        -- Verificar si el jugador spawneó sin autorización
+        if isElement(source) and not getElementData(source, "characterSelected") then
+            -- Si el jugador está spawneado, eliminarlo
+            if isPedDead(source) == false then
+                killPed(source)
+            end
+            fadeCamera(source, false, 0)
+            setCameraTarget(source, nil)
+        end
+        
+        -- Enviar evento al cliente para mostrar login
+        if isElement(source) then
+            triggerClientEvent(source, "onPlayerMustLogin", source)
+        end
+    end, 100, 1) -- Ejecutar muy rápido para interceptar el spawn
 end)
 
--- Prevenir spawn automático del gamemode
-addEventHandler("onPlayerSpawn", root, function()
+-- Prevenir spawn automático del gamemode - usar alta prioridad
+addEventHandler("onPlayerSpawn", root, function(spawnpoint)
     -- Si el jugador no ha seleccionado un personaje, cancelar el spawn
     if not getElementData(source, "characterSelected") then
-        outputServerLog("[Login] Spawn cancelado para " .. getPlayerName(source) .. " - debe hacer login primero")
-        fadeCamera(source, false)
+        outputServerLog("[Login] Spawn bloqueado para " .. getPlayerName(source) .. " - debe hacer login primero")
+        
+        -- Cancelar el spawn
+        cancelEvent()
+        
+        -- Asegurar que la cámara esté desactivada
+        fadeCamera(source, false, 0)
         setCameraTarget(source, nil)
-        -- No hacer nada más, el cliente mostrará el login
+        
+        -- Eliminar al jugador si ya spawneó
+        setTimer(function()
+            if isElement(source) and not getElementData(source, "characterSelected") then
+                if isPedDead(source) == false then
+                    killPed(source)
+                end
+                fadeCamera(source, false, 0)
+                setCameraTarget(source, nil)
+            end
+        end, 50, 1)
     end
-end)
+end, true, "high") -- Alta prioridad para ejecutar antes que otros handlers
 
 -- Cargar base de datos al iniciar el recurso
 addEventHandler("onResourceStart", resourceRoot, function()
+    -- IMPORTANTE: Los eventos deben estar registrados ANTES de que cualquier cliente intente usarlos
+    -- Por eso están al principio del archivo
+    
     if initDatabase() then
         outputServerLog("[Login] Sistema de autenticación iniciado (MySQL)")
         
         -- Para jugadores ya conectados, asegurar que no estén spawneados sin login
-        for _, player in ipairs(getElementsByType("player")) do
-            if not getElementData(player, "characterSelected") then
-                fadeCamera(player, false)
-                setCameraTarget(player, nil)
-                triggerClientEvent(player, "onPlayerMustLogin", player)
+        -- Usar un timer para dar tiempo a que todo esté completamente inicializado
+        setTimer(function()
+            for _, player in ipairs(getElementsByType("player")) do
+                if not getElementData(player, "characterSelected") then
+                    fadeCamera(player, false)
+                    setCameraTarget(player, nil)
+                    triggerClientEvent(player, "onPlayerMustLogin", player)
+                end
             end
-        end
+        end, 500, 1) -- Pequeño delay para asegurar que todo esté listo
     else
         outputServerLog("[Login] ERROR: No se pudo inicializar la base de datos")
     end
@@ -752,10 +788,9 @@ addEventHandler("onResourceStop", resourceRoot, function()
         end
     end
     
-    if db then
-        dbClose(db)
-        outputServerLog("[Login] Conexión a la base de datos cerrada")
-    end
+    -- La conexión a la base de datos se cierra automáticamente cuando el recurso se detiene
+    -- No es necesario cerrarla manualmente en MTA
+    outputServerLog("[Login] Recurso detenido - conexión a la base de datos se cerrará automáticamente")
 end)
 
 -- Comando de administrador para ver usuarios
