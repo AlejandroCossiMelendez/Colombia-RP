@@ -165,6 +165,9 @@ function initDatabase()
                     interior INT DEFAULT 0,
                     dimension INT DEFAULT 0,
                     lastLogin DATETIME,
+                    hunger INT NOT NULL DEFAULT 100,
+                    thirst INT NOT NULL DEFAULT 100,
+                    health FLOAT DEFAULT 100.0,
                     INDEX idx_username (username),
                     INDEX idx_char_id (id)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
@@ -172,6 +175,14 @@ function initDatabase()
             if query3 then
                 dbPoll(query3, -1)
                 outputServerLog("[Login] Tabla 'characters' creada sin foreign key")
+                
+                -- Agregar columna de salud si no existe (por si acaso)
+                local checkHealth2 = dbQuery(db, "SHOW COLUMNS FROM characters LIKE 'health'")
+                local healthResult2 = dbPoll(checkHealth2, -1)
+                if not healthResult2 or #healthResult2 == 0 then
+                    dbExec(db, "ALTER TABLE characters ADD COLUMN health FLOAT DEFAULT 100.0")
+                    outputServerLog("[Login] Columna 'health' agregada a la tabla 'characters' (fallback)")
+                end
             end
         end
     end
@@ -608,6 +619,9 @@ addEventHandler("onPlayerSelectCharacter", root, function(charId)
     if savedHealth < 1 then savedHealth = 1 end  -- Mínimo 1 de salud
     if savedHealth > 100 then savedHealth = 100 end  -- Máximo 100 de salud
     
+    -- Debug: verificar que la salud se está cargando correctamente
+    outputServerLog("[Login] Cargando salud del personaje " .. selectedChar.name .. " " .. selectedChar.surname .. ": " .. tostring(savedHealth) .. " (raw: " .. tostring(selectedChar.health) .. ")")
+    
     -- Spawnear al jugador en su última posición
     -- Primero desactivar cámara, luego spawnear
     fadeCamera(client, false, 0)
@@ -769,11 +783,19 @@ addEventHandler("onPlayerSavePosition", root, function()
     local playerThirst = getElementData(client, "characterThirst") or 100
     local playerHealth = getElementHealth(client)
     
-    dbExec(db, [[
+    -- Debug: verificar que la salud se está obteniendo correctamente
+    outputServerLog("[Login] Guardando salud del jugador " .. getPlayerName(client) .. ": " .. tostring(playerHealth))
+    
+    local success = dbExec(db, [[
         UPDATE characters 
         SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ?, health = ? 
         WHERE id = ?
     ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, playerHealth, charId)
+    
+    if not success then
+        local errorMsg = dbError(db)
+        outputServerLog("[Login] ERROR al guardar salud: " .. tostring(errorMsg))
+    end
 end)
 
 -- Guardar dinero cuando cambia
@@ -1073,6 +1095,136 @@ addEventHandler("onPlayerSpawn", root, function(spawnpoint)
         end, 100, 1)
     end
 end, true, "high") -- Alta prioridad para ejecutar antes que otros handlers
+
+-- ==================== SISTEMA DE RESPAWN AL MORIR ====================
+addEventHandler("onPlayerWasted", root, function(ammo, attacker, weapon, bodypart)
+    -- Solo procesar si el jugador tiene un personaje seleccionado
+    if not getElementData(source, "characterSelected") then
+        return
+    end
+    
+    local charId = getElementData(source, "characterId")
+    if not charId then return end
+    
+    -- Obtener posición guardada del personaje
+    local query = dbQuery(db, "SELECT posX, posY, posZ, rotation, interior, dimension, skin, health FROM characters WHERE id = ?", charId)
+    local result = dbPoll(query, -1)
+    
+    if result and #result > 0 then
+        local char = result[1]
+        local posX = tonumber(char.posX) or 1959.55
+        local posY = tonumber(char.posY) or -1714.46
+        local posZ = tonumber(char.posZ) or 10.0
+        local rotation = tonumber(char.rotation) or 0.0
+        local interior = tonumber(char.interior) or 0
+        local dimension = tonumber(char.dimension) or 0
+        local skin = tonumber(char.skin) or 0
+        local savedHealth = tonumber(char.health) or 100.0
+        if savedHealth < 1 then savedHealth = 1 end
+        if savedHealth > 100 then savedHealth = 100 end
+        
+        -- Si la posición guardada está bajo el agua (z < 0.5), usar posición por defecto
+        if posZ < 0.5 then
+            posX = 1959.55
+            posY = -1714.46
+            posZ = 10.0
+            rotation = 0.0
+            outputChatBox("⚠ Has respawneado en una posición segura (tu última posición estaba bajo el agua)", source, 255, 165, 0)
+        end
+        
+        -- Respawnear después de un pequeño delay
+        setTimer(function()
+            if isElement(source) and getElementData(source, "characterSelected") then
+                -- Respawnear en la posición guardada
+                spawnPlayer(source, posX, posY, posZ, rotation, skin)
+                setElementInterior(source, interior)
+                setElementDimension(source, dimension)
+                
+                -- Restaurar salud después de spawnear
+                setTimer(function()
+                    if isElement(source) then
+                        setElementHealth(source, savedHealth)
+                        setElementData(source, "characterHealth", savedHealth)
+                        
+                        -- Restaurar nombre del personaje
+                        local characterName = getElementData(source, "characterName")
+                        local characterSurname = getElementData(source, "characterSurname")
+                        if characterName and characterSurname then
+                            local characterFullName = characterName .. " " .. characterSurname
+                            if string.len(characterFullName) > 22 then
+                                characterFullName = string.sub(characterFullName, 1, 22)
+                            end
+                            characterFullName = string.gsub(characterFullName, " ", "_")
+                            setPlayerName(source, characterFullName)
+                        end
+                        
+                        -- Activar cámara
+                        setCameraTarget(source, source)
+                        fadeCamera(source, true, 1.0)
+                    end
+                end, 100, 1)
+            end
+        end, 2000, 1) -- Esperar 2 segundos antes de respawnear
+    end
+end)
+
+-- ==================== SISTEMA PARA SALIR DEL AGUA ====================
+-- Comando para teletransportarse fuera del agua si está atrapado
+addCommandHandler("salir", function(player)
+    if not getElementData(player, "characterSelected") then
+        return
+    end
+    
+    local x, y, z = getElementPosition(player)
+    local isUnderwater = isElementInWater(player) or (z < 0.5)
+    
+    if isUnderwater then
+        -- Buscar la posición guardada del personaje
+        local charId = getElementData(player, "characterId")
+        if charId then
+            local query = dbQuery(db, "SELECT posX, posY, posZ, rotation, interior, dimension FROM characters WHERE id = ?", charId)
+            local result = dbPoll(query, -1)
+            
+            if result and #result > 0 then
+                local char = result[1]
+                local posX = tonumber(char.posX) or 1959.55
+                local posY = tonumber(char.posY) or -1714.46
+                local posZ = tonumber(char.posZ) or 10.0
+                local rotation = tonumber(char.rotation) or 0.0
+                local interior = tonumber(char.interior) or 0
+                local dimension = tonumber(char.dimension) or 0
+                
+                -- Si la posición guardada también está bajo el agua, usar posición por defecto
+                if posZ < 0.5 then
+                    posX = 1959.55
+                    posY = -1714.46
+                    posZ = 10.0
+                    rotation = 0.0
+                end
+                
+                -- Teletransportar al jugador
+                setElementPosition(player, posX, posY, posZ)
+                setElementRotation(player, 0, 0, rotation)
+                setElementInterior(player, interior)
+                setElementDimension(player, dimension)
+                
+                outputChatBox("✓ Te has teletransportado fuera del agua", player, 0, 255, 0)
+            else
+                -- Si no hay posición guardada, usar posición por defecto
+                setElementPosition(player, 1959.55, -1714.46, 10.0)
+                setElementRotation(player, 0, 0, 0)
+                outputChatBox("✓ Te has teletransportado a una posición segura", player, 0, 255, 0)
+            end
+        else
+            -- Si no hay charId, usar posición por defecto
+            setElementPosition(player, 1959.55, -1714.46, 10.0)
+            setElementRotation(player, 0, 0, 0)
+            outputChatBox("✓ Te has teletransportado a una posición segura", player, 0, 255, 0)
+        end
+    else
+        outputChatBox("No estás bajo el agua. Usa /salir solo si estás atrapado en el agua.", player, 255, 165, 0)
+    end
+end)
 
 -- ==================== SISTEMA DE TIEMPO DEL JUEGO (BOGOTÁ, COLOMBIA) ====================
 -- Función para obtener hora de Bogotá (UTC-5) correctamente
