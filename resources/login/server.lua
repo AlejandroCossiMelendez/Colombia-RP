@@ -3,7 +3,7 @@ local db = nil
 
 -- ==================== CONFIGURACIÓN MySQL ====================
 -- Configura estos valores según tu base de datos MySQL
-local MYSQL_HOST = "localhost"      -- IP o hostname del servidor MySQL
+local MYSQL_HOST = "127.0.0.1"      -- IP o hostname del servidor MySQL
 local MYSQL_USER = "mta_user"           -- Usuario de MySQL
 local MYSQL_PASS = "15306266_Mta"               -- Contraseña de MySQL
 local MYSQL_DB = "mta_login"        -- Nombre de la base de datos
