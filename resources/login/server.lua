@@ -121,6 +121,8 @@ function initDatabase()
             interior INT DEFAULT 0,
             dimension INT DEFAULT 0,
             lastLogin DATETIME,
+            hunger INT NOT NULL DEFAULT 100,
+            thirst INT NOT NULL DEFAULT 100,
             INDEX idx_username (username),
             INDEX idx_char_id (id),
             FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
@@ -130,6 +132,21 @@ function initDatabase()
     if query2 then
         dbPoll(query2, -1)
         outputServerLog("[Login] Tabla 'characters' verificada/creada")
+        
+        -- Agregar columnas de hambre y sed si no existen (para tablas existentes)
+        local checkHunger = dbQuery(db, "SHOW COLUMNS FROM characters LIKE 'hunger'")
+        local hungerResult = dbPoll(checkHunger, -1)
+        if not hungerResult or #hungerResult == 0 then
+            dbExec(db, "ALTER TABLE characters ADD COLUMN hunger INT NOT NULL DEFAULT 100")
+            outputServerLog("[Login] Columna 'hunger' agregada a la tabla 'characters'")
+        end
+        
+        local checkThirst = dbQuery(db, "SHOW COLUMNS FROM characters LIKE 'thirst'")
+        local thirstResult = dbPoll(checkThirst, -1)
+        if not thirstResult or #thirstResult == 0 then
+            dbExec(db, "ALTER TABLE characters ADD COLUMN thirst INT NOT NULL DEFAULT 100")
+            outputServerLog("[Login] Columna 'thirst' agregada a la tabla 'characters'")
+        end
     else
         local errorMsg = dbError(db)
         outputServerLog("[Login] ERROR al crear tabla characters: " .. tostring(errorMsg))
@@ -458,10 +475,10 @@ addEventHandler("onPlayerCreateCharacter", root, function(name, surname, age, ge
     local defaultX, defaultY, defaultZ = 1959.55, -1714.46, 10.0
     
     local success = dbExec(db, [[
-        INSERT INTO characters (username, name, surname, age, gender, skin, money, created, posX, posY, posZ, rotation, interior, dimension) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO characters (username, name, surname, age, gender, skin, money, created, posX, posY, posZ, rotation, interior, dimension, hunger, thirst) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ]], username, name, surname or "", age, tonumber(gender) or 0, tonumber(skin) or 0, 5000, createdDate,
-        defaultX, defaultY, defaultZ, 0.0, 0, 0)
+        defaultX, defaultY, defaultZ, 0.0, 0, 0, 100, 100)
     
     if success then
         outputServerLog("[Login] Nuevo personaje creado: " .. name .. " " .. (surname or "") .. " para " .. username)
@@ -557,6 +574,8 @@ addEventHandler("onPlayerSelectCharacter", root, function(charId)
     setElementData(client, "characterAge", tonumber(selectedChar.age))
     setElementData(client, "characterGender", tonumber(selectedChar.gender))
     setElementData(client, "characterMoney", tonumber(selectedChar.money))
+    setElementData(client, "characterHunger", tonumber(selectedChar.hunger) or 100)
+    setElementData(client, "characterThirst", tonumber(selectedChar.thirst) or 100)
     setElementData(client, "characterSelected", true)
     
     -- Guardar el nombre original del jugador si no está guardado
@@ -740,11 +759,14 @@ addEventHandler("onPlayerSavePosition", root, function()
     local dimension = getElementDimension(client)
     local playerMoney = getPlayerMoney(client)
     
+    local playerHunger = getElementData(client, "characterHunger") or 100
+    local playerThirst = getElementData(client, "characterThirst") or 100
+    
     dbExec(db, [[
         UPDATE characters 
-        SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
+        SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
         WHERE id = ?
-    ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
+    ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
 end)
 
 -- Guardar dinero cuando cambia
@@ -782,11 +804,14 @@ addEventHandler("onPlayerQuit", root, function()
             local dimension = getElementDimension(source)
             local playerMoney = getPlayerMoney(source)
             
+            local playerHunger = getElementData(source, "characterHunger") or 100
+            local playerThirst = getElementData(source, "characterThirst") or 100
+            
             dbExec(db, [[
                 UPDATE characters 
-                SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
+                SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
                 WHERE id = ?
-            ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
+            ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
         end
     end
 end)
@@ -802,12 +827,14 @@ setTimer(function()
                 local interior = getElementInterior(player)
                 local dimension = getElementDimension(player)
                 local playerMoney = getPlayerMoney(player)
+                local playerHunger = getElementData(player, "characterHunger") or 100
+                local playerThirst = getElementData(player, "characterThirst") or 100
                 
                 dbExec(db, [[
                     UPDATE characters 
-                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
+                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
                     WHERE id = ?
-                ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
+                ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
             end
         end
     end
@@ -1164,12 +1191,14 @@ addEventHandler("onResourceStop", resourceRoot, function()
                 local interior = getElementInterior(player)
                 local dimension = getElementDimension(player)
                 local playerMoney = getPlayerMoney(player)
+                local playerHunger = getElementData(player, "characterHunger") or 100
+                local playerThirst = getElementData(player, "characterThirst") or 100
                 
                 dbExec(db, [[
                     UPDATE characters 
-                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
+                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
                     WHERE id = ?
-                ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
+                ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
             end
         end
         
