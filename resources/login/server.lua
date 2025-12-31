@@ -18,6 +18,7 @@ addEvent("onPlayerCreateCharacter", true)
 addEvent("onPlayerSelectCharacter", true)
 addEvent("onRequestCharacters", true)
 addEvent("onPlayerSavePosition", true)
+addEvent("onPlayerMoneyChanged", true)
 
 -- Verificar que los eventos estén registrados (esto se ejecuta cuando el script se carga)
 -- Los eventos están disponibles inmediatamente después de addEvent
@@ -733,15 +734,34 @@ addEventHandler("onPlayerSavePosition", root, function()
     local rotation = getPedRotation(client)
     local interior = getElementInterior(client)
     local dimension = getElementDimension(client)
+    local playerMoney = getPlayerMoney(client)
     
     dbExec(db, [[
         UPDATE characters 
-        SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ? 
+        SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
         WHERE id = ?
-    ]], x, y, z, rotation, interior, dimension, charId)
+    ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
 end)
 
--- Guardar posición periódicamente y al desconectarse
+-- Guardar dinero cuando cambia
+addEventHandler("onPlayerMoneyChanged", root, function(newAmount)
+    if not client then return end
+    
+    if not isPlayerLoggedIn(client) or not getElementData(client, "characterSelected") then
+        return
+    end
+    
+    local charId = getElementData(client, "characterId")
+    if not charId then return end
+    
+    -- Guardar dinero en la base de datos
+    dbExec(db, "UPDATE characters SET money = ? WHERE id = ?", newAmount, charId)
+    
+    -- Actualizar elementData
+    setElementData(client, "characterMoney", newAmount)
+end)
+
+-- Guardar posición y dinero al desconectarse
 addEventHandler("onPlayerQuit", root, function()
     -- Restaurar nombre original antes de desconectarse
     local originalName = getElementData(source, "originalPlayerName")
@@ -756,17 +776,18 @@ addEventHandler("onPlayerQuit", root, function()
             local rotation = getPedRotation(source)
             local interior = getElementInterior(source)
             local dimension = getElementDimension(source)
+            local playerMoney = getPlayerMoney(source)
             
             dbExec(db, [[
                 UPDATE characters 
-                SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ? 
+                SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
                 WHERE id = ?
-            ]], x, y, z, rotation, interior, dimension, charId)
+            ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
         end
     end
 end)
 
--- Guardar posición cada 30 segundos para jugadores activos
+-- Guardar posición y dinero cada 30 segundos para jugadores activos
 setTimer(function()
     for _, player in ipairs(getElementsByType("player")) do
         if isPlayerLoggedIn(player) and getElementData(player, "characterSelected") then
@@ -776,12 +797,13 @@ setTimer(function()
                 local rotation = getPedRotation(player)
                 local interior = getElementInterior(player)
                 local dimension = getElementDimension(player)
+                local playerMoney = getPlayerMoney(player)
                 
                 dbExec(db, [[
                     UPDATE characters 
-                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ? 
+                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
                     WHERE id = ?
-                ]], x, y, z, rotation, interior, dimension, charId)
+                ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
             end
         end
     end
@@ -896,6 +918,10 @@ addEventHandler("onPlayerJoin", root, function()
     -- Asegurar que el jugador no esté logueado al conectarse
     setElementData(source, "loggedIn", false)
     setElementData(source, "characterSelected", false)
+    
+    -- Guardar ID del jugador (usando getElementIndex que devuelve el ID único del jugador)
+    local playerID = getElementIndex(source) or 0
+    setElementData(source, "playerID", playerID)
     
     -- Desactivar cámara inmediatamente
     fadeCamera(source, false, 0)

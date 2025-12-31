@@ -4,9 +4,16 @@ local money = 0
 local health = 100
 local armor = 0
 
--- Cargar imagen para la salud
+-- Cargar imágenes
 local healthImage = nil
 local healthImageLoaded = false
+local moneyImage = nil
+local moneyImageLoaded = false
+
+-- Datos del personaje
+local characterName = ""
+local characterSurname = ""
+local playerID = 0
 
 -- Colores del tema
 local colors = {
@@ -18,8 +25,9 @@ local colors = {
     border = {41, 128, 185, 255}        -- Borde azul
 }
 
--- Tamaño de la imagen de salud (ajusta según tu imagen)
+-- Tamaños de las imágenes
 local healthImageSize = 80 -- Tamaño en píxeles (ancho y alto)
+local moneyImageSize = 40 -- Tamaño de la imagen del dólar
 
 -- Ocultar HUD por defecto de MTA
 addEventHandler("onClientResourceStart", resourceRoot, function()
@@ -32,15 +40,23 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
     setPlayerHudComponentVisible("vehicle_name", false)
     
     -- Cargar imagen de salud
-    -- Cambia "health_icon.png" por el nombre de tu imagen
     healthImage = dxCreateTexture("images/health_icon.png", "argb", true, "clamp")
     if healthImage then
         healthImageLoaded = true
-        outputChatBox("Imagen de salud cargada correctamente", 0, 255, 0)
     else
-        outputChatBox("No se pudo cargar la imagen de salud. Usando diseño por defecto.", 255, 255, 0)
         healthImageLoaded = false
     end
+    
+    -- Cargar imagen del dólar
+    moneyImage = dxCreateTexture("images/dolar.png", "argb", true, "clamp")
+    if moneyImage then
+        moneyImageLoaded = true
+    else
+        moneyImageLoaded = false
+    end
+    
+    -- Obtener ID del jugador (se establece desde el servidor)
+    playerID = getElementData(localPlayer, "playerID") or 0
 end)
 
 -- Función para formatear números con separadores de miles
@@ -74,34 +90,74 @@ function drawCustomHUD()
     health = getElementHealth(localPlayer)
     armor = getPedArmor(localPlayer)
     
+    -- Obtener nombre del personaje
+    local charName = getElementData(localPlayer, "characterName") or ""
+    local charSurname = getElementData(localPlayer, "characterSurname") or ""
+    characterName = charName
+    characterSurname = charSurname
+    
+    -- Obtener ID del jugador (se establece desde el servidor)
+    playerID = getElementData(localPlayer, "playerID") or 0
+    
     -- Posición del HUD (esquina superior derecha)
-    local hudX = screenWidth - 250
+    local hudX = screenWidth - 280
     local hudY = 20
-    local hudWidth = 230
-    local itemHeight = 35
-    local spacing = 5
+    local hudWidth = 260
+    local itemHeight = 40
+    local spacing = 8
+    
+    -- Calcular altura total del HUD
+    local totalHeight = 50 + (itemHeight * 2) + spacing + healthImageSize + 20
+    if armor > 0 then
+        totalHeight = totalHeight + itemHeight + spacing
+    end
     
     -- Fondo del HUD
-    dxDrawRectangle(hudX, hudY, hudWidth, (itemHeight * 3) + (spacing * 2) + 10, tocolor(colors.background[1], colors.background[2], colors.background[3], colors.background[4]))
+    dxDrawRectangle(hudX, hudY, hudWidth, totalHeight, tocolor(colors.background[1], colors.background[2], colors.background[3], colors.background[4]))
     
     -- Borde superior
     dxDrawRectangle(hudX, hudY, hudWidth, 3, tocolor(colors.border[1], colors.border[2], colors.border[3], colors.border[4]))
     
-    -- Título
-    dxDrawShadowText("COLOMBIA RP", hudX + 10, hudY + 5, hudX + hudWidth - 10, hudY + 20, 
-        tocolor(colors.text[1], colors.text[2], colors.text[3], colors.text[4]), 0.7, "default-bold", "left", "top")
+    -- Título y información del jugador
+    local titleY = hudY + 8
+    dxDrawShadowText("COLOMBIA RP", hudX + 10, titleY, hudX + hudWidth - 10, titleY + 15, 
+        tocolor(colors.text[1], colors.text[2], colors.text[3], colors.text[4]), 0.8, "default-bold", "left", "top")
     
-    local currentY = hudY + 25
+    -- Nombre del personaje e ID
+    local playerInfo = ""
+    if characterName ~= "" and characterSurname ~= "" then
+        playerInfo = characterName .. "_" .. characterSurname
+    else
+        playerInfo = getPlayerName(localPlayer) or "Jugador"
+    end
+    playerInfo = playerInfo .. " [ID: " .. playerID .. "]"
     
-    -- Dinero
-    dxDrawRectangle(hudX + 10, currentY, hudWidth - 20, itemHeight, tocolor(30, 30, 30, 200))
-    dxDrawRectangle(hudX + 10, currentY, 3, itemHeight, tocolor(colors.money[1], colors.money[2], colors.money[3], colors.money[4]))
-    dxDrawShadowText("💰 Dinero", hudX + 20, currentY + 5, hudX + hudWidth - 10, currentY + itemHeight, 
+    dxDrawShadowText(playerInfo, hudX + 10, titleY + 18, hudX + hudWidth - 10, titleY + 33, 
+        tocolor(colors.text[1], colors.text[2], colors.text[3], 180), 0.6, "default", "left", "top")
+    
+    local currentY = hudY + 45
+    
+    -- Dinero con imagen
+    local moneyBoxHeight = itemHeight
+    dxDrawRectangle(hudX + 10, currentY, hudWidth - 20, moneyBoxHeight, tocolor(30, 30, 30, 200))
+    dxDrawRectangle(hudX + 10, currentY, 3, moneyBoxHeight, tocolor(colors.money[1], colors.money[2], colors.money[3], colors.money[4]))
+    
+    -- Imagen del dólar
+    local moneyImageX = hudX + 20
+    local moneyImageY = currentY + (moneyBoxHeight / 2) - (moneyImageSize / 2)
+    
+    if moneyImageLoaded and moneyImage then
+        dxDrawImage(moneyImageX, moneyImageY, moneyImageSize, moneyImageSize, moneyImage, 0, 0, 0, tocolor(255, 255, 255, 255))
+    end
+    
+    -- Texto del dinero
+    local moneyTextX = moneyImageX + moneyImageSize + 10
+    dxDrawShadowText("Dinero", moneyTextX, currentY + 5, hudX + hudWidth - 10, currentY + 20, 
         tocolor(colors.text[1], colors.text[2], colors.text[3], 200), 0.6, "default", "left", "top")
-    dxDrawShadowText("$" .. formatNumber(money), hudX + 20, currentY + 18, hudX + hudWidth - 10, currentY + itemHeight, 
-        tocolor(colors.money[1], colors.money[2], colors.money[3], colors.money[4]), 0.7, "default-bold", "left", "top")
+    dxDrawShadowText("$" .. formatNumber(money), moneyTextX, currentY + 20, hudX + hudWidth - 10, currentY + moneyBoxHeight, 
+        tocolor(colors.money[1], colors.money[2], colors.money[3], colors.money[4]), 0.75, "default-bold", "left", "top")
     
-    currentY = currentY + itemHeight + spacing
+    currentY = currentY + moneyBoxHeight + spacing
     
     -- Salud con imagen PNG
     local healthPercent = math.max(0, math.min(100, health))
@@ -196,6 +252,32 @@ addEventHandler("onClientRender", root, drawCustomHUD)
 -- Actualizar cuando cambia el dinero
 addEventHandler("onClientPlayerMoneyChange", localPlayer, function(newAmount, oldAmount, instant)
     money = newAmount
+    -- Notificar al servidor para guardar en la base de datos
+    triggerServerEvent("onPlayerMoneyChanged", localPlayer, newAmount)
+end)
+
+-- Actualizar datos del personaje cuando se selecciona
+addEventHandler("onClientResourceStart", resourceRoot, function()
+    -- Esperar a que el recurso de login esté listo
+    setTimer(function()
+        if getElementData(localPlayer, "characterSelected") then
+            characterName = getElementData(localPlayer, "characterName") or ""
+            characterSurname = getElementData(localPlayer, "characterSurname") or ""
+            playerID = getElementData(localPlayer, "playerID") or 0
+        end
+    end, 1000, 1)
+end)
+
+-- Escuchar cuando se selecciona un personaje
+addEvent("onCharacterSelectResult", true)
+addEventHandler("onCharacterSelectResult", root, function(success, message)
+    if success then
+        setTimer(function()
+            characterName = getElementData(localPlayer, "characterName") or ""
+            characterSurname = getElementData(localPlayer, "characterSurname") or ""
+            playerID = getElementData(localPlayer, "playerID") or 0
+        end, 500, 1)
+    end
 end)
 
 -- Actualizar cuando cambia la salud

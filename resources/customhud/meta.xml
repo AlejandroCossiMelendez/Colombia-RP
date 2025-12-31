@@ -2,5 +2,6 @@
     <info author="Colombia RP" version="1.0" name="Custom HUD" description="HUD personalizado para Colombia RP" />
     <script src="client.lua" type="client" />
     <file src="images/health_icon.png" />
+    <file src="images/dolar.png" />
 </meta>
 
