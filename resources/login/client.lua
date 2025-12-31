@@ -248,12 +248,12 @@ function destroyLoginWindow()
 end
 
 -- Mostrar ventana cuando el jugador se conecta o cuando el recurso inicia
+-- SIEMPRE mostrar login primero, sin importar si hay datos guardados
 addEventHandler("onClientResourceStart", resourceRoot, function()
     -- Esperar un poco para asegurar que el servidor esté listo
     setTimer(function()
-        if not getElementData(localPlayer, "loggedIn") then
-            createLoginWindow()
-        end
+        -- Siempre mostrar login, el servidor verificará si ya está logueado
+        createLoginWindow()
     end, 1500, 1)
 end)
 
@@ -261,7 +261,19 @@ end)
 addEventHandler("onClientPlayerJoin", root, function()
     if source == localPlayer then
         setTimer(function()
-            if not getElementData(localPlayer, "loggedIn") then
+            -- Siempre mostrar login primero
+            if not loginWindow or not guiGetVisible(loginWindow) then
+                createLoginWindow()
+            end
+        end, 2000, 1)
+    end
+end)
+
+-- Asegurar que el login se muestre al conectar
+addEventHandler("onClientResourceStart", getRootElement(), function(resource)
+    if resource == getThisResource() then
+        setTimer(function()
+            if not loginWindow or not guiGetVisible(loginWindow) then
                 createLoginWindow()
             end
         end, 2000, 1)

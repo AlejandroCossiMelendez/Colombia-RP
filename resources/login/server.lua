@@ -1,175 +1,85 @@
--- Sistema de Autenticación y Registro - Servidor
-local usersFile = "users.xml"
-local charactersFile = "characters.xml"
-local usersData = {}
-local charactersData = {} -- Estructura: charactersData[usernameLower] = {char1, char2, ...}
+-- Sistema de Autenticación y Registro - Servidor (MySQL)
+local db = nil
+
+-- ==================== CONFIGURACIÓN MySQL ====================
+-- Configura estos valores según tu base de datos MySQL
+local MYSQL_HOST = "localhost"      -- IP o hostname del servidor MySQL
+local MYSQL_USER = "mta_user"           -- Usuario de MySQL
+local MYSQL_PASS = "15306266_Mta"               -- Contraseña de MySQL
+local MYSQL_DB = "mta_login"        -- Nombre de la base de datos
+local MYSQL_PORT = 3306             -- Puerto de MySQL (default: 3306)
 
 -- ==================== REGISTRAR EVENTOS PRIMERO ====================
--- Es importante registrar todos los eventos al inicio para que estén disponibles
 addEvent("onPlayerRegister", true)
 addEvent("onPlayerLogin", true)
 addEvent("onPlayerCreateCharacter", true)
 addEvent("onPlayerSelectCharacter", true)
 addEvent("onRequestCharacters", true)
+addEvent("onPlayerSavePosition", true)
 
--- Cargar usuarios desde el archivo XML
-function loadUsers()
-    local xmlFile = xmlLoadFile(usersFile)
-    if not xmlFile then
-        -- Crear archivo si no existe
-        xmlFile = xmlCreateFile(usersFile, "users")
-        xmlSaveFile(xmlFile)
+-- ==================== BASE DE DATOS MySQL ====================
+function initDatabase()
+    -- Conectar a la base de datos MySQL
+    db = dbConnect("mysql", 
+        "dbname=" .. MYSQL_DB .. ";host=" .. MYSQL_HOST .. ";port=" .. MYSQL_PORT,
+        MYSQL_USER, 
+        MYSQL_PASS
+    )
+    
+    if not db then
+        outputServerLog("[Login] ERROR: No se pudo conectar a la base de datos MySQL")
+        outputServerLog("[Login] Verifica la configuración en server.lua (MYSQL_HOST, MYSQL_USER, MYSQL_PASS, MYSQL_DB)")
+        return false
     end
     
-    usersData = {}
-    local usersNode = xmlFindChild(xmlFile, "user", 0)
-    local index = 0
+    -- Crear base de datos si no existe (solo si tienes permisos)
+    -- dbExec(db, "CREATE DATABASE IF NOT EXISTS " .. MYSQL_DB)
+    -- dbExec(db, "USE " .. MYSQL_DB)
     
-    while usersNode do
-        local username = xmlNodeGetAttribute(usersNode, "username")
-        local password = xmlNodeGetAttribute(usersNode, "password")
-        local email = xmlNodeGetAttribute(usersNode, "email")
-        local registerDate = xmlNodeGetAttribute(usersNode, "registerDate")
-        
-        if username and password then
-            usersData[username:lower()] = {
-                username = username,
-                password = password,
-                email = email or "",
-                registerDate = registerDate or getRealTime().year .. "-" .. getRealTime().month .. "-" .. getRealTime().monthday
-            }
-        end
-        
-        index = index + 1
-        usersNode = xmlFindChild(xmlFile, "user", index)
-    end
+    -- Crear tabla de usuarios si no existe
+    dbExec(db, [[
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(20) UNIQUE NOT NULL,
+            password VARCHAR(255) NOT NULL,
+            email VARCHAR(100) UNIQUE NOT NULL,
+            registerDate DATETIME NOT NULL,
+            INDEX idx_username (username),
+            INDEX idx_email (email)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ]])
     
-    xmlUnloadFile(xmlFile)
-    local count = 0
-    for _ in pairs(usersData) do
-        count = count + 1
-    end
-    outputServerLog("[Login] Usuarios cargados: " .. count)
+    -- Crear tabla de personajes si no existe (con campos de posición)
+    dbExec(db, [[
+        CREATE TABLE IF NOT EXISTS characters (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(20) NOT NULL,
+            name VARCHAR(20) NOT NULL,
+            surname VARCHAR(20) NOT NULL,
+            age INT NOT NULL DEFAULT 18,
+            gender INT NOT NULL DEFAULT 0,
+            skin INT NOT NULL DEFAULT 0,
+            money INT NOT NULL DEFAULT 5000,
+            created DATETIME NOT NULL,
+            posX FLOAT DEFAULT 1959.55,
+            posY FLOAT DEFAULT -1714.46,
+            posZ FLOAT DEFAULT 10.0,
+            rotation FLOAT DEFAULT 0.0,
+            interior INT DEFAULT 0,
+            dimension INT DEFAULT 0,
+            lastLogin DATETIME,
+            INDEX idx_username (username),
+            INDEX idx_char_id (id),
+            FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ]])
+    
+    outputServerLog("[Login] Base de datos MySQL inicializada correctamente")
+    return true
 end
 
--- Cargar personajes desde el archivo XML
-function loadCharacters()
-    local xmlFile = xmlLoadFile(charactersFile)
-    if not xmlFile then
-        xmlFile = xmlCreateFile(charactersFile, "characters")
-        xmlSaveFile(xmlFile)
-    end
-    
-    charactersData = {}
-    local charNode = xmlFindChild(xmlFile, "character", 0)
-    local index = 0
-    
-    while charNode do
-        local username = xmlNodeGetAttribute(charNode, "username")
-        local charName = xmlNodeGetAttribute(charNode, "name")
-        local charSurname = xmlNodeGetAttribute(charNode, "surname")
-        local charAge = xmlNodeGetAttribute(charNode, "age")
-        local charGender = xmlNodeGetAttribute(charNode, "gender")
-        local charSkin = xmlNodeGetAttribute(charNode, "skin")
-        local charMoney = xmlNodeGetAttribute(charNode, "money")
-        local charCreated = xmlNodeGetAttribute(charNode, "created")
-        local charId = xmlNodeGetAttribute(charNode, "id")
-        
-        if username and charName then
-            local usernameLower = string.lower(username)
-            if not charactersData[usernameLower] then
-                charactersData[usernameLower] = {}
-            end
-            
-            table.insert(charactersData[usernameLower], {
-                id = charId or #charactersData[usernameLower] + 1,
-                name = charName,
-                surname = charSurname or "",
-                age = tonumber(charAge) or 18,
-                gender = tonumber(charGender) or 0, -- 0 = masculino, 1 = femenino
-                skin = tonumber(charSkin) or 0,
-                money = tonumber(charMoney) or 0,
-                created = charCreated or ""
-            })
-        end
-        
-        index = index + 1
-        charNode = xmlFindChild(xmlFile, "character", index)
-    end
-    
-    xmlUnloadFile(xmlFile)
-    local totalChars = 0
-    for _, chars in pairs(charactersData) do
-        totalChars = totalChars + #chars
-    end
-    outputServerLog("[Login] Personajes cargados: " .. totalChars)
-end
-
--- Guardar personajes en el archivo XML
-function saveCharacters()
-    local xmlFile = xmlLoadFile(charactersFile)
-    if not xmlFile then
-        xmlFile = xmlCreateFile(charactersFile, "characters")
-    end
-    
-    -- Limpiar personajes existentes
-    local charNode = xmlFindChild(xmlFile, "character", 0)
-    while charNode do
-        xmlDestroyNode(charNode)
-        charNode = xmlFindChild(xmlFile, "character", 0)
-    end
-    
-    -- Guardar todos los personajes
-    for username, chars in pairs(charactersData) do
-        for _, charData in ipairs(chars) do
-            local charNode = xmlCreateChild(xmlFile, "character")
-            xmlNodeSetAttribute(charNode, "username", username)
-            xmlNodeSetAttribute(charNode, "id", tostring(charData.id))
-            xmlNodeSetAttribute(charNode, "name", charData.name)
-            xmlNodeSetAttribute(charNode, "surname", charData.surname)
-            xmlNodeSetAttribute(charNode, "age", tostring(charData.age))
-            xmlNodeSetAttribute(charNode, "gender", tostring(charData.gender))
-            xmlNodeSetAttribute(charNode, "skin", tostring(charData.skin))
-            xmlNodeSetAttribute(charNode, "money", tostring(charData.money))
-            xmlNodeSetAttribute(charNode, "created", charData.created)
-        end
-    end
-    
-    xmlSaveFile(xmlFile)
-    xmlUnloadFile(xmlFile)
-end
-
--- Guardar usuarios en el archivo XML
-function saveUsers()
-    local xmlFile = xmlLoadFile(usersFile)
-    if not xmlFile then
-        xmlFile = xmlCreateFile(usersFile, "users")
-    end
-    
-    -- Limpiar usuarios existentes
-    local usersNode = xmlFindChild(xmlFile, "user", 0)
-    while usersNode do
-        xmlDestroyNode(usersNode)
-        usersNode = xmlFindChild(xmlFile, "user", 0)
-    end
-    
-    -- Guardar todos los usuarios
-    for username, userData in pairs(usersData) do
-        local userNode = xmlCreateChild(xmlFile, "user")
-        xmlNodeSetAttribute(userNode, "username", userData.username)
-        xmlNodeSetAttribute(userNode, "password", userData.password)
-        xmlNodeSetAttribute(userNode, "email", userData.email)
-        xmlNodeSetAttribute(userNode, "registerDate", tostring(userData.registerDate))
-    end
-    
-    xmlSaveFile(xmlFile)
-    xmlUnloadFile(xmlFile)
-end
-
--- Función para hashear contraseña (simple, para producción usar SHA256 o mejor)
+-- Función para hashear contraseña
 function hashPassword(password)
-    -- En producción, usar una función de hash real como SHA256
-    -- Por ahora, usamos una función simple
     local hash = 0
     for i = 1, #password do
         hash = hash + string.byte(password, i) * i
@@ -183,7 +93,6 @@ function isValidUsername(username)
         return false, "El usuario debe tener entre 3 y 20 caracteres"
     end
     
-    -- Solo letras, números y guiones bajos
     if not string.match(username, "^[%a%d_]+$") then
         return false, "El usuario solo puede contener letras, números y guiones bajos"
     end
@@ -228,60 +137,65 @@ addEventHandler("onPlayerRegister", root, function(username, password, email)
     end
     
     -- Verificar si el usuario ya existe
-    local usernameLower = string.lower(username)
-    if usersData[usernameLower] then
+    local query = dbQuery(db, "SELECT * FROM users WHERE LOWER(username) = ?", string.lower(username))
+    local result = dbPoll(query, -1)
+    
+    if result and #result > 0 then
         triggerClientEvent(client, "onRegisterResult", client, false, "Este usuario ya está registrado")
         return
     end
     
     -- Verificar si el email ya está en uso
-    for _, userData in pairs(usersData) do
-        if userData.email and string.lower(userData.email) == string.lower(email) then
-            triggerClientEvent(client, "onRegisterResult", client, false, "Este email ya está registrado")
-            return
-        end
+    query = dbQuery(db, "SELECT * FROM users WHERE LOWER(email) = ?", string.lower(email))
+    result = dbPoll(query, -1)
+    
+    if result and #result > 0 then
+        triggerClientEvent(client, "onRegisterResult", client, false, "Este email ya está registrado")
+        return
     end
     
     -- Crear nuevo usuario
     local hashedPassword = hashPassword(password)
     local time = getRealTime()
-    local registerDate = time.year .. "-" .. (time.month + 1) .. "-" .. time.monthday .. " " .. time.hour .. ":" .. time.minute
+    local registerDate = string.format("%04d-%02d-%02d %02d:%02d:%02d", 
+        time.year + 1900, time.month + 1, time.monthday, time.hour, time.minute, time.second)
     
-    usersData[usernameLower] = {
-        username = username,
-        password = hashedPassword,
-        email = email,
-        registerDate = registerDate
-    }
+    local success = dbExec(db, "INSERT INTO users (username, password, email, registerDate) VALUES (?, ?, ?, ?)", 
+        username, hashedPassword, email, registerDate)
     
-    saveUsers()
-    
-    outputServerLog("[Login] Nuevo usuario registrado: " .. username .. " (" .. email .. ")")
-    triggerClientEvent(client, "onRegisterResult", client, true, "¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.")
+    if success then
+        outputServerLog("[Login] Nuevo usuario registrado: " .. username .. " (" .. email .. ")")
+        triggerClientEvent(client, "onRegisterResult", client, true, "¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.")
+    else
+        triggerClientEvent(client, "onRegisterResult", client, false, "Error al crear la cuenta. Intenta de nuevo.")
+    end
 end)
 
 -- Evento de login
 addEventHandler("onPlayerLogin", root, function(username, password)
     if not client then return end
     
+    -- Asegurar que el jugador no esté ya logueado
+    if getElementData(client, "loggedIn") then
+        return
+    end
+    
     if not username or not password then
         triggerClientEvent(client, "onLoginResult", client, false, "Por favor completa todos los campos")
         return
     end
     
-    local usernameLower = string.lower(username)
-    local userData = usersData[usernameLower]
-    
-    if not userData then
-        triggerClientEvent(client, "onLoginResult", client, false, "Usuario o contraseña incorrectos")
-        return
-    end
-    
     local hashedPassword = hashPassword(password)
-    if userData.password ~= hashedPassword then
+    local query = dbQuery(db, "SELECT * FROM users WHERE LOWER(username) = ? AND password = ?", 
+        string.lower(username), hashedPassword)
+    local result = dbPoll(query, -1)
+    
+    if not result or #result == 0 then
         triggerClientEvent(client, "onLoginResult", client, false, "Usuario o contraseña incorrectos")
         return
     end
+    
+    local userData = result[1]
     
     -- Login exitoso
     setElementData(client, "loggedIn", true)
@@ -291,8 +205,31 @@ addEventHandler("onPlayerLogin", root, function(username, password)
     outputServerLog("[Login] Usuario conectado: " .. userData.username .. " (" .. getPlayerName(client) .. ")")
     
     -- Obtener personajes del usuario
-    local usernameLower = string.lower(userData.username)
-    local userCharacters = charactersData[usernameLower] or {}
+    local charQuery = dbQuery(db, "SELECT * FROM characters WHERE LOWER(username) = ? ORDER BY id", 
+        string.lower(userData.username))
+    local charResult = dbPoll(charQuery, -1)
+    
+    local userCharacters = {}
+    if charResult then
+        for _, char in ipairs(charResult) do
+            table.insert(userCharacters, {
+                id = char.id,
+                name = char.name,
+                surname = char.surname,
+                age = tonumber(char.age),
+                gender = tonumber(char.gender),
+                skin = tonumber(char.skin),
+                money = tonumber(char.money),
+                created = char.created,
+                posX = tonumber(char.posX) or 1959.55,
+                posY = tonumber(char.posY) or -1714.46,
+                posZ = tonumber(char.posZ) or 10.0,
+                rotation = tonumber(char.rotation) or 0.0,
+                interior = tonumber(char.interior) or 0,
+                dimension = tonumber(char.dimension) or 0
+            })
+        end
+    end
     
     -- Enviar personajes al cliente para mostrar el panel de selección
     triggerClientEvent(client, "onLoginResult", client, true, "Login exitoso", userCharacters)
@@ -301,12 +238,6 @@ end)
 -- Verificar si el jugador está logueado
 function isPlayerLoggedIn(player)
     return getElementData(player, "loggedIn") == true
-end
-
--- Obtener personajes de un usuario
-function getUserCharacters(username)
-    local usernameLower = string.lower(username)
-    return charactersData[usernameLower] or {}
 end
 
 -- Crear nuevo personaje
@@ -320,8 +251,6 @@ addEventHandler("onPlayerCreateCharacter", root, function(name, surname, age, ge
     
     local username = getElementData(client, "username")
     if not username then return end
-    
-    local usernameLower = string.lower(username)
     
     -- Validaciones
     if not name or string.len(name) < 2 or string.len(name) > 20 then
@@ -341,49 +270,103 @@ addEventHandler("onPlayerCreateCharacter", root, function(name, surname, age, ge
     end
     
     -- Verificar límite de personajes (máximo 3 por usuario)
-    if not charactersData[usernameLower] then
-        charactersData[usernameLower] = {}
-    end
+    local charQuery = dbQuery(db, "SELECT COUNT(*) as count FROM characters WHERE LOWER(username) = ?", 
+        string.lower(username))
+    local charResult = dbPoll(charQuery, -1)
     
-    if #charactersData[usernameLower] >= 3 then
+    if charResult and charResult[1] and tonumber(charResult[1].count) >= 3 then
         triggerClientEvent(client, "onCharacterCreateResult", client, false, "Ya tienes el máximo de personajes (3)")
         return
     end
     
     -- Verificar si el nombre ya existe para este usuario
-    for _, char in ipairs(charactersData[usernameLower]) do
-        if string.lower(char.name) == string.lower(name) and string.lower(char.surname) == string.lower(surname or "") then
-            triggerClientEvent(client, "onCharacterCreateResult", client, false, "Ya tienes un personaje con ese nombre y apellido")
-            return
-        end
+    charQuery = dbQuery(db, "SELECT * FROM characters WHERE LOWER(username) = ? AND LOWER(name) = ? AND LOWER(surname) = ?", 
+        string.lower(username), string.lower(name), string.lower(surname or ""))
+    charResult = dbPoll(charQuery, -1)
+    
+    if charResult and #charResult > 0 then
+        triggerClientEvent(client, "onCharacterCreateResult", client, false, "Ya tienes un personaje con ese nombre y apellido")
+        return
     end
     
-    -- Crear nuevo personaje
+    -- Crear nuevo personaje con posición por defecto
     local time = getRealTime()
-    local createdDate = time.year .. "-" .. (time.month + 1) .. "-" .. time.monthday
+    local createdDate = string.format("%04d-%02d-%02d %02d:%02d:%02d", 
+        time.year + 1900, time.month + 1, time.monthday, time.hour, time.minute, time.second)
     
-    local newChar = {
-        id = #charactersData[usernameLower] + 1,
-        name = name,
-        surname = surname or "",
-        age = age,
-        gender = tonumber(gender) or 0,
-        skin = tonumber(skin) or 0,
-        money = 5000, -- Dinero inicial
-        created = createdDate
-    }
+    local defaultX, defaultY, defaultZ = 1959.55, -1714.46, 10.0
     
-    table.insert(charactersData[usernameLower], newChar)
-    saveCharacters()
+    local success = dbExec(db, [[
+        INSERT INTO characters (username, name, surname, age, gender, skin, money, created, posX, posY, posZ, rotation, interior, dimension) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ]], username, name, surname or "", age, tonumber(gender) or 0, tonumber(skin) or 0, 5000, createdDate,
+        defaultX, defaultY, defaultZ, 0.0, 0, 0)
     
-    outputServerLog("[Login] Nuevo personaje creado: " .. name .. " " .. (surname or "") .. " para " .. username)
-    triggerClientEvent(client, "onCharacterCreateResult", client, true, "Personaje creado exitosamente", newChar)
-    
-    -- Enviar lista actualizada de personajes
-    triggerClientEvent(client, "onCharactersUpdated", client, charactersData[usernameLower])
+    if success then
+        outputServerLog("[Login] Nuevo personaje creado: " .. name .. " " .. (surname or "") .. " para " .. username)
+        
+        -- Obtener el personaje recién creado
+        charQuery = dbQuery(db, "SELECT * FROM characters WHERE LOWER(username) = ? AND LOWER(name) = ? AND LOWER(surname) = ? ORDER BY id DESC LIMIT 1", 
+            string.lower(username), string.lower(name), string.lower(surname or ""))
+        charResult = dbPoll(charQuery, -1)
+        
+        local newChar = nil
+        if charResult and #charResult > 0 then
+            local char = charResult[1]
+            newChar = {
+                id = char.id,
+                name = char.name,
+                surname = char.surname,
+                age = tonumber(char.age),
+                gender = tonumber(char.gender),
+                skin = tonumber(char.skin),
+                money = tonumber(char.money),
+                created = char.created,
+                posX = tonumber(char.posX) or defaultX,
+                posY = tonumber(char.posY) or defaultY,
+                posZ = tonumber(char.posZ) or defaultZ,
+                rotation = tonumber(char.rotation) or 0.0,
+                interior = tonumber(char.interior) or 0,
+                dimension = tonumber(char.dimension) or 0
+            }
+        end
+        
+        triggerClientEvent(client, "onCharacterCreateResult", client, true, "Personaje creado exitosamente", newChar)
+        
+        -- Enviar lista actualizada de personajes
+        charQuery = dbQuery(db, "SELECT * FROM characters WHERE LOWER(username) = ? ORDER BY id", 
+            string.lower(username))
+        charResult = dbPoll(charQuery, -1)
+        
+        local userCharacters = {}
+        if charResult then
+            for _, char in ipairs(charResult) do
+                table.insert(userCharacters, {
+                    id = char.id,
+                    name = char.name,
+                    surname = char.surname,
+                    age = tonumber(char.age),
+                    gender = tonumber(char.gender),
+                    skin = tonumber(char.skin),
+                    money = tonumber(char.money),
+                    created = char.created,
+                    posX = tonumber(char.posX) or defaultX,
+                    posY = tonumber(char.posY) or defaultY,
+                    posZ = tonumber(char.posZ) or defaultZ,
+                    rotation = tonumber(char.rotation) or 0.0,
+                    interior = tonumber(char.interior) or 0,
+                    dimension = tonumber(char.dimension) or 0
+                })
+            end
+        end
+        
+        triggerClientEvent(client, "onCharactersUpdated", client, userCharacters)
+    else
+        triggerClientEvent(client, "onCharacterCreateResult", client, false, "Error al crear el personaje")
+    end
 end)
 
--- Seleccionar personaje
+-- Seleccionar personaje y spawnear en última posición
 addEventHandler("onPlayerSelectCharacter", root, function(charId)
     if not client then return end
     
@@ -394,44 +377,118 @@ addEventHandler("onPlayerSelectCharacter", root, function(charId)
     local username = getElementData(client, "username")
     if not username then return end
     
-    local usernameLower = string.lower(username)
-    local userCharacters = charactersData[usernameLower] or {}
-    
     -- Buscar el personaje
-    local selectedChar = nil
-    for _, char in ipairs(userCharacters) do
-        if tostring(char.id) == tostring(charId) then
-            selectedChar = char
-            break
-        end
-    end
+    local query = dbQuery(db, "SELECT * FROM characters WHERE id = ? AND LOWER(username) = ?", 
+        tonumber(charId), string.lower(username))
+    local result = dbPoll(query, -1)
     
-    if not selectedChar then
+    if not result or #result == 0 then
         triggerClientEvent(client, "onCharacterSelectResult", client, false, "Personaje no encontrado")
         return
     end
+    
+    local selectedChar = result[1]
     
     -- Guardar datos del personaje seleccionado
     setElementData(client, "characterId", selectedChar.id)
     setElementData(client, "characterName", selectedChar.name)
     setElementData(client, "characterSurname", selectedChar.surname)
-    setElementData(client, "characterAge", selectedChar.age)
-    setElementData(client, "characterGender", selectedChar.gender)
-    setElementData(client, "characterMoney", selectedChar.money)
+    setElementData(client, "characterAge", tonumber(selectedChar.age))
+    setElementData(client, "characterGender", tonumber(selectedChar.gender))
+    setElementData(client, "characterMoney", tonumber(selectedChar.money))
     setElementData(client, "characterSelected", true)
+    
+    -- Obtener posición guardada
+    local posX = tonumber(selectedChar.posX) or 1959.55
+    local posY = tonumber(selectedChar.posY) or -1714.46
+    local posZ = tonumber(selectedChar.posZ) or 10.0
+    local rotation = tonumber(selectedChar.rotation) or 0.0
+    local interior = tonumber(selectedChar.interior) or 0
+    local dimension = tonumber(selectedChar.dimension) or 0
     
     outputServerLog("[Login] Personaje seleccionado: " .. selectedChar.name .. " " .. selectedChar.surname .. " por " .. username)
     
-    -- Spawnear al jugador (puedes personalizar esto)
-    spawnPlayer(client, 1959.55, -1714.46, 10, 0, selectedChar.skin)
+    -- Actualizar último login
+    local time = getRealTime()
+    local lastLogin = string.format("%04d-%02d-%02d %02d:%02d:%02d", 
+        time.year + 1900, time.month + 1, time.monthday, time.hour, time.minute, time.second)
+    dbExec(db, "UPDATE characters SET lastLogin = ? WHERE id = ?", lastLogin, selectedChar.id)
+    
+    -- Spawnear al jugador en su última posición
+    spawnPlayer(client, posX, posY, posZ, rotation, tonumber(selectedChar.skin))
+    setElementInterior(client, interior)
+    setElementDimension(client, dimension)
     setCameraTarget(client, client)
     fadeCamera(client, true)
     
     triggerClientEvent(client, "onCharacterSelectResult", client, true, "Personaje seleccionado: " .. selectedChar.name .. " " .. selectedChar.surname)
     
-    -- Aquí puedes agregar más lógica: dar dinero, items, etc.
-    setPlayerMoney(client, selectedChar.money)
+    -- Dar dinero al jugador
+    setPlayerMoney(client, tonumber(selectedChar.money))
 end)
+
+-- Guardar posición del jugador
+addEventHandler("onPlayerSavePosition", root, function()
+    if not client then return end
+    
+    if not isPlayerLoggedIn(client) or not getElementData(client, "characterSelected") then
+        return
+    end
+    
+    local charId = getElementData(client, "characterId")
+    if not charId then return end
+    
+    local x, y, z = getElementPosition(client)
+    local rotation = getPedRotation(client)
+    local interior = getElementInterior(client)
+    local dimension = getElementDimension(client)
+    
+    dbExec(db, [[
+        UPDATE characters 
+        SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ? 
+        WHERE id = ?
+    ]], x, y, z, rotation, interior, dimension, charId)
+end)
+
+-- Guardar posición periódicamente y al desconectarse
+addEventHandler("onPlayerQuit", root, function()
+    if isPlayerLoggedIn(source) and getElementData(source, "characterSelected") then
+        local charId = getElementData(source, "characterId")
+        if charId then
+            local x, y, z = getElementPosition(source)
+            local rotation = getPedRotation(source)
+            local interior = getElementInterior(source)
+            local dimension = getElementDimension(source)
+            
+            dbExec(db, [[
+                UPDATE characters 
+                SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ? 
+                WHERE id = ?
+            ]], x, y, z, rotation, interior, dimension, charId)
+        end
+    end
+end)
+
+-- Guardar posición cada 30 segundos para jugadores activos
+setTimer(function()
+    for _, player in ipairs(getElementsByType("player")) do
+        if isPlayerLoggedIn(player) and getElementData(player, "characterSelected") then
+            local charId = getElementData(player, "characterId")
+            if charId then
+                local x, y, z = getElementPosition(player)
+                local rotation = getPedRotation(player)
+                local interior = getElementInterior(player)
+                local dimension = getElementDimension(player)
+                
+                dbExec(db, [[
+                    UPDATE characters 
+                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ? 
+                    WHERE id = ?
+                ]], x, y, z, rotation, interior, dimension, charId)
+            end
+        end
+    end
+end, 30000, 0) -- Cada 30 segundos
 
 -- Evento para solicitar personajes
 addEventHandler("onRequestCharacters", root, function()
@@ -444,8 +501,31 @@ addEventHandler("onRequestCharacters", root, function()
     local username = getElementData(client, "username")
     if not username then return end
     
-    local usernameLower = string.lower(username)
-    local userCharacters = charactersData[usernameLower] or {}
+    local query = dbQuery(db, "SELECT * FROM characters WHERE LOWER(username) = ? ORDER BY id", 
+        string.lower(username))
+    local result = dbPoll(query, -1)
+    
+    local userCharacters = {}
+    if result then
+        for _, char in ipairs(result) do
+            table.insert(userCharacters, {
+                id = char.id,
+                name = char.name,
+                surname = char.surname,
+                age = tonumber(char.age),
+                gender = tonumber(char.gender),
+                skin = tonumber(char.skin),
+                money = tonumber(char.money),
+                created = char.created,
+                posX = tonumber(char.posX) or 1959.55,
+                posY = tonumber(char.posY) or -1714.46,
+                posZ = tonumber(char.posZ) or 10.0,
+                rotation = tonumber(char.rotation) or 0.0,
+                interior = tonumber(char.interior) or 0,
+                dimension = tonumber(char.dimension) or 0
+            })
+        end
+    end
     
     triggerClientEvent(client, "onCharactersUpdated", client, userCharacters)
 end)
@@ -457,28 +537,90 @@ addCommandHandler("changechar", function(player)
         return
     end
     
+    -- Guardar posición actual antes de cambiar
+    if getElementData(player, "characterSelected") then
+        local charId = getElementData(player, "characterId")
+        if charId then
+            local x, y, z = getElementPosition(player)
+            local rotation = getPedRotation(player)
+            local interior = getElementInterior(player)
+            local dimension = getElementDimension(player)
+            
+            dbExec(db, [[
+                UPDATE characters 
+                SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ? 
+                WHERE id = ?
+            ]], x, y, z, rotation, interior, dimension, charId)
+        end
+    end
+    
     local username = getElementData(player, "username")
     if not username then return end
     
-    local usernameLower = string.lower(username)
-    local userCharacters = charactersData[usernameLower] or {}
+    local query = dbQuery(db, "SELECT * FROM characters WHERE LOWER(username) = ? ORDER BY id", 
+        string.lower(username))
+    local result = dbPoll(query, -1)
+    
+    local userCharacters = {}
+    if result then
+        for _, char in ipairs(result) do
+            table.insert(userCharacters, {
+                id = char.id,
+                name = char.name,
+                surname = char.surname,
+                age = tonumber(char.age),
+                gender = tonumber(char.gender),
+                skin = tonumber(char.skin),
+                money = tonumber(char.money),
+                created = char.created,
+                posX = tonumber(char.posX) or 1959.55,
+                posY = tonumber(char.posY) or -1714.46,
+                posZ = tonumber(char.posZ) or 10.0,
+                rotation = tonumber(char.rotation) or 0.0,
+                interior = tonumber(char.interior) or 0,
+                dimension = tonumber(char.dimension) or 0
+            })
+        end
+    end
     
     -- Enviar personajes al cliente para mostrar el panel
     triggerClientEvent(player, "onShowCharacterSelection", player, userCharacters)
 end)
 
--- Cargar usuarios al iniciar el recurso
+-- Cargar base de datos al iniciar el recurso
 addEventHandler("onResourceStart", resourceRoot, function()
-    loadUsers()
-    loadCharacters()
-    outputServerLog("[Login] Sistema de autenticación iniciado")
+    if initDatabase() then
+        outputServerLog("[Login] Sistema de autenticación iniciado (MySQL)")
+    else
+        outputServerLog("[Login] ERROR: No se pudo inicializar la base de datos")
+    end
 end)
 
--- Guardar usuarios al detener el recurso
+-- Cerrar conexión al detener el recurso
 addEventHandler("onResourceStop", resourceRoot, function()
-    saveUsers()
-    saveCharacters()
-    outputServerLog("[Login] Sistema de autenticación detenido")
+    -- Guardar posiciones de todos los jugadores antes de cerrar
+    for _, player in ipairs(getElementsByType("player")) do
+        if isPlayerLoggedIn(player) and getElementData(player, "characterSelected") then
+            local charId = getElementData(player, "characterId")
+            if charId then
+                local x, y, z = getElementPosition(player)
+                local rotation = getPedRotation(player)
+                local interior = getElementInterior(player)
+                local dimension = getElementDimension(player)
+                
+                dbExec(db, [[
+                    UPDATE characters 
+                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ? 
+                    WHERE id = ?
+                ]], x, y, z, rotation, interior, dimension, charId)
+            end
+        end
+    end
+    
+    if db then
+        dbClose(db)
+        outputServerLog("[Login] Conexión a la base de datos cerrada")
+    end
 end)
 
 -- Comando de administrador para ver usuarios
@@ -488,16 +630,19 @@ addCommandHandler("listusers", function(player)
         return
     end
     
-    local count = 0
-    for _ in pairs(usersData) do
-        count = count + 1
-    end
+    local query = dbQuery(db, "SELECT COUNT(*) as count FROM users")
+    local result = dbPoll(query, -1)
+    local count = result and result[1] and tonumber(result[1].count) or 0
     
     outputChatBox("=== USUARIOS REGISTRADOS ===", player, 255, 255, 0)
     outputChatBox("Total: " .. count, player, 255, 255, 0)
     
-    for username, userData in pairs(usersData) do
-        outputChatBox("- " .. userData.username .. " (" .. userData.email .. ")", player)
+    query = dbQuery(db, "SELECT username, email FROM users LIMIT 20")
+    result = dbPoll(query, -1)
+    
+    if result then
+        for _, user in ipairs(result) do
+            outputChatBox("- " .. user.username .. " (" .. user.email .. ")", player)
+        end
     end
 end)
-
