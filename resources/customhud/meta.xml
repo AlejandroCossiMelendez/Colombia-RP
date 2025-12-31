@@ -1,0 +1,5 @@
+<meta>
+    <info author="Colombia RP" version="1.0" name="Custom HUD" description="HUD personalizado para Colombia RP" />
+    <script src="client.lua" type="client" />
+</meta>
+
