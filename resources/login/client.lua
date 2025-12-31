@@ -607,10 +607,19 @@ addEventHandler("onCharacterSelectResult", root, function(success, message)
         toggleControl("fire", true)
         toggleControl("action", true)
         
+        -- Desactivar controles de vuelo/jetpack
+        toggleControl("jump", true) -- Permitir saltar normalmente
+        -- No hay control directo para jetpack, se maneja desde el servidor
+        
         -- Asegurar que la cámara esté activada después de seleccionar personaje
         setTimer(function()
             fadeCamera(true, 1.0)
             setCameraTarget(localPlayer, localPlayer)
+            
+            -- Desactivar jetpack si lo tiene
+            if doesPedHaveJetPack(localPlayer) then
+                removePedJetPack(localPlayer)
+            end
         end, 500, 1)
     else
         outputChatBox(message or "Error al seleccionar el personaje", 255, 0, 0)
