@@ -22,6 +22,7 @@ addEvent("onPlayerSelectCharacter", true)
 addEvent("onRequestCharacters", true)
 addEvent("onPlayerSavePosition", true)
 addEvent("onPlayerMoneyChanged", true)
+addEvent("onRequestBogotaTime", true)
 
 -- Verificar que los eventos estén registrados (esto se ejecuta cuando el script se carga)
 -- Los eventos están disponibles inmediatamente después de addEvent
@@ -1033,14 +1034,25 @@ addEventHandler("onPlayerSpawn", root, function(spawnpoint)
 end, true, "high") -- Alta prioridad para ejecutar antes que otros handlers
 
 -- ==================== SISTEMA DE TIEMPO DEL JUEGO (BOGOTÁ, COLOMBIA) ====================
--- Función para obtener hora de Bogotá (UTC-5)
+-- Función para obtener hora de Bogotá (UTC-5) correctamente
 function getBogotaTime()
     local time = getRealTime()
-    local hour = time.hour - 5  -- UTC-5 para Bogotá
-    if hour < 0 then
-        hour = hour + 24
+    -- getRealTime() en servidor devuelve hora local del servidor
+    -- Necesitamos obtener UTC real y luego convertir a Bogotá
+    
+    -- Calcular hora UTC: si el servidor está en UTC, usar directamente
+    -- Si está en otra zona, necesitamos el offset
+    -- Por ahora, asumimos que el servidor está en UTC (común en servidores Linux)
+    local utcHour = time.hour
+    local utcMinute = time.minute
+    
+    -- Convertir UTC a hora de Bogotá (UTC-5)
+    local bogotaHour = utcHour - 5
+    if bogotaHour < 0 then
+        bogotaHour = bogotaHour + 24
     end
-    return hour, time.minute
+    
+    return bogotaHour, utcMinute, time.second, time.monthday, time.month + 1, time.year + 1900
 end
 
 -- Función para sincronizar el tiempo del juego con la hora de Bogotá
@@ -1049,6 +1061,22 @@ function syncGameTime()
     setTime(hour, minute)
     setMinuteDuration(60000)  -- 1 minuto real = 1 minuto en el juego (tiempo real)
 end
+
+-- Evento para enviar hora de Bogotá a los clientes
+addEvent("onRequestBogotaTime", true)
+addEventHandler("onRequestBogotaTime", root, function()
+    if not client then return end
+    local hour, minute, second, day, month, year = getBogotaTime()
+    triggerClientEvent(client, "onBogotaTimeReceived", client, hour, minute, second, day, month, year)
+end)
+
+-- Enviar hora a todos los clientes cada segundo
+setTimer(function()
+    local hour, minute, second, day, month, year = getBogotaTime()
+    for _, player in ipairs(getElementsByType("player")) do
+        triggerClientEvent(player, "onBogotaTimeReceived", player, hour, minute, second, day, month, year)
+    end
+end, 1000, 0)  -- Cada segundo
 
 -- Sincronizar tiempo cada minuto
 setTimer(function()

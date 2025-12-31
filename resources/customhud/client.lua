@@ -116,22 +116,59 @@ function drawProgressBar(x, y, width, height, progress, color, bgColor, postGUI)
     end
 end
 
+-- Variables para almacenar hora de Bogotá recibida del servidor
+local bogotaHour = 0
+local bogotaMinute = 0
+local bogotaSecond = 0
+local bogotaDay = 1
+local bogotaMonth = 1
+local bogotaYear = 2024
+
+-- Evento para recibir hora de Bogotá del servidor
+addEvent("onBogotaTimeReceived", true)
+addEventHandler("onBogotaTimeReceived", root, function(hour, minute, second, day, month, year)
+    bogotaHour = hour
+    bogotaMinute = minute
+    bogotaSecond = second
+    bogotaDay = day
+    bogotaMonth = month
+    bogotaYear = year
+end)
+
+-- Solicitar hora al servidor cuando el recurso inicia
+addEventHandler("onClientResourceStart", resourceRoot, function()
+    -- Solicitar hora inmediatamente
+    triggerServerEvent("onRequestBogotaTime", localPlayer)
+    -- Y luego cada 5 segundos para mantener sincronizado
+    setTimer(function()
+        triggerServerEvent("onRequestBogotaTime", localPlayer)
+    end, 5000, 0)
+end)
+
 -- Función para obtener hora de Bogotá, Colombia (UTC-5)
 function getBogotaTime()
-    local time = getRealTime()
-    local hour = time.hour - 5  -- UTC-5 para Bogotá
-    if hour < 0 then
-        hour = hour + 24
+    -- Usar la hora recibida del servidor (más confiable)
+    -- Si no hay hora del servidor aún, usar hora local como fallback
+    if bogotaHour == 0 and bogotaMinute == 0 then
+        local time = getRealTime()
+        local hour = time.hour - 5
+        if hour < 0 then
+            hour = hour + 24
+        end
+        bogotaHour = hour
+        bogotaMinute = time.minute
+        bogotaSecond = time.second
+        bogotaDay = time.monthday
+        bogotaMonth = time.month + 1
+        bogotaYear = time.year + 1900
     end
-    local minute = time.minute
-    local second = time.second
     
     -- Formatear con ceros a la izquierda
-    local hourStr = string.format("%02d", hour)
-    local minuteStr = string.format("%02d", minute)
-    local secondStr = string.format("%02d", second)
+    local hourStr = string.format("%02d", bogotaHour)
+    local minuteStr = string.format("%02d", bogotaMinute)
+    local secondStr = string.format("%02d", bogotaSecond)
     
-    return hourStr, minuteStr, secondStr, time.monthday, time.month + 1, time.year + 1900
+    return hourStr, minuteStr, secondStr, bogotaDay, bogotaMonth, bogotaYear
 end
 
 -- Función para obtener nombre del día y mes
