@@ -51,22 +51,47 @@ function initDatabase()
     -- dbExec(db, "CREATE DATABASE IF NOT EXISTS " .. MYSQL_DB)
     -- dbExec(db, "USE " .. MYSQL_DB)
     
-    -- Crear tabla de usuarios si no existe
+    -- Crear tabla de usuarios si no existe (con campo de rol)
     local query1 = dbQuery(db, [[
         CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
             username VARCHAR(20) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL,
             email VARCHAR(100) UNIQUE NOT NULL,
+            role VARCHAR(20) NOT NULL DEFAULT 'user',
             registerDate DATETIME NOT NULL,
             INDEX idx_username (username),
-            INDEX idx_email (email)
+            INDEX idx_email (email),
+            INDEX idx_role (role)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ]])
     
     if query1 then
         dbPoll(query1, -1)
         outputServerLog("[Login] Tabla 'users' verificada/creada")
+        
+        -- Verificar si la columna 'role' existe y agregarla si no existe
+        -- MySQL no soporta IF NOT EXISTS en ALTER TABLE, así que verificamos primero
+        local checkQuery = dbQuery(db, "SHOW COLUMNS FROM users LIKE 'role'")
+        local checkResult = dbPoll(checkQuery, -1)
+        
+        if not checkResult or #checkResult == 0 then
+            -- La columna no existe, agregarla
+            dbExec(db, "ALTER TABLE users ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'user'")
+            outputServerLog("[Login] Columna 'role' agregada a la tabla 'users'")
+            
+            -- Agregar índice
+            local indexQuery = dbQuery(db, "SHOW INDEX FROM users WHERE Key_name = 'idx_role'")
+            local indexResult = dbPoll(indexQuery, -1)
+            if not indexResult or #indexResult == 0 then
+                dbExec(db, "ALTER TABLE users ADD INDEX idx_role (role)")
+            end
+        else
+            outputServerLog("[Login] Columna 'role' ya existe en la tabla 'users'")
+        end
+        
+        -- Actualizar usuarios existentes sin rol
+        dbExec(db, "UPDATE users SET role = 'user' WHERE role IS NULL OR role = ''")
     else
         local errorMsg = dbError(db)
         outputServerLog("[Login] ERROR al crear tabla users: " .. tostring(errorMsg))
@@ -222,15 +247,18 @@ addEventHandler("onPlayerRegister", root, function(username, password, email)
         return
     end
     
-    -- Crear nuevo usuario
+    -- Crear nuevo usuario (siempre como 'user' por defecto)
     local hashedPassword = hashPassword(password)
     local time = getRealTime()
     local registerDate = string.format("%04d-%02d-%02d %02d:%02d:%02d", 
         time.year + 1900, time.month + 1, time.monthday, time.hour, time.minute, time.second)
     
+    -- Todos los usuarios registrados son 'user' por defecto
+    local defaultRole = "user"
+    
     -- Usar dbQuery y dbPoll para obtener mejor información de errores
-    local query = dbQuery(db, "INSERT INTO users (username, password, email, registerDate) VALUES (?, ?, ?, ?)", 
-        username, hashedPassword, email, registerDate)
+    local query = dbQuery(db, "INSERT INTO users (username, password, email, role, registerDate) VALUES (?, ?, ?, ?, ?)", 
+        username, hashedPassword, email, defaultRole, registerDate)
     
     if not query then
         outputServerLog("[Login] ERROR: No se pudo crear la consulta de inserción")
@@ -326,7 +354,11 @@ addEventHandler("onPlayerCustomLogin", root, function(username, password)
     setElementData(client, "username", userData.username)
     setElementData(client, "userEmail", userData.email)
     
-    outputServerLog("[Login] Usuario conectado: " .. userData.username .. " (" .. getPlayerName(client) .. ")")
+    -- Guardar rol del usuario (user, staff, admin)
+    local userRole = userData.role or "user"
+    setElementData(client, "userRole", userRole)
+    
+    outputServerLog("[Login] Usuario conectado: " .. userData.username .. " (Rol: " .. userRole .. ")")
     
     -- Obtener personajes del usuario
     local charQuery = dbQuery(db, "SELECT * FROM characters WHERE LOWER(username) = ? ORDER BY id", 
@@ -522,6 +554,21 @@ addEventHandler("onPlayerSelectCharacter", root, function(charId)
     setElementData(client, "characterMoney", tonumber(selectedChar.money))
     setElementData(client, "characterSelected", true)
     
+    -- Guardar el nombre original del jugador si no está guardado
+    if not getElementData(client, "originalPlayerName") then
+        setElementData(client, "originalPlayerName", getPlayerName(client))
+    end
+    
+    -- Cambiar el nombre del jugador al nombre del personaje para que aparezca en el scoreboard (TAB)
+    local characterFullName = selectedChar.name .. " " .. selectedChar.surname
+    -- Limitar a 22 caracteres (límite de MTA para nombres de jugador)
+    if string.len(characterFullName) > 22 then
+        characterFullName = string.sub(characterFullName, 1, 22)
+    end
+    -- Reemplazar espacios con guiones bajos porque MTA no permite espacios en nombres
+    characterFullName = string.gsub(characterFullName, " ", "_")
+    setPlayerName(client, characterFullName)
+    
     -- Obtener posición guardada
     local posX = tonumber(selectedChar.posX) or 1959.55
     local posY = tonumber(selectedChar.posY) or -1714.46
@@ -547,15 +594,128 @@ addEventHandler("onPlayerSelectCharacter", root, function(charId)
     
     -- Activar cámara después de un pequeño delay
     setTimer(function()
-        setCameraTarget(client, client)
-        fadeCamera(client, true, 1.0)
+        if isElement(client) then
+            setCameraTarget(client, client)
+            fadeCamera(client, true, 1.0)
+        end
     end, 500, 1)
     
     triggerClientEvent(client, "onCharacterSelectResult", client, true, "Personaje seleccionado: " .. selectedChar.name .. " " .. selectedChar.surname)
     
     -- Dar dinero al jugador
     setPlayerMoney(client, tonumber(selectedChar.money))
+    
+    -- Desactivar jetpack si lo tiene (solo para usuarios normales, admins pueden usarlo)
+    if not isPlayerAdmin(client) then
+        removePedJetPack(client)
+    end
+    
+    -- Enviar el rol del jugador al cliente para que configure los controles apropiadamente
+    local userRole = getPlayerRole(client)
+    triggerClientEvent(client, "onPlayerRoleSet", client, userRole)
+    
+    -- Notificar al jugador sobre el cambio de nombre
+    outputChatBox("Tu nombre ahora es: " .. selectedChar.name .. " " .. selectedChar.surname, client, 0, 255, 0)
+    outputChatBox("Este nombre aparecerá en el scoreboard (TAB)", client, 255, 255, 255)
+    
+    -- Informar sobre permisos de vuelo
+    if userRole == "admin" then
+        outputChatBox("Tienes permisos de administrador - Puedes usar jetpack", client, 0, 255, 0)
+    else
+        outputChatBox("Vuelo deshabilitado - Solo administradores pueden volar", client, 255, 200, 0)
+    end
 end)
+
+-- ==================== SISTEMA DE ROLES ====================
+-- Funciones para verificar roles
+function isPlayerAdmin(player)
+    local role = getElementData(player, "userRole")
+    return role == "admin"
+end
+
+function isPlayerStaff(player)
+    local role = getElementData(player, "userRole")
+    return role == "staff" or role == "admin"
+end
+
+function getPlayerRole(player)
+    return getElementData(player, "userRole") or "user"
+end
+
+-- ==================== PREVENIR JETPACK Y VUELO TIPO SUPERMAN ====================
+-- Monitorear y remover jetpack constantemente (solo para usuarios normales)
+setTimer(function()
+    for _, player in ipairs(getElementsByType("player")) do
+        if isElement(player) and getElementData(player, "characterSelected") then
+            -- Solo prevenir vuelo si NO es admin
+            if not isPlayerAdmin(player) then
+                -- Remover jetpack si lo tiene
+                if doesPedHaveJetPack(player) then
+                    removePedJetPack(player)
+                    outputChatBox("Jetpack desactivado - Solo disponible para administradores", player, 255, 0, 0)
+                end
+                
+                -- Prevenir vuelo tipo superman (detectar si está volando sin vehículo)
+                if not isPedInVehicle(player) then
+                    local x, y, z = getElementPosition(player)
+                    local velocityX, velocityY, velocityZ = getElementVelocity(player)
+                    
+                    -- Detectar vuelo basándose en velocidad vertical y altura
+                    -- Si está subiendo (velocidad Z positiva) o flotando (velocidad Z casi 0 pero alto)
+                    if velocityZ > 0.05 then
+                        -- Está subiendo, forzar caída inmediata
+                        setElementVelocity(player, velocityX, velocityY, -0.3)
+                    elseif velocityZ > -0.05 and velocityZ < 0.05 and z > 5.0 then
+                        -- Está flotando a cierta altura, forzar caída
+                        setElementVelocity(player, velocityX, velocityY, -0.2)
+                    end
+                    
+                    -- Si está extremadamente alto (probablemente volando), teletransportar hacia abajo
+                    if z > 50.0 then
+                        setElementPosition(player, x, y, z - 30.0)
+                        outputChatBox("Vuelo deshabilitado - Solo administradores pueden volar", player, 255, 0, 0)
+                    elseif z > 20.0 and velocityZ >= 0 then
+                        -- Si está alto y no está cayendo, forzar caída más agresiva
+                        setElementVelocity(player, velocityX, velocityY, -0.5)
+                    end
+                end
+            end
+        end
+    end
+end, 200, 0) -- Verificar cada 200ms (más frecuente para prevenir mejor)
+
+-- Prevenir que los jugadores normales obtengan jetpack mediante comandos
+addEventHandler("onPlayerCommand", root, function(command)
+    if command == "jetpack" then
+        if not isPlayerAdmin(source) then
+            cancelEvent()
+            outputChatBox("El comando /jetpack solo está disponible para administradores", source, 255, 0, 0)
+            removePedJetPack(source) -- Asegurar que se quite inmediatamente
+        end
+    end
+end)
+
+-- Prevenir jetpack del gamemode freeroam (doble Shift)
+addEventHandler("onPlayerWeaponSwitch", root, function(previousWeapon, currentWeapon)
+    if not isPlayerAdmin(source) then
+        if doesPedHaveJetPack(source) then
+            removePedJetPack(source)
+        end
+    end
+end)
+
+-- Evento del cliente para verificar jetpack
+addEvent("onClientCheckJetpack", true)
+addEventHandler("onClientCheckJetpack", root, function()
+    if not isPlayerAdmin(source) then
+        if doesPedHaveJetPack(source) then
+            removePedJetPack(source)
+            outputChatBox("Jetpack desactivado - Solo disponible para administradores", source, 255, 0, 0)
+        end
+    end
+end)
+
+-- Nota: La restauración de skin y nombre se maneja en el handler de onPlayerSpawn con alta prioridad más abajo
 
 -- Guardar posición del jugador
 addEventHandler("onPlayerSavePosition", root, function()
@@ -582,6 +742,12 @@ end)
 
 -- Guardar posición periódicamente y al desconectarse
 addEventHandler("onPlayerQuit", root, function()
+    -- Restaurar nombre original antes de desconectarse
+    local originalName = getElementData(source, "originalPlayerName")
+    if originalName then
+        setPlayerName(source, originalName)
+    end
+    
     if isPlayerLoggedIn(source) and getElementData(source, "characterSelected") then
         local charId = getElementData(source, "characterId")
         if charId then
@@ -681,6 +847,12 @@ addCommandHandler("changechar", function(player)
                 SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ? 
                 WHERE id = ?
             ]], x, y, z, rotation, interior, dimension, charId)
+        end
+        
+        -- Restaurar nombre original antes de cambiar de personaje
+        local originalName = getElementData(player, "originalPlayerName")
+        if originalName then
+            setPlayerName(player, originalName)
         end
     end
     
@@ -788,6 +960,45 @@ addEventHandler("onPlayerSpawn", root, function(spawnpoint)
                 setCameraTarget(source, nil)
             end
         end, 50, 1)
+        return
+    end
+    
+    -- Si el jugador tiene un personaje seleccionado, restaurar skin y nombre
+    -- (Este código se ejecuta después de verificar que tiene personaje)
+    local charId = getElementData(source, "characterId")
+    if charId then
+        -- Restaurar skin del personaje desde la base de datos
+        local query = dbQuery(db, "SELECT skin FROM characters WHERE id = ?", charId)
+        local result = dbPoll(query, -1)
+        if result and #result > 0 then
+            local skin = tonumber(result[1].skin) or 0
+            setTimer(function()
+                if isElement(source) then
+                    setElementModel(source, skin)
+                end
+            end, 100, 1)
+        end
+        
+        -- Restaurar nombre del personaje en el scoreboard (TAB)
+        local characterName = getElementData(source, "characterName")
+        local characterSurname = getElementData(source, "characterSurname")
+        if characterName and characterSurname then
+            local characterFullName = characterName .. " " .. characterSurname
+            -- Limitar a 22 caracteres (límite de MTA para nombres de jugador)
+            if string.len(characterFullName) > 22 then
+                characterFullName = string.sub(characterFullName, 1, 22)
+            end
+            -- Reemplazar espacios con guiones bajos porque MTA no permite espacios en nombres
+            characterFullName = string.gsub(characterFullName, " ", "_")
+            setPlayerName(source, characterFullName)
+        end
+        
+        -- Remover jetpack si no es admin
+        setTimer(function()
+            if isElement(source) and not isPlayerAdmin(source) then
+                removePedJetPack(source)
+            end
+        end, 100, 1)
     end
 end, true, "high") -- Alta prioridad para ejecutar antes que otros handlers
 
@@ -845,10 +1056,73 @@ addEventHandler("onResourceStop", resourceRoot, function()
     outputServerLog("[Login] Recurso detenido - conexión a la base de datos se cerrará automáticamente")
 end)
 
+-- ==================== COMANDOS DE ADMINISTRACIÓN ====================
+-- Comando para asignar roles (solo admins)
+addCommandHandler("setrole", function(player, cmd, targetUsername, newRole)
+    if not isPlayerAdmin(player) then
+        outputChatBox("No tienes permisos para usar este comando", player, 255, 0, 0)
+        return
+    end
+    
+    if not targetUsername or not newRole then
+        outputChatBox("Uso: /setrole [usuario] [user|staff|admin]", player, 255, 255, 0)
+        return
+    end
+    
+    -- Validar rol
+    newRole = string.lower(newRole)
+    if newRole ~= "user" and newRole ~= "staff" and newRole ~= "admin" then
+        outputChatBox("Roles válidos: user, staff, admin", player, 255, 0, 0)
+        return
+    end
+    
+    -- Actualizar rol en la base de datos
+    local query = dbQuery(db, "UPDATE users SET role = ? WHERE LOWER(username) = ?", 
+        newRole, string.lower(targetUsername))
+    local result = dbPoll(query, -1)
+    
+    if result then
+        outputChatBox("Rol de " .. targetUsername .. " actualizado a: " .. newRole, player, 0, 255, 0)
+        
+        -- Si el jugador está conectado, actualizar su rol en tiempo real
+        for _, p in ipairs(getElementsByType("player")) do
+            local username = getElementData(p, "username")
+            if username and string.lower(username) == string.lower(targetUsername) then
+                setElementData(p, "userRole", newRole)
+                outputChatBox("Tu rol ha sido actualizado a: " .. newRole, p, 0, 255, 0)
+                
+                -- Si cambió a admin, permitir jetpack
+                if newRole == "admin" then
+                    outputChatBox("Ahora tienes acceso al modo admin (jetpack disponible)", p, 0, 255, 255)
+                else
+                    -- Si dejó de ser admin, quitar jetpack
+                    removePedJetPack(p)
+                    outputChatBox("Modo admin desactivado", p, 255, 255, 0)
+                end
+            end
+        end
+    else
+        outputChatBox("Error al actualizar el rol. Usuario no encontrado.", player, 255, 0, 0)
+    end
+end)
+
+-- Comando para ver tu rol
+addCommandHandler("myrole", function(player)
+    local role = getPlayerRole(player)
+    local roleColor = {255, 255, 255}
+    if role == "admin" then
+        roleColor = {255, 0, 0}
+    elseif role == "staff" then
+        roleColor = {0, 255, 255}
+    end
+    
+    outputChatBox("Tu rol actual: " .. role, player, roleColor[1], roleColor[2], roleColor[3])
+end)
+
 -- Comando de administrador para ver usuarios
 addCommandHandler("listusers", function(player)
-    if not hasObjectPermissionTo(player, "command.kick", false) then
-        outputChatBox("No tienes permisos para usar este comando", player)
+    if not isPlayerStaff(player) then
+        outputChatBox("No tienes permisos para usar este comando", player, 255, 0, 0)
         return
     end
     
@@ -859,12 +1133,18 @@ addCommandHandler("listusers", function(player)
     outputChatBox("=== USUARIOS REGISTRADOS ===", player, 255, 255, 0)
     outputChatBox("Total: " .. count, player, 255, 255, 0)
     
-    query = dbQuery(db, "SELECT username, email FROM users LIMIT 20")
+    query = dbQuery(db, "SELECT username, email, role FROM users LIMIT 20")
     result = dbPoll(query, -1)
     
     if result then
         for _, user in ipairs(result) do
-            outputChatBox("- " .. user.username .. " (" .. user.email .. ")", player)
+            local roleColor = ""
+            if user.role == "admin" then
+                roleColor = " [ADMIN]"
+            elseif user.role == "staff" then
+                roleColor = " [STAFF]"
+            end
+            outputChatBox("- " .. user.username .. " (" .. user.email .. ")" .. roleColor, player)
         end
     end
 end)
