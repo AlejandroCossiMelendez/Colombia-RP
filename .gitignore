@@ -1,0 +1,27 @@
+# Archivos de logs
+logs/
+server.log
+
+# Bases de datos y configuraciones locales
+databases/
+internal.db
+registry.db
+mtaserver.conf  # si contiene datos sensibles
+settings.xml
+acl.xml
+admin.xml
+banlist.xml
+vehiclecolors.conf
+
+# Backups y dumps
+backups/
+dumps/
+
+# Cachés de recursos
+resource-cache/
+
+# Claves del servidor
+server-id.keys
+
+# Zip de recursos (opcional si ya están descomprimidos)
+resources.zip
