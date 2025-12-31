@@ -658,21 +658,38 @@ setTimer(function()
                 -- Prevenir vuelo tipo superman (detectar si está volando sin vehículo)
                 if not isPedInVehicle(player) then
                     local x, y, z = getElementPosition(player)
-                    local groundZ = getGroundPosition(x, y, z)
-                    local distanceToGround = z - groundZ
+                    local velocityX, velocityY, velocityZ = getElementVelocity(player)
                     
-                    -- Si está volando (más de 2 unidades del suelo)
-                    if distanceToGround > 2.0 then
-                        local velocityX, velocityY, velocityZ = getElementVelocity(player)
+                    -- Usar processLineOfSight para detectar el suelo
+                    local hit, hitX, hitY, hitZ, hitElement = processLineOfSight(x, y, z, x, y, z - 50, true, true, true, true, false, false, false, false, player)
+                    
+                    if hit then
+                        local groundZ = hitZ
+                        local distanceToGround = z - groundZ
                         
-                        -- Si está subiendo o flotando, forzar caída
-                        if velocityZ > 0.05 or (velocityZ > -0.05 and velocityZ < 0.05 and distanceToGround > 3.0) then
-                            -- Forzar caída
-                            setElementVelocity(player, velocityX, velocityY, -0.3)
+                        -- Si está volando (más de 2 unidades del suelo)
+                        if distanceToGround > 2.0 then
+                            -- Si está subiendo o flotando, forzar caída
+                            if velocityZ > 0.05 or (velocityZ > -0.05 and velocityZ < 0.05 and distanceToGround > 3.0) then
+                                -- Forzar caída
+                                setElementVelocity(player, velocityX, velocityY, -0.3)
+                                
+                                -- Si está muy alto, teletransportar al suelo
+                                if distanceToGround > 10.0 then
+                                    setElementPosition(player, x, y, groundZ + 1.0)
+                                    outputChatBox("Vuelo deshabilitado - Solo administradores pueden volar", player, 255, 0, 0)
+                                end
+                            end
+                        end
+                    else
+                        -- Si no hay colisión (está muy alto), verificar velocidad
+                        if velocityZ > 0.05 or (velocityZ > -0.05 and velocityZ < 0.05 and z > 10.0) then
+                            -- Está volando sin colisión, forzar caída
+                            setElementVelocity(player, velocityX, velocityY, -0.5)
                             
-                            -- Si está muy alto, teletransportar al suelo
-                            if distanceToGround > 10.0 then
-                                setElementPosition(player, x, y, groundZ + 1.0)
+                            -- Si está extremadamente alto, teletransportar a una posición segura
+                            if z > 50.0 then
+                                setElementPosition(player, x, y, z - 20.0)
                                 outputChatBox("Vuelo deshabilitado - Solo administradores pueden volar", player, 255, 0, 0)
                             end
                         end
