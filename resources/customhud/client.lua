@@ -15,38 +15,45 @@ local characterName = ""
 local characterSurname = ""
 local playerID = 0
 
--- Colores modernos y profesionales
+-- Colores profesionales y modernos con más contraste
 local colors = {
-    -- Fondos
-    bgPrimary = {15, 15, 20, 240},      -- Fondo principal oscuro
-    bgSecondary = {25, 25, 35, 220},   -- Fondo secundario
-    bgCard = {30, 30, 40, 230},        -- Fondo de tarjetas
+    -- Fondos con más profundidad
+    bgPrimary = {10, 10, 15, 250},        -- Fondo principal muy oscuro
+    bgSecondary = {20, 20, 28, 240},      -- Fondo secundario
+    bgCard = {18, 18, 25, 245},          -- Fondo de tarjetas con más opacidad
+    bgCardGlow = {25, 25, 35, 180},      -- Resplandor de tarjetas
     
-    -- Acentos
-    accent = {74, 144, 226, 255},      -- Azul moderno
-    accentDark = {54, 104, 176, 255},  -- Azul oscuro
+    -- Acentos vibrantes
+    accent = {99, 102, 241, 255},         -- Índigo vibrante
+    accentGlow = {99, 102, 241, 100},    -- Resplandor del acento
+    accentDark = {67, 56, 202, 255},      -- Índigo oscuro
     
-    -- Estados
-    money = {52, 211, 153, 255},       -- Verde esmeralda
-    health = {239, 68, 68, 255},       -- Rojo moderno
-    healthGood = {34, 197, 94, 255},  -- Verde saludable
-    armor = {59, 130, 246, 255},       -- Azul armadura
+    -- Estados con más saturación
+    money = {16, 185, 129, 255},          -- Verde esmeralda brillante
+    moneyGlow = {16, 185, 129, 80},      -- Resplandor verde
+    health = {239, 68, 68, 255},          -- Rojo intenso
+    healthGlow = {239, 68, 68, 80},       -- Resplandor rojo
+    healthGood = {34, 197, 94, 255},      -- Verde saludable
+    healthGoodGlow = {34, 197, 94, 80},   -- Resplandor verde salud
+    armor = {59, 130, 246, 255},          -- Azul brillante
+    armorGlow = {59, 130, 246, 80},        -- Resplandor azul
     
-    -- Texto
-    textPrimary = {255, 255, 255, 255},    -- Texto principal
-    textSecondary = {200, 200, 210, 255},   -- Texto secundario
-    textMuted = {150, 150, 160, 255},      -- Texto atenuado
+    -- Texto con mejor contraste
+    textPrimary = {255, 255, 255, 255},   -- Texto principal blanco puro
+    textSecondary = {220, 220, 230, 255}, -- Texto secundario más claro
+    textMuted = {160, 160, 170, 255},     -- Texto atenuado
     
-    -- Bordes y líneas
-    border = {60, 60, 75, 255},        -- Borde sutil
-    divider = {40, 40, 50, 255}        -- Divisor
+    -- Bordes y líneas más definidos
+    border = {50, 50, 65, 255},           -- Borde más visible
+    divider = {35, 35, 45, 255},          -- Divisor más marcado
+    shadow = {0, 0, 0, 200}              -- Sombra profunda
 }
 
 -- Tamaños
-local healthImageSize = 48  -- Reducido para que se vea mejor
-local moneyImageSize = 32
-local cardPadding = 16
-local cardSpacing = 12
+local healthImageSize = 36  -- Más pequeño y profesional
+local moneyImageSize = 28
+local cardPadding = 18
+local cardSpacing = 10
 
 -- Ocultar HUD por defecto de MTA
 addEventHandler("onClientResourceStart", resourceRoot, function()
@@ -89,30 +96,60 @@ function dxDrawModernText(text, x, y, w, h, color, scale, font, alignX, alignY, 
     dxDrawText(text, x, y, w, h, color, scale, font, alignX, alignY, clip, wordBreak, postGUI)
 end
 
--- Función para dibujar tarjeta con sombra
-function drawCard(x, y, width, height, color, postGUI)
-    postGUI = postGUI or true  -- Por defecto dibujar encima de todo
-    -- Sombra
-    dxDrawRectangle(x + 2, y + 2, width, height, tocolor(0, 0, 0, 100), postGUI)
-    -- Tarjeta
+-- Función para dibujar tarjeta profesional con sombra y resplandor
+function drawCard(x, y, width, height, color, postGUI, glowColor)
+    postGUI = postGUI or true
+    glowColor = glowColor or nil
+    
+    -- Sombra profunda (múltiples capas para efecto profesional)
+    dxDrawRectangle(x + 3, y + 3, width, height, tocolor(0, 0, 0, 120), postGUI)
+    dxDrawRectangle(x + 2, y + 2, width, height, tocolor(0, 0, 0, 80), postGUI)
+    dxDrawRectangle(x + 1, y + 1, width, height, tocolor(0, 0, 0, 60), postGUI)
+    
+    -- Resplandor sutil (si se especifica)
+    if glowColor then
+        dxDrawRectangle(x - 1, y - 1, width + 2, height + 2, 
+            tocolor(glowColor[1], glowColor[2], glowColor[3], glowColor[4] or 60), postGUI)
+    end
+    
+    -- Tarjeta principal
     dxDrawRectangle(x, y, width, height, tocolor(color[1], color[2], color[3], color[4]), postGUI)
-    -- Borde superior sutil
-    dxDrawRectangle(x, y, width, 1, tocolor(255, 255, 255, 30), postGUI)
+    
+    -- Borde superior brillante (efecto de luz)
+    dxDrawRectangle(x, y, width, 2, tocolor(255, 255, 255, 40), postGUI)
+    
+    -- Borde inferior sutil
+    dxDrawRectangle(x, y + height - 1, width, 1, tocolor(0, 0, 0, 100), postGUI)
 end
 
--- Función para dibujar barra de progreso moderna
-function drawProgressBar(x, y, width, height, progress, color, bgColor, postGUI)
+-- Función para dibujar barra de progreso profesional con efectos
+function drawProgressBar(x, y, width, height, progress, color, bgColor, postGUI, glowColor)
     postGUI = postGUI or true
     progress = math.max(0, math.min(100, progress))
     local barWidth = (width * progress) / 100
     
-    -- Fondo
-    dxDrawRectangle(x, y, width, height, tocolor(bgColor[1], bgColor[2], bgColor[3], bgColor[4] or 200), postGUI)
-    -- Barra
+    -- Sombra del fondo
+    dxDrawRectangle(x + 1, y + 1, width, height, tocolor(0, 0, 0, 150), postGUI)
+    
+    -- Fondo de la barra
+    dxDrawRectangle(x, y, width, height, tocolor(bgColor[1], bgColor[2], bgColor[3], bgColor[4] or 220), postGUI)
+    
+    -- Barra de progreso
     if barWidth > 0 then
+        -- Resplandor sutil detrás de la barra
+        if glowColor then
+            dxDrawRectangle(x - 1, y - 1, barWidth + 2, height + 2, 
+                tocolor(glowColor[1], glowColor[2], glowColor[3], glowColor[4] or 60), postGUI)
+        end
+        
+        -- Barra principal
         dxDrawRectangle(x, y, barWidth, height, tocolor(color[1], color[2], color[3], color[4] or 255), postGUI)
-        -- Brillo superior
-        dxDrawRectangle(x, y, barWidth, 1, tocolor(255, 255, 255, 80), postGUI)
+        
+        -- Brillo superior (efecto de luz)
+        dxDrawRectangle(x, y, barWidth, 2, tocolor(255, 255, 255, 100), postGUI)
+        
+        -- Brillo inferior sutil
+        dxDrawRectangle(x, y + height - 1, barWidth, 1, tocolor(0, 0, 0, 80), postGUI)
     end
 end
 
@@ -210,13 +247,14 @@ function drawCustomHUD()
     local hudY = 20
     
     -- ========== TARJETA DE RELOJ (BOGOTÁ, COLOMBIA) ==========
-    -- Dibujar con postGUI = true para que se vea delante de todo
-    local clockCardHeight = 80
-    drawCard(hudX, hudY, cardWidth, clockCardHeight, colors.bgCard, true)
+    local clockCardHeight = 85
+    drawCard(hudX, hudY, cardWidth, clockCardHeight, colors.bgCard, true, colors.accentGlow)
     
-    -- Línea de acento superior
-    dxDrawRectangle(hudX, hudY, cardWidth, 3,
+    -- Línea de acento superior con resplandor
+    dxDrawRectangle(hudX, hudY, cardWidth, 4,
         tocolor(colors.accent[1], colors.accent[2], colors.accent[3], colors.accent[4]), true)
+    dxDrawRectangle(hudX, hudY, cardWidth, 2,
+        tocolor(255, 255, 255, 60), true)  -- Brillo superior
     
     -- Obtener hora de Bogotá
     local hour, minute, second, day, month, year = getBogotaTime()
@@ -242,11 +280,12 @@ function drawCustomHUD()
     local currentY = hudY + clockCardHeight + cardSpacing
     
     -- ========== TARJETA DE INFORMACIÓN DEL JUGADOR ==========
-    local playerCardHeight = 70
-    drawCard(hudX, currentY, cardWidth, playerCardHeight, colors.bgCard, true)
+    local playerCardHeight = 75
+    drawCard(hudX, currentY, cardWidth, playerCardHeight, colors.bgCard, true, colors.accentGlow)
     
-    -- Línea de acento superior
-    dxDrawRectangle(hudX, currentY, cardWidth, 3, tocolor(colors.accent[1], colors.accent[2], colors.accent[3], colors.accent[4]), true)
+    -- Línea de acento superior con resplandor
+    dxDrawRectangle(hudX, currentY, cardWidth, 4, tocolor(colors.accent[1], colors.accent[2], colors.accent[3], colors.accent[4]), true)
+    dxDrawRectangle(hudX, currentY, cardWidth, 2, tocolor(255, 255, 255, 60), true)  -- Brillo superior
     
     -- Título del servidor
     dxDrawModernText("COLOMBIA RP", hudX + cardPadding, currentY + 12, hudX + cardWidth - cardPadding, currentY + 30,
@@ -273,12 +312,14 @@ function drawCustomHUD()
     currentY = currentY + playerCardHeight + cardSpacing
     
     -- ========== TARJETA DE DINERO ==========
-    local moneyCardHeight = 60
-    drawCard(hudX, currentY, cardWidth, moneyCardHeight, colors.bgCard, true)
+    local moneyCardHeight = 65
+    drawCard(hudX, currentY, cardWidth, moneyCardHeight, colors.bgCard, true, colors.moneyGlow)
     
-    -- Línea de acento izquierda
-    dxDrawRectangle(hudX, currentY, 3, moneyCardHeight,
+    -- Línea de acento izquierda con resplandor
+    dxDrawRectangle(hudX, currentY, 4, moneyCardHeight,
         tocolor(colors.money[1], colors.money[2], colors.money[3], colors.money[4]), true)
+    dxDrawRectangle(hudX + 1, currentY, 2, moneyCardHeight,
+        tocolor(255, 255, 255, 50), true)  -- Brillo interno
     
     -- Imagen del dólar
     local moneyImageX = hudX + cardPadding
@@ -302,14 +343,18 @@ function drawCustomHUD()
     currentY = currentY + moneyCardHeight + cardSpacing
     
     -- ========== TARJETA DE SALUD ==========
-    local healthCardHeight = 75  -- Reducido porque la imagen es más pequeña
-    drawCard(hudX, currentY, cardWidth, healthCardHeight, colors.bgCard, true)
-    
-    -- Línea de acento izquierda
+    local healthCardHeight = 70  -- Más compacto con imagen más pequeña
     local healthPercent = math.max(0, math.min(100, health))
     local healthColor = healthPercent > 30 and colors.healthGood or colors.health
-    dxDrawRectangle(hudX, currentY, 3, healthCardHeight,
+    local healthGlow = healthPercent > 30 and colors.healthGoodGlow or colors.healthGlow
+    
+    drawCard(hudX, currentY, cardWidth, healthCardHeight, colors.bgCard, true, healthGlow)
+    
+    -- Línea de acento izquierda con resplandor
+    dxDrawRectangle(hudX, currentY, 4, healthCardHeight,
         tocolor(healthColor[1], healthColor[2], healthColor[3], healthColor[4]), true)
+    dxDrawRectangle(hudX + 1, currentY, 2, healthCardHeight,
+        tocolor(255, 255, 255, 50), true)  -- Brillo interno
     
     -- Imagen de salud
     local healthImageX = hudX + cardPadding
@@ -320,11 +365,11 @@ function drawCustomHUD()
         dxDrawImage(healthImageX, healthImageY, healthImageSize, healthImageSize, healthImage, 0, 0, 0,
             tocolor(255, 255, 255, 255), true)
         
-        -- Borde circular de salud
-        local borderThickness = 5
+        -- Borde circular de salud (más delgado y elegante)
+        local borderThickness = 4
         local centerX = healthImageX + (healthImageSize / 2)
         local centerY = healthImageY + (healthImageSize / 2)
-        local radius = (healthImageSize / 2) + 3
+        local radius = (healthImageSize / 2) + 2
         
         -- Fondo del borde (gris oscuro)
         for i = 0, 360, 3 do
@@ -361,24 +406,26 @@ function drawCustomHUD()
         tocolor(healthColor[1], healthColor[2], healthColor[3], healthColor[4]),
         0.95, "default-bold", "left", "top", false, false, true)
     
-    -- Barra de salud debajo
-    local barY = currentY + healthCardHeight - 18
+    -- Barra de salud debajo con resplandor
+    local barY = currentY + healthCardHeight - 16
     local barWidth = cardWidth - (cardPadding * 2) - healthImageSize - 12
     local barX = healthInfoX
-    drawProgressBar(barX, barY, barWidth, 5, healthPercent, healthColor, {40, 40, 50, 255}, true)
+    drawProgressBar(barX, barY, barWidth, 6, healthPercent, healthColor, {25, 25, 35, 255}, true, healthGlow)
     
     currentY = currentY + healthCardHeight + cardSpacing
     
     -- ========== TARJETA DE ARMADURA (solo si tiene) ==========
     if armor > 0 then
-        local armorCardHeight = 60
+        local armorCardHeight = 65
         local armorPercent = math.max(0, math.min(100, armor))
         
-        drawCard(hudX, currentY, cardWidth, armorCardHeight, colors.bgCard, true)
+        drawCard(hudX, currentY, cardWidth, armorCardHeight, colors.bgCard, true, colors.armorGlow)
         
-        -- Línea de acento izquierda
-        dxDrawRectangle(hudX, currentY, 3, armorCardHeight,
+        -- Línea de acento izquierda con resplandor
+        dxDrawRectangle(hudX, currentY, 4, armorCardHeight,
             tocolor(colors.armor[1], colors.armor[2], colors.armor[3], colors.armor[4]), true)
+        dxDrawRectangle(hudX + 1, currentY, 2, armorCardHeight,
+            tocolor(255, 255, 255, 50), true)  -- Brillo interno
         
         -- Texto de armadura
         dxDrawModernText("ARMADURA", hudX + cardPadding, currentY + 10, hudX + cardWidth - cardPadding, currentY + 25,
@@ -389,10 +436,10 @@ function drawCustomHUD()
             tocolor(colors.armor[1], colors.armor[2], colors.armor[3], colors.armor[4]),
             0.9, "default-bold", "left", "top", false, false, true)
         
-        -- Barra de armadura
-        local armorBarY = currentY + armorCardHeight - 15
+        -- Barra de armadura con resplandor
+        local armorBarY = currentY + armorCardHeight - 16
         local armorBarWidth = cardWidth - (cardPadding * 2)
-        drawProgressBar(hudX + cardPadding, armorBarY, armorBarWidth, 6, armorPercent, colors.armor, {40, 40, 50, 255}, true)
+        drawProgressBar(hudX + cardPadding, armorBarY, armorBarWidth, 6, armorPercent, colors.armor, {25, 25, 35, 255}, true, colors.armorGlow)
     end
 end
 
