@@ -1081,26 +1081,30 @@ function getBogotaTime()
         utcMinute = utcTime.min
         utcSecond = utcTime.sec
     else
-        -- Método 2: Si os.date no funciona, asumir que getRealTime() devuelve UTC
-        -- (común en servidores Linux configurados en UTC)
+        -- Método 2: Si os.date no funciona, getRealTime() devuelve hora local del servidor
+        -- Si el servidor muestra 9:56 y Colombia es 14:57, entonces:
+        -- - El servidor está 5 horas ATRÁS de Colombia
+        -- - Necesitamos SUMAR 5 horas para obtener la hora de Colombia
         utcHour = time.hour
         utcMinute = time.minute
         utcSecond = time.second
-        
-        -- Si esto muestra hora incorrecta, el servidor NO está en UTC
-        -- En ese caso, necesitamos ajustar manualmente
-        -- Si el servidor muestra 9:56 y Colombia es 14:57, entonces:
-        -- - El servidor está 5 horas atrás de Colombia
-        -- - Si Colombia es UTC-5, entonces el servidor está en UTC-10 o similar
-        -- - O el servidor está en otra zona horaria
-        
-        -- Por ahora, asumimos UTC y convertimos a Bogotá
     end
     
-    -- Convertir UTC a hora de Bogotá (UTC-5)
-    local bogotaHour = utcHour - 5
+    -- Convertir a hora de Bogotá
+    local bogotaHour
+    if success and utcTime then
+        -- Tenemos UTC real, convertir a Bogotá (UTC-5) = restar 5
+        bogotaHour = utcHour - 5
+    else
+        -- getRealTime() devuelve hora local del servidor que está 5 horas atrás
+        -- Necesitamos SUMAR 5 horas para obtener la hora de Colombia
+        bogotaHour = utcHour + 5
+    end
+    
     if bogotaHour < 0 then
         bogotaHour = bogotaHour + 24
+    elseif bogotaHour >= 24 then
+        bogotaHour = bogotaHour - 24
     end
     
     return bogotaHour, utcMinute, utcSecond, time.monthday, time.month + 1, time.year + 1900
@@ -1113,8 +1117,7 @@ function syncGameTime()
     setMinuteDuration(60000)  -- 1 minuto real = 1 minuto en el juego (tiempo real)
 end
 
--- Evento para enviar hora de Bogotá a los clientes
-addEvent("onRequestBogotaTime", true)
+-- Evento para enviar hora de Bogotá a los clientes (ya está registrado arriba)
 addEventHandler("onRequestBogotaTime", root, function()
     if not client then return end
     local hour, minute, second, day, month, year = getBogotaTime()
