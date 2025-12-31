@@ -594,6 +594,209 @@ end)
 -- Variable para almacenar el rol del jugador
 local playerRole = "user"
 
+-- ==================== PANEL DE VEHÍCULOS ====================
+local vehicleWindow = nil
+
+-- Función para obtener el nombre del modelo del vehículo
+function getVehicleNameFromModel(model)
+    local vehicleNames = {
+        [400] = "Landstalker", [401] = "Bravura", [402] = "Buffalo", [403] = "Linerunner",
+        [404] = "Perennial", [405] = "Sentinel", [406] = "Dumper", [407] = "Firetruck",
+        [408] = "Trashmaster", [409] = "Stretch", [410] = "Manana", [411] = "Infernus",
+        [412] = "Voodoo", [413] = "Pony", [414] = "Mule", [415] = "Cheetah",
+        [416] = "Ambulance", [417] = "Leviathan", [418] = "Moonbeam", [419] = "Esperanto",
+        [420] = "Taxi", [421] = "Washington", [422] = "Bobcat", [423] = "Mr Whoopee",
+        [424] = "BF Injection", [425] = "Hunter", [426] = "Premier", [427] = "Enforcer",
+        [428] = "Securicar", [429] = "Banshee", [430] = "Predator", [431] = "Bus",
+        [432] = "Rhino", [433] = "Barracks", [434] = "Hotknife", [435] = "Trailer",
+        [436] = "Previon", [437] = "Coach", [438] = "Cabbie", [439] = "Stallion",
+        [440] = "Rumpo", [441] = "RC Bandit", [442] = "Romero", [443] = "Packer",
+        [444] = "Monster", [445] = "Admiral", [446] = "Squalo", [447] = "Seasparrow",
+        [448] = "Pizzaboy", [449] = "Tram", [450] = "Trailer", [451] = "Turismo",
+        [452] = "Speeder", [453] = "Reefer", [454] = "Tropic", [455] = "Flatbed",
+        [456] = "Yankee", [457] = "Caddy", [458] = "Solair", [459] = "Berkley's RC Van",
+        [460] = "Skimmer", [461] = "PCJ-600", [462] = "Faggio", [463] = "Freeway",
+        [464] = "RC Baron", [465] = "RC Raider", [466] = "Glendale", [467] = "Oceanic",
+        [468] = "Sanchez", [469] = "Sparrow", [470] = "Patriot", [471] = "Quad",
+        [472] = "Coastguard", [473] = "Dinghy", [474] = "Hermes", [475] = "Sabre",
+        [476] = "Rustler", [477] = "ZR-350", [478] = "Walton", [479] = "Regina",
+        [480] = "Comet", [481] = "BMX", [482] = "Burrito", [483] = "Camper",
+        [484] = "Marquis", [485] = "Baggage", [486] = "Dozer", [487] = "Maverick",
+        [488] = "News Chopper", [489] = "Rancher", [490] = "FBI Rancher", [491] = "Virgo",
+        [492] = "Greenwood", [493] = "Jetmax", [494] = "Hotring", [495] = "Sandking",
+        [496] = "Blista Compact", [497] = "Police Maverick", [498] = "Boxville", [499] = "Benson",
+        [500] = "Mesa", [501] = "RC Goblin", [502] = "Hotring Racer A", [503] = "Hotring Racer B",
+        [504] = "Bloodring Banger", [505] = "Rancher", [506] = "Super GT", [507] = "Elegant",
+        [508] = "Journey", [509] = "Bike", [510] = "Mountain Bike", [511] = "Beagle",
+        [512] = "Cropduster", [513] = "Stunt", [514] = "Tanker", [515] = "Roadtrain",
+        [516] = "Nebula", [517] = "Majestic", [518] = "Buccaneer", [519] = "Shamal",
+        [520] = "Hydra", [521] = "FCR-900", [522] = "NRG-500", [523] = "HPV1000",
+        [524] = "Cement Truck", [525] = "Tow Truck", [526] = "Fortune", [527] = "Cadrona",
+        [528] = "FBI Truck", [529] = "Willard", [530] = "Forklift", [531] = "Tractor",
+        [532] = "Combine", [533] = "Feltzer", [534] = "Remington", [535] = "Slamvan",
+        [536] = "Blade", [537] = "Freight", [538] = "Streak", [539] = "Vortex",
+        [540] = "Vincent", [541] = "Bullet", [542] = "Clover", [543] = "Sadler",
+        [544] = "Firetruck LA", [545] = "Hustler", [546] = "Intruder", [547] = "Primo",
+        [548] = "Cargobob", [549] = "Tampa", [550] = "Sunrise", [551] = "Merit",
+        [552] = "Utility", [553] = "Nevada", [554] = "Yosemite", [555] = "Windsor",
+        [556] = "Monster A", [557] = "Monster B", [558] = "Uranus", [559] = "Jester",
+        [560] = "Sultan", [561] = "Stratum", [562] = "Elegy", [563] = "Raindance",
+        [564] = "RC Tiger", [565] = "Flash", [566] = "Tahoma", [567] = "Savanna",
+        [568] = "Bandito", [569] = "Freight Flat", [570] = "Streak Car", [571] = "Kart",
+        [572] = "Mower", [573] = "Dune", [574] = "Sweeper", [575] = "Broadway",
+        [576] = "Tornado", [577] = "AT-400", [578] = "DFT-30", [579] = "Huntley",
+        [580] = "Stafford", [581] = "BF-400", [582] = "News Van", [583] = "Tug",
+        [584] = "Petrol Trailer", [585] = "Emperor", [586] = "Wayfarer", [587] = "Euros",
+        [588] = "Hotdog", [589] = "Club", [590] = "Freight Box", [591] = "Article Trailer",
+        [592] = "Andromada", [593] = "Dodo", [594] = "RC Cam", [595] = "Launch",
+        [596] = "Police Car (LSPD)", [597] = "Police Car (SFPD)", [598] = "Police Car (LVPD)",
+        [599] = "Police Ranger", [600] = "Picador", [601] = "SWAT Tank", [602] = "Alpha",
+        [603] = "Phoenix", [604] = "Glendale", [605] = "Sadler", [606] = "Luggage Trailer A",
+        [607] = "Luggage Trailer B", [608] = "Stair Trailer", [609] = "Boxville", [610] = "Farm Plow",
+        [611] = "Utility Trailer"
+    }
+    return vehicleNames[model] or "Vehículo " .. model
+end
+
+-- Función para mostrar el panel de vehículos
+function showVehiclePanel(vehicles)
+    if vehicleWindow then
+        destroyElement(vehicleWindow)
+    end
+    
+    local windowWidth, windowHeight = 900, 600
+    local x = (screenWidth - windowWidth) / 2
+    local y = (screenHeight - windowHeight) / 2
+    
+    vehicleWindow = guiCreateWindow(x, y, windowWidth, windowHeight, "Colombia RP - Lista de Vehículos del Servidor", false)
+    guiWindowSetMovable(vehicleWindow, true)
+    guiWindowSetSizable(vehicleWindow, false)
+    guiSetAlpha(vehicleWindow, 1)
+    guiSetVisible(vehicleWindow, true)
+    
+    -- Título
+    local titleLabel = guiCreateLabel(20, 30, windowWidth - 40, 30, "VEHÍCULOS EN EL SERVIDOR (" .. #vehicles .. ")", false, vehicleWindow)
+    guiSetFont(titleLabel, "default-bold")
+    guiLabelSetHorizontalAlign(titleLabel, "center", true)
+    guiLabelSetColor(titleLabel, colors.text[1], colors.text[2], colors.text[3])
+    
+    -- Gridlist para mostrar vehículos
+    local vehicleList = guiCreateGridList(20, 70, windowWidth - 40, 450, false, vehicleWindow)
+    guiGridListAddColumn(vehicleList, "ID", 0.08)
+    guiGridListAddColumn(vehicleList, "Modelo", 0.15)
+    guiGridListAddColumn(vehicleList, "Nombre", 0.2)
+    guiGridListAddColumn(vehicleList, "Posición X", 0.12)
+    guiGridListAddColumn(vehicleList, "Posición Y", 0.12)
+    guiGridListAddColumn(vehicleList, "Posición Z", 0.12)
+    guiGridListAddColumn(vehicleList, "Conductor", 0.21)
+    
+    -- Llenar la lista con vehículos
+    if #vehicles > 0 then
+        for _, vehicle in ipairs(vehicles) do
+            local row = guiGridListAddRow(vehicleList)
+            guiGridListSetItemText(vehicleList, row, 1, tostring(vehicle.id), false, false)
+            guiGridListSetItemText(vehicleList, row, 2, tostring(vehicle.model), false, false)
+            guiGridListSetItemText(vehicleList, row, 3, vehicle.name, false, false)
+            guiGridListSetItemText(vehicleList, row, 4, string.format("%.2f", vehicle.x), false, false)
+            guiGridListSetItemText(vehicleList, row, 5, string.format("%.2f", vehicle.y), false, false)
+            guiGridListSetItemText(vehicleList, row, 6, string.format("%.2f", vehicle.z), false, false)
+            guiGridListSetItemText(vehicleList, row, 7, vehicle.driver or "Ninguno", false, false)
+        end
+    else
+        local row = guiGridListAddRow(vehicleList)
+        guiGridListSetItemText(vehicleList, row, 1, "No hay vehículos", false, false)
+    end
+    
+    -- Botón de generar vehículo
+    local generateButton = guiCreateButton(20, windowHeight - 50, 200, 35, "Generar Vehículo", false, vehicleWindow)
+    guiSetProperty(generateButton, "NormalTextColour", "FF" .. string.format("%02X%02X%02X", colors.success[1], colors.success[2], colors.success[3]))
+    
+    -- Botón de cerrar
+    local closeButton = guiCreateButton(windowWidth - 220, windowHeight - 50, 200, 35, "Cerrar", false, vehicleWindow)
+    guiSetProperty(closeButton, "NormalTextColour", "FF" .. string.format("%02X%02X%02X", colors.text[1], colors.text[2], colors.text[3]))
+    
+    -- Mostrar cursor
+    showCursor(true)
+    guiSetInputEnabled(true)
+    
+    -- Variable para almacenar el vehículo seleccionado
+    local selectedVehicle = nil
+    
+    -- Evento para seleccionar un vehículo de la lista
+    addEventHandler("onClientGUIClick", vehicleList, function(button, state)
+        if button == "left" and state == "up" then
+            local selectedRow = guiGridListGetSelectedItem(vehicleList)
+            if selectedRow >= 0 then
+                local vehicleId = guiGridListGetItemText(vehicleList, selectedRow, 1)
+                local vehicleModel = guiGridListGetItemText(vehicleList, selectedRow, 2)
+                local vehicleName = guiGridListGetItemText(vehicleList, selectedRow, 3)
+                
+                if vehicleId and vehicleId ~= "No hay vehículos" then
+                    selectedVehicle = {
+                        id = vehicleId,
+                        model = tonumber(vehicleModel),
+                        name = vehicleName
+                    }
+                    outputChatBox("Vehículo seleccionado: " .. vehicleName .. " (Modelo: " .. vehicleModel .. ")", 0, 255, 0)
+                end
+            end
+        end
+    end, false)
+    
+    -- Evento para generar vehículo
+    addEventHandler("onClientGUIClick", generateButton, function()
+        if selectedVehicle then
+            triggerServerEvent("onRequestSpawnVehicle", localPlayer, selectedVehicle.model)
+            outputChatBox("Generando vehículo: " .. selectedVehicle.name, 0, 255, 0)
+        else
+            outputChatBox("Por favor selecciona un vehículo de la lista primero", 255, 165, 0)
+        end
+    end, false)
+    
+    -- Evento para cerrar
+    addEventHandler("onClientGUIClick", closeButton, function()
+        destroyElement(vehicleWindow)
+        vehicleWindow = nil
+        showCursor(false)
+        guiSetInputEnabled(false)
+    end, false)
+end
+
+-- Evento para recibir la lista de vehículos del servidor
+addEvent("onVehicleListReceived", true)
+addEventHandler("onVehicleListReceived", root, function(vehicles)
+    showVehiclePanel(vehicles)
+end)
+
+-- Comando para abrir el panel de vehículos (solo para admins)
+addCommandHandler("vehiculos", function()
+    if getElementData(localPlayer, "characterSelected") then
+        -- Verificar si es admin
+        triggerServerEvent("onRequestVehicleList", localPlayer)
+    else
+        outputChatBox("Debes estar logueado para usar este comando", 255, 0, 0)
+    end
+end)
+
+addCommandHandler("autos", function()
+    if getElementData(localPlayer, "characterSelected") then
+        -- Verificar si es admin
+        triggerServerEvent("onRequestVehicleList", localPlayer)
+    else
+        outputChatBox("Debes estar logueado para usar este comando", 255, 0, 0)
+    end
+end)
+
+-- Evento para recibir confirmación de generación de vehículo
+addEvent("onVehicleSpawned", true)
+addEventHandler("onVehicleSpawned", root, function(success, message)
+    if success then
+        outputChatBox(message or "Vehículo generado exitosamente", 0, 255, 0)
+    else
+        outputChatBox(message or "Error al generar el vehículo", 255, 0, 0)
+    end
+end)
+
 addEvent("onCharacterSelectResult", true)
 addEventHandler("onCharacterSelectResult", root, function(success, message)
     if success then

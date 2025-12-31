@@ -1397,6 +1397,180 @@ addEventHandler("onResourceStart", resourceRoot, function()
     end
 end)
 
+-- ==================== SISTEMA DE LISTA DE VEHÍCULOS ====================
+-- Función para obtener el nombre del modelo del vehículo
+function getVehicleNameFromModel(model)
+    local vehicleNames = {
+        [400] = "Landstalker", [401] = "Bravura", [402] = "Buffalo", [403] = "Linerunner",
+        [404] = "Perennial", [405] = "Sentinel", [406] = "Dumper", [407] = "Firetruck",
+        [408] = "Trashmaster", [409] = "Stretch", [410] = "Manana", [411] = "Infernus",
+        [412] = "Voodoo", [413] = "Pony", [414] = "Mule", [415] = "Cheetah",
+        [416] = "Ambulance", [417] = "Leviathan", [418] = "Moonbeam", [419] = "Esperanto",
+        [420] = "Taxi", [421] = "Washington", [422] = "Bobcat", [423] = "Mr Whoopee",
+        [424] = "BF Injection", [425] = "Hunter", [426] = "Premier", [427] = "Enforcer",
+        [428] = "Securicar", [429] = "Banshee", [430] = "Predator", [431] = "Bus",
+        [432] = "Rhino", [433] = "Barracks", [434] = "Hotknife", [435] = "Trailer",
+        [436] = "Previon", [437] = "Coach", [438] = "Cabbie", [439] = "Stallion",
+        [440] = "Rumpo", [441] = "RC Bandit", [442] = "Romero", [443] = "Packer",
+        [444] = "Monster", [445] = "Admiral", [446] = "Squalo", [447] = "Seasparrow",
+        [448] = "Pizzaboy", [449] = "Tram", [450] = "Trailer", [451] = "Turismo",
+        [452] = "Speeder", [453] = "Reefer", [454] = "Tropic", [455] = "Flatbed",
+        [456] = "Yankee", [457] = "Caddy", [458] = "Solair", [459] = "Berkley's RC Van",
+        [460] = "Skimmer", [461] = "PCJ-600", [462] = "Faggio", [463] = "Freeway",
+        [464] = "RC Baron", [465] = "RC Raider", [466] = "Glendale", [467] = "Oceanic",
+        [468] = "Sanchez", [469] = "Sparrow", [470] = "Patriot", [471] = "Quad",
+        [472] = "Coastguard", [473] = "Dinghy", [474] = "Hermes", [475] = "Sabre",
+        [476] = "Rustler", [477] = "ZR-350", [478] = "Walton", [479] = "Regina",
+        [480] = "Comet", [481] = "BMX", [482] = "Burrito", [483] = "Camper",
+        [484] = "Marquis", [485] = "Baggage", [486] = "Dozer", [487] = "Maverick",
+        [488] = "News Chopper", [489] = "Rancher", [490] = "FBI Rancher", [491] = "Virgo",
+        [492] = "Greenwood", [493] = "Jetmax", [494] = "Hotring", [495] = "Sandking",
+        [496] = "Blista Compact", [497] = "Police Maverick", [498] = "Boxville", [499] = "Benson",
+        [500] = "Mesa", [501] = "RC Goblin", [502] = "Hotring Racer A", [503] = "Hotring Racer B",
+        [504] = "Bloodring Banger", [505] = "Rancher", [506] = "Super GT", [507] = "Elegant",
+        [508] = "Journey", [509] = "Bike", [510] = "Mountain Bike", [511] = "Beagle",
+        [512] = "Cropduster", [513] = "Stunt", [514] = "Tanker", [515] = "Roadtrain",
+        [516] = "Nebula", [517] = "Majestic", [518] = "Buccaneer", [519] = "Shamal",
+        [520] = "Hydra", [521] = "FCR-900", [522] = "NRG-500", [523] = "HPV1000",
+        [524] = "Cement Truck", [525] = "Tow Truck", [526] = "Fortune", [527] = "Cadrona",
+        [528] = "FBI Truck", [529] = "Willard", [530] = "Forklift", [531] = "Tractor",
+        [532] = "Combine", [533] = "Feltzer", [534] = "Remington", [535] = "Slamvan",
+        [536] = "Blade", [537] = "Freight", [538] = "Streak", [539] = "Vortex",
+        [540] = "Vincent", [541] = "Bullet", [542] = "Clover", [543] = "Sadler",
+        [544] = "Firetruck LA", [545] = "Hustler", [546] = "Intruder", [547] = "Primo",
+        [548] = "Cargobob", [549] = "Tampa", [550] = "Sunrise", [551] = "Merit",
+        [552] = "Utility", [553] = "Nevada", [554] = "Yosemite", [555] = "Windsor",
+        [556] = "Monster A", [557] = "Monster B", [558] = "Uranus", [559] = "Jester",
+        [560] = "Sultan", [561] = "Stratum", [562] = "Elegy", [563] = "Raindance",
+        [564] = "RC Tiger", [565] = "Flash", [566] = "Tahoma", [567] = "Savanna",
+        [568] = "Bandito", [569] = "Freight Flat", [570] = "Streak Car", [571] = "Kart",
+        [572] = "Mower", [573] = "Dune", [574] = "Sweeper", [575] = "Broadway",
+        [576] = "Tornado", [577] = "AT-400", [578] = "DFT-30", [579] = "Huntley",
+        [580] = "Stafford", [581] = "BF-400", [582] = "News Van", [583] = "Tug",
+        [584] = "Petrol Trailer", [585] = "Emperor", [586] = "Wayfarer", [587] = "Euros",
+        [588] = "Hotdog", [589] = "Club", [590] = "Freight Box", [591] = "Article Trailer",
+        [592] = "Andromada", [593] = "Dodo", [594] = "RC Cam", [595] = "Launch",
+        [596] = "Police Car (LSPD)", [597] = "Police Car (SFPD)", [598] = "Police Car (LVPD)",
+        [599] = "Police Ranger", [600] = "Picador", [601] = "SWAT Tank", [602] = "Alpha",
+        [603] = "Phoenix", [604] = "Glendale", [605] = "Sadler", [606] = "Luggage Trailer A",
+        [607] = "Luggage Trailer B", [608] = "Stair Trailer", [609] = "Boxville", [610] = "Farm Plow",
+        [611] = "Utility Trailer"
+    }
+    return vehicleNames[model] or "Vehículo " .. model
+end
+
+-- Evento para solicitar lista de vehículos (solo para admins)
+addEvent("onRequestVehicleList", true)
+addEventHandler("onRequestVehicleList", root, function()
+    if not client then return end
+    
+    if not isPlayerLoggedIn(client) or not getElementData(client, "characterSelected") then
+        outputChatBox("Debes estar logueado para usar este comando", client, 255, 0, 0)
+        return
+    end
+    
+    -- Verificar si es administrador
+    if not isPlayerAdmin(client) then
+        outputChatBox("Este comando solo está disponible para administradores", client, 255, 0, 0)
+        return
+    end
+    
+    -- Obtener todos los vehículos del servidor
+    local vehicles = {}
+    local allVehicles = getElementsByType("vehicle")
+    
+    for _, vehicle in ipairs(allVehicles) do
+        if isElement(vehicle) then
+            local x, y, z = getElementPosition(vehicle)
+            local model = getElementModel(vehicle)
+            local vehicleName = getVehicleNameFromModel(model)
+            local driver = getVehicleController(vehicle)
+            local driverName = nil
+            
+            if driver then
+                driverName = getPlayerName(driver)
+            end
+            
+            table.insert(vehicles, {
+                id = getElementID(vehicle) or "N/A",
+                model = model,
+                name = vehicleName,
+                x = x,
+                y = y,
+                z = z,
+                driver = driverName
+            })
+        end
+    end
+    
+    -- Enviar lista al cliente
+    triggerClientEvent(client, "onVehicleListReceived", client, vehicles)
+    outputChatBox("Lista de vehículos cargada: " .. #vehicles .. " vehículos encontrados", client, 0, 255, 0)
+end)
+
+-- Evento para generar vehículo (solo para admins)
+addEvent("onRequestSpawnVehicle", true)
+addEventHandler("onRequestSpawnVehicle", root, function(vehicleModel)
+    if not client then return end
+    
+    if not isPlayerLoggedIn(client) or not getElementData(client, "characterSelected") then
+        triggerClientEvent(client, "onVehicleSpawned", client, false, "Debes estar logueado para usar este comando")
+        return
+    end
+    
+    -- Verificar si es administrador
+    if not isPlayerAdmin(client) then
+        triggerClientEvent(client, "onVehicleSpawned", client, false, "Este comando solo está disponible para administradores")
+        return
+    end
+    
+    -- Validar modelo de vehículo
+    vehicleModel = tonumber(vehicleModel)
+    if not vehicleModel or vehicleModel < 400 or vehicleModel > 611 then
+        triggerClientEvent(client, "onVehicleSpawned", client, false, "Modelo de vehículo inválido")
+        return
+    end
+    
+    -- Obtener posición del jugador
+    local x, y, z = getElementPosition(client)
+    local rotation = getPedRotation(client)
+    
+    -- Calcular posición delante del jugador (a 3 metros de distancia)
+    local distance = 3.0
+    local radians = math.rad(rotation)
+    local spawnX = x + (math.sin(radians) * distance)
+    local spawnY = y - (math.cos(radians) * distance)
+    local spawnZ = z
+    
+    -- Obtener altura del suelo en la posición de spawn
+    local groundZ = getGroundPosition(spawnX, spawnY, spawnZ)
+    if groundZ then
+        spawnZ = groundZ + 0.5
+    else
+        spawnZ = z + 0.5
+    end
+    
+    -- Crear el vehículo
+    local vehicle = createVehicle(vehicleModel, spawnX, spawnY, spawnZ, 0, 0, rotation)
+    
+    if vehicle then
+        local vehicleName = getVehicleNameFromModel(vehicleModel)
+        setElementFrozen(vehicle, false)
+        setVehicleEngineState(vehicle, false)
+        
+        -- Guardar información del vehículo en elementData
+        setElementData(vehicle, "spawnedBy", getPlayerName(client))
+        local time = getRealTime()
+        local timestamp = time.year + 1900 .. "-" .. (time.month + 1) .. "-" .. time.monthday .. " " .. time.hour .. ":" .. time.minute .. ":" .. time.second
+        setElementData(vehicle, "spawnTime", timestamp)
+        
+        triggerClientEvent(client, "onVehicleSpawned", client, true, "Vehículo " .. vehicleName .. " (Modelo: " .. vehicleModel .. ") generado exitosamente")
+        outputChatBox("Vehículo " .. vehicleName .. " generado a tu lado", client, 0, 255, 0)
+    else
+        triggerClientEvent(client, "onVehicleSpawned", client, false, "Error al crear el vehículo")
+    end
+end)
+
 -- Cerrar conexión al detener el recurso
 addEventHandler("onResourceStop", resourceRoot, function()
     -- Guardar posiciones y dinero de todos los jugadores antes de cerrar
