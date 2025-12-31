@@ -3,5 +3,7 @@
     <script src="client.lua" type="client" />
     <file src="images/health_icon.png" />
     <file src="images/dolar.png" />
+    <file src="images/botella-de-agua.png" />
+    <file src="images/hamburguesa-con-queso.png" />
 </meta>
 

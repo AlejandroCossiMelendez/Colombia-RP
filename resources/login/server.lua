@@ -121,6 +121,8 @@ function initDatabase()
             interior INT DEFAULT 0,
             dimension INT DEFAULT 0,
             lastLogin DATETIME,
+            hunger INT NOT NULL DEFAULT 100,
+            thirst INT NOT NULL DEFAULT 100,
             INDEX idx_username (username),
             INDEX idx_char_id (id),
             FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
@@ -458,10 +460,10 @@ addEventHandler("onPlayerCreateCharacter", root, function(name, surname, age, ge
     local defaultX, defaultY, defaultZ = 1959.55, -1714.46, 10.0
     
     local success = dbExec(db, [[
-        INSERT INTO characters (username, name, surname, age, gender, skin, money, created, posX, posY, posZ, rotation, interior, dimension) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO characters (username, name, surname, age, gender, skin, money, created, posX, posY, posZ, rotation, interior, dimension, hunger, thirst) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ]], username, name, surname or "", age, tonumber(gender) or 0, tonumber(skin) or 0, 5000, createdDate,
-        defaultX, defaultY, defaultZ, 0.0, 0, 0)
+        defaultX, defaultY, defaultZ, 0.0, 0, 0, 100, 100)
     
     if success then
         outputServerLog("[Login] Nuevo personaje creado: " .. name .. " " .. (surname or "") .. " para " .. username)
@@ -557,6 +559,8 @@ addEventHandler("onPlayerSelectCharacter", root, function(charId)
     setElementData(client, "characterAge", tonumber(selectedChar.age))
     setElementData(client, "characterGender", tonumber(selectedChar.gender))
     setElementData(client, "characterMoney", tonumber(selectedChar.money))
+    setElementData(client, "characterHunger", tonumber(selectedChar.hunger) or 100)
+    setElementData(client, "characterThirst", tonumber(selectedChar.thirst) or 100)
     setElementData(client, "characterSelected", true)
     
     -- Guardar el nombre original del jugador si no está guardado
@@ -739,12 +743,14 @@ addEventHandler("onPlayerSavePosition", root, function()
     local interior = getElementInterior(client)
     local dimension = getElementDimension(client)
     local playerMoney = getPlayerMoney(client)
+    local playerHunger = getElementData(client, "characterHunger") or 100
+    local playerThirst = getElementData(client, "characterThirst") or 100
     
     dbExec(db, [[
         UPDATE characters 
-        SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
+        SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
         WHERE id = ?
-    ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
+    ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
 end)
 
 -- Guardar dinero cuando cambia
@@ -781,12 +787,14 @@ addEventHandler("onPlayerQuit", root, function()
             local interior = getElementInterior(source)
             local dimension = getElementDimension(source)
             local playerMoney = getPlayerMoney(source)
+            local playerHunger = getElementData(source, "characterHunger") or 100
+            local playerThirst = getElementData(source, "characterThirst") or 100
             
             dbExec(db, [[
                 UPDATE characters 
-                SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
+                SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
                 WHERE id = ?
-            ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
+            ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
         end
     end
 end)
@@ -802,12 +810,14 @@ setTimer(function()
                 local interior = getElementInterior(player)
                 local dimension = getElementDimension(player)
                 local playerMoney = getPlayerMoney(player)
+                local playerHunger = getElementData(player, "characterHunger") or 100
+                local playerThirst = getElementData(player, "characterThirst") or 100
                 
                 dbExec(db, [[
                     UPDATE characters 
-                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
+                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
                     WHERE id = ?
-                ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
+                ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
             end
         end
     end
@@ -1120,6 +1130,44 @@ end, 60000, 0)  -- Cada 60 segundos (1 minuto)
 -- Sincronizar tiempo al iniciar el recurso
 syncGameTime()
 
+-- ==================== SISTEMA DE HAMBRE Y SED ====================
+-- Decrementar hambre y sed cada minuto para jugadores activos
+setTimer(function()
+    for _, player in ipairs(getElementsByType("player")) do
+        if isPlayerLoggedIn(player) and getElementData(player, "characterSelected") then
+            local currentHunger = getElementData(player, "characterHunger") or 100
+            local currentThirst = getElementData(player, "characterThirst") or 100
+            
+            -- Decrementar hambre (1 punto por minuto, mínimo 0)
+            local newHunger = math.max(0, currentHunger - 1)
+            setElementData(player, "characterHunger", newHunger)
+            
+            -- Decrementar sed (1.5 puntos por minuto, mínimo 0) - la sed baja más rápido
+            local newThirst = math.max(0, currentThirst - 1.5)
+            setElementData(player, "characterThirst", math.floor(newThirst))
+            
+            -- Si hambre o sed están muy bajos, reducir salud gradualmente
+            if newHunger <= 0 or newThirst <= 0 then
+                local currentHealth = getElementHealth(player)
+                if currentHealth > 0 then
+                    -- Reducir 1 punto de salud cada 10 segundos si está sin comida/agua
+                    setElementHealth(player, math.max(1, currentHealth - 1))
+                end
+            end
+            
+            -- Si hambre o sed están bajos (menos de 20), mostrar advertencia
+            if newHunger < 20 or newThirst < 20 then
+                if newHunger < 20 then
+                    outputChatBox("⚠ Tienes hambre - Busca comida", player, 255, 165, 0)
+                end
+                if newThirst < 20 then
+                    outputChatBox("⚠ Tienes sed - Busca agua", player, 0, 150, 255)
+                end
+            end
+        end
+    end
+end, 60000, 0)  -- Cada 60 segundos (1 minuto)
+
 -- Cargar base de datos al iniciar el recurso
 addEventHandler("onResourceStart", resourceRoot, function()
     -- IMPORTANTE: Los eventos ya están registrados al inicio del archivo (líneas 15-20)
@@ -1164,12 +1212,14 @@ addEventHandler("onResourceStop", resourceRoot, function()
                 local interior = getElementInterior(player)
                 local dimension = getElementDimension(player)
                 local playerMoney = getPlayerMoney(player)
+                local playerHunger = getElementData(player, "characterHunger") or 100
+                local playerThirst = getElementData(player, "characterThirst") or 100
                 
                 dbExec(db, [[
                     UPDATE characters 
-                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
+                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
                     WHERE id = ?
-                ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
+                ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
             end
         end
         
