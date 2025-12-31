@@ -1,8 +1,6 @@
 <meta>
     <info author="Colombia RP" version="1.0" name="Custom Skins" description="Skins personalizadas para Colombia RP" />
     <script src="client.lua" type="client" />
-    
-    <!-- Archivos de la skin 58 -->
     <file src="skin58.dff" />
     <file src="skin58.txd" />
 </meta>
