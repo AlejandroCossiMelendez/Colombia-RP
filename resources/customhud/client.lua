@@ -3,19 +3,12 @@ local screenWidth, screenHeight = guiGetScreenSize()
 local money = 0
 local health = 100
 local armor = 0
-local hunger = 100  -- Hambre (0-100)
-local thirst = 100  -- Sed (0-100)
-local oxygen = 100  -- Oxígeno/Respiración (0-100)
 
 -- Cargar imágenes
 local healthImage = nil
 local healthImageLoaded = false
 local moneyImage = nil
 local moneyImageLoaded = false
-local waterImage = nil
-local waterImageLoaded = false
-local foodImage = nil
-local foodImageLoaded = false
 
 -- Datos del personaje
 local characterName = ""
@@ -43,13 +36,7 @@ local colors = {
     healthGood = {34, 197, 94, 255},      -- Verde saludable
     healthGoodGlow = {34, 197, 94, 80},   -- Resplandor verde salud
     armor = {59, 130, 246, 255},          -- Azul brillante
-    armorGlow = {59, 130, 246, 80},       -- Resplandor azul
-    hunger = {251, 146, 60, 255},          -- Naranja para hambre
-    hungerGlow = {251, 146, 60, 80},     -- Resplandor naranja
-    thirst = {56, 189, 248, 255},         -- Azul claro para sed
-    thirstGlow = {56, 189, 248, 80},     -- Resplandor azul claro
-    oxygen = {34, 211, 238, 255},         -- Cian para oxígeno
-    oxygenGlow = {34, 211, 238, 80}      -- Resplandor cian
+    armorGlow = {59, 130, 246, 80},        -- Resplandor azul
     
     -- Texto con mejor contraste
     textPrimary = {255, 255, 255, 255},   -- Texto principal blanco puro
@@ -65,12 +52,11 @@ local colors = {
 -- Tamaños
 local healthImageSize = 36  -- Más pequeño y profesional
 local moneyImageSize = 28
-local iconSize = 24  -- Tamaño para iconos de hambre, sed y oxígeno
 local cardPadding = 18
 local cardSpacing = 10
 
--- Función para ocultar todos los componentes del HUD nativo
-function hideNativeHUD()
+-- Ocultar HUD por defecto de MTA
+addEventHandler("onClientResourceStart", resourceRoot, function()
     setPlayerHudComponentVisible("money", false)
     setPlayerHudComponentVisible("health", false)
     setPlayerHudComponentVisible("armour", false)
@@ -80,21 +66,6 @@ function hideNativeHUD()
     setPlayerHudComponentVisible("vehicle_name", false)
     setPlayerHudComponentVisible("clock", false)  -- Ocultar reloj nativo del juego
     setPlayerHudComponentVisible("radar", false)  -- Opcional: ocultar radar también
-    setPlayerHudComponentVisible("breath", false)  -- Ocultar respiración nativa
-end
-
--- Ocultar HUD inmediatamente al iniciar el recurso
-hideNativeHUD()
-
--- Ocultar HUD por defecto de MTA (cada vez que el recurso se inicia o reinicia)
-addEventHandler("onClientResourceStart", resourceRoot, function()
-    -- Ocultar inmediatamente
-    hideNativeHUD()
-    
-    -- También ocultar después de un pequeño delay para asegurar
-    setTimer(function()
-        hideNativeHUD()
-    end, 100, 3)  -- Ejecutar 3 veces con 100ms de intervalo
     
     -- Cargar imágenes
     healthImage = dxCreateTexture("images/health_icon.png", "argb", true, "clamp")
@@ -103,17 +74,7 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
     moneyImage = dxCreateTexture("images/dolar.png", "argb", true, "clamp")
     moneyImageLoaded = moneyImage ~= nil
     
-    waterImage = dxCreateTexture("images/botella-de-agua.png", "argb", true, "clamp")
-    waterImageLoaded = waterImage ~= nil
-    
-    foodImage = dxCreateTexture("images/hamburguesa-con-queso.png", "argb", true, "clamp")
-    foodImageLoaded = foodImage ~= nil
-    
     playerID = getElementData(localPlayer, "playerID") or 0
-    
-    -- Obtener valores iniciales del servidor
-    hunger = getElementData(localPlayer, "characterHunger") or 100
-    thirst = getElementData(localPlayer, "characterThirst") or 100
 end)
 
 -- Función para formatear números
@@ -488,137 +449,11 @@ function drawCustomHUD()
         local armorBarY = currentY + armorCardHeight - 16
         local armorBarWidth = cardWidth - (cardPadding * 2)
         drawProgressBar(hudX + cardPadding, armorBarY, armorBarWidth, 6, armorPercent, colors.armor, {25, 25, 35, 255}, true, colors.armorGlow)
-        
-        currentY = currentY + armorCardHeight + cardSpacing
-    end
-    
-    -- ========== TARJETA DE HAMBRE ==========
-    local hungerCardHeight = 60
-    local hungerPercent = math.max(0, math.min(100, hunger))
-    local hungerColor = hungerPercent > 30 and colors.hunger or {239, 68, 68, 255}  -- Rojo si está muy bajo
-    local hungerGlow = hungerPercent > 30 and colors.hungerGlow or colors.healthGlow
-    
-    drawCard(hudX, currentY, cardWidth, hungerCardHeight, colors.bgCard, true, hungerGlow)
-    
-    -- Línea de acento izquierda
-    dxDrawRectangle(hudX, currentY, 4, hungerCardHeight,
-        tocolor(hungerColor[1], hungerColor[2], hungerColor[3], hungerColor[4]), true)
-    dxDrawRectangle(hudX + 1, currentY, 2, hungerCardHeight,
-        tocolor(255, 255, 255, 50), true)
-    
-    -- Imagen de hambre
-    local foodImageX = hudX + cardPadding
-    local foodImageY = currentY + (hungerCardHeight / 2) - (iconSize / 2)
-    
-    if foodImageLoaded and foodImage then
-        dxDrawImage(foodImageX, foodImageY, iconSize, iconSize, foodImage, 0, 0, 0,
-            tocolor(255, 255, 255, 255), true)
-    end
-    
-    -- Texto de hambre
-    local foodTextX = foodImageX + iconSize + 12
-    dxDrawModernText("HAMBRE", foodTextX, currentY + 10, hudX + cardWidth - cardPadding, currentY + 25,
-        tocolor(colors.textMuted[1], colors.textMuted[2], colors.textMuted[3], colors.textMuted[4]),
-        0.6, "default", "left", "top", false, false, true)
-    
-    dxDrawModernText(math.floor(hungerPercent) .. "%", foodTextX, currentY + 28, hudX + cardWidth - cardPadding, currentY + 50,
-        tocolor(hungerColor[1], hungerColor[2], hungerColor[3], hungerColor[4]),
-        0.9, "default-bold", "left", "top", false, false, true)
-    
-    -- Barra de hambre
-    local hungerBarY = currentY + hungerCardHeight - 16
-    local hungerBarWidth = cardWidth - (cardPadding * 2) - iconSize - 12
-    drawProgressBar(foodTextX, hungerBarY, hungerBarWidth, 6, hungerPercent, hungerColor, {25, 25, 35, 255}, true, hungerGlow)
-    
-    currentY = currentY + hungerCardHeight + cardSpacing
-    
-    -- ========== TARJETA DE SED ==========
-    local thirstCardHeight = 60
-    local thirstPercent = math.max(0, math.min(100, thirst))
-    local thirstColor = thirstPercent > 30 and colors.thirst or {239, 68, 68, 255}  -- Rojo si está muy bajo
-    local thirstGlow = thirstPercent > 30 and colors.thirstGlow or colors.healthGlow
-    
-    drawCard(hudX, currentY, cardWidth, thirstCardHeight, colors.bgCard, true, thirstGlow)
-    
-    -- Línea de acento izquierda
-    dxDrawRectangle(hudX, currentY, 4, thirstCardHeight,
-        tocolor(thirstColor[1], thirstColor[2], thirstColor[3], thirstColor[4]), true)
-    dxDrawRectangle(hudX + 1, currentY, 2, thirstCardHeight,
-        tocolor(255, 255, 255, 50), true)
-    
-    -- Imagen de sed
-    local waterImageX = hudX + cardPadding
-    local waterImageY = currentY + (thirstCardHeight / 2) - (iconSize / 2)
-    
-    if waterImageLoaded and waterImage then
-        dxDrawImage(waterImageX, waterImageY, iconSize, iconSize, waterImage, 0, 0, 0,
-            tocolor(255, 255, 255, 255), true)
-    end
-    
-    -- Texto de sed
-    local waterTextX = waterImageX + iconSize + 12
-    dxDrawModernText("HIDRATACIÓN", waterTextX, currentY + 10, hudX + cardWidth - cardPadding, currentY + 25,
-        tocolor(colors.textMuted[1], colors.textMuted[2], colors.textMuted[3], colors.textMuted[4]),
-        0.6, "default", "left", "top", false, false, true)
-    
-    dxDrawModernText(math.floor(thirstPercent) .. "%", waterTextX, currentY + 28, hudX + cardWidth - cardPadding, currentY + 50,
-        tocolor(thirstColor[1], thirstColor[2], thirstColor[3], thirstColor[4]),
-        0.9, "default-bold", "left", "top", false, false, true)
-    
-    -- Barra de sed
-    local thirstBarY = currentY + thirstCardHeight - 16
-    local thirstBarWidth = cardWidth - (cardPadding * 2) - iconSize - 12
-    drawProgressBar(waterTextX, thirstBarY, thirstBarWidth, 6, thirstPercent, thirstColor, {25, 25, 35, 255}, true, thirstGlow)
-    
-    currentY = currentY + thirstCardHeight + cardSpacing
-    
-    -- ========== TARJETA DE RESPIRACIÓN (solo si está bajo el agua) ==========
-    local x, y, z = getElementPosition(localPlayer)
-    local isUnderwater = isElementInWater(localPlayer) or (z < 0.5)  -- Verificar si está bajo el agua
-    
-    if isUnderwater then
-        -- Obtener oxígeno del juego
-        local pedOxygen = getPedOxygenLevel(localPlayer)
-        oxygen = (pedOxygen / 1000) * 100  -- Convertir a porcentaje (0-1000 en MTA)
-        
-        local oxygenCardHeight = 60
-        local oxygenPercent = math.max(0, math.min(100, oxygen))
-        local oxygenColor = oxygenPercent > 30 and colors.oxygen or {239, 68, 68, 255}  -- Rojo si está muy bajo
-        local oxygenGlow = oxygenPercent > 30 and colors.oxygenGlow or colors.healthGlow
-        
-        drawCard(hudX, currentY, cardWidth, oxygenCardHeight, colors.bgCard, true, oxygenGlow)
-        
-        -- Línea de acento izquierda
-        dxDrawRectangle(hudX, currentY, 4, oxygenCardHeight,
-            tocolor(oxygenColor[1], oxygenColor[2], oxygenColor[3], oxygenColor[4]), true)
-        dxDrawRectangle(hudX + 1, currentY, 2, oxygenCardHeight,
-            tocolor(255, 255, 255, 50), true)
-        
-        -- Texto de respiración
-        dxDrawModernText("RESPIRACIÓN", hudX + cardPadding, currentY + 10, hudX + cardWidth - cardPadding, currentY + 25,
-            tocolor(colors.textMuted[1], colors.textMuted[2], colors.textMuted[3], colors.textMuted[4]),
-            0.6, "default", "left", "top", false, false, true)
-        
-        dxDrawModernText(math.floor(oxygenPercent) .. "%", hudX + cardPadding, currentY + 28, hudX + cardWidth - cardPadding, currentY + 50,
-            tocolor(oxygenColor[1], oxygenColor[2], oxygenColor[3], oxygenColor[4]),
-            0.9, "default-bold", "left", "top", false, false, true)
-        
-        -- Barra de respiración
-        local oxygenBarY = currentY + oxygenCardHeight - 16
-        local oxygenBarWidth = cardWidth - (cardPadding * 2)
-        drawProgressBar(hudX + cardPadding, oxygenBarY, oxygenBarWidth, 6, oxygenPercent, oxygenColor, {25, 25, 35, 255}, true, oxygenGlow)
     end
 end
 
 -- Renderizar el HUD cada frame
 addEventHandler("onClientRender", root, drawCustomHUD)
-
--- Timer para asegurar que el HUD nativo siempre esté oculto
-setTimer(function()
-    if getElementData(localPlayer, "characterSelected") then
-        hideNativeHUD()
-    end
-end, 1000, 0)  -- Verificar cada segundo
 
 -- Actualizar cuando cambia el dinero
 addEventHandler("onClientPlayerMoneyChange", localPlayer, function(newAmount, oldAmount, instant)
@@ -654,31 +489,10 @@ addEventHandler("onClientPlayerDamage", localPlayer, function(attacker, weapon, 
     health = getElementHealth(localPlayer)
 end)
 
--- Actualizar cuando cambia la armadura, salud, hambre y sed
+-- Actualizar cuando cambia la armadura
 setTimer(function()
-    if isElement(localPlayer) and getElementData(localPlayer, "characterSelected") then
+    if isElement(localPlayer) then
         armor = getPedArmor(localPlayer)
         health = getElementHealth(localPlayer)
-        
-        -- Obtener hambre y sed del servidor
-        local serverHunger = getElementData(localPlayer, "characterHunger")
-        local serverThirst = getElementData(localPlayer, "characterThirst")
-        
-        if serverHunger then
-            hunger = tonumber(serverHunger) or hunger
-        end
-        
-        if serverThirst then
-            thirst = tonumber(serverThirst) or thirst
-        end
-        
-        -- Actualizar oxígeno si está bajo el agua
-        local x, y, z = getElementPosition(localPlayer)
-        if isElementInWater(localPlayer) or (z < 0.5) then
-            local pedOxygen = getPedOxygenLevel(localPlayer)
-            oxygen = (pedOxygen / 1000) * 100
-        else
-            oxygen = 100  -- Lleno cuando no está bajo el agua
-        end
     end
 end, 100, 0)

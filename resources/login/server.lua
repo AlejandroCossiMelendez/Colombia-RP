@@ -121,8 +121,6 @@ function initDatabase()
             interior INT DEFAULT 0,
             dimension INT DEFAULT 0,
             lastLogin DATETIME,
-            hunger INT NOT NULL DEFAULT 100,
-            thirst INT NOT NULL DEFAULT 100,
             INDEX idx_username (username),
             INDEX idx_char_id (id),
             FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
@@ -132,21 +130,6 @@ function initDatabase()
     if query2 then
         dbPoll(query2, -1)
         outputServerLog("[Login] Tabla 'characters' verificada/creada")
-        
-        -- Agregar columnas de hambre y sed si no existen (para tablas existentes)
-        local checkHunger = dbQuery(db, "SHOW COLUMNS FROM characters LIKE 'hunger'")
-        local hungerResult = dbPoll(checkHunger, -1)
-        if not hungerResult or #hungerResult == 0 then
-            dbExec(db, "ALTER TABLE characters ADD COLUMN hunger INT NOT NULL DEFAULT 100")
-            outputServerLog("[Login] Columna 'hunger' agregada a la tabla 'characters'")
-        end
-        
-        local checkThirst = dbQuery(db, "SHOW COLUMNS FROM characters LIKE 'thirst'")
-        local thirstResult = dbPoll(checkThirst, -1)
-        if not thirstResult or #thirstResult == 0 then
-            dbExec(db, "ALTER TABLE characters ADD COLUMN thirst INT NOT NULL DEFAULT 100")
-            outputServerLog("[Login] Columna 'thirst' agregada a la tabla 'characters'")
-        end
     else
         local errorMsg = dbError(db)
         outputServerLog("[Login] ERROR al crear tabla characters: " .. tostring(errorMsg))
@@ -475,10 +458,10 @@ addEventHandler("onPlayerCreateCharacter", root, function(name, surname, age, ge
     local defaultX, defaultY, defaultZ = 1959.55, -1714.46, 10.0
     
     local success = dbExec(db, [[
-        INSERT INTO characters (username, name, surname, age, gender, skin, money, created, posX, posY, posZ, rotation, interior, dimension, hunger, thirst) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO characters (username, name, surname, age, gender, skin, money, created, posX, posY, posZ, rotation, interior, dimension) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ]], username, name, surname or "", age, tonumber(gender) or 0, tonumber(skin) or 0, 5000, createdDate,
-        defaultX, defaultY, defaultZ, 0.0, 0, 0, 100, 100)
+        defaultX, defaultY, defaultZ, 0.0, 0, 0)
     
     if success then
         outputServerLog("[Login] Nuevo personaje creado: " .. name .. " " .. (surname or "") .. " para " .. username)
@@ -574,8 +557,6 @@ addEventHandler("onPlayerSelectCharacter", root, function(charId)
     setElementData(client, "characterAge", tonumber(selectedChar.age))
     setElementData(client, "characterGender", tonumber(selectedChar.gender))
     setElementData(client, "characterMoney", tonumber(selectedChar.money))
-    setElementData(client, "characterHunger", tonumber(selectedChar.hunger) or 100)
-    setElementData(client, "characterThirst", tonumber(selectedChar.thirst) or 100)
     setElementData(client, "characterSelected", true)
     
     -- Guardar el nombre original del jugador si no está guardado
@@ -759,14 +740,11 @@ addEventHandler("onPlayerSavePosition", root, function()
     local dimension = getElementDimension(client)
     local playerMoney = getPlayerMoney(client)
     
-    local playerHunger = getElementData(client, "characterHunger") or 100
-    local playerThirst = getElementData(client, "characterThirst") or 100
-    
     dbExec(db, [[
         UPDATE characters 
-        SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
+        SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
         WHERE id = ?
-    ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
+    ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
 end)
 
 -- Guardar dinero cuando cambia
@@ -804,14 +782,11 @@ addEventHandler("onPlayerQuit", root, function()
             local dimension = getElementDimension(source)
             local playerMoney = getPlayerMoney(source)
             
-            local playerHunger = getElementData(source, "characterHunger") or 100
-            local playerThirst = getElementData(source, "characterThirst") or 100
-            
             dbExec(db, [[
                 UPDATE characters 
-                SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
+                SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
                 WHERE id = ?
-            ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
+            ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
         end
     end
 end)
@@ -827,14 +802,12 @@ setTimer(function()
                 local interior = getElementInterior(player)
                 local dimension = getElementDimension(player)
                 local playerMoney = getPlayerMoney(player)
-                local playerHunger = getElementData(player, "characterHunger") or 100
-                local playerThirst = getElementData(player, "characterThirst") or 100
                 
                 dbExec(db, [[
                     UPDATE characters 
-                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
+                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
                     WHERE id = ?
-                ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
+                ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
             end
         end
     end
@@ -1081,30 +1054,26 @@ function getBogotaTime()
         utcMinute = utcTime.min
         utcSecond = utcTime.sec
     else
-        -- Método 2: Si os.date no funciona, getRealTime() devuelve hora local del servidor
-        -- Si el servidor muestra 9:56 y Colombia es 14:57, entonces:
-        -- - El servidor está 5 horas ATRÁS de Colombia
-        -- - Necesitamos SUMAR 5 horas para obtener la hora de Colombia
+        -- Método 2: Si os.date no funciona, asumir que getRealTime() devuelve UTC
+        -- (común en servidores Linux configurados en UTC)
         utcHour = time.hour
         utcMinute = time.minute
         utcSecond = time.second
+        
+        -- Si esto muestra hora incorrecta, el servidor NO está en UTC
+        -- En ese caso, necesitamos ajustar manualmente
+        -- Si el servidor muestra 9:56 y Colombia es 14:57, entonces:
+        -- - El servidor está 5 horas atrás de Colombia
+        -- - Si Colombia es UTC-5, entonces el servidor está en UTC-10 o similar
+        -- - O el servidor está en otra zona horaria
+        
+        -- Por ahora, asumimos UTC y convertimos a Bogotá
     end
     
-    -- Convertir a hora de Bogotá
-    local bogotaHour
-    if success and utcTime then
-        -- Tenemos UTC real, convertir a Bogotá (UTC-5) = restar 5
-        bogotaHour = utcHour - 5
-    else
-        -- getRealTime() devuelve hora local del servidor que está 5 horas atrás
-        -- Necesitamos SUMAR 5 horas para obtener la hora de Colombia
-        bogotaHour = utcHour + 5
-    end
-    
+    -- Convertir UTC a hora de Bogotá (UTC-5)
+    local bogotaHour = utcHour - 5
     if bogotaHour < 0 then
         bogotaHour = bogotaHour + 24
-    elseif bogotaHour >= 24 then
-        bogotaHour = bogotaHour - 24
     end
     
     return bogotaHour, utcMinute, utcSecond, time.monthday, time.month + 1, time.year + 1900
@@ -1117,7 +1086,8 @@ function syncGameTime()
     setMinuteDuration(60000)  -- 1 minuto real = 1 minuto en el juego (tiempo real)
 end
 
--- Evento para enviar hora de Bogotá a los clientes (ya está registrado arriba)
+-- Evento para enviar hora de Bogotá a los clientes
+addEvent("onRequestBogotaTime", true)
 addEventHandler("onRequestBogotaTime", root, function()
     if not client then return end
     local hour, minute, second, day, month, year = getBogotaTime()
@@ -1194,14 +1164,12 @@ addEventHandler("onResourceStop", resourceRoot, function()
                 local interior = getElementInterior(player)
                 local dimension = getElementDimension(player)
                 local playerMoney = getPlayerMoney(player)
-                local playerHunger = getElementData(player, "characterHunger") or 100
-                local playerThirst = getElementData(player, "characterThirst") or 100
                 
                 dbExec(db, [[
                     UPDATE characters 
-                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ?, hunger = ?, thirst = ? 
+                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
                     WHERE id = ?
-                ]], x, y, z, rotation, interior, dimension, playerMoney, playerHunger, playerThirst, charId)
+                ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
             end
         end
         
