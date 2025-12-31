@@ -11,6 +11,7 @@ local MYSQL_PORT = 3306             -- Puerto de MySQL (default: 3306)
 
 -- ==================== REGISTRAR EVENTOS PRIMERO ====================
 -- Es CRÍTICO registrar los eventos ANTES de cualquier otra cosa
+-- Estos eventos DEBEN estar al inicio del archivo para estar disponibles inmediatamente
 addEvent("onPlayerRegister", true)
 addEvent("onPlayerLogin", true)
 addEvent("onPlayerCreateCharacter", true)
@@ -18,8 +19,8 @@ addEvent("onPlayerSelectCharacter", true)
 addEvent("onRequestCharacters", true)
 addEvent("onPlayerSavePosition", true)
 
--- Log para verificar que los eventos están registrados
-outputServerLog("[Login] Eventos registrados: onPlayerRegister, onPlayerLogin, onPlayerCreateCharacter, onPlayerSelectCharacter, onRequestCharacters, onPlayerSavePosition")
+-- Verificar que los eventos estén registrados (esto se ejecuta cuando el script se carga)
+-- Los eventos están disponibles inmediatamente después de addEvent
 
 -- ==================== BASE DE DATOS MySQL ====================
 function initDatabase()
@@ -745,8 +746,10 @@ end, true, "high") -- Alta prioridad para ejecutar antes que otros handlers
 
 -- Cargar base de datos al iniciar el recurso
 addEventHandler("onResourceStart", resourceRoot, function()
-    -- IMPORTANTE: Los eventos deben estar registrados ANTES de que cualquier cliente intente usarlos
-    -- Por eso están al principio del archivo
+    -- IMPORTANTE: Los eventos ya están registrados al inicio del archivo (líneas 14-19)
+    -- Por lo tanto están disponibles inmediatamente cuando el recurso inicia
+    
+    outputServerLog("[Login] Recurso iniciado - eventos disponibles inmediatamente")
     
     if initDatabase() then
         outputServerLog("[Login] Sistema de autenticación iniciado (MySQL)")

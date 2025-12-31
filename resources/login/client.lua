@@ -238,10 +238,12 @@ end)
 addEvent("onRegisterResult", true)
 addEventHandler("onRegisterResult", root, function(success, message)
     if success then
-        showMessage(message or "¡Cuenta creada exitosamente!", false)
+        showMessage("¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.", false)
         setTimer(function()
+            -- Cambiar a modo login y mostrar el panel
             isLoginMode = true
             createLoginWindow()
+            outputChatBox("Por favor inicia sesión con tu nueva cuenta", 0, 255, 0)
         end, 2000, 1)
     else
         showMessage(message or "Error al crear la cuenta", true)
