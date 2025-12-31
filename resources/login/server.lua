@@ -1,6 +1,9 @@
 -- Sistema de Autenticación y Registro - Servidor (MySQL)
 local db = nil
 
+-- Contador para IDs de jugadores (se incrementa cada vez que un jugador se conecta)
+local playerIDCounter = 0
+
 -- ==================== CONFIGURACIÓN MySQL ====================
 -- Configura estos valores según tu base de datos MySQL
 local MYSQL_HOST = "127.0.0.1"      -- IP o hostname del servidor MySQL
@@ -919,9 +922,9 @@ addEventHandler("onPlayerJoin", root, function()
     setElementData(source, "loggedIn", false)
     setElementData(source, "characterSelected", false)
     
-    -- Guardar ID del jugador (usando getElementIndex que devuelve el ID único del jugador)
-    local playerID = getElementIndex(source) or 0
-    setElementData(source, "playerID", playerID)
+    -- Guardar ID del jugador (usando un contador incremental)
+    playerIDCounter = playerIDCounter + 1
+    setElementData(source, "playerID", playerIDCounter)
     
     -- Desactivar cámara inmediatamente
     fadeCamera(source, false, 0)
@@ -1059,28 +1062,52 @@ end)
 
 -- Cerrar conexión al detener el recurso
 addEventHandler("onResourceStop", resourceRoot, function()
-    -- Guardar posiciones de todos los jugadores antes de cerrar
+    -- Guardar posiciones y dinero de todos los jugadores antes de cerrar
     for _, player in ipairs(getElementsByType("player")) do
         if isPlayerLoggedIn(player) and getElementData(player, "characterSelected") then
             local charId = getElementData(player, "characterId")
-            if charId then
+            if charId and db then
                 local x, y, z = getElementPosition(player)
                 local rotation = getPedRotation(player)
                 local interior = getElementInterior(player)
                 local dimension = getElementDimension(player)
+                local playerMoney = getPlayerMoney(player)
                 
                 dbExec(db, [[
                     UPDATE characters 
-                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ? 
+                    SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, money = ? 
                     WHERE id = ?
-                ]], x, y, z, rotation, interior, dimension, charId)
+                ]], x, y, z, rotation, interior, dimension, playerMoney, charId)
             end
         end
+        
+        -- LIMPIAR ESTADO DE LOGIN de todos los jugadores al reiniciar el recurso
+        -- Esto permite que puedan volver a iniciar sesión después del restart
+        setElementData(player, "loggedIn", false)
+        setElementData(player, "characterSelected", false)
+        setElementData(player, "username", nil)
+        setElementData(player, "characterId", nil)
+        setElementData(player, "characterName", nil)
+        setElementData(player, "characterSurname", nil)
+        
+        -- Restaurar nombre original si existe
+        local originalName = getElementData(player, "originalPlayerName")
+        if originalName then
+            setPlayerName(player, originalName)
+        end
+        
+        -- Desactivar cámara y forzar que vuelvan a hacer login
+        fadeCamera(player, false, 0)
+        setCameraTarget(player, nil)
+        
+        -- Notificar al cliente que debe volver a iniciar sesión
+        triggerClientEvent(player, "onPlayerMustLogin", player)
     end
+    
+    outputServerLog("[Login] Recurso detenido - Todas las sesiones cerradas")
     
     -- La conexión a la base de datos se cierra automáticamente cuando el recurso se detiene
     -- No es necesario cerrarla manualmente en MTA
-    outputServerLog("[Login] Recurso detenido - conexión a la base de datos se cerrará automáticamente")
 end)
 
 -- ==================== COMANDOS DE ADMINISTRACIÓN ====================
