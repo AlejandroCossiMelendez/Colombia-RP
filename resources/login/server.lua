@@ -1711,6 +1711,82 @@ addCommandHandler("velocidad", function(player, cmd, action)
     end
 end)
 
+-- Comando para eliminar todos los vehículos del mapa (solo admins)
+addCommandHandler("limpiarvehiculos", function(player, cmd)
+    if not isPlayerAdmin(player) then
+        outputChatBox("No tienes permisos para usar este comando", player, 255, 0, 0)
+        return
+    end
+    
+    local vehicleCount = 0
+    local allVehicles = getElementsByType("vehicle")
+    
+    for _, vehicle in ipairs(allVehicles) do
+        if isElement(vehicle) then
+            -- Verificar si hay jugadores dentro del vehículo
+            local occupants = getVehicleOccupants(vehicle)
+            local hasOccupants = false
+            
+            if occupants then
+                for seat, occupant in pairs(occupants) do
+                    if isElement(occupant) then
+                        hasOccupants = true
+                        -- Expulsar al jugador del vehículo
+                        removePedFromVehicle(occupant)
+                        outputChatBox("Has sido expulsado del vehículo - El vehículo será eliminado", occupant, 255, 165, 0)
+                    end
+                end
+            end
+            
+            -- Eliminar el vehículo
+            destroyElement(vehicle)
+            vehicleCount = vehicleCount + 1
+        end
+    end
+    
+    outputChatBox("✓ Se eliminaron " .. vehicleCount .. " vehículo(s) del mapa", player, 0, 255, 0)
+    outputChatBox("Un administrador ha eliminado todos los vehículos del mapa", root, 255, 165, 0)
+    outputServerLog("[Admin] " .. getPlayerName(player) .. " eliminó " .. vehicleCount .. " vehículo(s) del mapa")
+end)
+
+-- Alias del comando
+addCommandHandler("limpiarautos", function(player, cmd)
+    if not isPlayerAdmin(player) then
+        outputChatBox("No tienes permisos para usar este comando", player, 255, 0, 0)
+        return
+    end
+    
+    local vehicleCount = 0
+    local allVehicles = getElementsByType("vehicle")
+    
+    for _, vehicle in ipairs(allVehicles) do
+        if isElement(vehicle) then
+            -- Verificar si hay jugadores dentro del vehículo
+            local occupants = getVehicleOccupants(vehicle)
+            local hasOccupants = false
+            
+            if occupants then
+                for seat, occupant in pairs(occupants) do
+                    if isElement(occupant) then
+                        hasOccupants = true
+                        -- Expulsar al jugador del vehículo
+                        removePedFromVehicle(occupant)
+                        outputChatBox("Has sido expulsado del vehículo - El vehículo será eliminado", occupant, 255, 165, 0)
+                    end
+                end
+            end
+            
+            -- Eliminar el vehículo
+            destroyElement(vehicle)
+            vehicleCount = vehicleCount + 1
+        end
+    end
+    
+    outputChatBox("✓ Se eliminaron " .. vehicleCount .. " vehículo(s) del mapa", player, 0, 255, 0)
+    outputChatBox("Un administrador ha eliminado todos los vehículos del mapa", root, 255, 165, 0)
+    outputServerLog("[Admin] " .. getPlayerName(player) .. " eliminó " .. vehicleCount .. " vehículo(s) del mapa")
+end)
+
 -- Aplicar efecto de velocidad cuando un jugador spawnea/selecciona personaje
 addEventHandler("onPlayerSpawn", root, function()
     if getElementData(source, "characterSelected") then
