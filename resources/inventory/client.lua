@@ -26,6 +26,39 @@ local SLOT_SPACING = 5  -- Espacio entre slots
 -- Datos del inventario
 local inventoryItems = {}  -- Tabla de items: {slot = {id, name, quantity, icon}}
 
+-- Cargar imágenes de items
+local waterFullImage = nil
+local waterEmptyImage = nil
+
+-- Items consumibles (debe coincidir con el servidor)
+local consumableItems = {
+    ["Agua Llena"] = true,
+    ["Agua"] = true
+}
+
+-- Cargar imágenes al iniciar
+addEventHandler("onClientResourceStart", resourceRoot, function()
+    waterFullImage = dxCreateTexture("images/agua-lleno.png", "argb", true, "clamp")
+    waterEmptyImage = dxCreateTexture("images/agua-vacio.png", "argb", true, "clamp")
+    
+    if not waterFullImage then
+        outputChatBox("⚠ No se pudo cargar la imagen agua-lleno.png", 255, 165, 0)
+    end
+    if not waterEmptyImage then
+        outputChatBox("⚠ No se pudo cargar la imagen agua-vacio.png", 255, 165, 0)
+    end
+end)
+
+-- Función para obtener la imagen de un item
+function getItemImage(itemName, itemId)
+    if itemName == "Agua Llena" or itemName == "Agua" or itemId == 2000 then
+        return waterFullImage
+    elseif itemName == "Agua Vacía" or itemName == "Botella Vacía" or itemId == 2001 then
+        return waterEmptyImage
+    end
+    return nil
+end
+
 -- Función para crear/abrir el inventario
 function openInventory(items)
     if inventoryOpen then
@@ -90,13 +123,40 @@ function openInventory(items)
             setElementData(slot, "slotIndex", slotIndex)
             slots[slotIndex] = slot
             
-            -- Agregar evento de clic
+            -- Agregar evento de clic (doble clic para consumir)
+            local lastClickTime = {}
             addEventHandler("onClientGUIClick", slot, function(button, state)
                 if button == "left" and state == "up" then
                     local slotIdx = getElementData(source, "slotIndex")
                     if inventoryItems[slotIdx] then
                         local item = inventoryItems[slotIdx]
-                        outputChatBox("Item: " .. item.name .. " x" .. item.quantity, 0, 255, 0)
+                        local currentTime = getTickCount()
+                        
+                        -- Verificar si es un doble clic (dentro de 500ms)
+                        if lastClickTime[slotIdx] and (currentTime - lastClickTime[slotIdx]) < 500 then
+                            -- Doble clic - consumir item si es consumible
+                            if consumableItems[item.name] then
+                                triggerServerEvent("onInventoryItemUse", localPlayer, slotIdx)
+                            else
+                                outputChatBox("Este item no se puede consumir", 255, 165, 0)
+                            end
+                            lastClickTime[slotIdx] = nil
+                        else
+                            -- Clic simple - mostrar información
+                            outputChatBox("Item: " .. item.name .. " x" .. item.quantity .. " (Doble clic para consumir)", 0, 255, 0)
+                            lastClickTime[slotIdx] = currentTime
+                        end
+                    end
+                elseif button == "right" and state == "up" then
+                    -- Clic derecho - consumir directamente si es consumible
+                    local slotIdx = getElementData(source, "slotIndex")
+                    if inventoryItems[slotIdx] then
+                        local item = inventoryItems[slotIdx]
+                        if consumableItems[item.name] then
+                            triggerServerEvent("onInventoryItemUse", localPlayer, slotIdx)
+                        else
+                            outputChatBox("Este item no se puede consumir", 255, 165, 0)
+                        end
                     end
                 end
             end, false)
@@ -164,30 +224,39 @@ function drawInventory()
             if inventoryItems[slotIndex] then
                 local item = inventoryItems[slotIndex]
                 
-                -- Fondo del item con efecto de brillo
-                dxDrawRectangle(slotX + 3, slotY + 3, SLOT_SIZE - 6, SLOT_SIZE - 6, 
-                    tocolor(colors.primary[1], colors.primary[2], colors.primary[3], 150), true)
+                -- Obtener imagen del item si existe
+                local itemImage = getItemImage(item.name, item.id)
                 
-                -- Borde interno del item
-                dxDrawRectangle(slotX + 3, slotY + 3, SLOT_SIZE - 6, SLOT_SIZE - 6, 
-                    tocolor(colors.primary[1] + 30, colors.primary[2] + 30, colors.primary[3] + 30, 100), false, true)
-                
-                -- Nombre del item (abreviado)
-                local itemName = item.name
-                if string.len(itemName) > 10 then
-                    itemName = string.sub(itemName, 1, 10) .. "..."
+                if itemImage then
+                    -- Dibujar imagen del item
+                    dxDrawImage(slotX + 5, slotY + 5, SLOT_SIZE - 10, SLOT_SIZE - 10, itemImage, 0, 0, 0,
+                        tocolor(255, 255, 255, 255), true)
+                else
+                    -- Fondo del item con efecto de brillo (si no hay imagen)
+                    dxDrawRectangle(slotX + 3, slotY + 3, SLOT_SIZE - 6, SLOT_SIZE - 6, 
+                        tocolor(colors.primary[1], colors.primary[2], colors.primary[3], 150), true)
+                    
+                    -- Borde interno del item
+                    dxDrawRectangle(slotX + 3, slotY + 3, SLOT_SIZE - 6, SLOT_SIZE - 6, 
+                        tocolor(colors.primary[1] + 30, colors.primary[2] + 30, colors.primary[3] + 30, 100), false, true)
+                    
+                    -- Nombre del item (abreviado)
+                    local itemName = item.name
+                    if string.len(itemName) > 10 then
+                        itemName = string.sub(itemName, 1, 10) .. "..."
+                    end
+                    
+                    -- Sombra del texto
+                    dxDrawText(itemName, slotX + 6, slotY + 7, slotX + SLOT_SIZE - 6, slotY + SLOT_SIZE - 25,
+                        tocolor(0, 0, 0, 200), 0.65, "default-bold", "left", "top", false, false, true)
+                    
+                    -- Texto principal
+                    dxDrawText(itemName, slotX + 5, slotY + 6, slotX + SLOT_SIZE - 5, slotY + SLOT_SIZE - 24,
+                        tocolor(colors.text[1], colors.text[2], colors.text[3], 255),
+                        0.65, "default-bold", "left", "top", false, false, true)
                 end
                 
-                -- Sombra del texto
-                dxDrawText(itemName, slotX + 6, slotY + 7, slotX + SLOT_SIZE - 6, slotY + SLOT_SIZE - 25,
-                    tocolor(0, 0, 0, 200), 0.65, "default-bold", "left", "top", false, false, true)
-                
-                -- Texto principal
-                dxDrawText(itemName, slotX + 5, slotY + 6, slotX + SLOT_SIZE - 5, slotY + SLOT_SIZE - 24,
-                    tocolor(colors.text[1], colors.text[2], colors.text[3], 255),
-                    0.65, "default-bold", "left", "top", false, false, true)
-                
-                -- Cantidad
+                -- Cantidad (siempre visible, incluso con imagen)
                 if item.quantity > 1 then
                     local qtyText = "x" .. item.quantity
                     -- Sombra de la cantidad
@@ -198,6 +267,13 @@ function drawInventory()
                     dxDrawText(qtyText, slotX + 5, slotY + SLOT_SIZE - 21, slotX + SLOT_SIZE - 5, slotY + SLOT_SIZE - 5,
                         tocolor(colors.success[1], colors.success[2], colors.success[3], 255),
                         0.75, "default-bold", "right", "bottom", false, false, true)
+                end
+                
+                -- Indicador de consumible (pequeño icono o texto)
+                if consumableItems[item.name] then
+                    dxDrawText("⚡", slotX + SLOT_SIZE - 18, slotY + 3, slotX + SLOT_SIZE - 3, slotY + 18,
+                        tocolor(colors.success[1], colors.success[2], colors.success[3], 255),
+                        0.6, "default", "right", "top", false, false, true)
                 end
             else
                 -- Slot vacío - mostrar número del slot en gris claro

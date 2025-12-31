@@ -13,7 +13,7 @@ local MYSQL_PORT = 3306
 addEvent("onRequestInventory", true)
 addEvent("onInventoryItemAdd", true)
 addEvent("onInventoryItemRemove", true)
-addEvent("onInventoryItemUse", true)
+addEvent("onInventoryItemUse", true)  -- Evento para consumir items
 
 -- ==================== BASE DE DATOS ====================
 function initInventoryDatabase()
@@ -191,6 +191,93 @@ function findEmptySlot(characterId, maxSlots)
     return nil  -- Inventario lleno
 end
 
+-- ==================== SISTEMA DE ITEMS CONSUMIBLES ====================
+
+-- Tabla de items consumibles y sus efectos
+local consumableItems = {
+    ["Agua Llena"] = {
+        type = "thirst",
+        restore = 30,  -- Restaura 30% de sed
+        consumedName = "Agua Vacía",
+        consumedId = 2001  -- ID para el item vacío
+    },
+    ["Agua"] = {
+        type = "thirst",
+        restore = 30,
+        consumedName = "Botella Vacía",
+        consumedId = 2001
+    }
+}
+
+-- Función para consumir un item
+function consumeItem(player, characterId, slot)
+    if not db or not characterId or not slot then
+        return false
+    end
+    
+    -- Obtener el item del slot
+    local query = dbQuery(db, "SELECT item_id, item_name, quantity FROM inventory WHERE character_id = ? AND slot = ?", characterId, slot)
+    local result = dbPoll(query, -1)
+    
+    if not result or #result == 0 then
+        return false
+    end
+    
+    local itemName = result[1].item_name
+    local itemId = tonumber(result[1].item_id)
+    local quantity = tonumber(result[1].quantity)
+    
+    -- Verificar si el item es consumible
+    local consumable = consumableItems[itemName]
+    if not consumable then
+        outputChatBox("Este item no se puede consumir", player, 255, 165, 0)
+        return false
+    end
+    
+    -- Aplicar efecto según el tipo
+    if consumable.type == "thirst" then
+        local currentThirst = getElementData(player, "characterThirst") or 100
+        local newThirst = math.min(100, currentThirst + consumable.restore)
+        setElementData(player, "characterThirst", newThirst)
+        outputChatBox("✓ Has bebido agua - Sed restaurada: +" .. consumable.restore .. "%", player, 0, 150, 255)
+        
+        -- Guardar sed en la base de datos
+        local charId = getElementData(player, "characterId")
+        if charId then
+            dbExec(db, "UPDATE characters SET thirst = ? WHERE id = ?", newThirst, charId)
+        end
+    elseif consumable.type == "hunger" then
+        local currentHunger = getElementData(player, "characterHunger") or 100
+        local newHunger = math.min(100, currentHunger + consumable.restore)
+        setElementData(player, "characterHunger", newHunger)
+        outputChatBox("✓ Has comido - Hambre restaurada: +" .. consumable.restore .. "%", player, 255, 200, 0)
+        
+        -- Guardar hambre en la base de datos
+        local charId = getElementData(player, "characterId")
+        if charId then
+            dbExec(db, "UPDATE characters SET hunger = ? WHERE id = ?", newHunger, charId)
+        end
+    end
+    
+    -- Si el item tiene un estado consumido, cambiar el item
+    if consumable.consumedName then
+        -- Actualizar el item a su versión consumida
+        dbExec(db, "UPDATE inventory SET item_id = ?, item_name = ? WHERE character_id = ? AND slot = ?",
+            consumable.consumedId, consumable.consumedName, characterId, slot)
+        
+        outputChatBox("Botella vacía guardada en el inventario", player, 150, 150, 150)
+    else
+        -- Si no tiene estado consumido, simplemente reducir cantidad o eliminar
+        if quantity > 1 then
+            dbExec(db, "UPDATE inventory SET quantity = quantity - 1 WHERE character_id = ? AND slot = ?", characterId, slot)
+        else
+            dbExec(db, "DELETE FROM inventory WHERE character_id = ? AND slot = ?", characterId, slot)
+        end
+    end
+    
+    return true
+end
+
 -- ==================== EVENTOS ====================
 
 -- Solicitar inventario
@@ -205,6 +292,23 @@ addEventHandler("onRequestInventory", root, function()
     
     local inventory = getCharacterInventory(characterId)
     triggerClientEvent(source, "onInventoryReceived", source, inventory)
+end)
+
+-- Consumir item
+addEventHandler("onInventoryItemUse", root, function(slot)
+    if not isElement(source) then return end
+    
+    local characterId = getElementData(source, "characterId")
+    if not characterId then
+        outputChatBox("No tienes un personaje seleccionado", source, 255, 0, 0)
+        return
+    end
+    
+    if consumeItem(source, characterId, slot) then
+        -- Actualizar inventario del cliente
+        local inventory = getCharacterInventory(characterId)
+        triggerClientEvent(source, "onInventoryUpdated", source, inventory)
+    end
 end)
 
 -- Agregar item (comando de admin para testing)
@@ -243,6 +347,13 @@ addCommandHandler("daritem", function(player, cmd, targetPlayer, itemName, quant
     
     -- Generar un ID único para el item (podrías tener una tabla de items)
     local itemId = math.random(1000, 9999)
+    
+    -- IDs especiales para items conocidos
+    if itemName == "Agua Llena" or itemName == "Agua" then
+        itemId = 2000  -- ID para agua llena
+    elseif itemName == "Agua Vacía" or itemName == "Botella Vacía" then
+        itemId = 2001  -- ID para agua vacía
+    end
     
     if addItemToInventory(characterId, emptySlot, itemId, itemName, quantity, "") then
         outputChatBox("Item '" .. itemName .. "' x" .. quantity .. " agregado al inventario de " .. getPlayerName(target), player, 0, 255, 0)
