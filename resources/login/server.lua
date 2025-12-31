@@ -660,39 +660,23 @@ setTimer(function()
                     local x, y, z = getElementPosition(player)
                     local velocityX, velocityY, velocityZ = getElementVelocity(player)
                     
-                    -- Usar processLineOfSight para detectar el suelo
-                    local hit, hitX, hitY, hitZ, hitElement = processLineOfSight(x, y, z, x, y, z - 50, true, true, true, true, false, false, false, false, player)
+                    -- Detectar vuelo basándose en velocidad vertical y altura
+                    -- Si está subiendo (velocidad Z positiva) o flotando (velocidad Z casi 0 pero alto)
+                    if velocityZ > 0.05 then
+                        -- Está subiendo, forzar caída inmediata
+                        setElementVelocity(player, velocityX, velocityY, -0.3)
+                    elseif velocityZ > -0.05 and velocityZ < 0.05 and z > 5.0 then
+                        -- Está flotando a cierta altura, forzar caída
+                        setElementVelocity(player, velocityX, velocityY, -0.2)
+                    end
                     
-                    if hit then
-                        local groundZ = hitZ
-                        local distanceToGround = z - groundZ
-                        
-                        -- Si está volando (más de 2 unidades del suelo)
-                        if distanceToGround > 2.0 then
-                            -- Si está subiendo o flotando, forzar caída
-                            if velocityZ > 0.05 or (velocityZ > -0.05 and velocityZ < 0.05 and distanceToGround > 3.0) then
-                                -- Forzar caída
-                                setElementVelocity(player, velocityX, velocityY, -0.3)
-                                
-                                -- Si está muy alto, teletransportar al suelo
-                                if distanceToGround > 10.0 then
-                                    setElementPosition(player, x, y, groundZ + 1.0)
-                                    outputChatBox("Vuelo deshabilitado - Solo administradores pueden volar", player, 255, 0, 0)
-                                end
-                            end
-                        end
-                    else
-                        -- Si no hay colisión (está muy alto), verificar velocidad
-                        if velocityZ > 0.05 or (velocityZ > -0.05 and velocityZ < 0.05 and z > 10.0) then
-                            -- Está volando sin colisión, forzar caída
-                            setElementVelocity(player, velocityX, velocityY, -0.5)
-                            
-                            -- Si está extremadamente alto, teletransportar a una posición segura
-                            if z > 50.0 then
-                                setElementPosition(player, x, y, z - 20.0)
-                                outputChatBox("Vuelo deshabilitado - Solo administradores pueden volar", player, 255, 0, 0)
-                            end
-                        end
+                    -- Si está extremadamente alto (probablemente volando), teletransportar hacia abajo
+                    if z > 50.0 then
+                        setElementPosition(player, x, y, z - 30.0)
+                        outputChatBox("Vuelo deshabilitado - Solo administradores pueden volar", player, 255, 0, 0)
+                    elseif z > 20.0 and velocityZ >= 0 then
+                        -- Si está alto y no está cayendo, forzar caída más agresiva
+                        setElementVelocity(player, velocityX, velocityY, -0.5)
                     end
                 end
             end
@@ -1043,15 +1027,46 @@ addEventHandler("onResourceStop", resourceRoot, function()
 end)
 
 -- ==================== COMANDOS DE ADMINISTRACIÓN ====================
--- Comando para asignar roles (solo admins)
-addCommandHandler("setrole", function(player, cmd, targetUsername, newRole)
+-- Función auxiliar para encontrar jugador por ID o nombre
+local function findPlayerByIdOrName(identifier)
+    if not identifier then return nil end
+    
+    -- Intentar como ID primero
+    local id = tonumber(identifier)
+    if id then
+        for _, player in ipairs(getElementsByType("player")) do
+            local playerID = getElementData(player, "playerID")
+            if playerID and playerID == id then
+                return player
+            end
+        end
+    end
+    
+    -- Si no se encontró por ID, buscar por nombre
+    for _, player in ipairs(getElementsByType("player")) do
+        local username = getElementData(player, "username")
+        local playerName = getPlayerName(player)
+        
+        if username and string.lower(username) == string.lower(identifier) then
+            return player
+        elseif string.lower(playerName) == string.lower(identifier) then
+            return player
+        end
+    end
+    
+    return nil
+end
+
+-- Comando para asignar roles (solo admins) - Ahora acepta ID o nombre
+addCommandHandler("setrole", function(player, cmd, targetIdentifier, newRole)
     if not isPlayerAdmin(player) then
         outputChatBox("No tienes permisos para usar este comando", player, 255, 0, 0)
         return
     end
     
-    if not targetUsername or not newRole then
-        outputChatBox("Uso: /setrole [usuario] [user|staff|admin]", player, 255, 255, 0)
+    if not targetIdentifier or not newRole then
+        outputChatBox("Uso: /setrole [ID o nombre] [user|staff|admin]", player, 255, 255, 0)
+        outputChatBox("Ejemplo: /setrole 1 admin o /setrole Juan_Perez admin", player, 255, 255, 0)
         return
     end
     
@@ -1062,33 +1077,59 @@ addCommandHandler("setrole", function(player, cmd, targetUsername, newRole)
         return
     end
     
+    -- Buscar jugador por ID o nombre
+    local targetPlayer = findPlayerByIdOrName(targetIdentifier)
+    local targetUsername = nil
+    
+    if targetPlayer then
+        targetUsername = getElementData(targetPlayer, "username")
+    else
+        -- Si no está conectado, buscar en la base de datos
+        local query = dbQuery(db, "SELECT username FROM users WHERE LOWER(username) = ?", 
+            string.lower(targetIdentifier))
+        local result = dbPoll(query, -1)
+        
+        if result and #result > 0 then
+            targetUsername = result[1].username
+        else
+            outputChatBox("Jugador no encontrado. Usa el ID del scoreboard (TAB) o el nombre exacto.", player, 255, 0, 0)
+            return
+        end
+    end
+    
+    if not targetUsername then
+        outputChatBox("Jugador no encontrado. Usa el ID del scoreboard (TAB) o el nombre exacto.", player, 255, 0, 0)
+        return
+    end
+    
     -- Actualizar rol en la base de datos
     local query = dbQuery(db, "UPDATE users SET role = ? WHERE LOWER(username) = ?", 
         newRole, string.lower(targetUsername))
     local result = dbPoll(query, -1)
     
     if result then
-        outputChatBox("Rol de " .. targetUsername .. " actualizado a: " .. newRole, player, 0, 255, 0)
+        local playerID = targetPlayer and getElementData(targetPlayer, "playerID") or "N/A"
+        outputChatBox("Rol de " .. targetUsername .. " (ID: " .. tostring(playerID) .. ") actualizado a: " .. newRole, player, 0, 255, 0)
         
         -- Si el jugador está conectado, actualizar su rol en tiempo real
-        for _, p in ipairs(getElementsByType("player")) do
-            local username = getElementData(p, "username")
-            if username and string.lower(username) == string.lower(targetUsername) then
-                setElementData(p, "userRole", newRole)
-                outputChatBox("Tu rol ha sido actualizado a: " .. newRole, p, 0, 255, 0)
-                
-                -- Si cambió a admin, permitir jetpack
-                if newRole == "admin" then
-                    outputChatBox("Ahora tienes acceso al modo admin (jetpack disponible)", p, 0, 255, 255)
-                else
-                    -- Si dejó de ser admin, quitar jetpack
-                    removePedJetPack(p)
-                    outputChatBox("Modo admin desactivado", p, 255, 255, 0)
-                end
+        if targetPlayer then
+            setElementData(targetPlayer, "userRole", newRole)
+            outputChatBox("Tu rol ha sido actualizado a: " .. newRole, targetPlayer, 0, 255, 0)
+            
+            -- Si cambió a admin, permitir jetpack
+            if newRole == "admin" then
+                outputChatBox("Ahora tienes acceso al modo admin (jetpack disponible)", targetPlayer, 0, 255, 255)
+            else
+                -- Si dejó de ser admin, quitar jetpack
+                removePedJetPack(targetPlayer)
+                outputChatBox("Modo admin desactivado", targetPlayer, 255, 255, 0)
             end
+            
+            -- Notificar al cliente sobre el cambio de rol
+            triggerClientEvent(targetPlayer, "onPlayerRoleSet", targetPlayer, newRole)
         end
     else
-        outputChatBox("Error al actualizar el rol. Usuario no encontrado.", player, 255, 0, 0)
+        outputChatBox("Error al actualizar el rol. Verifica que el usuario exista.", player, 255, 0, 0)
     end
 end)
 

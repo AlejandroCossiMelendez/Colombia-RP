@@ -725,15 +725,18 @@ function startFlightPrevention()
                 local x, y, z = getElementPosition(localPlayer)
                 local groundZ = getGroundPosition(x, y, z)
                 local distanceToGround = z - groundZ
+                local velocityX, velocityY, velocityZ = getElementVelocity(localPlayer)
                 
-                -- Si está volando (más de 1.5 unidades del suelo y subiendo)
-                if distanceToGround > 1.5 then
-                    local velocityX, velocityY, velocityZ = getElementVelocity(localPlayer)
-                    
-                    -- Si está subiendo (velocidad Z positiva y significativa)
-                    if velocityZ > 0.1 then
-                        -- Forzar caída cancelando la velocidad vertical hacia arriba
+                -- Solo prevenir vuelo si está claramente volando (alto y subiendo o flotando)
+                -- Permitir saltos normales (distancia pequeña y velocidad hacia arriba es normal)
+                if distanceToGround > 2.0 then
+                    -- Si está subiendo (velocidad Z positiva y significativa) y está alto
+                    if velocityZ > 0.15 then
+                        -- Está volando, forzar caída
                         setElementVelocity(localPlayer, velocityX, velocityY, -0.1)
+                    elseif velocityZ > -0.05 and velocityZ < 0.05 and distanceToGround > 3.0 then
+                        -- Está flotando a cierta altura, forzar caída suave
+                        setElementVelocity(localPlayer, velocityX, velocityY, -0.05)
                     end
                     
                     -- Si está demasiado alto, forzar caída más agresiva
@@ -760,18 +763,20 @@ end
 addEventHandler("onClientKey", root, function(button, press)
     if playerRole ~= "admin" then
         -- Prevenir doble Shift que activa el vuelo tipo superman
+        -- Solo cancelar si está claramente volando, no durante saltos normales
         if (button == "lshift" or button == "rshift") and press then
-            -- Si el jugador está en el aire, prevenir el vuelo
             local x, y, z = getElementPosition(localPlayer)
             local groundZ = getGroundPosition(x, y, z)
             local distanceToGround = z - groundZ
+            local velocityX, velocityY, velocityZ = getElementVelocity(localPlayer)
             
-            if distanceToGround > 0.5 then
-                -- Está en el aire, cancelar el evento para prevenir vuelo
+            -- Solo cancelar si está volando (alto y subiendo), no durante saltos normales
+            -- Un salto normal tiene distancia < 2.0 y velocidad hacia arriba es normal
+            if distanceToGround > 2.0 and velocityZ > 0.1 then
+                -- Está volando, cancelar el evento para prevenir vuelo
                 cancelEvent()
                 
                 -- Forzar caída inmediata
-                local velocityX, velocityY, velocityZ = getElementVelocity(localPlayer)
                 if velocityZ > 0 then
                     setElementVelocity(localPlayer, velocityX, velocityY, -0.2)
                 end
