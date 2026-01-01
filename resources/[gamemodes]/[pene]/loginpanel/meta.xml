@@ -18,5 +18,6 @@
 
 	<!-- <file src="sounds/music.mp3"/> -->
 	<!-- Archivo music.mp3 comentado temporalmente - copiar desde !GUARDAR/loginpanel/sounds/ si es necesario -->
-	<file src="sounds/music_ban.mp3"/>
+	<!-- <file src="sounds/music_ban.mp3"/> -->
+	<!-- Archivo music_ban.mp3 comentado temporalmente - copiar desde !GUARDAR/loginpanel/sounds/ si es necesario -->
 </meta>
