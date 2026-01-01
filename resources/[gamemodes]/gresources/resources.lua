@@ -43,10 +43,10 @@ function startAll( player )
 			end
 		end
 	end
-	--outputServerLog( "startall: Todas las resources han sido iniciadas. " .. " (Solicitado por " .. ( not player and "Consola" or getAccountName( getPlayerAccount( player ) ) or getPlayerName(player) ) .. ")" )
+	outputServerLog( "startall: Todas las resources han sido iniciadas. " .. " (Solicitado por " .. ( not player and "Consola" or getAccountName( getPlayerAccount( player ) ) or getPlayerName(player) ) .. ")" )
 	if player then
-		--outputChatBox ( "Todos los recursos han sido iniciados.", player, 0, 255, 153 )
+		outputChatBox ( "Todos los recursos han sido iniciados.", player, 0, 255, 153 )
 	end
 end
---addCommandHandler("startall", startAll)
+addCommandHandler("startall", startAll, true)
 addEventHandler("onResourceStart", getResourceRootElement(getThisResource()), startAll)

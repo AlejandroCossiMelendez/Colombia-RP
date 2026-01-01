@@ -1,6 +1,0 @@
-<meta>
-    <info author="Colombia RP" version="1.0" name="Animations & Effects" description="Sistema de animaciones y efectos para Colombia RP" />
-    <script src="client.lua" type="client" />
-    <script src="server.lua" type="server" />
-</meta>
-
