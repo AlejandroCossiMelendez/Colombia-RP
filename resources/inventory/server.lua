@@ -327,14 +327,14 @@ end)
 
 -- ==================== SISTEMA DE BOTAR ITEMS ====================
 
--- ID del modelo personalizado para la botella (debe coincidir con el cliente)
-local CUSTOM_BOTTLE_MODEL_ID = 20000
+-- NOTA: El servidor solo puede usar modelos nativos de MTA
+-- El cliente reemplazará visualmente el modelo personalizado cuando sea necesario
 
--- Tabla de modelos de objetos para cada item
+-- Tabla de modelos de objetos para cada item (solo modelos nativos)
 local itemModels = {
-    ["Agua Vacía"] = CUSTOM_BOTTLE_MODEL_ID,  -- Botella vacía personalizada
-    ["Botella Vacía"] = CUSTOM_BOTTLE_MODEL_ID,
-    ["Agua Llena"] = 1543,  -- Botella llena (modelo nativo por ahora)
+    ["Agua Vacía"] = 1543,  -- Botella vacía (modelo nativo - el cliente lo reemplazará visualmente)
+    ["Botella Vacía"] = 1543,  -- Botella vacía (modelo nativo - el cliente lo reemplazará visualmente)
+    ["Agua Llena"] = 1543,  -- Botella llena (modelo nativo)
     ["Agua"] = 1543,
     ["Hamburguesa"] = 2880,  -- Modelo de comida/hamburguesa
     ["Comida"] = 2880
@@ -408,10 +408,14 @@ function dropItemToGround(player, characterId, slot)
     triggerClientEvent(player, "onInventoryUpdated", player, inventory)
     
     -- Notificar a otros jugadores cercanos
-    local players = getElementsWithinRange(dropX, dropY, dropZ, 20, "player")
-    for _, nearbyPlayer in ipairs(players) do
-        if nearbyPlayer ~= player then
-            outputChatBox(getPlayerName(player) .. " ha botado: " .. itemName, nearbyPlayer, 200, 200, 200)
+    local allPlayers = getElementsByType("player")
+    for _, nearbyPlayer in ipairs(allPlayers) do
+        if nearbyPlayer ~= player and isElement(nearbyPlayer) then
+            local px, py, pz = getElementPosition(nearbyPlayer)
+            local distance = getDistanceBetweenPoints3D(px, py, pz, dropX, dropY, dropZ)
+            if distance <= 20.0 then
+                outputChatBox(getPlayerName(player) .. " ha botado: " .. itemName, nearbyPlayer, 200, 200, 200)
+            end
         end
     end
     

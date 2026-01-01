@@ -87,6 +87,39 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
     else
         outputChatBox("⚠ No se pudo cargar bottle.dff", 255, 165, 0)
     end
+    
+    -- Reemplazar modelos de objetos botados existentes
+    replaceDroppedBottles()
+end)
+
+-- Función para reemplazar visualmente objetos botados que son botellas vacías
+function replaceDroppedBottles()
+    local objects = getElementsByType("object")
+    for _, obj in ipairs(objects) do
+        if getElementData(obj, "droppedItem") then
+            local itemName = getElementData(obj, "itemName")
+            if itemName == "Botella Vacía" or itemName == "Agua Vacía" then
+                local currentModel = getElementModel(obj)
+                -- Si el objeto tiene el modelo nativo 1543, reemplazarlo con el personalizado
+                if currentModel == 1543 then
+                    setElementModel(obj, CUSTOM_BOTTLE_MODEL_ID)
+                end
+            end
+        end
+    end
+end
+
+-- Reemplazar modelos cuando un objeto entra en el stream
+addEventHandler("onClientElementStreamIn", root, function()
+    if getElementType(source) == "object" and getElementData(source, "droppedItem") then
+        local itemName = getElementData(source, "itemName")
+        if itemName == "Botella Vacía" or itemName == "Agua Vacía" then
+            local currentModel = getElementModel(source)
+            if currentModel == 1543 then
+                setElementModel(source, CUSTOM_BOTTLE_MODEL_ID)
+            end
+        end
+    end
 end)
 
 -- Función para obtener la imagen de un item
