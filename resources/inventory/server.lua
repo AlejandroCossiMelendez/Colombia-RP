@@ -327,11 +327,14 @@ end)
 
 -- ==================== SISTEMA DE BOTAR ITEMS ====================
 
+-- ID del modelo personalizado para la botella (debe coincidir con el cliente)
+local CUSTOM_BOTTLE_MODEL_ID = 20000
+
 -- Tabla de modelos de objetos para cada item
 local itemModels = {
-    ["Agua Vacía"] = 1543,  -- Botella vacía
-    ["Botella Vacía"] = 1543,
-    ["Agua Llena"] = 1543,  -- Botella llena
+    ["Agua Vacía"] = CUSTOM_BOTTLE_MODEL_ID,  -- Botella vacía personalizada
+    ["Botella Vacía"] = CUSTOM_BOTTLE_MODEL_ID,
+    ["Agua Llena"] = 1543,  -- Botella llena (modelo nativo por ahora)
     ["Agua"] = 1543,
     ["Hamburguesa"] = 2880,  -- Modelo de comida/hamburguesa
     ["Comida"] = 2880

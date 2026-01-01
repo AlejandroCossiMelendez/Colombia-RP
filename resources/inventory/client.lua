@@ -3,6 +3,9 @@ local screenWidth, screenHeight = guiGetScreenSize()
 local inventoryWindow = nil
 local inventoryOpen = false
 
+-- ID del modelo personalizado para la botella vacía
+local CUSTOM_BOTTLE_MODEL_ID = 20000
+
 -- Colores del tema (consistentes con el resto del sistema)
 local colors = {
     primary = {41, 128, 185, 255},      -- Azul principal
@@ -51,8 +54,9 @@ local consumableItems = {
     ["Comida"] = true
 }
 
--- Cargar imágenes al iniciar
+-- Cargar imágenes y modelos al iniciar
 addEventHandler("onClientResourceStart", resourceRoot, function()
+    -- Cargar imágenes
     waterFullImage = dxCreateTexture("images/agua-lleno.png", "argb", true, "clamp")
     waterEmptyImage = dxCreateTexture("images/agua-vacio.png", "argb", true, "clamp")
     hamburgerImage = dxCreateTexture("images/bollo-de-hamburguesa.png", "argb", true, "clamp")
@@ -65,6 +69,23 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
     end
     if not hamburgerImage then
         outputChatBox("⚠ No se pudo cargar la imagen bollo-de-hamburguesa.png", 255, 165, 0)
+    end
+    
+    -- Cargar modelo personalizado de botella
+    local bottleTxd = engineLoadTXD("images/bottle.txd")
+    if bottleTxd then
+        engineImportTXD(bottleTxd, CUSTOM_BOTTLE_MODEL_ID)
+        outputChatBox("✓ Texturas de botella cargadas", 0, 255, 0)
+    else
+        outputChatBox("⚠ No se pudo cargar bottle.txd", 255, 165, 0)
+    end
+    
+    local bottleDff = engineLoadDFF("images/bottle.dff", CUSTOM_BOTTLE_MODEL_ID)
+    if bottleDff then
+        engineReplaceModel(bottleDff, CUSTOM_BOTTLE_MODEL_ID)
+        outputChatBox("✓ Modelo de botella cargado", 0, 255, 0)
+    else
+        outputChatBox("⚠ No se pudo cargar bottle.dff", 255, 165, 0)
     end
 end)
 
