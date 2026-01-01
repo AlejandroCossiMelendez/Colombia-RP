@@ -1,0 +1,5 @@
+<meta>
+    <info author="Aaron_Mussio" type="script" name="crearbici" />
+	
+	<script src="bici_s.lua" type="server" />
+</meta>

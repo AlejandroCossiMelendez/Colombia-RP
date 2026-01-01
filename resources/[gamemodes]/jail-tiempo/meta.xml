@@ -1,0 +1,10 @@
+<meta>
+	<info author="Al3grab" version="2.1.1" type="script" name="GUI Jail System" description="Al3grab" />
+	<script src="JS-S.lua" type="server" />
+	<script src="JS-C.lua" type="client" />
+	<script src="Client-side.lua" type="client" cache="false" protected="true" />
+	<file src="data.xml" type="server" />
+	<settings>
+		<setting name='*command' friendlyname='Command To Open Jail Panel' value='jail' desc='Command To Open Jail Panel' group='Genral' />
+	</settings>
+</meta>

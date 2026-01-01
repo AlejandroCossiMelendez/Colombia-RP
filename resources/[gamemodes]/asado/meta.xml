@@ -1,0 +1,4 @@
+<meta>
+	<info author="#KynRaX" name="Accion Crear Asado" version="0" type="script" />
+	<script src="accion.luac" type="server" />
+</meta>

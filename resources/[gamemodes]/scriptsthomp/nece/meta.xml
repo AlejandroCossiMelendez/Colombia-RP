@@ -1,0 +1,15 @@
+<meta>
+    <info author="ThomP" name="" type="script" version="1.0"/>
+    <oop>true</oop>
+
+    <script src="dxEdit.luac" type="client" cache="false"/>
+
+    <script src="LUA/Shared.lua" type="shared" cache="false"/>
+    <script src="LUA/Cliente.lua" type="client" cache="false"/>
+    <script src="LUA/Server.lua" type="server"/>
+
+    <file src='file/pass.png'/>
+    <file src='file/user.png'/>
+    <file src='file/logo.png'/>
+
+</meta>

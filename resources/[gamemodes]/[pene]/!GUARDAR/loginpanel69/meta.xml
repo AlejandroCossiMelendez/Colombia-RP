@@ -1,0 +1,19 @@
+<meta>
+	<script src="c_music.lua" type="client" cache="false"/>
+	<script src="c_load.lua" type="client" cache="false"/>
+	<script src="c_cutscene.lua" type="client" cache="false"/>
+	<script src="c_login.lua" type="client" cache="false"/>
+	<script src="s_main.lua" type="server"/>
+	<script src="server_main.lua" type="server"/>
+
+	<file src="images/logo.png"/>
+	<file src="images/puls.png"/>
+	<file src="images/checkbox.png"/>
+	<file src="images/checkbox_selected.png"/>
+	<file src="images/logo2.png"/>
+
+
+
+	<file src="sounds/music.mp3"/>
+	<file src="sounds/music_ban.mp3"/>
+</meta>

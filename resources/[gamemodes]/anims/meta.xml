@@ -1,0 +1,8 @@
+<meta>
+
+	<file src="Lato-Italic.ttf"/>
+	<file src="Lato-Light.ttf"/>
+	
+	<script src="anims.lua"/>
+	<script src="anims_c.lua" type="client"/>
+</meta>

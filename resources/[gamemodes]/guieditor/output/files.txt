@@ -1,0 +1,4 @@
+
+:guieditor/output/GUI_output_2018-11-23_21-11.txt
+:guieditor/output/GUI_output_2018-11-23_21-38.txt
+:guieditor2/output/GUI_output_2020-10-31_1-9.txt

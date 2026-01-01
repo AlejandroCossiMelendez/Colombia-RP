@@ -1,0 +1,8 @@
+<meta>
+	<info author="ImpactCreepy" type="script" name="bankSystem" />
+	<script src="c_bankSystem.lua" type="client" cache="false" />
+	<script src="s_bankSystem.lua" type="server" />
+	<file src="rcs/roboto.ttf" />
+	<file src="rcs/background.png" />
+	<file src="rcs/huella.png" />
+</meta>

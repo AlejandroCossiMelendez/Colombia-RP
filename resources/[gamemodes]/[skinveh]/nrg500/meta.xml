@@ -1,0 +1,6 @@
+<meta>
+	<info author="FasTriX" version="1.0.0" type="script" name="" description="" showInResourceBrowser="true" />
+	<script src="idskin.lua" type="client" />
+	<file src="nrg500.txd" />
+	<file src="nrg500.dff" />
+</meta>

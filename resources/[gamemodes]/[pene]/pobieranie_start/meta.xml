@@ -1,0 +1,5 @@
+<meta>
+	<script src="c.lua" type="client" cache="false"/>
+	<export function="stopDownloading" type="client"/>
+	<download_priority_group>1</download_priority_group>
+</meta>

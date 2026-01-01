@@ -1,0 +1,16 @@
+<meta>
+    <script src="clipboardHelper.lua" type="client" cache="false"/>
+    <script src="c.lua" type="client" cache="false"/>
+
+    <file src="images/pasek.png"/>
+
+    <export function="createCustomEditbox" type="client"/>
+    <export function="destroyCustomEditbox" type="client"/>
+    <export function="getCustomEditboxText" type="client"/>
+    <export function="customEditboxSetText" type="client"/>
+    <export function="customEditboxSetAlpha" type="client"/>
+    <export function="customEditboxGetSelected" type="client"/>
+    <export function="customEditboxSetPosition" type="client"/>
+    <export function="getEditboxSelected" type="client"/>    
+    <export function="new_gui" type="client"/>
+</meta>

@@ -1,0 +1,12 @@
+<meta>
+    <info author="_ThomP" name="" type="script" version="1.0"/>
+    <oop>true</oop>
+
+    <script src="cliente.lua" type="client" cache="false"/>
+    <script src="minero_c.lua" type="client" cache="false"/>
+    <script src="servidor.lua" type="server"/>
+
+    <file src='files/pico.dff' id='337'/>
+	<file src='files/pico.txd' id='337'/>
+	<file src='files/pico.mp3' id='337'/>
+</meta>

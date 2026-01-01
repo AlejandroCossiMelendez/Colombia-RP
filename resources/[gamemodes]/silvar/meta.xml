@@ -1,0 +1,5 @@
+<meta>
+    <script src="silvarS.lua" type="server" />
+    <script src="silvarC.lua" type="client" cache="false" />
+    <file src="sonido/silvar.mp3" />
+</meta>

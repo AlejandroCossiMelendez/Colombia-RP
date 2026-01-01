@@ -1,0 +1,7 @@
+<meta>
+
+     <info author="Kimval" version="1" name="Cinto de seguridad" description="" type="script" />
+    
+	<script src="cinto.lua" type="server" />
+	
+</meta>

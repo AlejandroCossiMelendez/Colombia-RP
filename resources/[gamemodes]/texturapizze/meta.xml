@@ -1,0 +1,6 @@
+<meta>
+	<info type="misc" name="N/A" author="+Fernandes" description="" version="1.0" />
+	<file src="ce_pizza.txd" />
+	<script type="client" src="replace.lua" />
+
+</meta>

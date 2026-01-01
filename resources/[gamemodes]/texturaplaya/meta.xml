@@ -1,0 +1,6 @@
+<meta>
+<info name='n-sei' type='misc' />
+<script src='script.lua' type='client' />
+<file src='law_beach2.txd' />
+<file src='beach01_law2.dff' />
+</meta>

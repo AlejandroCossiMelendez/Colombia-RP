@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="GM2MC" type="misc" name="[Txd]Object-compras" description="[Txd]Object-compras" />
+     <script src="script.lua" type="client" />
+     <file src="12845.txd" />
+</meta>

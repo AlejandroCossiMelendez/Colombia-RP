@@ -1,0 +1,5 @@
+<meta>
+	<info author="ImpactCreepy" type="script" name="Facturacion" />
+	<script src="c_Facturacion.lua" type="client" cache="false" />
+	<script src="s_Facturacion.lua" type="server" />
+</meta>

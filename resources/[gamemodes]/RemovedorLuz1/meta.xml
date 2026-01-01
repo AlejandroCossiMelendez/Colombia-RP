@@ -1,0 +1,4 @@
+<meta>
+    <info author="Trululu" version="1.0" name="Removedor" type="script" />
+    <script src="remove.lua" type="client"/>
+</meta>
