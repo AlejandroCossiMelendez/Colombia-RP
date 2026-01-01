@@ -72,20 +72,20 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
     end
     
     -- Cargar modelo personalizado de botella
-    local bottleTxd = engineLoadTXD("images/bottle.txd")
+    local bottleTxd = engineLoadTXD("images/bottle-1.txd")
     if bottleTxd then
         engineImportTXD(bottleTxd, CUSTOM_BOTTLE_MODEL_ID)
         outputChatBox("✓ Texturas de botella cargadas", 0, 255, 0)
     else
-        outputChatBox("⚠ No se pudo cargar bottle.txd", 255, 165, 0)
+        outputChatBox("⚠ No se pudo cargar bottle-1.txd", 255, 165, 0)
     end
     
-    local bottleDff = engineLoadDFF("images/bottle.dff", CUSTOM_BOTTLE_MODEL_ID)
+    local bottleDff = engineLoadDFF("images/bottle-1.dff", CUSTOM_BOTTLE_MODEL_ID)
     if bottleDff then
         engineReplaceModel(bottleDff, CUSTOM_BOTTLE_MODEL_ID)
         outputChatBox("✓ Modelo de botella cargado", 0, 255, 0)
     else
-        outputChatBox("⚠ No se pudo cargar bottle.dff", 255, 165, 0)
+        outputChatBox("⚠ No se pudo cargar bottle-1.dff", 255, 165, 0)
     end
     
     -- Reemplazar modelos de objetos botados existentes
