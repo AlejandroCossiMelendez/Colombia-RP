@@ -72,12 +72,12 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
     end
     
     -- Cargar modelo personalizado de botella
-    local bottleTxd = engineLoadTXD("images/bottle-1.txd")
+    local bottleTxd = engineLoadTXD("images/bottle-2.txd")
     if bottleTxd then
         engineImportTXD(bottleTxd, CUSTOM_BOTTLE_MODEL_ID)
         outputChatBox("✓ Texturas de botella cargadas", 0, 255, 0)
     else
-        outputChatBox("⚠ No se pudo cargar bottle-1.txd", 255, 165, 0)
+        outputChatBox("⚠ No se pudo cargar bottle-2.txd", 255, 165, 0)
     end
     
     local bottleDff = engineLoadDFF("images/bottle-1.dff", CUSTOM_BOTTLE_MODEL_ID)
