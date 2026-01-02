@@ -510,20 +510,104 @@ addEventHandler("admin:createVehicle", root, function(vehicleId)
     local adminInterior = getElementInterior(source)
     local adminDimension = getElementDimension(source)
     
+    -- Solicitar al cliente que calcule la posición delante usando la cámara
+    -- Esto es más preciso que usar solo la rotación del ped
+    triggerClientEvent(source, "admin:calculateVehiclePosition", source, vehicleId, adminX, adminY, adminZ, adminRotation, adminInterior, adminDimension)
+end)
+
+-- Evento del cliente para calcular la posición y crear el vehículo
+addEvent("admin:createVehicleAtPosition", true)
+addEventHandler("admin:createVehicleAtPosition", root, function(vehicleId, x, y, z, rotation, interior, dimension)
+    if not isElement(source) or getElementType(source) ~= "player" then
+        return
+    end
+    
+    if not isPlayerAdmin(source) then
+        return
+    end
+    
+    -- Crear el vehículo en la posición calculada por el cliente
+    local vehicle = createVehicle(vehicleId, x, y, z, 0, 0, rotation)
+    
+    if not vehicle then
+        outputChatBox("Error al crear el vehículo. Verifica que el ID sea válido.", source, 255, 0, 0)
+        return
+    end
+    
+    -- Configurar dimensiones e interior del vehículo
+    setElementDimension(vehicle, dimension)
+    setElementInterior(vehicle, interior)
+    
+    -- Asegurar que el vehículo sea visible
+    setElementAlpha(vehicle, 255)
+    
+    -- Obtener nombre del vehículo
+    local vehicleName = getVehicleNameFromModel(vehicleId) or "Vehículo " .. vehicleId
+    
+    -- Mensaje de confirmación con coordenadas
+    outputChatBox("✓ Vehículo '" .. vehicleName .. "' (ID: " .. vehicleId .. ") creado correctamente.", source, 0, 255, 0)
+    outputChatBox("Posición: X=" .. string.format("%.2f", x) .. " Y=" .. string.format("%.2f", y) .. " Z=" .. string.format("%.2f", z), source, 255, 255, 255)
+    outputServerLog("[ADMIN] " .. getPlayerName(source) .. " creó el vehículo " .. vehicleName .. " (ID: " .. vehicleId .. ") en " .. string.format("%.2f, %.2f, %.2f", x, y, z))
+    outputServerLog("[ADMIN] Dimensión vehículo: " .. getElementDimension(vehicle) .. " Interior vehículo: " .. getElementInterior(vehicle))
+end)
+
+-- Evento para crear vehículo (versión antigua - mantener por compatibilidad)
+addEvent("admin:createVehicleOld", true)
+addEventHandler("admin:createVehicleOld", root, function(vehicleId)
+    if not isElement(source) or getElementType(source) ~= "player" then
+        return
+    end
+    
+    if not isPlayerAdmin(source) then
+        outputChatBox("No tienes permiso para usar esta función.", source, 255, 0, 0)
+        return
+    end
+    
+    if not vehicleId or not tonumber(vehicleId) then
+        outputChatBox("ID de vehículo inválido.", source, 255, 0, 0)
+        return
+    end
+    
+    vehicleId = tonumber(vehicleId)
+    
+    -- Validar que el ID del vehículo esté en el rango válido (400-611)
+    if vehicleId < 400 or vehicleId > 611 then
+        outputChatBox("ID de vehículo inválido. Debe estar entre 400 y 611.", source, 255, 0, 0)
+        return
+    end
+    
+    -- Obtener posición y rotación del admin
+    local adminX, adminY, adminZ = getElementPosition(source)
+    local adminRotation = getPedRotation(source)
+    local adminInterior = getElementInterior(source)
+    local adminDimension = getElementDimension(source)
+    
     -- Calcular posición 5 metros delante del admin
+    -- En MTA, rotación 0 = mirando al norte (Y+), 90 = este (X+), 180 = sur (Y-), 270 = oeste (X-)
     local rotationRad = math.rad(adminRotation)
     local distanceFront = 5.0
+    
+    -- Calcular dirección hacia adelante usando la fórmula correcta
+    -- En MTA, para ir "adelante" desde la rotación del ped:
+    -- -sin(rotación) para X (este es positivo)
+    -- cos(rotación) para Y (norte es positivo)
     local frontX = adminX - math.sin(rotationRad) * distanceFront
     local frontY = adminY + math.cos(rotationRad) * distanceFront
     local frontZ = adminZ
     
-    -- Verificar que no haya colisión con el suelo
-    local hit, hitX, hitY, hitZ = processLineOfSight(frontX, frontY, frontZ + 10, frontX, frontY, frontZ - 10, true, true, false, true, false, false, false, false, source)
-    if hit then
+    -- Verificar altura del suelo en la posición calculada
+    -- Usar un rango más amplio para detectar el suelo
+    local hit, hitX, hitY, hitZ = processLineOfSight(frontX, frontY, adminZ + 20, frontX, frontY, adminZ - 50, true, true, false, true, false, false, false, false, source)
+    if hit and hitZ then
         frontZ = hitZ + 0.5
     else
-        -- Si no hay suelo detectado, usar la altura del admin
-        frontZ = adminZ
+        -- Si no hay suelo detectado, usar la altura del admin + un pequeño offset
+        frontZ = adminZ + 0.5
+    end
+    
+    -- Asegurar que la altura mínima sea razonable
+    if frontZ < 5.0 then
+        frontZ = adminZ + 0.5
     end
     
     -- Crear el vehículo
@@ -534,15 +618,24 @@ addEventHandler("admin:createVehicle", root, function(vehicleId)
         return
     end
     
-    -- Configurar dimensiones e interior del vehículo
+    -- Configurar dimensiones e interior del vehículo (IMPORTANTE: debe coincidir con el admin)
     setElementDimension(vehicle, adminDimension)
     setElementInterior(vehicle, adminInterior)
+    
+    -- Asegurar que el vehículo sea visible
+    setElementAlpha(vehicle, 255)
     
     -- Obtener nombre del vehículo
     local vehicleName = getVehicleNameFromModel(vehicleId) or "Vehículo " .. vehicleId
     
-    -- Mensaje de confirmación
+    -- Mensaje de confirmación con coordenadas
     outputChatBox("✓ Vehículo '" .. vehicleName .. "' (ID: " .. vehicleId .. ") creado correctamente.", source, 0, 255, 0)
+    outputChatBox("Posición: X=" .. string.format("%.2f", frontX) .. " Y=" .. string.format("%.2f", frontY) .. " Z=" .. string.format("%.2f", frontZ), source, 255, 255, 255)
+    outputChatBox("Tu posición: X=" .. string.format("%.2f", adminX) .. " Y=" .. string.format("%.2f", adminY) .. " Z=" .. string.format("%.2f", adminZ), source, 255, 255, 255)
+    outputChatBox("Distancia: " .. string.format("%.2f", getDistanceBetweenPoints3D(adminX, adminY, adminZ, frontX, frontY, frontZ)) .. " metros", source, 255, 255, 255)
     outputServerLog("[ADMIN] " .. getPlayerName(source) .. " creó el vehículo " .. vehicleName .. " (ID: " .. vehicleId .. ") en " .. string.format("%.2f, %.2f, %.2f", frontX, frontY, frontZ))
+    outputServerLog("[ADMIN] Posición del admin: " .. string.format("%.2f, %.2f, %.2f", adminX, adminY, adminZ) .. " Rotación: " .. adminRotation)
+    outputServerLog("[ADMIN] Dimensión admin: " .. adminDimension .. " Interior admin: " .. adminInterior)
+    outputServerLog("[ADMIN] Dimensión vehículo: " .. getElementDimension(vehicle) .. " Interior vehículo: " .. getElementInterior(vehicle))
 end)
 

@@ -48,6 +48,7 @@
     <script src="client/vest_icon.lua" type="client" />
     <script src="client/voice.lua" type="client" />
     <script src="client/admin_panel.lua" type="client" />
+    <script src="client/admin_vehicle.lua" type="client" />
     <script src="client/freecam.lua" type="client" />
     <script src="client/inventory.lua" type="client" />
     <script src="client/cursor_toggle.lua" type="client" />
