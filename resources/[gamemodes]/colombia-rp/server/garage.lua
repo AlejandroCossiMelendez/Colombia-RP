@@ -77,18 +77,32 @@ addEventHandler("garage:requestVehicle", root, function(vehicleId)
     outputChatBox("Has pagado $" .. cost .. " por el servicio de garaje.", source, 0, 255, 0)
     outputChatBox("Tu vehículo llegará en 20 segundos...", source, 255, 255, 0)
     
+    -- Capturar el jugador y los datos antes del timer
+    local player = source
+    local playerCharId = characterId
+    local vehModel = vehicleData.model
+    local vehPlate = vehicleData.plate
+    local vehLocked = vehicleData.locked
+    local vehFuel = vehicleData.fuel or 100
+    local vehId = vehicleId
+    
+    outputServerLog("[GARAGE] Timer iniciado para " .. getPlayerName(player) .. " - Vehículo ID: " .. vehId .. " (" .. vehPlate .. ")")
+    
     -- Enviar datos del vehículo al cliente para spawn después de 20 segundos
     setTimer(function()
+        outputServerLog("[GARAGE] Timer ejecutado para " .. (isElement(player) and getPlayerName(player) or "DESCONECTADO") .. " - Vehículo ID: " .. vehId)
+        
         -- Verificar que el jugador sigue conectado
-        if not isElement(source) or getElementType(source) ~= "player" then
+        if not isElement(player) or getElementType(player) ~= "player" then
+            outputServerLog("[GARAGE] ERROR: El jugador se desconectó antes de que llegara el vehículo.")
             return
         end
         
         -- Obtener posición del jugador
-        local px, py, pz = getElementPosition(source)
-        local rotation = getPedRotation(source)
-        local interior = getElementInterior(source)
-        local dimension = getElementDimension(source)
+        local px, py, pz = getElementPosition(player)
+        local rotation = getPedRotation(player)
+        local interior = getElementInterior(player)
+        local dimension = getElementDimension(player)
         
         -- Calcular posición 5 metros delante del jugador
         local rotationRad = math.rad(rotation)
@@ -101,7 +115,7 @@ addEventHandler("garage:requestVehicle", root, function(vehicleId)
         local existingVehicle = nil
         for _, veh in ipairs(getElementsByType("vehicle")) do
             local vehDbId = getElementData(veh, "vehicle:db_id") or getElementData(veh, "vehicle:id")
-            if vehDbId and tonumber(vehDbId) == vehicleId then
+            if vehDbId and tonumber(vehDbId) == vehId then
                 existingVehicle = veh
                 break
             end
@@ -113,37 +127,40 @@ addEventHandler("garage:requestVehicle", root, function(vehicleId)
             setElementRotation(existingVehicle, 0, 0, rotation)
             setElementDimension(existingVehicle, dimension)
             setElementInterior(existingVehicle, interior)
-            outputChatBox("Tu vehículo ha sido movido a tu ubicación.", source, 0, 255, 0)
+            outputChatBox("Tu vehículo ha sido movido a tu ubicación.", player, 0, 255, 0)
+            outputServerLog("[GARAGE] Vehículo " .. vehPlate .. " movido para " .. getPlayerName(player))
         else
             -- Crear el vehículo desde la base de datos
-            local vehicle = createVehicle(vehicleData.model, frontX, frontY, frontZ, 0, 0, rotation)
+            local vehicle = createVehicle(vehModel, frontX, frontY, frontZ, 0, 0, rotation)
             
             if vehicle then
                 -- Configurar el vehículo
                 setElementDimension(vehicle, dimension)
                 setElementInterior(vehicle, interior)
-                setVehiclePlateText(vehicle, vehicleData.plate)
-                setVehicleLocked(vehicle, vehicleData.locked == 1)
+                setVehiclePlateText(vehicle, vehPlate)
+                setVehicleLocked(vehicle, vehLocked == 1)
                 
                 -- Restaurar combustible
-                local fuel = vehicleData.fuel or 100
-                setElementData(vehicle, "vehicle:fuel", fuel)
+                setElementData(vehicle, "vehicle:fuel", vehFuel)
                 
                 -- Guardar datos en elementData
-                setElementData(vehicle, "vehicle:id", vehicleId)
-                setElementData(vehicle, "vehicle:db_id", vehicleId)
-                setElementData(vehicle, "vehicle:plate", vehicleData.plate)
-                setElementData(vehicle, "vehicle:owner_id", characterId)
-                setElementData(vehicle, "vehicle:locked", vehicleData.locked == 1)
+                setElementData(vehicle, "vehicle:id", vehId)
+                setElementData(vehicle, "vehicle:db_id", vehId)
+                setElementData(vehicle, "vehicle:plate", vehPlate)
+                setElementData(vehicle, "vehicle:owner_id", playerCharId)
+                setElementData(vehicle, "vehicle:locked", vehLocked == 1)
                 
                 -- Actualizar posición en la base de datos
                 executeDatabase("UPDATE vehicles SET x = ?, y = ?, z = ?, rot_z = ?, interior = ?, dimension = ? WHERE id = ?", 
-                    frontX, frontY, frontZ, rotation, interior, dimension, vehicleId)
+                    frontX, frontY, frontZ, rotation, interior, dimension, vehId)
                 
-                outputChatBox("✓ Tu vehículo '" .. (getVehicleNameFromModel(vehicleData.model) or "Vehículo") .. "' ha llegado!", source, 0, 255, 0)
-                outputChatBox("Matrícula: " .. vehicleData.plate, source, 255, 255, 0)
+                local vehicleName = getVehicleNameFromModel(vehModel) or "Vehículo"
+                outputChatBox("✓ Tu vehículo '" .. vehicleName .. "' ha llegado!", player, 0, 255, 0)
+                outputChatBox("Matrícula: " .. vehPlate, player, 255, 255, 0)
+                outputServerLog("[GARAGE] Vehículo " .. vehPlate .. " creado para " .. getPlayerName(player) .. " en " .. string.format("%.2f, %.2f, %.2f", frontX, frontY, frontZ))
             else
-                outputChatBox("Error al crear el vehículo. Contacta a un administrador.", source, 255, 0, 0)
+                outputChatBox("Error al crear el vehículo. Contacta a un administrador.", player, 255, 0, 0)
+                outputServerLog("[GARAGE] ERROR: No se pudo crear el vehículo " .. vehPlate .. " para " .. getPlayerName(player))
             end
         end
     end, 20000, 1) -- 20 segundos

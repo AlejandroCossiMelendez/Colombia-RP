@@ -24,11 +24,8 @@ end)
 bindKey("k", "down", function()
     if not vehicleControlsEnabled then return end
     
-    -- Verificar si hay algún GUI abierto que pueda interferir (inventario, teléfono, etc.)
-    if showCursor() then
-        -- Si el cursor está visible, probablemente hay un GUI abierto, no hacer nada
-        return
-    end
+    -- NO bloquear si hay GUI abierto - permitir usar la tecla siempre
+    -- (el servidor verificará las llaves)
     
     local vehicle = getPedOccupiedVehicle(localPlayer)
     
@@ -56,7 +53,8 @@ bindKey("k", "down", function()
         if nearbyVehicle then
             vehicle = nearbyVehicle
         else
-            return -- No hay vehículo cerca
+            -- No mostrar mensaje, simplemente no hacer nada
+            return
         end
     end
     
@@ -67,6 +65,9 @@ bindKey("k", "down", function()
     -- Obtener estado actual del bloqueo
     local isLocked = getVehicleLocked(vehicle)
     local newState = not isLocked
+    
+    -- Debug: mostrar en chat que se presionó la tecla
+    -- outputChatBox("[DEBUG] Presionaste K - Vehículo: " .. (getElementData(vehicle, "vehicle:plate") or "Sin matrícula"), 255, 255, 0)
     
     -- Enviar al servidor para verificar llaves y cambiar estado
     triggerServerEvent("vehicle:toggleLock", localPlayer, vehicle, newState)
@@ -112,12 +113,13 @@ end)
 
 -- Evento para reproducir sonido de bloqueo/desbloqueo
 addEvent("vehicle:playLockSound", true)
-addEventHandler("vehicle:playLockSound", resourceRoot, function(x, y, z)
+addEventHandler("vehicle:playLockSound", root, function(x, y, z)
     -- Siempre reproducir sonido del juego primero (más confiable)
     playSoundFrontEnd(40)
     
     -- Intentar reproducir el sonido personalizado también
     local sound = nil
+    -- La ruta debe ser relativa al recurso (sin "client/")
     local soundPath = "assents/sound/block-desblock.mp3"
     
     if x and y and z then
@@ -127,6 +129,12 @@ addEventHandler("vehicle:playLockSound", resourceRoot, function(x, y, z)
             setSoundVolume(sound, 0.7)
             setSoundMaxDistance(sound, 30)
             setSoundMinDistance(sound, 5)
+        else
+            -- Si falla el sonido 3D, intentar sonido local
+            sound = playSound(soundPath, false)
+            if sound and isElement(sound) then
+                setSoundVolume(sound, 0.7)
+            end
         end
     else
         -- Si no hay posición, reproducir sonido local

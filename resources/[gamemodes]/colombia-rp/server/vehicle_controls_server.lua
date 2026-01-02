@@ -67,13 +67,27 @@ end)
 -- Evento: Bloquear/Desbloquear puertas
 addEvent("vehicle:toggleLock", true)
 addEventHandler("vehicle:toggleLock", root, function(vehicle, newState)
-    if not isElement(source) or not isElement(vehicle) then
+    if not isElement(source) or getElementType(source) ~= "player" then
+        outputServerLog("[VEHICLE] ERROR: source inválido en vehicle:toggleLock")
+        return
+    end
+    
+    if not isElement(vehicle) or getElementType(vehicle) ~= "vehicle" then
+        outputChatBox("Vehículo inválido.", source, 255, 0, 0)
+        outputServerLog("[VEHICLE] ERROR: vehículo inválido en vehicle:toggleLock para " .. getPlayerName(source))
         return
     end
     
     -- Verificar si tiene las llaves
-    if not playerHasVehicleKey(source, vehicle) then
+    if not playerHasVehicleKey then
+        outputServerLog("[VEHICLE] ERROR: playerHasVehicleKey no está disponible")
+        return
+    end
+    
+    local hasKey = playerHasVehicleKey(source, vehicle)
+    if not hasKey then
         outputChatBox("No tienes las llaves de este vehículo.", source, 255, 0, 0)
+        outputServerLog("[VEHICLE] " .. getPlayerName(source) .. " intentó bloquear vehículo sin llaves: " .. (getElementData(vehicle, "vehicle:plate") or "Sin matrícula"))
         return
     end
     
@@ -89,10 +103,11 @@ addEventHandler("vehicle:toggleLock", root, function(vehicle, newState)
     
     -- Reproducir sonido de bloqueo/desbloqueo
     local vx, vy, vz = getElementPosition(vehicle)
-    triggerClientEvent(source, "vehicle:playLockSound", source, vx, vy, vz)
+    triggerClientEvent("vehicle:playLockSound", root, vx, vy, vz)
     
     local stateText = newState and "bloqueado" or "desbloqueado"
     outputChatBox("Vehículo " .. stateText, source, 0, 255, 0)
+    outputServerLog("[VEHICLE] " .. getPlayerName(source) .. " " .. stateText .. " vehículo: " .. (getElementData(vehicle, "vehicle:plate") or "Sin matrícula"))
 end)
 
 -- Evento: Prender/Apagar luces

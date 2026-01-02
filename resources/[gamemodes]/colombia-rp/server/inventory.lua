@@ -380,11 +380,12 @@ addEventHandler("useItem", root, function(slot, itemId, itemIndex)
         end
         
         -- Reproducir sonido y animación
-        triggerClientEvent(source, "vehicle:playLockSound", source, vx, vy, vz)
+        triggerClientEvent("vehicle:playLockSound", root, vx, vy, vz)
         setPedAnimation(source, "ghands", "gsign3lh", 2000, false, false, false)
         
         local stateText = newState and "bloqueado" or "desbloqueado"
         outputChatBox("Vehículo " .. stateText, source, 0, 255, 0)
+        outputServerLog("[INVENTORY] " .. getPlayerName(source) .. " usó llave para " .. stateText .. " vehículo: " .. itemValue)
         
         return
     end
