@@ -1,7 +1,7 @@
 
 local files = {
-	{ "[COLOMBIANO].txd.pcrypt", 30 },
-	{ "[COLOMBIANO].dff.pcrypt", 30 },
+	{ "[COLOMBIANO].txd.pcrypt", 0 },
+	{ "[COLOMBIANO].dff.pcrypt", 0 },
 }
 
 
