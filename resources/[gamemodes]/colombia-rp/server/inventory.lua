@@ -303,7 +303,6 @@ addEventHandler("useItem", root, function(slot, itemId, itemIndex)
         -- Marcar que el jugador tiene chaleco equipado (para mostrar icono)
         setElementData(source, "has:vest", true)
         setElementData(source, "vest:armor", armorValue) -- Guardar el porcentaje de defensa del chaleco
-        setElementData(source, "vest:itemIndex", item.index) -- Guardar el índice de la BD del chaleco equipado
         
         -- Remover el item del inventario usando el sistema de items
         if take then
@@ -461,33 +460,14 @@ end)
 -- Evento para quitarse el chaleco
 addEvent("unequipVest", true)
 addEventHandler("unequipVest", root, function()
-    outputServerLog("[INVENTORY] Evento unequipVest recibido de " .. getPlayerName(source))
-    
     local hasVest = getElementData(source, "has:vest")
-    local currentArmor = math.floor(getPedArmor(source))
-    
-    outputServerLog("[INVENTORY] has:vest = " .. tostring(hasVest) .. ", armor = " .. tostring(currentArmor))
-    
     if not hasVest then
         outputChatBox("No tienes un chaleco equipado", source, 255, 0, 0)
-        outputServerLog("[INVENTORY] No tiene chaleco equipado")
         return
     end
     
     -- Obtener el porcentaje de defensa actual
-    if currentArmor < 0 then currentArmor = 0 end
-    if currentArmor > 100 then currentArmor = 100 end
-    
-    -- Si el armor es 0, no devolver el chaleco al inventario
-    if currentArmor <= 0 then
-        setPedArmor(source, 0)
-        removeElementData(source, "has:vest")
-        removeElementData(source, "vest:armor")
-        removeElementData(source, "vest:itemIndex")
-        outputChatBox("El chaleco se ha destruido (0% de defensa restante).", source, 255, 165, 0)
-        outputServerLog("[INVENTORY] Chaleco destruido (0% de defensa)")
-        return
-    end
+    local currentArmor = math.floor(getPedArmor(source))
     
     -- Quitar el chaleco (poner defensa a 0)
     setPedArmor(source, 0)
@@ -495,28 +475,22 @@ addEventHandler("unequipVest", root, function()
     -- Remover los datos del chaleco
     removeElementData(source, "has:vest")
     removeElementData(source, "vest:armor")
-    removeElementData(source, "vest:itemIndex")
-    
-    outputServerLog("[INVENTORY] Intentando devolver chaleco al inventario con " .. currentArmor .. "% de defensa")
     
     -- Devolver el chaleco al inventario con el porcentaje de defensa restante
     if give then
         -- Usar el sistema de items para dar el chaleco
         -- El valor del item será el porcentaje de defensa restante
-        local result = give(source, 46, currentArmor, "Chaleco Antibalas") -- 46 es el ID del chaleco antibalas
+        local result = give(source, 46, currentArmor) -- 46 es el ID del chaleco antibalas
         if result then
             outputChatBox("Te has quitado el Chaleco Antibalas. Defensa restante: " .. currentArmor .. "%", source, 0, 150, 255)
-            outputServerLog("[INVENTORY] Chaleco devuelto al inventario exitosamente")
             -- Recargar items para actualizar el inventario
             if load then
                 load(source, true)
             end
         else
             outputChatBox("Error al devolver el chaleco al inventario", source, 255, 0, 0)
-            outputServerLog("[INVENTORY] ERROR: No se pudo devolver el chaleco al inventario")
         end
     else
         outputChatBox("Error: Sistema de items no disponible", source, 255, 0, 0)
-        outputServerLog("[INVENTORY] ERROR: Sistema de items no disponible (give function no existe)")
     end
 end)

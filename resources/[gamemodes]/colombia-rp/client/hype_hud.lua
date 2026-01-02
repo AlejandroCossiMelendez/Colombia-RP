@@ -62,7 +62,7 @@ function HudHype()
     local Emprego = getElementData(localPlayer, "character:job") or "Desempleado"
     local Vida = math.floor(getElementHealth(localPlayer))
     local Colete = math.floor(getPedArmor(localPlayer))
-    local Stamina = math.floor(tonumber(getElementData(localPlayer, "stamina") or 100)) -- Redondear a número entero
+    local Stamina = tonumber(getElementData(localPlayer, "stamina") or 100)
     local Hambre = tonumber(getElementData(localPlayer, "character:hunger") or 100)
     local Sed = tonumber(getElementData(localPlayer, "character:thirst") or 100)
     
@@ -122,7 +122,7 @@ function HudHype()
     --<!-- DX2 --!>--
     dxDrawText(Vida, x*1245, y*161, x*1279, y*174, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
     dxDrawText(Colete, x*1245, y*194, x*1279, y*207, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
-    dxDrawText(math.floor(Stamina), x*1245, y*228, x*1279, y*241, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
+    dxDrawText(Stamina, x*1245, y*228, x*1279, y*241, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
     dxDrawText(math.floor(Hambre), x*1245, y*262, x*1279, y*275, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
     dxDrawText(math.floor(Sed), x*1245, y*296, x*1279, y*309, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
     
@@ -246,12 +246,10 @@ local vestClickArea = {
 }
 
 addEventHandler("onClientClick", root, function(button, state, absX, absY)
-    if button == "left" and state == "down" and hudEnabled and getElementData(localPlayer, "character:selected") then
+    if button == "left" and state == "down" then
         -- Verificar si el jugador tiene chaleco equipado
         local hasVest = getElementData(localPlayer, "has:vest")
-        local currentArmor = math.floor(getPedArmor(localPlayer))
-        
-        if not hasVest or currentArmor <= 0 then
+        if not hasVest then
             return
         end
         
@@ -259,25 +257,15 @@ addEventHandler("onClientClick", root, function(button, state, absX, absY)
         local screenW, screenH = guiGetScreenSize()
         local x, y = (screenW/1366), (screenH/768)
         
-        -- Área del icono de defensa (armor.png) - Área más grande para facilitar el click
+        -- Área del icono de defensa (armor.png)
         local iconX = x * 1303
         local iconY = y * 191
         local iconW = x * 24
         local iconH = y * 19
         
-        -- También incluir el área de la barra de defensa para facilitar el click
-        local barX = x * 1225
-        local barY = y * 187
-        local barW = x * 101
-        local barH = y * 28
-        
-        -- Verificar si el click está dentro del área del icono o de la barra
-        local clickedOnIcon = (absX >= iconX and absX <= iconX + iconW and absY >= iconY and absY <= iconY + iconH)
-        local clickedOnBar = (absX >= barX and absX <= barX + barW and absY >= barY and absY <= barY + barH)
-        
-        if clickedOnIcon or clickedOnBar then
+        -- Verificar si el click está dentro del área del icono
+        if absX >= iconX and absX <= iconX + iconW and absY >= iconY and absY <= iconY + iconH then
             -- Enviar evento al servidor para quitarse el chaleco
-            outputChatBox("Quitando chaleco...", 0, 150, 255)
             triggerServerEvent("unequipVest", localPlayer)
         end
     end

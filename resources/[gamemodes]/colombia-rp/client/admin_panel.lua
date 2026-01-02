@@ -763,16 +763,10 @@ function showGiveItemsPanel()
                 end
             end
             
-            -- Para el chaleco (ID 46), el valor por defecto debe ser 100 (100% de defensa)
-            local defaultValue = 1
-            if itemId == 46 then
-                defaultValue = 100
-            end
-            
             table.insert(itemsData, {
                 itemId = itemId,
                 quantity = quantity,
-                value = defaultValue,
+                value = 1, -- Valor por defecto, puede ajustarse
                 name = nil
             })
         end
