@@ -131,7 +131,8 @@ function performLogin()
         return
     end
     
-    triggerServerEvent("onPlayerLogin", localPlayer, username, password)
+    -- Activar evento del servidor (usando root para enviar a todos los recursos del servidor)
+    triggerServerEvent("onPlayerLogin", root, username, password)
 end
 
 function performRegister()
@@ -159,7 +160,8 @@ function performRegister()
         return
     end
     
-    triggerServerEvent("onPlayerRegister", localPlayer, username, password, email)
+    -- Activar evento del servidor (usando root para enviar a todos los recursos del servidor)
+    triggerServerEvent("onPlayerRegister", root, username, password, email)
 end
 
 function hideLoginGUI()
