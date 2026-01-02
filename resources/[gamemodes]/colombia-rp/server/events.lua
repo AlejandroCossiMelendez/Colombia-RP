@@ -44,6 +44,7 @@ outputServerLog("[EVENTS] Eventos del HUD registrados: initializeStamina")
 addEvent("onConectarAFrecuencia", true)
 addEvent("onAbrirMisFrecuencias", true)
 addEvent("onCerrarMisFrecuencias", true)
-outputServerLog("[EVENTS] Eventos de voz registrados: onConectarAFrecuencia, onAbrirMisFrecuencias, onCerrarMisFrecuencias")
+addEvent("onCharacterSelected", false) -- Evento interno del servidor
+outputServerLog("[EVENTS] Eventos de voz registrados: onConectarAFrecuencia, onAbrirMisFrecuencias, onCerrarMisFrecuencias, onCharacterSelected")
 
 outputServerLog("[EVENTS] Todos los eventos registrados correctamente")

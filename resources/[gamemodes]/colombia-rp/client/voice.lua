@@ -244,18 +244,8 @@ addEventHandler("onClientPlayerVoiceStop", root, function()
     end
 end)
 
--- Verificar si el jugador tiene frecuencia antes de hablar
-addEventHandler("onClientPlayerVoiceStart", root, function()
-    if source == localPlayer then
-        local frecuencia = getElementData(localPlayer, "frecuencia.voz")
-        if not frecuencia or tonumber(frecuencia) == -1 then
-            cancelEvent()
-            outputChatBox("Utiliza /misf para unirte a un canal de voz antes de poder hablar.", 255, 0, 0)
-            setElementData(localPlayer, "Hype>Voice", false)
-            return
-        end
-    end
-end)
+-- La voz por proximidad funciona por defecto, no necesitamos cancelar el evento
+-- Solo actualizamos el icono del HUD cuando hablas
 
 -- Actualizar el icono de voz cuando cambia la frecuencia
 addEventHandler("onClientElementDataChange", root, function(dataName)

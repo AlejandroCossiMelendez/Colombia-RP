@@ -67,14 +67,14 @@ addEventHandler("onConectarAFrecuencia", root, function(frecuenciaID, frecuencia
     
     venFrecAb[source] = nil
     
-    if tonumber(frecuenciaID) >= 100 then
+    if tonumber(frecuenciaID) >= 100 and tonumber(frecuenciaID) < 2000 then
         if conectarJugadorAFrecuencia(source, frecuenciaID) then
             outputChatBox("Canal de voz conectado a ["..tostring(frecuenciaID).."] '"..tostring(frecuenciaName).."'.", source, 0, 255, 0)
+            outputChatBox("Ahora hablas en la frecuencia. Presiona 'Z' para hablar en la frecuencia.", source, 255, 255, 0)
         end
     elseif tonumber(frecuenciaID) == -1 then
-        local characterId = getElementData(source, "character:id") or 0
-        if conectarJugadorAFrecuencia(source, 2000 + characterId) then
-            outputChatBox("Te has desconectado del servicio de voz.", source, 255, 0, 0)
+        if conectarJugadorAFrecuencia(source, -1) then
+            outputChatBox("Te has desconectado de la frecuencia. Ahora hablas por proximidad.", source, 255, 255, 0)
         end
     end
 end)
@@ -85,22 +85,58 @@ function conectarJugadorAFrecuencia(jugador, frecuencia, ignoreAviso)
         return false
     end
     
-    -- Crear tabla de broadcast
-    local tablaBroadcast = {}
-    
     -- Obtener frecuencia anterior
     local frecuencia_old = getElementData(jugador, "frecuencia.voz")
+    
+    -- Si se desconecta de la frecuencia (frecuencia = -1 o >= 2000), volver a voz por proximidad
+    if tonumber(frecuencia) == -1 or tonumber(frecuencia) >= 2000 then
+        setElementData(jugador, "frecuencia.voz", tonumber(frecuencia))
+        -- Restaurar voz por proximidad (no configurar broadcast)
+        setPlayerVoiceBroadcastTo(jugador, {})
+        removeElementData(jugador, "frecuencia.voz.whisper")
+        
+        -- Notificar a otros jugadores si salió de una frecuencia
+        if frecuencia_old and tonumber(frecuencia_old) and tonumber(frecuencia_old) ~= -1 and tonumber(frecuencia_old) < 2000 then
+            -- Reconstruir la tabla de broadcast para los que quedan en la frecuencia
+            local tablaBroadcast = {}
+            for _, v in ipairs(getElementsByType("player")) do
+                if isElement(v) and getElementData(v, "character:selected") and v ~= jugador then
+                    if tonumber(getElementData(v, "frecuencia.voz")) == tonumber(frecuencia_old) then
+                        table.insert(tablaBroadcast, v)
+                    end
+                end
+            end
+            -- Actualizar broadcast para los que quedan
+            for _, v in ipairs(getElementsByType("player")) do
+                if isElement(v) and getElementData(v, "character:selected") and v ~= jugador then
+                    if tonumber(getElementData(v, "frecuencia.voz")) == tonumber(frecuencia_old) then
+                        setPlayerVoiceBroadcastTo(v, tablaBroadcast)
+                    end
+                end
+            end
+        end
+        return true
+    end
+    
+    -- Si se conecta a una frecuencia válida (100-999)
     setElementData(jugador, "frecuencia.voz", tonumber(frecuencia))
     
     -- Notificar a otros jugadores si cambió de frecuencia
-    if frecuencia_old and tonumber(frecuencia_old) and tonumber(frecuencia_old) ~= tonumber(frecuencia) and tonumber(frecuencia_old) ~= -1 then
+    if frecuencia_old and tonumber(frecuencia_old) and tonumber(frecuencia_old) ~= tonumber(frecuencia) and tonumber(frecuencia_old) ~= -1 and tonumber(frecuencia_old) < 2000 then
+        -- Reconstruir tabla para la frecuencia anterior
+        local tablaBroadcastOld = {}
         for _, v in ipairs(getElementsByType("player")) do
             if isElement(v) and getElementData(v, "character:selected") and v ~= jugador then
                 if tonumber(getElementData(v, "frecuencia.voz")) == tonumber(frecuencia_old) then
-                    conectarJugadorAFrecuencia(v, frecuencia_old, true)
-                    local charName = getElementData(jugador, "character:name") or getPlayerName(jugador)
-                    local charSurname = getElementData(jugador, "character:surname") or ""
-                    outputChatBox((charName .. " " .. charSurname) .. " ha salido de tu frecuencia.", v, 0, 255, 0)
+                    table.insert(tablaBroadcastOld, v)
+                end
+            end
+        end
+        -- Actualizar broadcast para los que quedan en la frecuencia anterior
+        for _, v in ipairs(getElementsByType("player")) do
+            if isElement(v) and getElementData(v, "character:selected") and v ~= jugador then
+                if tonumber(getElementData(v, "frecuencia.voz")) == tonumber(frecuencia_old) then
+                    setPlayerVoiceBroadcastTo(v, tablaBroadcastOld)
                 end
             end
         end
@@ -114,6 +150,7 @@ function conectarJugadorAFrecuencia(jugador, frecuencia, ignoreAviso)
     end
     
     -- Construir tabla de broadcast con todos los jugadores en la misma frecuencia
+    local tablaBroadcast = {}
     for _, v in ipairs(getElementsByType("player")) do
         if isElement(v) and getElementData(v, "character:selected") then
             if tonumber(getElementData(v, "frecuencia.voz")) == tonumber(frecuencia) then
@@ -175,9 +212,33 @@ end)
 -- Comando de ayuda
 addCommandHandler("voz", function(player)
     outputChatBox("~~ Instrucciones del sistema de voz ~~", player, 255, 255, 255)
-    outputChatBox(" - Usa /misf para abrir el menú de frecuencias", player, 0, 255, 0)
-    outputChatBox(" - Presiona 'Z' para hablar en tu frecuencia", player, 255, 255, 255)
-    outputChatBox(" - Usa /whisper para hablar a toda tu facción", player, 0, 255, 0)
+    outputChatBox(" - Por defecto, hablas por proximidad (todos los cercanos te escuchan)", player, 0, 255, 0)
+    outputChatBox(" - Usa /misf para abrir el menú de frecuencias (opcional)", player, 255, 255, 255)
+    outputChatBox(" - Si tienes frecuencia activa, presiona 'Z' para hablar en la frecuencia", player, 255, 255, 255)
+    outputChatBox(" - Usa /whisper para hablar a toda tu facción (solo con frecuencia activa)", player, 0, 255, 0)
+end)
+
+-- Inicializar voz por proximidad cuando el jugador spawnea
+addEventHandler("onPlayerSpawn", root, function()
+    if getElementData(source, "character:selected") then
+        -- Si no tiene frecuencia activa, asegurar voz por proximidad
+        local frecuencia = getElementData(source, "frecuencia.voz")
+        if not frecuencia or tonumber(frecuencia) == -1 or tonumber(frecuencia) >= 2000 then
+            setPlayerVoiceBroadcastTo(source, {}) -- Voz por proximidad
+        end
+    end
+end)
+
+-- Inicializar voz por proximidad cuando el jugador selecciona un personaje
+addEvent("onCharacterSelected", true)
+addEventHandler("onCharacterSelected", root, function()
+    if isElement(source) and getElementType(source) == "player" then
+        -- Inicializar sin frecuencia (voz por proximidad)
+        if not getElementData(source, "frecuencia.voz") then
+            setElementData(source, "frecuencia.voz", -1)
+            setPlayerVoiceBroadcastTo(source, {}) -- Voz por proximidad
+        end
+    end
 end)
 
 -- Desconectar al cambiar de personaje

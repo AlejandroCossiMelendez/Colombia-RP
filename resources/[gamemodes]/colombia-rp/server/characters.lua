@@ -135,6 +135,8 @@ addEventHandler("createCharacter", getRootElement(), function(name, surname, age
                             setElementData(source, "character:job", "Desempleado")
                             -- Inicializar stamina en el cliente
                             triggerClientEvent(source, "initializeStamina", resourceRoot)
+                            -- Inicializar sistema de voz (voz por proximidad)
+                            triggerEvent("onCharacterSelected", source)
                             
                             outputServerLog("[CHARACTERS] Spawneando personaje recién creado ID: " .. newCharacterId .. " para " .. getPlayerName(source))
                             
@@ -237,6 +239,8 @@ addEventHandler("selectCharacter", getRootElement(), function(characterId)
         -- Inicializar stamina en el cliente
         triggerClientEvent(source, "initializeStamina", resourceRoot)
         setElementData(source, "character:health", character.health)
+        -- Inicializar sistema de voz (voz por proximidad)
+        triggerEvent("onCharacterSelected", source)
         
         outputServerLog("[CHARACTERS] Spawneando personaje ID: " .. characterId .. " para " .. getPlayerName(source))
         
