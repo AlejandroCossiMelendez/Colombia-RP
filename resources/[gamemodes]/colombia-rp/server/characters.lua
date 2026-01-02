@@ -300,7 +300,7 @@ addEventHandler("deleteCharacter", getRootElement(), function(characterId)
     
     if checkResult and #checkResult > 0 then
         -- Eliminar inventario del personaje
-        executeDatabase("DELETE FROM inventory WHERE character_id = ?", characterId)
+        executeDatabase("DELETE FROM inventory WHERE characterId = ?", characterId)
         
         -- Eliminar personaje
         local success = executeDatabase("DELETE FROM characters WHERE id = ?", characterId)

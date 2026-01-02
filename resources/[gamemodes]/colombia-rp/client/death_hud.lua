@@ -1,6 +1,7 @@
--- Sistema de HUD para muerte y cuenta regresiva - RESPONSIVE
-local deathTimeRemaining = 0
+-- Sistema de HUD para muerte y cuenta regresiva
+local deathTimeRemaining = 0 -- Tiempo restante en segundos
 local isDead = false
+local screenWidth, screenHeight = guiGetScreenSize()
 
 -- Función para iniciar la cuenta regresiva de muerte
 function startDeathCountdown(seconds)
@@ -19,32 +20,24 @@ function updateDeathTime(seconds)
     deathTimeRemaining = seconds
 end
 
--- Renderizar el HUD de muerte - RESPONSIVE
+-- Renderizar el HUD de muerte
 addEventHandler("onClientRender", root, function()
     if isDead and deathTimeRemaining > 0 then
-        -- Obtener dimensiones de pantalla
-        local sw, sh = guiGetScreenSize()
-        
         -- Calcular minutos y segundos
         local minutes = math.floor(deathTimeRemaining / 60)
         local seconds = math.floor(deathTimeRemaining % 60)
         
-        -- Fondo semi-transparente (responsivo)
-        dxDrawRectangle(0, 0, sw, sh, tocolor(0, 0, 0, 180), false)
+        -- Dibujar fondo semi-transparente
+        dxDrawRectangle(0, 0, screenWidth, screenHeight, tocolor(0, 0, 0, 180), false)
         
-        -- Tamaño de fuente responsivo
-        local titleSize = math.max(2.0, math.min(3.5, sw / 400))
-        local countdownSize = math.max(4.0, math.min(7.0, sw / 250))
-        
-        -- Texto principal "HAS MUERTO" (centrado, responsivo)
+        -- Dibujar texto principal (HAS MUERTO)
         dxDrawText("HAS MUERTO", 
-                   sw / 2, sh / 2 - (sh * 0.15), 
-                   sw / 2, sh / 2 - (sh * 0.15),
-                   tocolor(255, 0, 0, 255), 
-                   titleSize, "default-bold", "center", "center", 
-                   false, false, false, false, false)
+            screenWidth / 2, screenHeight / 2 - 120, 
+            screenWidth / 2, screenHeight / 2 - 120,
+            tocolor(255, 0, 0, 255), 
+            3.0, "default-bold", "center", "center", false, false, false, false, false)
         
-        -- Contador grande (solo números) - RESPONSIVE
+        -- Dibujar contador grande (solo números)
         local timeText = ""
         if minutes > 0 then
             timeText = string.format("%d:%02d", minutes, seconds)
@@ -52,13 +45,12 @@ addEventHandler("onClientRender", root, function()
             timeText = string.format("%d", seconds)
         end
         
-        -- Contador grande en el centro (responsivo)
+        -- Contador grande en el centro
         dxDrawText(timeText, 
-                   sw / 2, sh / 2 - (sh * 0.05), 
-                   sw / 2, sh / 2 - (sh * 0.05),
-                   tocolor(255, 255, 0, 255), 
-                   countdownSize, "default-bold", "center", "center", 
-                   false, false, false, false, false)
+            screenWidth / 2, screenHeight / 2 - 20, 
+            screenWidth / 2, screenHeight / 2 - 20,
+            tocolor(255, 255, 0, 255), 
+            5.0, "default-bold", "center", "center", false, false, false, false, false)
     end
 end)
 
@@ -108,3 +100,4 @@ addEventHandler("onClientPlayerRevived", resourceRoot, function()
     -- Restaurar cámara normal
     setCameraTarget(localPlayer, localPlayer)
 end)
+

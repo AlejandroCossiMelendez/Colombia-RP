@@ -4,15 +4,18 @@ local screenWidth, screenHeight = guiGetScreenSize()
 addEventHandler("onClientResourceStart", resourceRoot, function()
     outputChatBox("Colombia RP cargado correctamente", 0, 255, 0)
     
-    -- Deshabilitar scoreboard por defecto de MTA
-    setPlayerHudComponentVisible("radar", false)
-    setPlayerHudComponentVisible("area_name", false)
-    setPlayerHudComponentVisible("vehicle_name", false)
-    
     -- Configurar nametags para que aparezcan arriba del jugador
     for _, player in ipairs(getElementsByType("player")) do
         setPlayerNametagShowing(player, true)
     end
+    
+    -- Actualizar nombres después de un delay para asegurar que los datos estén cargados
+    setTimer(function()
+        -- Llamar a la función de actualización si existe
+        if updatePlayerNames then
+            updatePlayerNames()
+        end
+    end, 2000, 1)
 end)
 
 -- Configurar cámara de vista previa mientras espera login
@@ -38,6 +41,7 @@ end)
 -- Prevenir spawn automático hasta que el personaje esté seleccionado
 addEventHandler("onClientPlayerSpawn", localPlayer, function()
     local characterSelected = getElementData(localPlayer, "character:selected")
+    outputChatBox("[DEBUG] Spawn detectado. Personaje seleccionado: " .. tostring(characterSelected), 255, 255, 0)
     
     if not characterSelected then
         -- No hacer spawn hasta que el personaje esté seleccionado
@@ -45,6 +49,7 @@ addEventHandler("onClientPlayerSpawn", localPlayer, function()
         setupPreviewCamera()
     else
         -- Si el personaje está seleccionado, activar cámara normal
+        outputChatBox("[DEBUG] Activando cámara del jugador", 0, 255, 0)
         fadeCamera(true, 1.0)
         setCameraTarget(localPlayer, localPlayer)
     end
