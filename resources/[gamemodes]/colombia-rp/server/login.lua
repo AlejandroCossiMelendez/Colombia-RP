@@ -1,11 +1,5 @@
--- ==================== REGISTRAR EVENTOS PRIMERO ====================
--- CRÍTICO: Estos eventos DEBEN estar al inicio absoluto del archivo
--- El segundo parámetro 'true' marca el evento como remotamente activable
-addEvent("onPlayerLogin", true)
-addEvent("onPlayerRegister", true)
-outputServerLog("[LOGIN] Eventos onPlayerLogin y onPlayerRegister registrados con addEvent")
-
 -- Sistema de Login y Registro
+-- Nota: Los eventos están registrados en server/events.lua que se carga primero
 
 -- Hash de contraseña usando md5 (más seguro que hash() que requiere permisos)
 function hashPassword(password)
@@ -67,7 +61,7 @@ addEventHandler("onResourceStart", resourceRoot, function()
 end)
 
 -- Evento de login desde el cliente (usando getRootElement() como en el ejemplo que funciona)
-addEventHandler("onPlayerLogin", getRootElement(), function(username, password)
+addEventHandler("colombiaRP:playerLogin", getRootElement(), function(username, password)
     outputServerLog("[LOGIN] Evento onPlayerLogin recibido de " .. getPlayerName(source) .. " con usuario: " .. tostring(username))
     
     if not username or not password then
@@ -110,7 +104,7 @@ addEventHandler("onPlayerLogin", getRootElement(), function(username, password)
 end)
 
 -- Evento de registro desde el cliente (usando getRootElement() como en el ejemplo que funciona)
-addEventHandler("onPlayerRegister", getRootElement(), function(username, password, email)
+addEventHandler("colombiaRP:playerRegister", getRootElement(), function(username, password, email)
     outputServerLog("[LOGIN] Evento onPlayerRegister recibido de " .. getPlayerName(source))
     
     if not username or not password or not email then
