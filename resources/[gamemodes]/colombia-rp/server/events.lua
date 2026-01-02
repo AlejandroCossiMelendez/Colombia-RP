@@ -74,5 +74,11 @@ addEvent("loadContacts", true)
 addEvent("receiveContacts", true)
 addEvent("closePhoneFromBrowser", true)
 outputServerLog("[EVENTS] Eventos del teléfono registrados: saveContacts, loadContacts, receiveContacts, closePhoneFromBrowser")
+-- Eventos de llamadas
+addEvent("phone:makeCall", true)
+addEvent("phone:answerCall", true)
+addEvent("phone:hangup", true)
+addEvent("phone:toggleSpeaker", true)
+outputServerLog("[EVENTS] Eventos de llamadas registrados: phone:makeCall, phone:answerCall, phone:hangup, phone:toggleSpeaker")
 
 outputServerLog("[EVENTS] Todos los eventos registrados correctamente")

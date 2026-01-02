@@ -219,6 +219,11 @@ function openApp(appId) {
     if (appId === 7) {
         loadGallery();
     }
+    
+    // Si es la app de teléfono (appId 5), inicializar marcador
+    if (appId === 5) {
+        initPhoneApp();
+    }
 }
 
 let isInHomeScreen = true; // Variable para rastrear si estamos en el home
@@ -701,6 +706,298 @@ function deleteContact(index, contactNumber, skipConfirm) {
 
 // Exponer funciones para MTA
 window.setMyPhoneNumber = setMyPhoneNumber;
+
+// ==================== SISTEMA DE LLAMADAS ====================
+
+let currentCall = null;
+let callTimer = null;
+let callStartTime = null;
+let isSpeakerOn = false;
+
+// Inicializar app de teléfono
+function initPhoneApp() {
+    const phoneInput = get('#phoneNumberInput');
+    const keypadButtons = getAll('.keypad-btn');
+    const callButton = get('#callButton');
+    const deleteButton = get('#deleteButton');
+    const searchResults = get('#searchResults');
+    
+    if (!phoneInput) return;
+    
+    // Limpiar input
+    phoneInput.value = '';
+    phoneInput.addEventListener('input', handlePhoneInput);
+    
+    // Configurar teclado numérico
+    keypadButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const number = this.getAttribute('data-number');
+            if (phoneInput) {
+                phoneInput.value += number;
+                handlePhoneInput();
+            }
+        });
+    });
+    
+    // Botón de llamar
+    if (callButton) {
+        callButton.addEventListener('click', function() {
+            const number = phoneInput ? phoneInput.value.trim() : '';
+            if (number) {
+                makeCall(number);
+            }
+        });
+    }
+    
+    // Botón de borrar
+    if (deleteButton) {
+        deleteButton.addEventListener('click', function() {
+            if (phoneInput) {
+                phoneInput.value = phoneInput.value.slice(0, -1);
+                handlePhoneInput();
+            }
+        });
+    }
+    
+    // Botones de llamada activa
+    const speakerButton = get('#speakerButton');
+    const hangupButton = get('#hangupButton');
+    
+    if (speakerButton) {
+        speakerButton.addEventListener('click', function() {
+            toggleSpeaker();
+        });
+    }
+    
+    if (hangupButton) {
+        hangupButton.addEventListener('click', function() {
+            hangupCall();
+        });
+    }
+}
+
+// Manejar input del teléfono (búsqueda)
+function handlePhoneInput() {
+    const phoneInput = get('#phoneNumberInput');
+    const searchResults = get('#searchResults');
+    
+    if (!phoneInput || !searchResults) return;
+    
+    const query = phoneInput.value.trim();
+    
+    if (query.length === 0) {
+        searchResults.style.display = 'none';
+        return;
+    }
+    
+    // Buscar en contactos
+    const results = searchContacts(query);
+    
+    if (results.length > 0) {
+        searchResults.innerHTML = '';
+        results.forEach(contact => {
+            const item = document.createElement('div');
+            item.className = 'search-result-item';
+            item.innerHTML = `
+                <div class="search-result-name">${contact.name}</div>
+                <div class="search-result-number">${contact.number}</div>
+            `;
+            item.addEventListener('click', function() {
+                if (phoneInput) {
+                    phoneInput.value = contact.number;
+                    searchResults.style.display = 'none';
+                }
+            });
+            searchResults.appendChild(item);
+        });
+        searchResults.style.display = 'block';
+    } else {
+        searchResults.style.display = 'none';
+    }
+}
+
+// Buscar en contactos
+function searchContacts(query) {
+    if (!contacts || !Array.isArray(contacts)) return [];
+    
+    const lowerQuery = query.toLowerCase();
+    return contacts.filter(contact => {
+        return contact.name.toLowerCase().includes(lowerQuery) ||
+               contact.number.includes(query);
+    });
+}
+
+// Realizar llamada
+function makeCall(number) {
+    if (currentCall) {
+        return; // Ya hay una llamada activa
+    }
+    
+    // Limpiar formato del número (quitar guiones)
+    const cleanNumber = number.replace(/-/g, '');
+    
+    if (window.mta && window.mta.triggerEvent) {
+        window.mta.triggerEvent('phone:makeCall', cleanNumber);
+        showCallStatus('Llamando...', cleanNumber);
+    }
+}
+
+// Mostrar estado de llamada
+function showCallStatus(status, number) {
+    const callStatus = get('#callStatus');
+    const callInfo = get('#callInfo');
+    const callTimer = get('#callTimer');
+    const phoneContent = get('.phone-content');
+    
+    if (callStatus && callInfo && callTimer) {
+        callStatus.style.display = 'block';
+        callInfo.textContent = status + (number ? ' - ' + formatPhoneNumber(number) : '');
+        callTimer.textContent = '00:00';
+        
+        // Ocultar controles de marcado
+        if (phoneContent) {
+            const dialerSection = phoneContent.querySelector('.dialer-section');
+            const keypad = phoneContent.querySelector('.keypad');
+            const callControls = phoneContent.querySelector('.call-controls');
+            
+            if (dialerSection) dialerSection.style.display = 'none';
+            if (keypad) keypad.style.display = 'none';
+            if (callControls) callControls.style.display = 'none';
+        }
+    }
+}
+
+// Ocultar estado de llamada
+function hideCallStatus() {
+    const callStatus = get('#callStatus');
+    const phoneContent = get('.phone-content');
+    
+    if (callStatus) {
+        callStatus.style.display = 'none';
+    }
+    
+    // Mostrar controles de marcado
+    if (phoneContent) {
+        const dialerSection = phoneContent.querySelector('.dialer-section');
+        const keypad = phoneContent.querySelector('.keypad');
+        const callControls = phoneContent.querySelector('.call-controls');
+        
+        if (dialerSection) dialerSection.style.display = 'block';
+        if (keypad) keypad.style.display = 'block';
+        if (callControls) callControls.style.display = 'flex';
+    }
+}
+
+// Formatear número de teléfono
+function formatPhoneNumber(number) {
+    if (number.length === 10) {
+        return number.slice(0, 3) + '-' + number.slice(3);
+    }
+    return number;
+}
+
+// Iniciar temporizador de llamada
+function startCallTimer() {
+    callStartTime = Date.now();
+    if (callTimer) {
+        clearInterval(callTimer);
+    }
+    callTimer = setInterval(function() {
+        if (callStartTime) {
+            const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            const callTimerElement = get('#callTimer');
+            if (callTimerElement) {
+                callTimerElement.textContent = 
+                    String(minutes).padStart(2, '0') + ':' + 
+                    String(seconds).padStart(2, '0');
+            }
+        }
+    }, 1000);
+}
+
+// Detener temporizador de llamada
+function stopCallTimer() {
+    if (callTimer) {
+        clearInterval(callTimer);
+        callTimer = null;
+    }
+    callStartTime = null;
+}
+
+// Activar/desactivar altavoz
+function toggleSpeaker() {
+    isSpeakerOn = !isSpeakerOn;
+    const speakerButton = get('#speakerButton');
+    
+    if (speakerButton) {
+        if (isSpeakerOn) {
+            speakerButton.classList.add('active');
+        } else {
+            speakerButton.classList.remove('active');
+        }
+    }
+    
+    if (window.mta && window.mta.triggerEvent) {
+        window.mta.triggerEvent('phone:toggleSpeaker', isSpeakerOn);
+    }
+}
+
+// Colgar llamada
+function hangupCall() {
+    if (window.mta && window.mta.triggerEvent) {
+        window.mta.triggerEvent('phone:hangup');
+    }
+    endCall();
+}
+
+// Terminar llamada
+function endCall() {
+    currentCall = null;
+    stopCallTimer();
+    hideCallStatus();
+    isSpeakerOn = false;
+    
+    const speakerButton = get('#speakerButton');
+    if (speakerButton) {
+        speakerButton.classList.remove('active');
+    }
+}
+
+// Eventos desde MTA
+window.onCallStarted = function(callerNumber, receiverNumber, isIncoming) {
+    currentCall = {
+        caller: callerNumber,
+        receiver: receiverNumber,
+        isIncoming: isIncoming
+    };
+    
+    if (isIncoming) {
+        showCallStatus('Llamada entrante', callerNumber);
+    } else {
+        showCallStatus('Llamando...', receiverNumber);
+    }
+};
+
+window.onCallAnswered = function() {
+    const callInfo = get('#callInfo');
+    if (callInfo && currentCall) {
+        callInfo.textContent = 'En llamada - ' + formatPhoneNumber(currentCall.receiver || currentCall.caller);
+    }
+    startCallTimer();
+};
+
+window.onCallEnded = function() {
+    endCall();
+};
+
+window.onIncomingCall = function(callerNumber, callerName) {
+    // Esto se manejará en el cliente Lua para mostrar notificación
+    if (window.mta && window.mta.triggerEvent) {
+        window.mta.triggerEvent('phone:incomingCall', callerNumber, callerName);
+    }
+};
 window.loadContacts = loadContacts;
 window.showAddContactForm = showAddContactForm;
 window.hideAddContactForm = hideAddContactForm;

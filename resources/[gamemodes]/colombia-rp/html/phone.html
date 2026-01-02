@@ -88,7 +88,45 @@
                 </div>
                 <div class="app-interface" style="display: none;" data-app-id="3"></div> <!-- News App -->
                 <div class="app-interface" style="display: none;" data-app-id="4"></div> <!-- Settings App -->
-                <div class="app-interface" style="display: none;" data-app-id="5"></div> <!-- Phone App -->
+                <div class="app-interface" style="display: none;" data-app-id="5"> <!-- Phone App -->
+                    <div class="phone-app">
+                        <div class="phone-header">
+                            <h2>Llamadas</h2>
+                        </div>
+                        <div class="phone-content">
+                            <div class="dialer-section">
+                                <input type="text" id="phoneNumberInput" class="phone-input" placeholder="Número o nombre..." maxlength="15" />
+                                <div class="search-results" id="searchResults" style="display: none;"></div>
+                            </div>
+                            <div class="keypad">
+                                <button class="keypad-btn" data-number="1">1</button>
+                                <button class="keypad-btn" data-number="2">2<div class="keypad-letters">ABC</div></button>
+                                <button class="keypad-btn" data-number="3">3<div class="keypad-letters">DEF</div></button>
+                                <button class="keypad-btn" data-number="4">4<div class="keypad-letters">GHI</div></button>
+                                <button class="keypad-btn" data-number="5">5<div class="keypad-letters">JKL</div></button>
+                                <button class="keypad-btn" data-number="6">6<div class="keypad-letters">MNO</div></button>
+                                <button class="keypad-btn" data-number="7">7<div class="keypad-letters">PQRS</div></button>
+                                <button class="keypad-btn" data-number="8">8<div class="keypad-letters">TUV</div></button>
+                                <button class="keypad-btn" data-number="9">9<div class="keypad-letters">WXYZ</div></button>
+                                <button class="keypad-btn" data-number="*">*</button>
+                                <button class="keypad-btn" data-number="0">0</button>
+                                <button class="keypad-btn" data-number="#">#</button>
+                            </div>
+                            <div class="call-controls">
+                                <button class="call-btn" id="callButton">Llamar</button>
+                                <button class="delete-btn" id="deleteButton">⌫</button>
+                            </div>
+                            <div class="call-status" id="callStatus" style="display: none;">
+                                <div class="call-info" id="callInfo"></div>
+                                <div class="call-timer" id="callTimer">00:00</div>
+                                <div class="call-actions">
+                                    <button class="speaker-btn" id="speakerButton">🔊</button>
+                                    <button class="hangup-btn" id="hangupButton">Colgar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="app-interface" style="display: none;" data-app-id="6"> <!-- Contacts App -->
                     <div class="contacts-app">
                         <div class="contacts-header">

@@ -15,6 +15,8 @@ end
 function whenPhoneBrowserReady()
     -- El navegador está listo
     if browserContent and isElement(browserContent) then
+        -- Notificar a phone_calls.lua sobre el browserContent
+        triggerEvent("phone:setBrowserContent", resourceRoot, browserContent)
         executeBrowserJavascript(browserContent, "updateTime();")
         -- Asegurar que el teléfono se abra directamente en el home
         executeBrowserJavascript(browserContent, [[
@@ -340,5 +342,40 @@ end)
 -- Cerrar teléfono al detener el recurso
 addEventHandler("onClientResourceStop", resourceRoot, function()
     closePhone()
+end)
+
+-- Eventos de llamadas telefónicas
+addEvent("phone:makeCall", true)
+addEventHandler("phone:makeCall", resourceRoot, function(phoneNumber)
+    if phoneNumber and type(phoneNumber) == "string" then
+        triggerServerEvent("phone:makeCall", localPlayer, phoneNumber)
+    end
+end)
+
+addEvent("phone:hangup", true)
+addEventHandler("phone:hangup", resourceRoot, function()
+    triggerServerEvent("phone:hangup", localPlayer)
+end)
+
+addEvent("phone:toggleSpeaker", true)
+addEventHandler("phone:toggleSpeaker", resourceRoot, function(enabled)
+    if type(enabled) == "boolean" then
+        triggerServerEvent("phone:toggleSpeaker", localPlayer, enabled)
+    end
+end)
+
+-- Eventos del servidor para el navegador
+addEvent("phone:callRinging", true)
+addEventHandler("phone:callRinging", resourceRoot, function(phoneNumber)
+    if browserContent and isElement(browserContent) then
+        executeBrowserJavascript(browserContent, "onCallStarted(null, '" .. phoneNumber .. "', false);")
+    end
+end)
+
+addEvent("phone:callFailed", true)
+addEventHandler("phone:callFailed", resourceRoot, function(reason)
+    if browserContent and isElement(browserContent) then
+        executeBrowserJavascript(browserContent, "onCallEnded();")
+    end
 end)
 
