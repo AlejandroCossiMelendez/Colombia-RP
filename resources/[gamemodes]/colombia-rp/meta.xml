@@ -33,6 +33,7 @@
     <script src="server/fuel_system.lua" type="server" />
     <script src="server/vehicles_system.lua" type="server" />
     <script src="server/vehicle_controls_server.lua" type="server" />
+    <script src="server/garage.lua" type="server" />
     <script src="sistema_polvora/server.lua" type="server" />
     <script src="server/main.lua" type="server" />
     
@@ -61,6 +62,7 @@
     <script src="client/jbl_model.lua" type="client" />
     <script src="client/speedometer.lua" type="client" />
     <script src="client/vehicle_controls.lua" type="client" />
+    <script src="client/garage.lua" type="client" />
     <script src="sistema_polvora/client.lua" type="client" />
     
     <!-- Scripts del sistema de items (cliente) -->
@@ -331,6 +333,9 @@
     <file src="items/images/15.png" type="client" />
     <file src="items/images/16.png" type="client" />
     <file src="items/images/17.png" type="client" />
+    
+    <!-- Sonidos de vehículos -->
+    <file src="client/assents/sound/block-desblock.mp3" type="client" />
     <file src="items/images/18.png" type="client" />
     <file src="items/images/19.png" type="client" />
     <file src="items/images/20.png" type="client" />

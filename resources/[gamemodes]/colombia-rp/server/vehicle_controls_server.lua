@@ -87,6 +87,10 @@ addEventHandler("vehicle:toggleLock", root, function(vehicle, newState)
         setElementData(vehicle, "vehicle:locked", newState)
     end
     
+    -- Reproducir sonido de bloqueo/desbloqueo
+    local vx, vy, vz = getElementPosition(vehicle)
+    triggerClientEvent(source, "vehicle:playLockSound", source, vx, vy, vz)
+    
     local stateText = newState and "bloqueado" or "desbloqueado"
     outputChatBox("Vehículo " .. stateText, source, 0, 255, 0)
 end)

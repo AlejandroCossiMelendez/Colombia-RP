@@ -326,6 +326,68 @@ addEventHandler("useItem", root, function(slot, itemId, itemIndex)
     
     local itemId = tonumber(item.item)
     local itemName = item.name or "Item"
+    local itemValue = item.value -- Para las llaves, esto contiene la matrícula
+    
+    -- Llave de Coche (ID: 1) - Abrir/Desbloquear vehículo
+    if itemId == 1 then
+        if not itemValue or itemValue == "" then
+            outputChatBox("Esta llave no tiene una matrícula válida.", source, 255, 0, 0)
+            return
+        end
+        
+        -- Buscar el vehículo por matrícula
+        local vehicle = nil
+        for _, veh in ipairs(getElementsByType("vehicle")) do
+            local plate = getElementData(veh, "vehicle:plate")
+            if plate and plate == itemValue then
+                vehicle = veh
+                break
+            end
+        end
+        
+        if not vehicle then
+            outputChatBox("No se encontró el vehículo con matrícula: " .. itemValue, source, 255, 0, 0)
+            return
+        end
+        
+        -- Verificar distancia (máximo 20 metros)
+        local px, py, pz = getElementPosition(source)
+        local vx, vy, vz = getElementPosition(vehicle)
+        local distance = getDistanceBetweenPoints3D(px, py, pz, vx, vy, vz)
+        
+        if distance > 20 then
+            outputChatBox("El vehículo está muy lejos. Acércate más.", source, 255, 0, 0)
+            return
+        end
+        
+        -- Verificar que esté en la misma dimensión
+        if getElementDimension(source) ~= getElementDimension(vehicle) then
+            outputChatBox("El vehículo no está en tu dimensión.", source, 255, 0, 0)
+            return
+        end
+        
+        -- Cambiar estado del bloqueo
+        local isLocked = getVehicleLocked(vehicle)
+        local newState = not isLocked
+        
+        setVehicleLocked(vehicle, newState)
+        
+        -- Actualizar en base de datos
+        local vehicleDbId = getElementData(vehicle, "vehicle:db_id") or getElementData(vehicle, "vehicle:id")
+        if vehicleDbId then
+            executeDatabase("UPDATE vehicles SET locked = ? WHERE id = ?", newState and 1 or 0, vehicleDbId)
+            setElementData(vehicle, "vehicle:locked", newState)
+        end
+        
+        -- Reproducir sonido y animación
+        triggerClientEvent(source, "vehicle:playLockSound", source, vx, vy, vz)
+        setPedAnimation(source, "ghands", "gsign3lh", 2000, false, false, false)
+        
+        local stateText = newState and "bloqueado" or "desbloqueado"
+        outputChatBox("Vehículo " .. stateText, source, 0, 255, 0)
+        
+        return
+    end
     
     -- C4 Explosivos (IDs: 103, 104, 105) - Colocar C4 en el suelo
     if itemId == 103 or itemId == 104 or itemId == 105 then

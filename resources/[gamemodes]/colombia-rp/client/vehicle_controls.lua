@@ -89,3 +89,22 @@ addEventHandler("vehicle:enterCheckResult", root, function(canEnter)
         end
     end
 end)
+
+-- Evento para reproducir sonido de bloqueo/desbloqueo
+addEvent("vehicle:playLockSound", true)
+addEventHandler("vehicle:playLockSound", root, function(x, y, z)
+    if x and y and z then
+        -- Reproducir sonido 3D en la posición del vehículo
+        local sound = playSound3D("client/assents/sound/block-desblock.mp3", x, y, z, false)
+        if sound then
+            setSoundVolume(sound, 0.7)
+            setSoundMaxDistance(sound, 30)
+        end
+    else
+        -- Si no hay posición, reproducir sonido local
+        local sound = playSound("client/assents/sound/block-desblock.mp3", false)
+        if sound then
+            setSoundVolume(sound, 0.7)
+        end
+    end
+end)
