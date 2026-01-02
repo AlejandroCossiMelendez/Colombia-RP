@@ -184,6 +184,14 @@ function createAdminPanel()
         end, false)
         table.insert(adminButtons, freecamBtn)
         buttonY = buttonY + buttonSpacing
+        
+        -- Botón: Vehículos
+        local vehiculosBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Vehículos", false, adminWindow)
+        addEventHandler("onClientGUIClick", vehiculosBtn, function()
+            showVehiclesPanel()
+        end, false)
+        table.insert(adminButtons, vehiculosBtn)
+        buttonY = buttonY + buttonSpacing
     elseif userType == "staff" then
         -- Botón: Revivir Usuario
         local revivirBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Revivir Usuario", false, adminWindow)
@@ -805,6 +813,76 @@ addEventHandler("admin:receiveItemsList", resourceRoot, function(items)
         end
     end
 end)
+
+-- Variables para el panel de vehículos
+local vehiclesPanel = nil
+local vehiclesListGrid = nil
+local selectedVehicleId = nil
+
+-- Función para mostrar el panel de vehículos
+function showVehiclesPanel()
+    -- Cerrar panel anterior si existe
+    if vehiclesPanel and isElement(vehiclesPanel) then
+        destroyElement(vehiclesPanel)
+    end
+    
+    local windowWidth = 600
+    local windowHeight = 500
+    local windowX = (screenW - windowWidth) / 2
+    local windowY = (screenH - windowHeight) / 2
+    
+    vehiclesPanel = guiCreateWindow(windowX, windowY, windowWidth, windowHeight, "Generar Vehículo", false)
+    guiWindowSetSizable(vehiclesPanel, false)
+    
+    -- Label
+    local labelInfo = guiCreateLabel(10, 30, windowWidth - 20, 20, "Selecciona un vehículo y presiona 'Generar' para crearlo 5 metros delante de ti", false, vehiclesPanel)
+    guiLabelSetHorizontalAlign(labelInfo, "center", false)
+    
+    -- Grid list para vehículos
+    vehiclesListGrid = guiCreateGridList(10, 60, windowWidth - 20, 350, false, vehiclesPanel)
+    guiGridListAddColumn(vehiclesListGrid, "ID", 0.1)
+    guiGridListAddColumn(vehiclesListGrid, "Nombre del Vehículo", 0.85)
+    
+    -- Cargar todos los vehículos disponibles (IDs 400-611)
+    for vehicleId = 400, 611 do
+        local vehicleName = getVehicleNameFromModel(vehicleId)
+        if vehicleName and vehicleName ~= "" then
+            local row = guiGridListAddRow(vehiclesListGrid)
+            guiGridListSetItemText(vehiclesListGrid, row, 1, tostring(vehicleId), false, false)
+            guiGridListSetItemText(vehiclesListGrid, row, 2, vehicleName, false, false)
+        end
+    end
+    
+    -- Botones
+    local generateBtn = guiCreateButton(10, 420, 280, 30, "Generar Vehículo", false, vehiclesPanel)
+    local cancelBtn = guiCreateButton(300, 420, 280, 30, "Cancelar", false, vehiclesPanel)
+    
+    -- Eventos
+    addEventHandler("onClientGUIClick", generateBtn, function()
+        local row = guiGridListGetSelectedItem(vehiclesListGrid)
+        if row and row >= 0 then
+            local vehicleId = tonumber(guiGridListGetItemText(vehiclesListGrid, row, 1))
+            if vehicleId then
+                -- Enviar al servidor para crear el vehículo
+                triggerServerEvent("admin:createVehicle", localPlayer, vehicleId)
+                destroyElement(vehiclesPanel)
+                vehiclesPanel = nil
+                vehiclesListGrid = nil
+                outputChatBox("Vehículo generado correctamente.", 0, 255, 0)
+            else
+                outputChatBox("Error al obtener el ID del vehículo.", 255, 0, 0)
+            end
+        else
+            outputChatBox("Selecciona un vehículo de la lista.", 255, 255, 0)
+        end
+    end, false)
+    
+    addEventHandler("onClientGUIClick", cancelBtn, function()
+        destroyElement(vehiclesPanel)
+        vehiclesPanel = nil
+        vehiclesListGrid = nil
+    end, false)
+end
 
 -- Recibir respuesta de dar items
 addEvent("admin:giveItemsResponse", true)

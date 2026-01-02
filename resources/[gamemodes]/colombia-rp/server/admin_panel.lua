@@ -479,3 +479,70 @@ addEventHandler("admin:getCoords", root, function()
     outputServerLog("[COORDS] " .. getPlayerName(source) .. " - X: " .. x .. ", Y: " .. y .. ", Z: " .. z .. ", Rotación: " .. rotation .. ", Interior: " .. interior .. ", Dimensión: " .. dimension)
 end)
 
+-- Evento para crear vehículo (desde el panel)
+addEvent("admin:createVehicle", true)
+addEventHandler("admin:createVehicle", root, function(vehicleId)
+    if not isElement(source) or getElementType(source) ~= "player" then
+        return
+    end
+    
+    if not isPlayerAdmin(source) then
+        outputChatBox("No tienes permiso para usar esta función.", source, 255, 0, 0)
+        return
+    end
+    
+    if not vehicleId or not tonumber(vehicleId) then
+        outputChatBox("ID de vehículo inválido.", source, 255, 0, 0)
+        return
+    end
+    
+    vehicleId = tonumber(vehicleId)
+    
+    -- Validar que el ID del vehículo esté en el rango válido (400-611)
+    if vehicleId < 400 or vehicleId > 611 then
+        outputChatBox("ID de vehículo inválido. Debe estar entre 400 y 611.", source, 255, 0, 0)
+        return
+    end
+    
+    -- Obtener posición y rotación del admin
+    local adminX, adminY, adminZ = getElementPosition(source)
+    local adminRotation = getPedRotation(source)
+    local adminInterior = getElementInterior(source)
+    local adminDimension = getElementDimension(source)
+    
+    -- Calcular posición 5 metros delante del admin
+    local rotationRad = math.rad(adminRotation)
+    local distanceFront = 5.0
+    local frontX = adminX - math.sin(rotationRad) * distanceFront
+    local frontY = adminY + math.cos(rotationRad) * distanceFront
+    local frontZ = adminZ
+    
+    -- Verificar que no haya colisión con el suelo
+    local hit, hitX, hitY, hitZ = processLineOfSight(frontX, frontY, frontZ + 10, frontX, frontY, frontZ - 10, true, true, false, true, false, false, false, false, source)
+    if hit then
+        frontZ = hitZ + 0.5
+    else
+        -- Si no hay suelo detectado, usar la altura del admin
+        frontZ = adminZ
+    end
+    
+    -- Crear el vehículo
+    local vehicle = createVehicle(vehicleId, frontX, frontY, frontZ, 0, 0, adminRotation)
+    
+    if not vehicle then
+        outputChatBox("Error al crear el vehículo. Verifica que el ID sea válido.", source, 255, 0, 0)
+        return
+    end
+    
+    -- Configurar dimensiones e interior del vehículo
+    setElementDimension(vehicle, adminDimension)
+    setElementInterior(vehicle, adminInterior)
+    
+    -- Obtener nombre del vehículo
+    local vehicleName = getVehicleNameFromModel(vehicleId) or "Vehículo " .. vehicleId
+    
+    -- Mensaje de confirmación
+    outputChatBox("✓ Vehículo '" .. vehicleName .. "' (ID: " .. vehicleId .. ") creado correctamente.", source, 0, 255, 0)
+    outputServerLog("[ADMIN] " .. getPlayerName(source) .. " creó el vehículo " .. vehicleName .. " (ID: " .. vehicleId .. ") en " .. string.format("%.2f, %.2f, %.2f", frontX, frontY, frontZ))
+end)
+
