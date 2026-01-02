@@ -429,10 +429,55 @@ function closeInventory()
     draggedSlot = nil
 end
 
--- Recibir inventario del servidor
+-- Recibir inventario del servidor (tabla inventory)
 addEvent("receiveInventory", true)
 addEventHandler("receiveInventory", resourceRoot, function(inventory)
     playerInventory = inventory or {}
+end)
+
+-- Recibir items del sistema de items (tabla items) y convertirlos al formato del inventario visual
+addEvent("syncItems", true)
+addEventHandler("syncItems", root, function(...)
+    -- El evento syncItems se envía como: triggerClientEvent(player, "syncItems", player, items)
+    -- Puede recibir 1 o 2 parámetros dependiendo de cómo se envíe
+    local args = {...}
+    local player = args[1]
+    local items = args[2]
+    
+    -- Si solo hay un parámetro, es la tabla de items (compatibilidad con items_c.lua)
+    if not items and type(player) == "table" then
+        items = player
+        player = source
+    end
+    
+    -- Verificar si es el jugador local
+    if player == localPlayer then
+        -- Convertir items del sistema items al formato del inventario visual
+        playerInventory = {}
+        if items and type(items) == "table" then
+            for slot, item in ipairs(items) do
+                if item and item.item then
+                    -- Obtener el nombre del item
+                    local itemName = item.name or "Item " .. item.item
+                    if getName and type(getName) == "function" then
+                        local nameResult = getName(item.item)
+                        if nameResult and nameResult ~= " " and nameResult ~= "" then
+                            itemName = nameResult
+                        end
+                    end
+                    
+                    table.insert(playerInventory, {
+                        id = item.index or slot,
+                        slot = slot,
+                        item_id = item.item,
+                        item_name = itemName,
+                        quantity = tonumber(item.value) or 1,
+                        item_data = item.value2 or ""
+                    })
+                end
+            end
+        end
+    end
 end)
 
 -- Actualizar inventario

@@ -214,6 +214,10 @@ function give( element, item, val, name, value2 )
 					executeDatabase("UPDATE items SET value2 = "..tonumber(value2).." WHERE `index` = "..index)
 				end
 				notify( element )
+				-- Forzar recarga del inventario para asegurar sincronización
+				if getElementType( element ) == "player" then
+					load( element, true )
+				end
 				return true
 			end
 			return false, "MySQL Query failed"
