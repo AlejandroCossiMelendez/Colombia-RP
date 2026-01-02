@@ -515,9 +515,9 @@ addEventHandler("admin:createVehicle", root, function(vehicleId)
     triggerClientEvent(source, "admin:calculateVehiclePosition", source, vehicleId, adminX, adminY, adminZ, adminRotation, adminInterior, adminDimension)
 end)
 
--- Evento del cliente para calcular la posición y crear el vehículo
-addEvent("admin:createVehicleAtPosition", true)
-addEventHandler("admin:createVehicleAtPosition", root, function(vehicleId, x, y, z, rotation, interior, dimension)
+-- Evento mejorado para crear vehículo con opciones
+addEvent("admin:createVehicleWithOptions", true)
+addEventHandler("admin:createVehicleWithOptions", root, function(vehicleId, generateForPlayer, playerId)
     if not isElement(source) or getElementType(source) ~= "player" then
         return
     end
@@ -526,29 +526,78 @@ addEventHandler("admin:createVehicleAtPosition", root, function(vehicleId, x, y,
         return
     end
     
-    -- Crear el vehículo en la posición calculada por el cliente
-    local vehicle = createVehicle(vehicleId, x, y, z, 0, 0, rotation)
-    
-    if not vehicle then
-        outputChatBox("Error al crear el vehículo. Verifica que el ID sea válido.", source, 255, 0, 0)
+    -- Validar ID del vehículo
+    if vehicleId < 400 or vehicleId > 611 then
+        outputChatBox("ID de vehículo inválido. Debe estar entre 400 y 611.", source, 255, 0, 0)
         return
     end
     
-    -- Configurar dimensiones e interior del vehículo
-    setElementDimension(vehicle, dimension)
-    setElementInterior(vehicle, interior)
+    -- Solicitar al cliente que calcule la posición
+    triggerClientEvent(source, "admin:calculateVehiclePosition", source, vehicleId, generateForPlayer, playerId)
+end)
+
+-- Evento del cliente para calcular la posición y crear el vehículo
+addEvent("admin:createVehicleAtPosition", true)
+addEventHandler("admin:createVehicleAtPosition", root, function(vehicleId, x, y, z, rotation, interior, dimension, generateForPlayer, playerId)
+    if not isElement(source) or getElementType(source) ~= "player" then
+        return
+    end
     
-    -- Asegurar que el vehículo sea visible
-    setElementAlpha(vehicle, 255)
+    if not isPlayerAdmin(source) then
+        return
+    end
     
-    -- Obtener nombre del vehículo
+    -- Cargar el sistema de vehículos
+    if not createVehicleWithoutOwner or not createVehicleForPlayer then
+        outputChatBox("Error: Sistema de vehículos no disponible.", source, 255, 0, 0)
+        return
+    end
+    
+    local vehicle, plate
     local vehicleName = getVehicleNameFromModel(vehicleId) or "Vehículo " .. vehicleId
     
-    -- Mensaje de confirmación con coordenadas
-    outputChatBox("✓ Vehículo '" .. vehicleName .. "' (ID: " .. vehicleId .. ") creado correctamente.", source, 0, 255, 0)
-    outputChatBox("Posición: X=" .. string.format("%.2f", x) .. " Y=" .. string.format("%.2f", y) .. " Z=" .. string.format("%.2f", z), source, 255, 255, 255)
-    outputServerLog("[ADMIN] " .. getPlayerName(source) .. " creó el vehículo " .. vehicleName .. " (ID: " .. vehicleId .. ") en " .. string.format("%.2f, %.2f, %.2f", x, y, z))
-    outputServerLog("[ADMIN] Dimensión vehículo: " .. getElementDimension(vehicle) .. " Interior vehículo: " .. getElementInterior(vehicle))
+    if generateForPlayer and playerId then
+        -- Verificar que el jugador existe
+        local targetPlayer = nil
+        for _, player in ipairs(getElementsByType("player")) do
+            local charId = getElementData(player, "character:id")
+            if charId and charId == playerId then
+                targetPlayer = player
+                break
+            end
+        end
+        
+        if not targetPlayer then
+            outputChatBox("Error: No se encontró un jugador con ID de personaje " .. playerId, source, 255, 0, 0)
+            return
+        end
+        
+        -- Crear vehículo para el jugador
+        vehicle, plate = createVehicleForPlayer(vehicleId, x, y, z, rotation, interior, dimension, playerId)
+        
+        if vehicle then
+            outputChatBox("✓ Vehículo '" .. vehicleName .. "' creado para el jugador (ID: " .. playerId .. ")", source, 0, 255, 0)
+            outputChatBox("Matrícula: " .. plate, source, 255, 255, 0)
+            outputChatBox("✓ Has recibido las llaves del vehículo con matrícula: " .. plate, targetPlayer, 0, 255, 0)
+        else
+            outputChatBox("Error al crear el vehículo: " .. (plate or "Error desconocido"), source, 255, 0, 0)
+        end
+    else
+        -- Crear vehículo sin dueño
+        vehicle, plate = createVehicleWithoutOwner(vehicleId, x, y, z, rotation, interior, dimension)
+        
+        if vehicle then
+            outputChatBox("✓ Vehículo '" .. vehicleName .. "' creado sin dueño (cualquiera puede manejarlo)", source, 0, 255, 0)
+            outputChatBox("Matrícula: " .. plate, source, 255, 255, 0)
+        else
+            outputChatBox("Error al crear el vehículo: " .. (plate or "Error desconocido"), source, 255, 0, 0)
+        end
+    end
+    
+    if vehicle then
+        outputServerLog("[ADMIN] " .. getPlayerName(source) .. " creó el vehículo " .. vehicleName .. " (ID: " .. vehicleId .. ") en " .. string.format("%.2f, %.2f, %.2f", x, y, z))
+        outputServerLog("[ADMIN] Matrícula: " .. plate .. " | Dueño: " .. (playerId or "Ninguno"))
+    end
 end)
 
 -- Evento para crear vehículo (versión antigua - mantener por compatibilidad)

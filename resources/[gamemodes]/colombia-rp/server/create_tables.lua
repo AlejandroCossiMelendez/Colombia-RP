@@ -139,6 +139,42 @@ function createItemsTables()
         outputServerLog("[TABLES] ✗ ERROR al crear tabla 'maleteros'")
     end
     
+    -- Tabla: vehicles (vehículos del servidor)
+    local vehiclesTableSQL = [[
+        CREATE TABLE IF NOT EXISTS `vehicles` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `vehicle_element_id` INT DEFAULT NULL,
+            `model` INT NOT NULL,
+            `plate` VARCHAR(10) NOT NULL UNIQUE,
+            `owner_id` INT DEFAULT NULL,
+            `x` FLOAT NOT NULL,
+            `y` FLOAT NOT NULL,
+            `z` FLOAT NOT NULL,
+            `rot_x` FLOAT DEFAULT 0,
+            `rot_y` FLOAT DEFAULT 0,
+            `rot_z` FLOAT NOT NULL,
+            `interior` INT NOT NULL DEFAULT 0,
+            `dimension` INT NOT NULL DEFAULT 0,
+            `color1` INT DEFAULT 0,
+            `color2` INT DEFAULT 0,
+            `fuel` FLOAT DEFAULT 100,
+            `locked` TINYINT DEFAULT 0,
+            `engine` TINYINT DEFAULT 0,
+            `lights` TINYINT DEFAULT 0,
+            `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX `idx_owner_id` (`owner_id`),
+            INDEX `idx_plate` (`plate`),
+            INDEX `idx_vehicle_element_id` (`vehicle_element_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ]]
+    
+    success = executeDatabase(vehiclesTableSQL)
+    if success then
+        outputServerLog("[TABLES] ✓ Tabla 'vehicles' creada o ya existe")
+    else
+        outputServerLog("[TABLES] ✗ ERROR al crear tabla 'vehicles'")
+    end
+    
     outputServerLog("[TABLES] Verificación de tablas completada")
 end
-

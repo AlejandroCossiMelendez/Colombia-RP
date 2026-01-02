@@ -1,0 +1,126 @@
+-- Sistema de Controles de Vehículos - Servidor
+-- Maneja los eventos de motor, bloqueo y luces
+
+-- Cargar funciones del sistema de vehículos
+if not playerHasVehicleKey then
+    outputServerLog("[VEHICLES] ERROR: Sistema de vehículos no cargado. Asegúrate de que vehicles_system.lua esté cargado primero.")
+end
+
+-- Evento: Verificar si el jugador tiene las llaves
+addEvent("vehicle:checkKey", true)
+addEventHandler("vehicle:checkKey", root, function(vehicle)
+    if not isElement(source) or not isElement(vehicle) then
+        return
+    end
+    
+    local hasKey = playerHasVehicleKey(source, vehicle)
+    triggerClientEvent(source, "vehicle:keyCheckResult", source, hasKey)
+end)
+
+-- Evento: Verificar llaves al intentar entrar
+addEvent("vehicle:checkKeyForEnter", true)
+addEventHandler("vehicle:checkKeyForEnter", root, function(vehicle)
+    if not isElement(source) or not isElement(vehicle) then
+        return
+    end
+    
+    local hasKey = playerHasVehicleKey(source, vehicle)
+    triggerClientEvent(source, "vehicle:enterCheckResult", source, hasKey)
+end)
+
+-- Evento: Prender/Apagar motor
+addEvent("vehicle:toggleEngine", true)
+addEventHandler("vehicle:toggleEngine", root, function(vehicle, newState)
+    if not isElement(source) or not isElement(vehicle) then
+        return
+    end
+    
+    -- Verificar si tiene las llaves
+    if not playerHasVehicleKey(source, vehicle) then
+        outputChatBox("No tienes las llaves de este vehículo.", source, 255, 0, 0)
+        return
+    end
+    
+    -- Verificar que esté en el vehículo como conductor
+    if getPedOccupiedVehicle(source) ~= vehicle or getPedOccupiedVehicleSeat(source) ~= 0 then
+        outputChatBox("Debes ser el conductor para controlar el motor.", source, 255, 0, 0)
+        return
+    end
+    
+    -- Obtener estado actual si no se especificó
+    if newState == nil then
+        newState = not getVehicleEngineState(vehicle)
+    end
+    
+    -- Cambiar estado del motor
+    setVehicleEngineState(vehicle, newState)
+    
+    -- Actualizar en base de datos
+    local vehicleDbId = getElementData(vehicle, "vehicle:db_id") or getElementData(vehicle, "vehicle:id")
+    if vehicleDbId then
+        executeDatabase("UPDATE vehicles SET engine = ? WHERE id = ?", newState and 1 or 0, vehicleDbId)
+    end
+    
+    local stateText = newState and "encendido" or "apagado"
+    outputChatBox("Motor " .. stateText, source, 0, 255, 0)
+end)
+
+-- Evento: Bloquear/Desbloquear puertas
+addEvent("vehicle:toggleLock", true)
+addEventHandler("vehicle:toggleLock", root, function(vehicle, newState)
+    if not isElement(source) or not isElement(vehicle) then
+        return
+    end
+    
+    -- Verificar si tiene las llaves
+    if not playerHasVehicleKey(source, vehicle) then
+        outputChatBox("No tienes las llaves de este vehículo.", source, 255, 0, 0)
+        return
+    end
+    
+    -- Cambiar estado del bloqueo
+    setVehicleLocked(vehicle, newState)
+    
+    -- Actualizar en base de datos
+    local vehicleDbId = getElementData(vehicle, "vehicle:db_id") or getElementData(vehicle, "vehicle:id")
+    if vehicleDbId then
+        executeDatabase("UPDATE vehicles SET locked = ? WHERE id = ?", newState and 1 or 0, vehicleDbId)
+        setElementData(vehicle, "vehicle:locked", newState)
+    end
+    
+    local stateText = newState and "bloqueado" or "desbloqueado"
+    outputChatBox("Vehículo " .. stateText, source, 0, 255, 0)
+end)
+
+-- Evento: Prender/Apagar luces
+addEvent("vehicle:toggleLights", true)
+addEventHandler("vehicle:toggleLights", root, function(vehicle, newState)
+    if not isElement(source) or not isElement(vehicle) then
+        return
+    end
+    
+    -- Verificar si tiene las llaves
+    if not playerHasVehicleKey(source, vehicle) then
+        outputChatBox("No tienes las llaves de este vehículo.", source, 255, 0, 0)
+        return
+    end
+    
+    -- Verificar que esté en el vehículo como conductor
+    if getPedOccupiedVehicle(source) ~= vehicle or getPedOccupiedVehicleSeat(source) ~= 0 then
+        outputChatBox("Debes ser el conductor para controlar las luces.", source, 255, 0, 0)
+        return
+    end
+    
+    -- Cambiar estado de las luces
+    setVehicleOverrideLights(vehicle, newState)
+    
+    -- Actualizar en base de datos
+    local vehicleDbId = getElementData(vehicle, "vehicle:db_id") or getElementData(vehicle, "vehicle:id")
+    if vehicleDbId then
+        executeDatabase("UPDATE vehicles SET lights = ? WHERE id = ?", newState == 2 and 1 or 0, vehicleDbId)
+    end
+    
+    local stateText = (newState == 2) and "encendidas" or "apagadas"
+    outputChatBox("Luces " .. stateText, source, 0, 255, 0)
+end)
+

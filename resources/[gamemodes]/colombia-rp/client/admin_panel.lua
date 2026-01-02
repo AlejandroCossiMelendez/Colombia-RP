@@ -819,6 +819,11 @@ local vehiclesPanel = nil
 local vehiclesListGrid = nil
 local selectedVehicleId = nil
 
+-- Variables para el panel de vehículos mejorado
+local playerIdInput = nil
+local generateForPlayerRadio = nil
+local generateWithoutOwnerRadio = nil
+
 -- Función para mostrar el panel de vehículos
 function showVehiclesPanel()
     -- Cerrar panel anterior si existe
@@ -826,20 +831,20 @@ function showVehiclesPanel()
         destroyElement(vehiclesPanel)
     end
     
-    local windowWidth = 600
-    local windowHeight = 500
+    local windowWidth = 650
+    local windowHeight = 550
     local windowX = (screenW - windowWidth) / 2
     local windowY = (screenH - windowHeight) / 2
     
-    vehiclesPanel = guiCreateWindow(windowX, windowY, windowWidth, windowHeight, "Generar Vehículo", false)
+    vehiclesPanel = guiCreateWindow(windowX, windowY, windowWidth, windowHeight, "Sistema de Vehículos", false)
     guiWindowSetSizable(vehiclesPanel, false)
     
-    -- Label
-    local labelInfo = guiCreateLabel(10, 30, windowWidth - 20, 20, "Selecciona un vehículo y presiona 'Generar' para crearlo 5 metros delante de ti", false, vehiclesPanel)
+    -- Label informativo
+    local labelInfo = guiCreateLabel(10, 30, windowWidth - 20, 20, "Selecciona un vehículo y elige cómo generarlo", false, vehiclesPanel)
     guiLabelSetHorizontalAlign(labelInfo, "center", false)
     
     -- Grid list para vehículos
-    vehiclesListGrid = guiCreateGridList(10, 60, windowWidth - 20, 350, false, vehiclesPanel)
+    vehiclesListGrid = guiCreateGridList(10, 60, windowWidth - 20, 300, false, vehiclesPanel)
     guiGridListAddColumn(vehiclesListGrid, "ID", 0.1)
     guiGridListAddColumn(vehiclesListGrid, "Nombre del Vehículo", 0.85)
     
@@ -853,9 +858,25 @@ function showVehiclesPanel()
         end
     end
     
+    -- Opciones de generación
+    local optionsY = 370
+    local labelOptions = guiCreateLabel(10, optionsY, windowWidth - 20, 20, "Opciones de generación:", false, vehiclesPanel)
+    guiSetFont(labelOptions, "default-bold")
+    
+    -- Radio buttons
+    generateWithoutOwnerRadio = guiCreateRadioButton(10, optionsY + 25, 300, 20, "Generar sin dueño (cualquiera puede manejarlo)", false, vehiclesPanel)
+    guiRadioButtonSetSelected(generateWithoutOwnerRadio, true)
+    
+    generateForPlayerRadio = guiCreateRadioButton(10, optionsY + 50, 300, 20, "Generar para jugador (con matrícula y llaves)", false, vehiclesPanel)
+    
+    -- Input para ID del jugador
+    local labelPlayerId = guiCreateLabel(320, optionsY + 30, 100, 20, "ID del Jugador:", false, vehiclesPanel)
+    playerIdInput = guiCreateEdit(320, optionsY + 50, 150, 25, "", false, vehiclesPanel)
+    guiEditSetReadOnly(playerIdInput, false)
+    
     -- Botones
-    local generateBtn = guiCreateButton(10, 420, 280, 30, "Generar Vehículo", false, vehiclesPanel)
-    local cancelBtn = guiCreateButton(300, 420, 280, 30, "Cancelar", false, vehiclesPanel)
+    local generateBtn = guiCreateButton(10, optionsY + 85, 200, 35, "Generar Vehículo", false, vehiclesPanel)
+    local cancelBtn = guiCreateButton(220, optionsY + 85, 200, 35, "Cancelar", false, vehiclesPanel)
     
     -- Eventos
     addEventHandler("onClientGUIClick", generateBtn, function()
@@ -863,12 +884,26 @@ function showVehiclesPanel()
         if row and row >= 0 then
             local vehicleId = tonumber(guiGridListGetItemText(vehiclesListGrid, row, 1))
             if vehicleId then
+                local generateForPlayer = guiRadioButtonGetSelected(generateForPlayerRadio)
+                local playerId = nil
+                
+                if generateForPlayer then
+                    local playerIdText = guiGetText(playerIdInput)
+                    playerId = tonumber(playerIdText)
+                    if not playerId or playerId <= 0 then
+                        outputChatBox("Por favor ingresa un ID de jugador válido.", 255, 0, 0)
+                        return
+                    end
+                end
+                
                 -- Enviar al servidor para crear el vehículo
-                triggerServerEvent("admin:createVehicle", localPlayer, vehicleId)
+                triggerServerEvent("admin:createVehicleWithOptions", localPlayer, vehicleId, generateForPlayer, playerId)
                 destroyElement(vehiclesPanel)
                 vehiclesPanel = nil
                 vehiclesListGrid = nil
-                outputChatBox("Vehículo generado correctamente.", 0, 255, 0)
+                playerIdInput = nil
+                generateForPlayerRadio = nil
+                generateWithoutOwnerRadio = nil
             else
                 outputChatBox("Error al obtener el ID del vehículo.", 255, 0, 0)
             end
@@ -881,6 +916,9 @@ function showVehiclesPanel()
         destroyElement(vehiclesPanel)
         vehiclesPanel = nil
         vehiclesListGrid = nil
+        playerIdInput = nil
+        generateForPlayerRadio = nil
+        generateWithoutOwnerRadio = nil
     end, false)
 end
 

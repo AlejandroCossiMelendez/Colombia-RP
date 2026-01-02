@@ -31,6 +31,8 @@
     <script src="server/phone_calls.lua" type="server" />
     <script src="server/jbl_system.lua" type="server" />
     <script src="server/fuel_system.lua" type="server" />
+    <script src="server/vehicles_system.lua" type="server" />
+    <script src="server/vehicle_controls_server.lua" type="server" />
     <script src="sistema_polvora/server.lua" type="server" />
     <script src="server/main.lua" type="server" />
     
@@ -58,6 +60,7 @@
     <script src="client/jbl_panel.lua" type="client" />
     <script src="client/jbl_model.lua" type="client" />
     <script src="client/speedometer.lua" type="client" />
+    <script src="client/vehicle_controls.lua" type="client" />
     <script src="sistema_polvora/client.lua" type="client" />
     
     <!-- Scripts del sistema de items (cliente) -->

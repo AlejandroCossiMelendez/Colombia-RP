@@ -3,9 +3,12 @@
 
 -- Evento para calcular la posición del vehículo delante del jugador
 addEvent("admin:calculateVehiclePosition", true)
-addEventHandler("admin:calculateVehiclePosition", root, function(vehicleId, adminX, adminY, adminZ, adminRotation, adminInterior, adminDimension)
-    -- Obtener posición actual del jugador (más precisa que la del servidor)
+addEventHandler("admin:calculateVehiclePosition", root, function(vehicleId, generateForPlayer, playerId)
+    -- Obtener posición y rotación del jugador
     local playerX, playerY, playerZ = getElementPosition(localPlayer)
+    local adminRotation = getPedRotation(localPlayer)
+    local adminInterior = getElementInterior(localPlayer)
+    local adminDimension = getElementDimension(localPlayer)
     
     -- Intentar obtener la dirección desde la cámara
     local camX, camY, camZ, lookX, lookY, lookZ = getCameraMatrix()
@@ -70,7 +73,7 @@ addEventHandler("admin:calculateVehiclePosition", root, function(vehicleId, admi
     outputChatBox("Posición vehículo: " .. string.format("%.2f, %.2f, %.2f", frontX, frontY, frontZ), 255, 255, 255)
     outputChatBox("Distancia: " .. string.format("%.2f", getDistanceBetweenPoints3D(playerX, playerY, playerZ, frontX, frontY, frontZ)) .. " metros", 255, 255, 255)
     
-    -- Enviar al servidor para crear el vehículo
-    triggerServerEvent("admin:createVehicleAtPosition", localPlayer, vehicleId, frontX, frontY, frontZ, vehicleRotation, adminInterior, adminDimension)
+    -- Enviar al servidor para crear el vehículo con las opciones
+    triggerServerEvent("admin:createVehicleAtPosition", localPlayer, vehicleId, frontX, frontY, frontZ, vehicleRotation, adminInterior, adminDimension, generateForPlayer, playerId)
 end)
 
