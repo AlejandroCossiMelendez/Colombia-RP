@@ -81,8 +81,10 @@ function HudHype()
     local ano = ("%02d"):format(time.year + 1900)
     local mes = meses[time.month + 1]
 
-    local seconds = getTickCount() / 1600
-    local angle = math.sin(seconds) * 10
+    -- Animación suave del logo (hover sutil)
+    local seconds = getTickCount() / 2000 -- Más lento para animación suave
+    local hoverOffset = math.sin(seconds) * 3 -- Movimiento más sutil (3 píxeles en lugar de 10)
+    local angle = 0 -- Sin rotación, solo movimiento vertical suave
 
     --<!-- BARRAS FONDO --!>--
     dxDrawImage(x*1225, y*154, x*101, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 80), false) -- VIDA
@@ -202,8 +204,8 @@ function HudHype()
         dxDrawImage(x*1296, y*712, x*28, y*24, "hud-rp/Hype_Hud/imgs/voiceOff.png", 0, 0, 0, tocolor(255, 255, 255, 150), false)
     end
     
-    --<!-- LOGO --!>--
-    dxDrawImage(x*648, y*10, x*64, y*73, "hud-rp/Hype_Hud/imgs/logo.png", angle, 0, -40, tocolor(255, 255, 255, 255), false)
+    --<!-- LOGO (con hover suave) --!>--
+    dxDrawImage(x*648, y*10 + hoverOffset, x*64, y*73, "hud-rp/Hype_Hud/imgs/logo.png", angle, 0, 0, tocolor(255, 255, 255, 255), false)
 end
 addEventHandler("onClientRender", getRootElement(), HudHype)
 
