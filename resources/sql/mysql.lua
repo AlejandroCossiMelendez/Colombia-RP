@@ -24,7 +24,7 @@ local max_results = 3000
 -- connection functions
 local function connect( )
 
-	local server = "127.0.0.1"
+	local server = "localhost"
 	local user = "mta_user"
 	local password = "15306266_Mta"
 	local db = "mta_login"
