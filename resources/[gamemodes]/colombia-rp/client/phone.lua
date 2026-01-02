@@ -189,7 +189,7 @@ end
 
 -- Evento para guardar contactos (desde el navegador)
 addEvent("saveContacts", true)
-addEventHandler("saveContacts", localPlayer, function(contactsJson)
+addEventHandler("saveContacts", resourceRoot, function(contactsJson)
     local characterId = getElementData(localPlayer, "character:id")
     if not characterId then
         outputChatBox("Error: No se pudo obtener el ID del personaje para guardar contactos.", 255, 0, 0)

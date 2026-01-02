@@ -516,16 +516,21 @@ function addContact() {
     // Ocultar el formulario
     hideAddContactForm();
     
-    // Guardar en MTA (opcional, para persistencia)
+    // Guardar en MTA inmediatamente después de agregar
     if (window.mta && window.mta.triggerEvent) {
         try {
-            window.mta.triggerEvent('saveContacts', JSON.stringify(contacts));
-            console.log('Contactos guardados en MTA');
+            const jsonString = JSON.stringify(contacts);
+            console.log('Guardando contactos después de agregar:', contacts.length, 'contactos');
+            console.log('JSON a enviar:', jsonString);
+            window.mta.triggerEvent('saveContacts', jsonString);
+            console.log('Evento saveContacts enviado correctamente');
         } catch (e) {
             console.error('Error al guardar contactos:', e);
+            alert('Error al guardar contactos. Por favor intenta de nuevo.');
         }
     } else {
         console.warn('MTA no está disponible, los contactos se guardarán solo en memoria');
+        alert('Error: No se pudo conectar con el servidor para guardar contactos.');
     }
 }
 
@@ -555,13 +560,17 @@ function deleteContact(index) {
         console.log('Contacto eliminado. Contactos restantes:', contacts);
         loadContacts();
         
-        // Guardar en MTA
+        // Guardar en MTA inmediatamente después de eliminar
         if (window.mta && window.mta.triggerEvent) {
             try {
-                window.mta.triggerEvent('saveContacts', JSON.stringify(contacts));
-                console.log('Contactos guardados después de eliminar');
+                const jsonString = JSON.stringify(contacts);
+                console.log('Guardando contactos después de eliminar:', contacts.length, 'contactos');
+                console.log('JSON a enviar:', jsonString);
+                window.mta.triggerEvent('saveContacts', jsonString);
+                console.log('Evento saveContacts enviado correctamente después de eliminar');
             } catch (e) {
                 console.error('Error al guardar contactos:', e);
+                alert('Error al guardar contactos. Por favor intenta de nuevo.');
             }
         }
     }
