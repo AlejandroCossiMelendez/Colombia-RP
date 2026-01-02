@@ -525,7 +525,8 @@
     <file src="items/images/vodka.png" type="client" />
     <file src="items/images/vino.png" type="client" />
     
-    <!-- Archivos (ya no necesarios para login, pero se mantienen para character GUI) -->
-    <file src="client/character.html" />
+    <!-- Archivos HTML -->
+    <file src="client/login.html" type="client" />
+    <file src="client/character.html" type="client" />
 </meta>
 

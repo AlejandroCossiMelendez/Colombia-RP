@@ -31,3 +31,4 @@ end
 
 addEventHandler("onClientRender", root, drawVestIcon)
 
+
