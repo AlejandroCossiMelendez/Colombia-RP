@@ -1,10 +1,5 @@
 -- Sistema de Login y Registro
-
--- ==================== REGISTRAR EVENTOS PRIMERO ====================
--- Es CRÍTICO registrar los eventos ANTES de cualquier otra cosa
--- Estos eventos DEBEN estar al inicio del archivo para estar disponibles inmediatamente
-addEvent("onPlayerLogin", true)
-addEvent("onPlayerRegister", true)
+-- Nota: Los eventos están registrados en server/events.lua
 
 -- Hash de contraseña usando md5 (más seguro que hash() que requiere permisos)
 function hashPassword(password)

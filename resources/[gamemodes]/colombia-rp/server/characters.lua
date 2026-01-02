@@ -1,5 +1,5 @@
 -- Sistema de Personajes
-addEvent("requestCharacters", true)
+-- Nota: Los eventos están registrados en server/events.lua
 addEventHandler("requestCharacters", root, function()
     local userId = getElementData(source, "account:userId")
     if not userId then
@@ -18,7 +18,6 @@ addEventHandler("requestCharacters", root, function()
 end)
 
 -- Crear nuevo personaje
-addEvent("createCharacter", true)
 addEventHandler("createCharacter", root, function(name, surname, age, gender, skin)
     local userId = getElementData(source, "account:userId")
     local username = getElementData(source, "account:username")
@@ -90,7 +89,6 @@ addEventHandler("createCharacter", root, function(name, surname, age, gender, sk
 end)
 
 -- Seleccionar personaje
-addEvent("selectCharacter", true)
 addEventHandler("selectCharacter", root, function(characterId)
     local userId = getElementData(source, "account:userId")
     if not userId then
@@ -120,6 +118,10 @@ addEventHandler("selectCharacter", root, function(characterId)
         setElementHealth(source, character.health)
         setElementModel(source, character.skin)
         
+        -- Activar cámara del jugador
+        setCameraTarget(source, source)
+        fadeCamera(source, true, 1.0)
+        
         -- Actualizar último login
         executeDatabase("UPDATE characters SET lastLogin = NOW() WHERE id = ?", characterId)
         
@@ -137,7 +139,6 @@ addEventHandler("selectCharacter", root, function(characterId)
 end)
 
 -- Eliminar personaje
-addEvent("deleteCharacter", true)
 addEventHandler("deleteCharacter", root, function(characterId)
     local userId = getElementData(source, "account:userId")
     if not userId then
