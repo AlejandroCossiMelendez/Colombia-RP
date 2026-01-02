@@ -1063,6 +1063,9 @@ window.onCallEnded = function() {
     // Restaurar controles inmediatamente
     hideCallStatus();
     
+    // Limpiar estado de llamada
+    currentCall = null;
+    
     // Asegurar que el keypad se restaure correctamente y mantenga el grid 3x4
     setTimeout(function() {
         const keypad = get('.keypad');

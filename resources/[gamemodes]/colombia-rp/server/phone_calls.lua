@@ -485,9 +485,32 @@ function endCallVoice(call)
                     setPlayerVoiceIgnoreFrom(call.caller, {})
                     
                     -- Forzar actualización del sistema de proximidad
-                    if exports.voice_proximity and exports.voice_proximity.updatePlayerProximityVoice then
-                        exports.voice_proximity.updatePlayerProximityVoice(call.caller)
-                    end
+                    -- La función updatePlayerProximityVoice está en voice_proximity.lua
+                    -- Como está en el mismo gamemode, la llamamos directamente después de un delay
+                    -- para asegurar que el sistema de proximidad se actualice correctamente
+                    setTimer(function()
+                        if isElement(call.caller) and not getElementData(call.caller, "phone:inCall") then
+                            -- Llamar a la función de proximidad directamente
+                            -- Esta función está definida en voice_proximity.lua
+                            local x, y, z = getElementPosition(call.caller)
+                            local playersToIgnore = {}
+                            
+                            for _, otherPlayer in ipairs(getElementsByType("player")) do
+                                if otherPlayer ~= call.caller and isElement(otherPlayer) then
+                                    if getElementData(otherPlayer, "character:selected") then
+                                        local ox, oy, oz = getElementPosition(otherPlayer)
+                                        local distance = getDistanceBetweenPoints3D(x, y, z, ox, oy, oz)
+                                        
+                                        if distance > 5 then
+                                            table.insert(playersToIgnore, otherPlayer)
+                                        end
+                                    end
+                                end
+                            end
+                            
+                            setPlayerVoiceIgnoreFrom(call.caller, playersToIgnore)
+                        end
+                    end, 200, 1)
                 end
             end
         end, 100, 1)
@@ -517,9 +540,32 @@ function endCallVoice(call)
                     setPlayerVoiceIgnoreFrom(call.receiver, {})
                     
                     -- Forzar actualización del sistema de proximidad
-                    if exports.voice_proximity and exports.voice_proximity.updatePlayerProximityVoice then
-                        exports.voice_proximity.updatePlayerProximityVoice(call.receiver)
-                    end
+                    -- La función updatePlayerProximityVoice está en voice_proximity.lua
+                    -- Como está en el mismo gamemode, la llamamos directamente después de un delay
+                    -- para asegurar que el sistema de proximidad se actualice correctamente
+                    setTimer(function()
+                        if isElement(call.receiver) and not getElementData(call.receiver, "phone:inCall") then
+                            -- Llamar a la función de proximidad directamente
+                            -- Esta función está definida en voice_proximity.lua
+                            local x, y, z = getElementPosition(call.receiver)
+                            local playersToIgnore = {}
+                            
+                            for _, otherPlayer in ipairs(getElementsByType("player")) do
+                                if otherPlayer ~= call.receiver and isElement(otherPlayer) then
+                                    if getElementData(otherPlayer, "character:selected") then
+                                        local ox, oy, oz = getElementPosition(otherPlayer)
+                                        local distance = getDistanceBetweenPoints3D(x, y, z, ox, oy, oz)
+                                        
+                                        if distance > 5 then
+                                            table.insert(playersToIgnore, otherPlayer)
+                                        end
+                                    end
+                                end
+                            end
+                            
+                            setPlayerVoiceIgnoreFrom(call.receiver, playersToIgnore)
+                        end
+                    end, 200, 1)
                 end
             end
         end, 100, 1)

@@ -37,6 +37,12 @@ function whenPhoneBrowserReady()
         
         -- Los contactos se cargarán desde el evento openPhone del servidor
         -- No necesitamos cargarlos aquí porque ya vienen con el evento
+        
+        -- Solicitar estado de llamada activa cuando el navegador está listo
+        -- Esto asegura que si hay una llamada activa, se muestre al abrir el teléfono
+        setTimer(function()
+            triggerServerEvent("phone:requestCallStatus", localPlayer)
+        end, 500, 1)
     end
 end
 
