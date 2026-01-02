@@ -1,355 +1,427 @@
 -- =====================================================
--- VELOCÍMETRO MODERNO - MTA:SA
--- Diseño futurista con efectos visuales avanzados
+-- VELOCÍMETRO PREMIUM - ESTILO DASHBOARD DE LUJO
+-- Inspirado en BMW, Audi, Mercedes-Benz
+-- Con efectos visuales avanzados y animaciones suaves
 -- =====================================================
 
 local sw, sh = guiGetScreenSize()
+local font = dxCreateFont("fonts/Poppins-Bold.ttf", 14) or "default-bold"
+local fontLight = dxCreateFont("fonts/Poppins-Light.ttf", 12) or "default"
 
--- ================= CONFIG =================
-local MAX_SPEED = 260
-local MAX_RPM   = 8000
+-- ================= CONFIGURACIÓN =================
+local CONFIG = {
+    maxSpeed = 280,
+    maxRPM = 8500,
+    smoothFactor = 0.15,
+    glowIntensity = 0.6,
+    arcQuality = 2, -- Menor = más suave pero más pesado
+}
 
 local UI = {
-    radius = 100,
-    spacing = 260,
-    bottom = 50
+    scale = 1,
+    gaugeRadius = 110,
+    gaugeSpacing = 280,
+    bottomMargin = 50,
+    glowRadius = 140,
 }
 
-local colors = {
-    bg      = tocolor(5,5,10,240),
-    bgLight = tocolor(15,15,25,200),
-    white   = tocolor(255,255,255,255),
-    gray    = tocolor(180,180,180,220),
-    green   = tocolor(0,255,150,255),
-    cyan    = tocolor(0,255,255,255),
-    blue    = tocolor(100,200,255,255),
-    yellow  = tocolor(255,220,0,255),
-    orange  = tocolor(255,150,0,255),
-    red     = tocolor(255,80,80,255),
-    purple  = tocolor(200,100,255,255)
+-- ================= PALETA DE COLORES PREMIUM =================
+local COLORS = {
+    -- Backgrounds
+    bgPrimary = tocolor(12, 15, 23, 245),
+    bgGlass = tocolor(18, 22, 33, 200),
+    bgDark = tocolor(8, 10, 15, 220),
+    
+    -- Principales
+    primary = tocolor(0, 230, 255, 255),      -- Cyan brillante
+    secondary = tocolor(138, 180, 248, 255),  -- Azul suave
+    accent = tocolor(255, 107, 107, 255),     -- Rojo elegante
+    
+    -- Estados
+    success = tocolor(46, 213, 115, 255),
+    warning = tocolor(255, 184, 0, 255),
+    danger = tocolor(255, 71, 87, 255),
+    
+    -- Neutros
+    white = tocolor(255, 255, 255, 255),
+    lightGray = tocolor(180, 188, 210, 255),
+    gray = tocolor(120, 130, 155, 200),
+    darkGray = tocolor(60, 68, 88, 255),
+    
+    -- Glow effects
+    glowCyan = tocolor(0, 230, 255, 80),
+    glowRed = tocolor(255, 71, 87, 80),
+    glowGreen = tocolor(46, 213, 115, 80),
 }
 
-local smoothSpeed = 0
-local smoothRPM   = 0
-local isInVehicle = false
-local currentVehicle = nil
-local fuelLevel = 100
+-- ================= VARIABLES DE ESTADO =================
+local state = {
+    speed = 0,
+    rpm = 0,
+    smoothSpeed = 0,
+    smoothRPM = 0,
+    gear = "P",
+    fuel = 100,
+    temp = 90,
+    isInVehicle = false,
+    currentVehicle = nil,
+    engineOn = false,
+    lightsOn = false,
+    pulse = 0,
+}
 
--- ================= UTILS =================
-local function speedKMH(v)
-    if not v or not isElement(v) then return 0 end
-    local x,y,z = getElementVelocity(v)
-    return ((x*x+y*y+z*z)^0.5)*180
+-- ================= FUNCIONES AUXILIARES =================
+
+local function interpolate(current, target, factor)
+    return current + (target - current) * factor
 end
 
-local function calcRPM(speed)
-    local r = (speed / MAX_SPEED) * MAX_RPM
-    r = math.max(800, math.min(MAX_RPM, r))
-    if speed < 5 then
-        r = 800 + math.sin(getTickCount()/120)*50
-    end
-    return r
+local function speedKMH(vehicle)
+    if not vehicle or not isElement(vehicle) then return 0 end
+    local vx, vy, vz = getElementVelocity(vehicle)
+    return math.floor(((vx^2 + vy^2 + vz^2)^0.5) * 180)
 end
 
-local function gearFromSpeed(speed)
-    if speed < 5 then return "N"
-    elseif speed < 25 then return 1
-    elseif speed < 45 then return 2
-    elseif speed < 70 then return 3
-    elseif speed < 100 then return 4
-    elseif speed < 140 then return 5
-    else return 6 end
+local function calculateRPM(speed, gear)
+    if speed < 3 then
+        -- Motor en ralentí con vibración
+        return 900 + math.sin(getTickCount() / 100) * 80
+    end
+    
+    local baseRPM = (speed / CONFIG.maxSpeed) * CONFIG.maxRPM
+    local gearRatio = {6500, 5500, 4800, 4200, 3800, 3400}
+    local gearNum = tonumber(gear) or 1
+    
+    if gearNum >= 1 and gearNum <= 6 then
+        baseRPM = math.min(baseRPM * (gearRatio[gearNum] / 3500), CONFIG.maxRPM)
+    end
+    
+    return math.max(900, math.min(CONFIG.maxRPM, baseRPM))
 end
 
--- Texto con sombra mejorada
-local function shadowText(text,x,y,c,s,f,aX,aY,glow)
-    local glowColor = glow or tocolor(0,0,0,150)
-    -- Sombra múltiple para efecto de profundidad
-    dxDrawText(text,x+2,y+2,x,y,glowColor,s*1.1,f,aX,aY,false,false,false,false,false)
-    dxDrawText(text,x+1,y+1,x,y,glowColor,s,f,aX,aY,false,false,false,false,false)
-    -- Texto principal
-    dxDrawText(text,x,y,x,y,c,s,f,aX,aY,false,false,false,false,false)
+local function getGearFromSpeed(speed)
+    if speed < 2 then return "P"
+    elseif speed < 5 then return "1"
+    elseif speed < 30 then return "2"
+    elseif speed < 55 then return "3"
+    elseif speed < 85 then return "4"
+    elseif speed < 120 then return "5"
+    else return "6" end
 end
 
--- Círculo con efecto de brillo
-local function drawGlowCircle(cx,cy,r,color,w,glow)
-    glow = glow or false
-    -- Brillo exterior
-    if glow then
-        for i=0,360,4 do
-            local a = math.rad(i)
-            local glowR = r + 3
-            dxDrawLine(
-                cx+math.cos(a)*glowR,
-                cy+math.sin(a)*glowR,
-                cx+math.cos(a)*(glowR-2),
-                cy+math.sin(a)*(glowR-2),
-                tocolor(color[1],color[2],color[3],50),1
-            )
-        end
-    end
-    -- Círculo principal
-    for i=0,360,2 do
-        local a = math.rad(i)
-        dxDrawLine(
-            cx+math.cos(a)*r,
-            cy+math.sin(a)*r,
-            cx+math.cos(a)*(r-w),
-            cy+math.sin(a)*(r-w),
-            color,w
-        )
-    end
-end
-
--- Arco con gradiente y brillo
-local function drawGlowArc(cx,cy,r,startA,endA,color1,color2,w)
-    local steps = math.floor((endA - startA) / 1.5)
-    for i=0,steps do
-        local a = startA + (i/steps) * (endA - startA)
-        local rad = math.rad(a)
-        local ratio = i / steps
-        
-        -- Gradiente de color
-        local r = color1[1] + (color2[1] - color1[1]) * ratio
-        local g = color1[2] + (color2[2] - color1[2]) * ratio
-        local b = color1[3] + (color2[3] - color1[3]) * ratio
-        
-        -- Línea principal
-        dxDrawLine(
-            cx+math.cos(rad)*r,
-            cy+math.sin(rad)*r,
-            cx+math.cos(rad)*(r-w),
-            cy+math.sin(rad)*(r-w),
-            tocolor(r,g,b,255),w
-        )
-        
-        -- Brillo superior
-        if i % 3 == 0 then
-            dxDrawLine(
-                cx+math.cos(rad)*(r-w+1),
-                cy+math.sin(rad)*(r-w+1),
-                cx+math.cos(rad)*(r-w),
-                cy+math.sin(rad)*(r-w),
-                tocolor(255,255,255,100),1
-            )
-        end
-    end
-end
-
--- Barra de progreso moderna
-local function drawModernBar(x,y,w,h,percent,color1,color2)
-    -- Fondo
-    dxDrawRectangle(x,y,w,h,tocolor(0,0,0,180),false)
-    dxDrawRectangle(x+1,y+1,w-2,h-2,tocolor(20,20,30,255),false)
+local function getDynamicColor(value, max, reverse)
+    local percent = value / max
+    if reverse then percent = 1 - percent end
     
-    if percent > 0 then
-        local fillW = (percent/100)*w
-        
-        -- Gradiente
-        for i=0,fillW-1 do
-            local ratio = i/w
-            local r = color1[1] + (color2[1] - color1[1]) * ratio
-            local g = color1[2] + (color2[2] - color1[2]) * ratio
-            local b = color1[3] + (color2[3] - color1[3]) * ratio
-            dxDrawRectangle(x+i,y,1,h,tocolor(r,g,b,255),false)
-        end
-        
-        -- Brillo superior
-        dxDrawRectangle(x,y,fillW,2,tocolor(255,255,255,120),false)
-        
-        -- Borde brillante
-        dxDrawRectangle(x,y,fillW,1,tocolor(255,255,255,80),false)
-    end
-    
-    -- Borde exterior
-    dxDrawRectangle(x,y,w,1,tocolor(255,255,255,50),false)
-    dxDrawRectangle(x,y+h-1,w,1,tocolor(255,255,255,50),false)
-end
-
--- ================= DRAW =================
-addEventHandler("onClientRender",root,function()
-    local veh = getPedOccupiedVehicle(localPlayer)
-    if not veh or getPedOccupiedVehicleSeat(localPlayer) ~= 0 then return end
-
-    local speed = speedKMH(veh)
-    local rpm   = calcRPM(speed)
-    local gear  = gearFromSpeed(speed)
-    local fuel  = getElementData(veh,"vehicle:fuel") or fuelLevel
-    local hp    = math.floor(getElementHealth(veh)/10)
-    local engineState = getVehicleEngineState(veh)
-    local lightsState = getVehicleOverrideLights(veh)
-
-    -- Suavizado mejorado
-    smoothSpeed = smoothSpeed + (speed - smoothSpeed)*0.15
-    smoothRPM   = smoothRPM   + (rpm   - smoothRPM)  *0.15
-
-    local cx = sw/2
-    local cy = sh - UI.radius - UI.bottom
-
-    local leftX  = cx - UI.spacing/2
-    local rightX = cx + UI.spacing/2
-
-    -- FONDO MODERNO CON GRADIENTE
-    dxDrawRectangle(cx-400,cy-150,800,300,colors.bg)
-    -- Efecto de borde superior
-    dxDrawRectangle(cx-400,cy-150,800,2,tocolor(0,255,255,100),false)
-    -- Efecto de borde inferior
-    dxDrawRectangle(cx-400,cy+148,800,2,tocolor(0,255,255,100),false)
-
-    -- ========= RPM (IZQUIERDA) - ESTILO MODERNO =========
-    -- Círculo con brillo
-    drawGlowCircle(leftX,cy,UI.radius,tocolor(40,40,50,200),2,true)
-    
-    -- Arco RPM con gradiente (amarillo a naranja)
-    local rpmAngle = (smoothRPM/MAX_RPM)*270
-    if rpmAngle > 0 then
-        drawGlowArc(leftX,cy,UI.radius,-225,-225+rpmAngle,
-            {255,220,0},{255,150,0},7)
-    end
-    
-    -- Texto RPM moderno
-    shadowText(math.floor(smoothRPM/1000).."K",
-        leftX,cy+45,colors.yellow,1.1,"default-bold","center","top",tocolor(255,220,0,100))
-    shadowText("RPM",leftX,cy+65,colors.gray,0.75,"default","center","top")
-
-    -- ========= SPEED (DERECHA) - ESTILO MODERNO =========
-    -- Círculo con brillo
-    drawGlowCircle(rightX,cy,UI.radius,tocolor(40,40,50,200),2,true)
-    
-    -- Arco velocidad con gradiente (cyan a azul)
-    local spdAngle = (smoothSpeed/MAX_SPEED)*270
-    if spdAngle > 0 then
-        drawGlowArc(rightX,cy,UI.radius,-225,-225+spdAngle,
-            {0,255,255},{100,200,255},7)
-    end
-    
-    -- Velocidad grande y moderna
-    shadowText(string.format("%03d",math.floor(smoothSpeed)),
-        rightX,cy-30,colors.cyan,3.2,"default-bold","center","center",tocolor(0,255,255,80))
-    shadowText("KM/H",rightX,cy+25,colors.gray,0.9,"default","center","top")
-
-    -- ========= CENTER (MARCHA) - ESTILO MODERNO =========
-    -- Fondo para la marcha
-    dxDrawRectangle(cx-35,cy-50,70,70,tocolor(0,0,0,180),false)
-    dxDrawRectangle(cx-33,cy-48,66,66,tocolor(20,20,30,255),false)
-    dxDrawRectangle(cx-33,cy-48,66,2,tocolor(0,255,255,150),false) -- Borde superior
-    
-    shadowText("GEAR",cx,cy-40,colors.gray,0.85,"default","center","top")
-    shadowText(gear,cx,cy-10,colors.cyan,3.0,"default-bold","center","center",tocolor(0,255,255,100))
-
-    -- ========= COMBUSTIBLE MODERNO =========
-    local barW = 200
-    local barX = cx - barW/2
-    local barY = cy + 70
-    
-    -- Título
-    shadowText("FUEL",cx,barY,colors.gray,0.8,"default","center","top")
-    
-    -- Barra moderna con gradiente
-    local fuelColor1, fuelColor2
-    if fuel > 50 then
-        fuelColor1 = {0,255,150}
-        fuelColor2 = {0,200,255}
-    elseif fuel > 20 then
-        fuelColor1 = {255,220,0}
-        fuelColor2 = {255,150,0}
+    if percent > 0.7 then
+        return COLORS.success
+    elseif percent > 0.4 then
+        return COLORS.warning
     else
-        fuelColor1 = {255,80,80}
-        fuelColor2 = {255,0,0}
-    end
-    
-    drawModernBar(barX,barY+15,barW,12,fuel,fuelColor1,fuelColor2)
-    
-    -- Porcentaje
-    shadowText(math.floor(fuel).."%",cx,barY+32,colors.white,0.95,"default-bold","center","top")
-
-    -- ========= STATUS MODERNO =========
-    -- HP (Izquierda)
-    local hpColor = hp>60 and colors.green or hp>30 and colors.orange or colors.red
-    shadowText("HP "..hp.."%",cx-220,cy-90,hpColor,1.0,"default-bold","left","top")
-    
-    -- Motor (Derecha superior)
-    local engineColor = engineState and colors.green or colors.red
-    local engineText = engineState and "ON" or "OFF"
-    shadowText("ENG "..engineText,cx+200,cy-90,engineColor,1.0,"default-bold","left","top")
-    
-    -- Luces (Derecha inferior)
-    local lightsColor = (lightsState == 2) and colors.yellow or colors.gray
-    local lightsText = (lightsState == 2) and "ON" or "OFF"
-    shadowText("LGT "..lightsText,cx+200,cy-70,lightsColor,1.0,"default-bold","left","top")
-
-    -- Advertencia de combustible bajo (moderna)
-    if fuel <= 15 then
-        local blinkAlpha = (getTickCount() % 1000 < 500) and 255 or 120
-        -- Fondo de advertencia
-        dxDrawRectangle(cx-150,cy-120,300,40,tocolor(255,0,0,blinkAlpha*0.3),false)
-        dxDrawRectangle(cx-150,cy-120,300,2,tocolor(255,80,80,blinkAlpha),false)
-        dxDrawRectangle(cx-150,cy-78,300,2,tocolor(255,80,80,blinkAlpha),false)
-        
-        shadowText("⚠ LOW FUEL ⚠",cx,cy-105,tocolor(255,80,80,blinkAlpha),1.4,"default-bold","center","center")
-    end
-end)
-
--- ================= ACTUALIZACIÓN DE ESTADO =================
-function updateSpeedometer()
-    local vehicle = getPedOccupiedVehicle(localPlayer)
-    
-    if vehicle and vehicle ~= currentVehicle then
-        isInVehicle = true
-        currentVehicle = vehicle
-        smoothSpeed = 0
-        smoothRPM = 0
-        triggerServerEvent("speedometer:getFuel", localPlayer, vehicle)
-    elseif not vehicle and isInVehicle then
-        isInVehicle = false
-        currentVehicle = nil
+        return COLORS.danger
     end
 end
 
-setTimer(updateSpeedometer, 100, 0)
+-- ================= FUNCIONES DE DIBUJO =================
 
--- ================= EVENTOS DE VEHÍCULO =================
+local function drawTextShadow(text, x, y, color, scale, font, alignX, alignY, blur)
+    blur = blur or 2
+    local shadowAlpha = 180
+    
+    for i = 1, blur do
+        dxDrawText(text, x + i, y + i, x + i, y + i, 
+            tocolor(0, 0, 0, shadowAlpha / blur), 
+            scale, font, alignX, alignY, false, false, false, true, false)
+    end
+    
+    dxDrawText(text, x, y, x, y, color, scale, font, alignX, alignY, false, false, false, true, false)
+end
+
+local function drawGlow(x, y, radius, color, intensity)
+    intensity = intensity or 1
+    for i = 1, 4 do
+        local r = radius + (i * 8)
+        local alpha = (120 / i) * intensity
+        local glowColor = tocolor(
+            math.floor(color[1] or 0),
+            math.floor(color[2] or 0),
+            math.floor(color[3] or 0),
+            math.floor(alpha)
+        )
+        
+        for angle = 0, 360, 8 do
+            local rad = math.rad(angle)
+            local x1 = x + math.cos(rad) * r
+            local y1 = y + math.sin(rad) * r
+            dxDrawRectangle(x1 - 2, y1 - 2, 4, 4, glowColor, false, false)
+        end
+    end
+end
+
+local function drawCircularGauge(cx, cy, radius, value, maxValue, color, glowColor, showMarks)
+    local startAngle = -225
+    local endAngle = 45
+    local totalAngle = endAngle - startAngle
+    local valueAngle = (value / maxValue) * totalAngle
+    
+    -- Fondo del gauge (arco completo)
+    for angle = startAngle, endAngle, CONFIG.arcQuality do
+        local rad = math.rad(angle)
+        local x1 = cx + math.cos(rad) * radius
+        local y1 = cy + math.sin(rad) * radius
+        local x2 = cx + math.cos(rad) * (radius - 8)
+        local y2 = cy + math.sin(rad) * (radius - 8)
+        dxDrawLine(x1, y1, x2, y2, COLORS.darkGray, 3, false)
+    end
+    
+    -- Marcas del gauge
+    if showMarks then
+        for i = 0, 10 do
+            local angle = startAngle + (totalAngle / 10) * i
+            local rad = math.rad(angle)
+            local markSize = (i % 2 == 0) and 12 or 6
+            local x1 = cx + math.cos(rad) * radius
+            local y1 = cy + math.sin(rad) * radius
+            local x2 = cx + math.cos(rad) * (radius - markSize)
+            local y2 = cy + math.sin(rad) * (radius - markSize)
+            dxDrawLine(x1, y1, x2, y2, COLORS.gray, 2, false)
+        end
+    end
+    
+    -- Arco de valor (animado)
+    if valueAngle > 0 then
+        for angle = startAngle, startAngle + valueAngle, CONFIG.arcQuality do
+            local rad = math.rad(angle)
+            local x1 = cx + math.cos(rad) * radius
+            local y1 = cy + math.sin(rad) * radius
+            local x2 = cx + math.cos(rad) * (radius - 8)
+            local y2 = cy + math.sin(rad) * (radius - 8)
+            
+            -- Gradiente de color
+            local progress = (angle - startAngle) / valueAngle
+            local alpha = 200 + (55 * progress)
+            local gradientColor = tocolor(
+                color[1] or 255,
+                color[2] or 255,
+                color[3] or 255,
+                math.floor(alpha)
+            )
+            
+            dxDrawLine(x1, y1, x2, y2, gradientColor, 4, false)
+        end
+        
+        -- Punto final brillante
+        local finalAngle = math.rad(startAngle + valueAngle)
+        local dotX = cx + math.cos(finalAngle) * (radius - 4)
+        local dotY = cy + math.sin(finalAngle) * (radius - 4)
+        
+        dxDrawRectangle(dotX - 5, dotY - 5, 10, 10, color, false, false)
+        dxDrawRectangle(dotX - 3, dotY - 3, 6, 6, COLORS.white, false, false)
+    end
+end
+
+local function drawPanel(x, y, w, h, title)
+    -- Panel con efecto glass
+    dxDrawRectangle(x, y, w, h, COLORS.bgGlass, false, false)
+    dxDrawRectangle(x, y, w, 2, COLORS.primary, false, false)
+    
+    if title then
+        drawTextShadow(title, x + w/2, y + 8, COLORS.lightGray, 0.7, fontLight, "center", "top")
+    end
+end
+
+-- ================= RENDERIZADO PRINCIPAL =================
+
+local function renderSpeedometer()
+    local vehicle = getPedOccupiedVehicle(localPlayer)
+    if not vehicle or getPedOccupiedVehicleSeat(localPlayer) ~= 0 then 
+        state.isInVehicle = false
+        return 
+    end
+    
+    state.isInVehicle = true
+    state.currentVehicle = vehicle
+    
+    -- Actualizar valores
+    state.speed = speedKMH(vehicle)
+    state.gear = getGearFromSpeed(state.speed)
+    state.rpm = calculateRPM(state.speed, state.gear)
+    state.fuel = getElementData(vehicle, "vehicle:fuel") or 100
+    state.engineOn = getVehicleEngineState(vehicle)
+    state.lightsOn = getVehicleOverrideLights(vehicle) == 2
+    state.pulse = (math.sin(getTickCount() / 500) + 1) / 2
+    
+    -- Interpolación suave
+    state.smoothSpeed = interpolate(state.smoothSpeed, state.speed, CONFIG.smoothFactor)
+    state.smoothRPM = interpolate(state.smoothRPM, state.rpm, CONFIG.smoothFactor)
+    
+    -- Posiciones
+    local centerX = sw / 2
+    local centerY = sh - UI.gaugeRadius - UI.bottomMargin
+    local leftX = centerX - UI.gaugeSpacing / 2
+    local rightX = centerX + UI.gaugeSpacing / 2
+    
+    -- Panel principal
+    local panelW = 900
+    local panelH = 280
+    dxDrawRectangle(centerX - panelW/2, centerY - 150, panelW, panelH, COLORS.bgPrimary, false, false)
+    dxDrawRectangle(centerX - panelW/2, centerY - 150, panelW, 3, COLORS.primary, false, false)
+    
+    -- ========= GAUGE RPM (IZQUIERDA) =========
+    local rpmColor = state.smoothRPM > 7000 and 
+        {255, 71, 87} or {138, 180, 248}
+    
+    drawCircularGauge(leftX, centerY, UI.gaugeRadius, 
+        state.smoothRPM, CONFIG.maxRPM, 
+        tocolor(rpmColor[1], rpmColor[2], rpmColor[3], 255),
+        COLORS.glowCyan, true)
+    
+    -- Texto RPM
+    local rpmDisplay = string.format("%.1f", state.smoothRPM / 1000)
+    drawTextShadow(rpmDisplay, leftX, centerY - 10, COLORS.white, 2.2, font, "center", "center")
+    drawTextShadow("x1000 RPM", leftX, centerY + 30, COLORS.lightGray, 0.8, fontLight, "center", "top")
+    
+    -- ========= GAUGE VELOCIDAD (DERECHA) =========
+    local speedColor = {0, 230, 255}
+    
+    drawCircularGauge(rightX, centerY, UI.gaugeRadius, 
+        state.smoothSpeed, CONFIG.maxSpeed, 
+        tocolor(speedColor[1], speedColor[2], speedColor[3], 255),
+        COLORS.glowCyan, true)
+    
+    -- Texto velocidad
+    local speedDisplay = string.format("%03d", math.floor(state.smoothSpeed))
+    drawTextShadow(speedDisplay, rightX, centerY - 10, COLORS.white, 3, font, "center", "center")
+    drawTextShadow("KM/H", rightX, centerY + 35, COLORS.lightGray, 0.9, fontLight, "center", "top")
+    
+    -- ========= PANEL CENTRAL (MARCHA) =========
+    local gearPanelW = 120
+    local gearPanelH = 140
+    drawPanel(centerX - gearPanelW/2, centerY - 70, gearPanelW, gearPanelH, "GEAR")
+    
+    -- Marcha actual con glow
+    local gearColor = state.gear == "P" and COLORS.lightGray or COLORS.primary
+    drawTextShadow(state.gear, centerX, centerY + 10, gearColor, 4.5, font, "center", "center")
+    
+    -- ========= PANEL DE COMBUSTIBLE =========
+    local fuelPanelW = 280
+    local fuelPanelH = 50
+    drawPanel(centerX - fuelPanelW/2, centerY + 80, fuelPanelW, fuelPanelH, nil)
+    
+    -- Barra de combustible con gradiente
+    local fuelBarW = fuelPanelW - 20
+    local fuelBarH = 12
+    local fuelBarX = centerX - fuelBarW/2
+    local fuelBarY = centerY + 95
+    
+    dxDrawRectangle(fuelBarX, fuelBarY, fuelBarW, fuelBarH, COLORS.bgDark, false, false)
+    
+    local fuelColor = getDynamicColor(state.fuel, 100, true)
+    local fuelWidth = (state.fuel / 100) * fuelBarW
+    dxDrawRectangle(fuelBarX, fuelBarY, fuelWidth, fuelBarH, fuelColor, false, false)
+    
+    -- Texto combustible
+    drawTextShadow("FUEL " .. math.floor(state.fuel) .. "%", 
+        centerX, fuelBarY + fuelBarH + 5, COLORS.white, 0.8, fontLight, "center", "top")
+    
+    -- ========= INDICADORES LATERALES =========
+    -- Panel izquierdo
+    local leftPanelX = centerX - panelW/2 + 20
+    local leftPanelY = centerY - 120
+    
+    drawTextShadow("VEHICLE STATUS", leftPanelX, leftPanelY, COLORS.lightGray, 0.7, fontLight, "left", "top")
+    
+    local health = math.floor(getElementHealth(vehicle) / 10)
+    local healthColor = getDynamicColor(health, 100, true)
+    drawTextShadow("HP: " .. health .. "%", leftPanelX, leftPanelY + 20, healthColor, 0.9, font, "left", "top")
+    
+    local engineColor = state.engineOn and COLORS.success or COLORS.danger
+    local enginePulse = state.engineOn and 255 or (100 + state.pulse * 155)
+    drawTextShadow("ENGINE: " .. (state.engineOn and "ON" or "OFF"), 
+        leftPanelX, leftPanelY + 42, 
+        tocolor(engineColor[1], engineColor[2], engineColor[3], enginePulse), 
+        0.9, font, "left", "top")
+    
+    -- Panel derecho
+    local rightPanelX = centerX + panelW/2 - 20
+    local rightPanelY = centerY - 120
+    
+    drawTextShadow("SYSTEMS", rightPanelX, rightPanelY, COLORS.lightGray, 0.7, fontLight, "right", "top")
+    
+    local lightsColor = state.lightsOn and COLORS.warning or COLORS.gray
+    drawTextShadow("LIGHTS: " .. (state.lightsOn and "ON" or "OFF"), 
+        rightPanelX, rightPanelY + 20, lightsColor, 0.9, font, "right", "top")
+    
+    local tempColor = COLORS.success
+    drawTextShadow("TEMP: " .. state.temp .. "°C", 
+        rightPanelX, rightPanelY + 42, tempColor, 0.9, font, "right", "top")
+    
+    -- ========= ADVERTENCIAS =========
+    if state.fuel <= 15 then
+        local warningAlpha = 100 + (state.pulse * 155)
+        drawTextShadow("⚠ LOW FUEL WARNING ⚠", 
+            centerX, centerY - 130, 
+            tocolor(255, 71, 87, warningAlpha), 
+            1.3, font, "center", "top", 3)
+    end
+    
+    if state.smoothRPM > 7500 then
+        local redlineAlpha = 150 + (state.pulse * 105)
+        drawTextShadow("⚠ REDLINE ⚠", 
+            leftX, centerY - 90, 
+            tocolor(255, 71, 87, redlineAlpha), 
+            1.1, font, "center", "top", 2)
+    end
+end
+
+-- ================= EVENTOS =================
+
+addEventHandler("onClientRender", root, renderSpeedometer)
+
 addEventHandler("onClientPlayerVehicleEnter", localPlayer, function(vehicle, seat)
     if seat == 0 then
-        isInVehicle = true
-        currentVehicle = vehicle
-        smoothSpeed = 0
-        smoothRPM = 0
+        state.smoothSpeed = 0
+        state.smoothRPM = 0
         triggerServerEvent("speedometer:getFuel", localPlayer, vehicle)
     end
 end)
 
 addEventHandler("onClientPlayerVehicleExit", localPlayer, function(vehicle, seat)
     if seat == 0 then
-        isInVehicle = false
-        currentVehicle = nil
+        state.isInVehicle = false
+        state.currentVehicle = nil
     end
 end)
 
--- ================= EVENTOS DE COMBUSTIBLE =================
+-- Eventos de combustible
 addEvent("speedometer:receiveFuel", true)
 addEventHandler("speedometer:receiveFuel", root, function(fuel)
-    fuelLevel = fuel or 100
-    if currentVehicle then
-        setElementData(currentVehicle, "vehicle:fuel", fuelLevel)
-    end
+    state.fuel = fuel or 100
 end)
 
 addEvent("speedometer:updateFuel", true)
 addEventHandler("speedometer:updateFuel", root, function(fuel)
-    fuelLevel = fuel or fuelLevel
-    if currentVehicle then
-        setElementData(currentVehicle, "vehicle:fuel", fuelLevel)
+    state.fuel = fuel or state.fuel
+end)
+
+-- ================= INICIALIZACIÓN =================
+
+addEventHandler("onClientResourceStart", resourceRoot, function()
+    setPlayerHudComponentVisible("vehicle_name", false)
+    setPlayerHudComponentVisible("area_name", false)
+    outputChatBox("✓ Velocímetro Premium cargado correctamente", 46, 213, 115)
+end)
+
+addEventHandler("onClientResourceStop", resourceRoot, function()
+    setPlayerHudComponentVisible("vehicle_name", true)
+    setPlayerHudComponentVisible("area_name", true)
+end)
+
+-- ================= OPTIMIZACIÓN =================
+-- Timer para actualizar combustible cada 5 segundos
+setTimer(function()
+    if state.currentVehicle and isElement(state.currentVehicle) then
+        local fuel = getElementData(state.currentVehicle, "vehicle:fuel")
+        if fuel then state.fuel = fuel end
     end
-end)
-
--- ================= HUD =================
-addEventHandler("onClientResourceStart",resourceRoot,function()
-    setPlayerHudComponentVisible("vehicle_name",false)
-    setPlayerHudComponentVisible("area_name",false)
-end)
-
-addEventHandler("onClientResourceStop",resourceRoot,function()
-    setPlayerHudComponentVisible("vehicle_name",true)
-    setPlayerHudComponentVisible("area_name",true)
-end)
+end, 5000, 0)
