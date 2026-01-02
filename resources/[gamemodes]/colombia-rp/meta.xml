@@ -529,9 +529,11 @@
     <file src="html/login.html"/>
     <file src="html/login.css"/>
     <file src="html/login.js"/>
+    <file src="html/characters.html"/>
+    <file src="html/characters.css"/>
+    <file src="html/characters.js"/>
     
     <!-- Archivos -->
     <file src="colombia-rp-login.png" type="client" />
-    <file src="client/character.html" type="client" />
 </meta>
 
