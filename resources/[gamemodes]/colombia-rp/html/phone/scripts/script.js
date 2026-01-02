@@ -3,6 +3,12 @@
 const get = (element) => { return document.querySelector(element) };
 const getAll = (element) => { return document.querySelectorAll(element) };
 
+// Variables para el gesto de arrastre
+let isDragging = false;
+let startY = 0;
+let currentY = 0;
+let dragThreshold = 50; // Píxeles que debe arrastrar para cerrar
+
 const config = {
     battery: {
         getValue: () => get('.battery .bar').style.width,
@@ -23,6 +29,127 @@ onload = () => {
     }
     // Inicializar isInHomeScreen
     isInHomeScreen = true;
+    
+    // Agregar eventos de arrastre para cerrar el teléfono
+    setupDragToClose();
+}
+
+// Función para configurar el gesto de arrastre hacia abajo para cerrar
+function setupDragToClose() {
+    const iphone = get('.iphone');
+    if (!iphone) return;
+    
+    // Área superior del teléfono donde se puede arrastrar (notch y área superior)
+    const dragArea = document.createElement('div');
+    dragArea.style.position = 'absolute';
+    dragArea.style.top = '0';
+    dragArea.style.left = '0';
+    dragArea.style.right = '0';
+    dragArea.style.height = '80px';
+    dragArea.style.zIndex = '1000';
+    dragArea.style.cursor = 'grab';
+    dragArea.style.userSelect = 'none';
+    iphone.appendChild(dragArea);
+    
+    // Evento cuando se presiona el mouse/touch
+    dragArea.addEventListener('mousedown', handleDragStart);
+    dragArea.addEventListener('touchstart', handleDragStart, { passive: false });
+    
+    // Evento cuando se mueve el mouse/touch
+    document.addEventListener('mousemove', handleDragMove);
+    document.addEventListener('touchmove', handleDragMove, { passive: false });
+    
+    // Evento cuando se suelta el mouse/touch
+    document.addEventListener('mouseup', handleDragEnd);
+    document.addEventListener('touchend', handleDragEnd);
+}
+
+function handleDragStart(e) {
+    isDragging = true;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    startY = clientY;
+    currentY = clientY;
+    
+    // Prevenir scroll mientras se arrastra
+    if (e.touches) {
+        e.preventDefault();
+    }
+}
+
+function handleDragMove(e) {
+    if (!isDragging) return;
+    
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    currentY = clientY;
+    
+    const deltaY = currentY - startY;
+    
+    // Solo permitir arrastre hacia abajo
+    if (deltaY > 0) {
+        const iphone = get('.iphone');
+        if (iphone) {
+            // Mover el teléfono visualmente mientras se arrastra
+            const maxMove = 200; // Máximo movimiento en píxeles
+            const moveAmount = Math.min(deltaY, maxMove);
+            iphone.style.transform = `translateY(${moveAmount}px)`;
+            iphone.style.transition = 'none';
+            
+            // Cambiar opacidad mientras se arrastra
+            const opacity = 1 - (moveAmount / maxMove) * 0.5;
+            iphone.style.opacity = opacity;
+        }
+        
+        // Prevenir scroll
+        if (e.touches) {
+            e.preventDefault();
+        }
+    }
+}
+
+function handleDragEnd(e) {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    const deltaY = currentY - startY;
+    
+    const iphone = get('.iphone');
+    if (iphone) {
+        // Restaurar transición
+        iphone.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        
+        // Si se arrastró lo suficiente, cerrar el teléfono
+        if (deltaY > dragThreshold) {
+            // Guardar contactos antes de cerrar
+            saveContactsToMTA();
+            
+            // Cerrar el teléfono
+            if (window.mta && window.mta.triggerEvent) {
+                window.mta.triggerEvent('closePhoneFromBrowser');
+            }
+            // Resetear posición
+            iphone.style.transform = 'translateY(0)';
+            iphone.style.opacity = '1';
+        } else {
+            // Volver a la posición original
+            iphone.style.transform = 'translateY(0)';
+            iphone.style.opacity = '1';
+        }
+    }
+    
+    startY = 0;
+    currentY = 0;
+}
+
+// Función para guardar contactos en MTA
+function saveContactsToMTA() {
+    if (window.mta && window.mta.triggerEvent && contacts.length > 0) {
+        try {
+            window.mta.triggerEvent('saveContacts', JSON.stringify(contacts));
+            console.log('Contactos guardados al cerrar el teléfono');
+        } catch (e) {
+            console.error('Error al guardar contactos:', e);
+        }
+    }
 }
 
 const [lock, unlock] = [get('.lock-screen'), get('.unlock-screen')];
@@ -53,6 +180,9 @@ function returnToHomePage() {
     
     // Si ya está en el home (unlock visible y interfaces ocultas), cerrar el teléfono
     if (unlockVisible && !interfacesVisible) {
+        // Guardar contactos antes de cerrar
+        saveContactsToMTA();
+        
         // Cerrar el teléfono enviando evento a MTA
         if (window.mta && window.mta.triggerEvent) {
             window.mta.triggerEvent('closePhoneFromBrowser');
