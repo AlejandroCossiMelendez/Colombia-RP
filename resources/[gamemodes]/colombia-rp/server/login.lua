@@ -1,4 +1,11 @@
 -- Sistema de Login y Registro
+
+-- ==================== REGISTRAR EVENTOS PRIMERO ====================
+-- Es CRÍTICO registrar los eventos ANTES de cualquier otra cosa
+-- Estos eventos DEBEN estar al inicio del archivo para estar disponibles inmediatamente
+addEvent("onPlayerLogin", true)
+addEvent("onPlayerRegister", true)
+
 -- Hash de contraseña usando md5 (más seguro que hash() que requiere permisos)
 function hashPassword(password)
     -- Usar md5 que no requiere permisos especiales
@@ -59,7 +66,6 @@ addEventHandler("onResourceStart", resourceRoot, function()
 end)
 
 -- Evento de login desde el cliente
-addEvent("onPlayerLogin", true)
 addEventHandler("onPlayerLogin", root, function(username, password)
     if not username or not password then
         triggerClientEvent(source, "loginResponse", resourceRoot, false, "Usuario y contraseña requeridos")
@@ -93,7 +99,6 @@ addEventHandler("onPlayerLogin", root, function(username, password)
 end)
 
 -- Evento de registro desde el cliente
-addEvent("onPlayerRegister", true)
 addEventHandler("onPlayerRegister", root, function(username, password, email)
     if not username or not password or not email then
         triggerClientEvent(source, "registerResponse", resourceRoot, false, "Todos los campos son requeridos")
