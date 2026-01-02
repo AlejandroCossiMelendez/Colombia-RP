@@ -1,10 +1,9 @@
--- Sistema de Login y Registro
-
 -- ==================== REGISTRAR EVENTOS PRIMERO ====================
--- Registrar eventos INMEDIATAMENTE al inicio del archivo
+-- CRÍTICO: Estos eventos DEBEN estar al inicio absoluto del archivo
 addEvent("onPlayerLogin", true)
 addEvent("onPlayerRegister", true)
-outputServerLog("[LOGIN] Eventos registrados: onPlayerLogin, onPlayerRegister")
+
+-- Sistema de Login y Registro
 
 -- Hash de contraseña usando md5 (más seguro que hash() que requiere permisos)
 function hashPassword(password)
@@ -67,6 +66,8 @@ end)
 
 -- Evento de login desde el cliente
 addEventHandler("onPlayerLogin", root, function(username, password)
+    outputServerLog("[LOGIN] Evento onPlayerLogin recibido de " .. getPlayerName(source) .. " con usuario: " .. tostring(username))
+    
     if not username or not password then
         triggerClientEvent(source, "loginResponse", resourceRoot, false, "Usuario y contraseña requeridos")
         return
@@ -97,15 +98,19 @@ addEventHandler("onPlayerLogin", root, function(username, password)
                 end
             end, 500, 1)
         else
+            outputServerLog("[LOGIN] Contraseña incorrecta para usuario: " .. username)
             triggerClientEvent(source, "loginResponse", resourceRoot, false, "Contraseña incorrecta")
         end
     else
+        outputServerLog("[LOGIN] Usuario no encontrado: " .. username)
         triggerClientEvent(source, "loginResponse", resourceRoot, false, "Usuario no encontrado")
     end
 end)
 
 -- Evento de registro desde el cliente
 addEventHandler("onPlayerRegister", root, function(username, password, email)
+    outputServerLog("[LOGIN] Evento onPlayerRegister recibido de " .. getPlayerName(source))
+    
     if not username or not password or not email then
         triggerClientEvent(source, "registerResponse", resourceRoot, false, "Todos los campos son requeridos")
         return
@@ -148,9 +153,11 @@ addEventHandler("onPlayerRegister", root, function(username, password, email)
     local success = executeDatabase(insertQuery, username, hashedPassword, email, dateString, "user")
     
     if success then
+        outputServerLog("[LOGIN] Usuario registrado exitosamente: " .. username)
         outputChatBox("¡Registro exitoso! Ahora puedes iniciar sesión.", source, 0, 255, 0)
         triggerClientEvent(source, "registerResponse", resourceRoot, true, "Registro exitoso")
     else
+        outputServerLog("[LOGIN] Error al registrar usuario: " .. username)
         triggerClientEvent(source, "registerResponse", resourceRoot, false, "Error al crear la cuenta")
     end
 end)
@@ -172,4 +179,3 @@ addEventHandler("onPlayerQuit", root, function()
         executeDatabase(updateQuery, x, y, z, rotation, interior, dimension, health, hunger, thirst, characterId)
     end
 end)
-
