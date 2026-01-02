@@ -85,16 +85,36 @@ function openPhone()
     renderTime(true)
 end
 
--- Variable para rastrear si necesitamos forzar el cursor oculto
-local forceCursorHidden = false
-local phoneClosedTimer = nil
-
--- Función auxiliar para restaurar controles completamente
-local function restoreGameControls()
-    showCursor(false)
-    guiSetInputEnabled(false)
+function closePhone()
+    if not phoneVisible then
+        return
+    end
+    
+    phoneVisible = false
+    
+    -- PRIMERO: Remover event handlers ANTES de hacer cualquier cosa
+    if phoneBrowser and isElement(phoneBrowser) then
+        removeEventHandler("onClientBrowserCreated", phoneBrowser, loadPhoneBrowser)
+        removeEventHandler("onClientBrowserDocumentReady", phoneBrowser, whenPhoneBrowserReady)
+    end
+    
+    -- SEGUNDO: Restaurar modo de entrada ANTES de destruir el navegador
     guiSetInputMode("allow_binds")
     
+    -- TERCERO: Ocultar cursor y deshabilitar input ANTES de destruir
+    showCursor(false)
+    guiSetInputEnabled(false)
+    
+    -- CUARTO: Destruir el navegador
+    if phoneBrowser and isElement(phoneBrowser) then
+        destroyElement(phoneBrowser)
+        phoneBrowser = nil
+        browserContent = nil
+    end
+    
+    renderTime(false)
+    
+    -- QUINTO: Habilitar todos los controles del juego
     local controlsToEnable = {
         "fire", "next_weapon", "previous_weapon", "forwards", "backwards", 
         "left", "right", "jump", "sprint", "crouch", "walk", "enter_exit",
@@ -112,83 +132,24 @@ local function restoreGameControls()
     for _, control in ipairs(controlsToEnable) do
         toggleControl(control, true)
     end
-end
-
-function closePhone()
-    if not phoneVisible then
-        return
-    end
     
-    phoneVisible = false
-    forceCursorHidden = true  -- Activar flag para forzar cursor oculto
-    
-    -- Cancelar timer anterior si existe
-    if phoneClosedTimer and isTimer(phoneClosedTimer) then
-        killTimer(phoneClosedTimer)
-    end
-    
-    -- PRIMERO: Remover event handlers ANTES de hacer cualquier cosa
-    if phoneBrowser and isElement(phoneBrowser) then
-        removeEventHandler("onClientBrowserCreated", phoneBrowser, loadPhoneBrowser)
-        removeEventHandler("onClientBrowserDocumentReady", phoneBrowser, whenPhoneBrowserReady)
-    end
-    
-    -- SEGUNDO: Ocultar el navegador inmediatamente
-    if phoneBrowser and isElement(phoneBrowser) then
-        guiSetVisible(phoneBrowser, false)
-    end
-    
-    -- TERCERO: DESTRUIR el navegador INMEDIATAMENTE para que deje de capturar eventos
-    if phoneBrowser and isElement(phoneBrowser) then
-        destroyElement(phoneBrowser)
-        phoneBrowser = nil
-        browserContent = nil
-    end
-    
-    renderTime(false)
-    
-    -- CUARTO: Restaurar controles INMEDIATAMENTE
-    restoreGameControls()
-    
-    -- QUINTO: Forzar restauración múltiple veces
+    -- SEXTO: Verificación final después de un pequeño delay para asegurar que todo esté correcto
     setTimer(function()
-        restoreGameControls()
-    end, 0, 1)
-    
-    setTimer(function()
-        restoreGameControls()
-    end, 10, 1)
-    
-    setTimer(function()
-        restoreGameControls()
-    end, 50, 1)
-    
-    setTimer(function()
-        restoreGameControls()
-        triggerEvent("phoneClosed", localPlayer)
-    end, 100, 1)
-    
-    -- SEXTO: Mantener el flag activo por 1 segundo para asegurar que el cursor se mantenga oculto
-    phoneClosedTimer = setTimer(function()
-        forceCursorHidden = false
-        phoneClosedTimer = nil
-    end, 1000, 1)
-    
-    -- Notificar inmediatamente que el teléfono se cerró
-    triggerEvent("phoneClosed", localPlayer)
-end
-
--- Handler para forzar cursor oculto después de cerrar el teléfono
--- Este handler se ejecuta cada frame mientras forceCursorHidden sea true
-addEventHandler("onClientRender", root, function()
-    if forceCursorHidden then
+        -- Asegurar que el cursor esté oculto
         if isCursorShowing() then
             showCursor(false)
         end
-        guiSetInputEnabled(false)
+        -- Asegurar que el modo de entrada esté correcto
         guiSetInputMode("allow_binds")
-    end
-end)
+        guiSetInputEnabled(false)
+        -- Habilitar controles nuevamente por si acaso
+        for _, control in ipairs(controlsToEnable) do
+            toggleControl(control, true)
+        end
+        -- Notificar que el teléfono se cerró
+        triggerEvent("phoneClosed", localPlayer)
+    end, 50, 1)
+end
 
 -- Evento del servidor para abrir el teléfono
 addEvent("openPhone", true)
