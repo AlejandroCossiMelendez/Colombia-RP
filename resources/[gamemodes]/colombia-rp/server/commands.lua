@@ -107,3 +107,103 @@ addCommandHandler("revivir", function(player, cmd, characterIdStr)
     end
 end)
 
+-- Comando start (solo admin)
+addCommandHandler("start", function(player, cmd, resourceName)
+    if not isPlayerAdmin(player) then
+        outputChatBox("No tienes permiso para usar este comando. Solo administradores pueden usar /start.", player, 255, 0, 0)
+        return
+    end
+    
+    if not resourceName then
+        outputChatBox("Uso: /start [nombre del recurso]", player, 255, 255, 0)
+        return
+    end
+    
+    -- Ejecutar el comando start
+    local success = startResource(getResourceFromName(resourceName))
+    if success then
+        outputChatBox("Recurso '" .. resourceName .. "' iniciado correctamente.", player, 0, 255, 0)
+        outputServerLog("[ADMIN] " .. getPlayerName(player) .. " inició el recurso: " .. resourceName)
+    else
+        outputChatBox("Error al iniciar el recurso '" .. resourceName .. "'.", player, 255, 0, 0)
+    end
+end)
+
+-- Comando stop (solo admin)
+addCommandHandler("stop", function(player, cmd, resourceName)
+    if not isPlayerAdmin(player) then
+        outputChatBox("No tienes permiso para usar este comando. Solo administradores pueden usar /stop.", player, 255, 0, 0)
+        return
+    end
+    
+    if not resourceName then
+        outputChatBox("Uso: /stop [nombre del recurso]", player, 255, 255, 0)
+        return
+    end
+    
+    -- Ejecutar el comando stop
+    local resource = getResourceFromName(resourceName)
+    if resource then
+        local success = stopResource(resource)
+        if success then
+            outputChatBox("Recurso '" .. resourceName .. "' detenido correctamente.", player, 0, 255, 0)
+            outputServerLog("[ADMIN] " .. getPlayerName(player) .. " detuvo el recurso: " .. resourceName)
+        else
+            outputChatBox("Error al detener el recurso '" .. resourceName .. "'.", player, 255, 0, 0)
+        end
+    else
+        outputChatBox("Error: No se encontró el recurso '" .. resourceName .. "'.", player, 255, 0, 0)
+    end
+end)
+
+-- Comando restart (solo admin)
+addCommandHandler("restart", function(player, cmd, resourceName)
+    if not isPlayerAdmin(player) then
+        outputChatBox("No tienes permiso para usar este comando. Solo administradores pueden usar /restart.", player, 255, 0, 0)
+        return
+    end
+    
+    if not resourceName then
+        outputChatBox("Uso: /restart [nombre del recurso]", player, 255, 255, 0)
+        return
+    end
+    
+    -- Ejecutar el comando restart
+    local resource = getResourceFromName(resourceName)
+    if resource then
+        restartResource(resource)
+        outputChatBox("Recurso '" .. resourceName .. "' reiniciado correctamente.", player, 0, 255, 0)
+        outputServerLog("[ADMIN] " .. getPlayerName(player) .. " reinició el recurso: " .. resourceName)
+    else
+        outputChatBox("Error: No se encontró el recurso '" .. resourceName .. "'.", player, 255, 0, 0)
+    end
+end)
+
+-- Comando refresh (solo admin)
+addCommandHandler("refresh", function(player, cmd, resourceName)
+    if not isPlayerAdmin(player) then
+        outputChatBox("No tienes permiso para usar este comando. Solo administradores pueden usar /refresh.", player, 255, 0, 0)
+        return
+    end
+    
+    -- Si no se especifica recurso, refrescar todos
+    if not resourceName then
+        refreshResources(true)
+        outputChatBox("Todos los recursos han sido refrescados.", player, 0, 255, 0)
+        outputServerLog("[ADMIN] " .. getPlayerName(player) .. " refrescó todos los recursos")
+        return
+    end
+    
+    -- Refrescar un recurso específico
+    local resource = getResourceFromName(resourceName)
+    if resource then
+        -- Para refrescar un recurso específico, primero detenerlo y luego iniciarlo
+        stopResource(resource)
+        startResource(resource)
+        outputChatBox("Recurso '" .. resourceName .. "' refrescado correctamente.", player, 0, 255, 0)
+        outputServerLog("[ADMIN] " .. getPlayerName(player) .. " refrescó el recurso: " .. resourceName)
+    else
+        outputChatBox("Error: No se encontró el recurso '" .. resourceName .. "'.", player, 255, 0, 0)
+    end
+end)
+
