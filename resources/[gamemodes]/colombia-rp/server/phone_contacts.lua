@@ -4,9 +4,17 @@
 addEvent("saveContacts", true)
 addEventHandler("saveContacts", root, function(contactsJson)
     local player = source
-    local characterId = getElementData(player, "character:id")
     
-    outputServerLog("[PHONE] Recibido evento saveContacts de " .. getPlayerName(player))
+    -- Verificar que source sea un jugador
+    if not isElement(player) or getElementType(player) ~= "player" then
+        outputServerLog("[PHONE] ERROR: saveContacts recibido de elemento inválido (tipo: " .. tostring(getElementType(player)) .. ")")
+        return
+    end
+    
+    local characterId = getElementData(player, "character:id")
+    local playerName = getPlayerName(player) or "Unknown"
+    
+    outputServerLog("[PHONE] Recibido evento saveContacts de " .. playerName)
     outputServerLog("[PHONE] character_id: " .. tostring(characterId))
     outputServerLog("[PHONE] contactsJson length: " .. tostring(contactsJson and string.len(contactsJson) or 0))
     
@@ -75,11 +83,13 @@ addEventHandler("saveContacts", root, function(contactsJson)
     end
     
     outputServerLog("[PHONE] Contactos guardados para personaje ID " .. characterId .. ": " .. insertCount .. " exitosos, " .. errorCount .. " errores")
-    if insertCount > 0 then
-        outputChatBox("✓ " .. insertCount .. " contacto(s) guardado(s) correctamente.", player, 0, 255, 0)
-    end
-    if errorCount > 0 then
-        outputChatBox("⚠ Error al guardar " .. errorCount .. " contacto(s).", player, 255, 165, 0)
+    if isElement(player) and getElementType(player) == "player" then
+        if insertCount > 0 then
+            outputChatBox("✓ " .. insertCount .. " contacto(s) guardado(s) correctamente.", player, 0, 255, 0)
+        end
+        if errorCount > 0 then
+            outputChatBox("⚠ Error al guardar " .. errorCount .. " contacto(s).", player, 255, 165, 0)
+        end
     end
 end)
 
@@ -87,6 +97,13 @@ end)
 addEvent("loadContacts", true)
 addEventHandler("loadContacts", root, function()
     local player = source
+    
+    -- Verificar que source sea un jugador
+    if not isElement(player) or getElementType(player) ~= "player" then
+        outputServerLog("[PHONE] ERROR: loadContacts recibido de elemento inválido (tipo: " .. tostring(getElementType(player)) .. ")")
+        return
+    end
+    
     local characterId = getElementData(player, "character:id")
     
     if not characterId then
