@@ -7,15 +7,15 @@
 local sw, sh = guiGetScreenSize()
 
 -- ================= CONFIGURACIÓN PREMIUM =================
-local MAX_SPEED = 300
+local MAX_SPEED = 500  -- Aumentado para vehículos rápidos (hasta 470 km/h)
 local MAX_RPM = 8500
 
 local UI = {
-    radius = 115,
-    spacing = 280,
-    bottom = 50,
-    width = 820,
-    height = 280
+    radius = 100,
+    spacing = 250,
+    bottom = 45,
+    width = 720,  -- Más compacto
+    height = 240  -- Más compacto
 }
 
 -- Paleta de colores BMW i8 / Audi Virtual Cockpit
@@ -308,11 +308,56 @@ function drawVehicleStatus(cx, cy, width, height, vehicle)
     drawTextWithEffects(engineState and "ON" or "OFF", startX + 20, cy + height/2, 
         colors.digital_white, 0.8, "default", "left", "center", {shadow = true})
     
-    -- Luces
-    local lightsColor = (lightsState == 2) and colors.digital_yellow or colors.digital_gray
-    drawTextWithEffects("💡", startX + spacing, cy + height/2, lightsColor, 1.0, "default", "left", "center")
-    drawTextWithEffects((lightsState == 2) and "ON" or "OFF", startX + spacing + 20, cy + height/2, 
-        colors.digital_white, 0.8, "default", "left", "center", {shadow = true})
+    -- Luces mejoradas con indicador visual
+    local lightsColor = (lightsState == 2) and colors.digital_yellow or tocolor(120, 120, 120, 200)
+    local lightsText = (lightsState == 2) and "ON" or "OFF"
+    
+    -- Indicador visual de luces (círculo brillante cuando están encendidas)
+    local lightX = startX + spacing - 5
+    local lightY = cy + height/2
+    
+    if lightsState == 2 then
+        -- Círculo brillante cuando están encendidas
+        for i=0,360,5 do
+            local a = math.rad(i)
+            local lightR = 10
+            dxDrawLine(
+                lightX+math.cos(a)*lightR,
+                lightY+math.sin(a)*lightR,
+                lightX+math.cos(a)*(lightR-3),
+                lightY+math.sin(a)*(lightR-3),
+                tocolor(255,220,0,220),2
+            )
+        end
+        -- Brillo exterior
+        for i=0,360,10 do
+            local a = math.rad(i)
+            dxDrawLine(
+                lightX+math.cos(a)*12,
+                lightY+math.sin(a)*12,
+                lightX+math.cos(a)*10,
+                lightY+math.sin(a)*10,
+                tocolor(255,220,0,100),1
+            )
+        end
+    else
+        -- Círculo apagado
+        for i=0,360,5 do
+            local a = math.rad(i)
+            local lightR = 10
+            dxDrawLine(
+                lightX+math.cos(a)*lightR,
+                lightY+math.sin(a)*lightR,
+                lightX+math.cos(a)*(lightR-3),
+                lightY+math.sin(a)*(lightR-3),
+                tocolor(100,100,100,150),2
+            )
+        end
+    end
+    
+    drawTextWithEffects("💡", startX + spacing + 15, cy + height/2, lightsColor, 1.0, "default", "left", "center")
+    drawTextWithEffects(lightsText, startX + spacing + 35, cy + height/2, 
+        lightsColor, 0.8, "default-bold", "left", "center", {shadow = true})
     
     -- Salud
     local healthColor = health > 70 and colors.digital_green or health > 30 and colors.digital_yellow or colors.digital_red
