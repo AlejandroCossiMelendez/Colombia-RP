@@ -1,35 +1,18 @@
--- Scoreboard personalizado para Colombia RP - Responsive
+-- Scoreboard personalizado para Colombia RP - Versión Simple y Responsive
 local scoreboardVisible = false
 
--- Función para obtener dimensiones responsivas
-function getResponsiveSize()
-    local screenWidth, screenHeight = guiGetScreenSize()
-    
-    -- Calcular dimensiones basadas en porcentajes de la pantalla
-    local boardWidth = screenWidth * 0.45  -- 45% del ancho de pantalla
-    local minWidth = 500  -- Ancho mínimo
-    local maxWidth = 800  -- Ancho máximo
-    boardWidth = math.max(minWidth, math.min(maxWidth, boardWidth))
-    
-    return screenWidth, screenHeight, boardWidth
-end
-
--- Deshabilitar completamente el scoreboard por defecto de MTA
+-- Deshabilitar scoreboard por defecto de MTA
 addEventHandler("onClientResourceStart", root, function()
-    -- Ocultar todos los componentes del HUD por defecto relacionados con el scoreboard
     setPlayerHudComponentVisible("radar", false)
     setPlayerHudComponentVisible("area_name", false)
     setPlayerHudComponentVisible("vehicle_name", false)
 end)
 
--- Asegurar que el scoreboard por defecto esté oculto siempre
 setTimer(function()
     setPlayerHudComponentVisible("radar", false)
-    setPlayerHudComponentVisible("area_name", false)
-    setPlayerHudComponentVisible("vehicle_name", false)
-end, 100, 0) -- Verificar cada 100ms para asegurar que esté oculto
+end, 100, 0)
 
--- Toggle del scoreboard con TAB
+-- Toggle con TAB
 bindKey("tab", "down", function()
     scoreboardVisible = true
 end)
@@ -38,31 +21,28 @@ bindKey("tab", "up", function()
     scoreboardVisible = false
 end)
 
--- Interceptar y bloquear el comando scoreboard por defecto
 addCommandHandler("scoreboard", function()
-    -- Bloquear completamente el scoreboard por defecto
     return false
 end, true)
 
--- Función para obtener lista de jugadores ordenada
+-- Función para obtener jugadores
 function getPlayerList()
     local players = getElementsByType("player")
     local playerList = {}
     
     for _, player in ipairs(players) do
         if isElement(player) then
-            local characterSelected = getElementData(player, "character:selected")
-            
-            if characterSelected == true then
-                local charName = getElementData(player, "character:name")
-                local charSurname = getElementData(player, "character:surname")
-                local charId = getElementData(player, "character:id")
+            local selected = getElementData(player, "character:selected")
+            if selected == true then
+                local name = getElementData(player, "character:name")
+                local surname = getElementData(player, "character:surname")
+                local id = getElementData(player, "character:id")
                 
-                if charName and charSurname and charId then
+                if name and surname and id then
                     table.insert(playerList, {
                         player = player,
-                        name = charName .. " " .. charSurname,
-                        id = charId,
+                        name = name .. " " .. surname,
+                        id = id,
                         ping = getPlayerPing(player) or 0
                     })
                 end
@@ -70,7 +50,6 @@ function getPlayerList()
         end
     end
     
-    -- Ordenar por ID
     table.sort(playerList, function(a, b)
         return a.id < b.id
     end)
@@ -78,88 +57,97 @@ function getPlayerList()
     return playerList
 end
 
--- Renderizar scoreboard limpio y organizado - RESPONSIVE
+-- Renderizar scoreboard
 addEventHandler("onClientRender", root, function()
     if not scoreboardVisible then
         return
     end
     
-    -- Obtener dimensiones responsivas
-    local screenWidth, screenHeight, boardWidth = getResponsiveSize()
+    -- Obtener dimensiones de pantalla
+    local sw, sh = guiGetScreenSize()
     
     -- Obtener lista de jugadores
     local playerList = getPlayerList()
-    local totalPlayers = #playerList
+    local total = #playerList
     
-    if totalPlayers == 0 then
+    -- Debug: mostrar información en pantalla
+    if total == 0 then
+        -- Mostrar mensaje si no hay jugadores
+        dxDrawText("No hay jugadores con personaje seleccionado", 
+                   sw/2 - 200, sh/2 - 20, sw/2 + 200, sh/2 + 20,
+                   tocolor(255, 255, 255, 255), 1.2, "default-bold", "center", "center",
+                   false, false, false, false, false)
+        
+        -- Debug: mostrar cuántos jugadores hay en total
+        local allPlayers = getElementsByType("player")
+        local debugText = "Total jugadores: " .. #allPlayers .. " | Con personaje: 0"
+        dxDrawText(debugText, 
+                   sw/2 - 200, sh/2 + 30, sw/2 + 200, sh/2 + 50,
+                   tocolor(255, 0, 0, 255), 1.0, "default", "center", "center",
+                   false, false, false, false, false)
         return
     end
     
     -- Calcular dimensiones responsivas
-    local rowHeight = math.max(28, screenHeight * 0.04)  -- 4% de altura, mínimo 28px
-    local headerHeight = math.max(45, screenHeight * 0.06)  -- 6% de altura, mínimo 45px
-    local footerHeight = math.max(30, screenHeight * 0.04)  -- 4% de altura, mínimo 30px
+    local boardWidth = math.max(500, math.min(800, sw * 0.5))
+    local rowHeight = 35
+    local headerHeight = 50
+    local footerHeight = 35
+    local maxRows = math.floor((sh * 0.7) / rowHeight)  -- 70% de la altura disponible
+    maxRows = math.max(5, math.min(20, maxRows))  -- Entre 5 y 20 filas
     
-    -- Calcular máximo de filas visibles basado en la altura de pantalla
-    local availableHeight = screenHeight * 0.6  -- 60% de la altura disponible
-    local maxRows = math.floor((availableHeight - headerHeight - footerHeight) / rowHeight)
-    maxRows = math.max(5, math.min(15, maxRows))  -- Entre 5 y 15 filas
-    
-    local rowsToShow = math.min(totalPlayers, maxRows)
+    local rowsToShow = math.min(total, maxRows)
     local boardHeight = headerHeight + (rowsToShow * rowHeight) + footerHeight
     
-    -- Centrar el scoreboard
-    local boardX = (screenWidth - boardWidth) / 2
-    local boardY = (screenHeight - boardHeight) / 2
+    -- Centrar
+    local boardX = (sw - boardWidth) / 2
+    local boardY = (sh - boardHeight) / 2
     
-    -- Fondo principal
-    dxDrawRectangle(boardX, boardY, boardWidth, boardHeight, tocolor(20, 20, 20, 240), false)
+    -- Fondo
+    dxDrawRectangle(boardX, boardY, boardWidth, boardHeight, tocolor(0, 0, 0, 200), false)
     
-    -- Borde azul
-    local borderSize = math.max(2, screenWidth * 0.001)  -- Responsive border
-    dxDrawRectangle(boardX, boardY, boardWidth, borderSize, tocolor(0, 150, 255, 255), false) -- Superior
-    dxDrawRectangle(boardX, boardY + boardHeight - borderSize, boardWidth, borderSize, tocolor(0, 150, 255, 255), false) -- Inferior
-    dxDrawRectangle(boardX, boardY, borderSize, boardHeight, tocolor(0, 150, 255, 255), false) -- Izquierdo
-    dxDrawRectangle(boardX + boardWidth - borderSize, boardY, borderSize, boardHeight, tocolor(0, 150, 255, 255), false) -- Derecho
+    -- Bordes
+    local border = 2
+    dxDrawRectangle(boardX, boardY, boardWidth, border, tocolor(0, 150, 255, 255), false)
+    dxDrawRectangle(boardX, boardY + boardHeight - border, boardWidth, border, tocolor(0, 150, 255, 255), false)
+    dxDrawRectangle(boardX, boardY, border, boardHeight, tocolor(0, 150, 255, 255), false)
+    dxDrawRectangle(boardX + boardWidth - border, boardY, border, boardHeight, tocolor(0, 150, 255, 255), false)
     
-    -- Título con tamaño responsivo
-    local titleSize = math.max(1.2, math.min(1.8, screenWidth / 800))
+    -- Título
     dxDrawText("COLOMBIA RP", 
-               boardX, boardY + 5, boardX + boardWidth, boardY + headerHeight - 5,
-               tocolor(255, 255, 255, 255), titleSize, "default-bold", "center", "center",
+               boardX, boardY + 10, boardX + boardWidth, boardY + headerHeight - 5,
+               tocolor(255, 255, 255, 255), 1.5, "default-bold", "center", "center",
                false, false, false, false, false)
     
-    -- Encabezados de columnas con tamaño responsivo
-    local headerY = boardY + headerHeight - 5
+    -- Encabezados
+    local headerY = boardY + headerHeight - 8
     local headerColor = tocolor(0, 200, 255, 255)
-    local headerFontSize = math.max(0.9, math.min(1.2, screenWidth / 1000))
     
-    -- Calcular posiciones de columnas basadas en porcentajes
-    local colIdX = boardX + (boardWidth * 0.03)  -- 3% desde la izquierda
-    local colIdW = boardWidth * 0.08  -- 8% de ancho
-    local colNameX = boardX + (boardWidth * 0.15)  -- 15% desde la izquierda
-    local colNameW = boardWidth * 0.65  -- 65% de ancho
-    local colPingX = boardX + (boardWidth * 0.82)  -- 82% desde la izquierda
-    local colPingW = boardWidth * 0.15  -- 15% de ancho
+    -- Posiciones de columnas (usando porcentajes del ancho)
+    local colIdX = boardX + 20
+    local colIdW = 60
+    local colNameX = boardX + 100
+    local colNameW = boardWidth - 220
+    local colPingX = boardX + boardWidth - 100
+    local colPingW = 80
     
-    dxDrawText("ID", colIdX, headerY, colIdX + colIdW, headerY + 20,
-               headerColor, headerFontSize, "default-bold", "left", "center",
+    dxDrawText("ID", colIdX, headerY, colIdX + colIdW, headerY + 25,
+               headerColor, 1.0, "default-bold", "left", "center",
                false, false, false, false, false)
     
-    dxDrawText("NOMBRE", colNameX, headerY, colNameX + colNameW, headerY + 20,
-               headerColor, headerFontSize, "default-bold", "left", "center",
+    dxDrawText("NOMBRE", colNameX, headerY, colNameX + colNameW, headerY + 25,
+               headerColor, 1.0, "default-bold", "left", "center",
                false, false, false, false, false)
     
-    dxDrawText("PING", colPingX, headerY, colPingX + colPingW, headerY + 20,
-               headerColor, headerFontSize, "default-bold", "center", "center",
+    dxDrawText("PING", colPingX, headerY, colPingX + colPingW, headerY + 25,
+               headerColor, 1.0, "default-bold", "center", "center",
                false, false, false, false, false)
     
     -- Línea separadora
-    dxDrawRectangle(boardX + (boardWidth * 0.02), headerY + 20, boardWidth - (boardWidth * 0.04), 1, tocolor(0, 150, 255, 200), false)
+    dxDrawRectangle(boardX + 15, headerY + 25, boardWidth - 30, 1, tocolor(0, 150, 255, 180), false)
     
     -- Lista de jugadores
-    local startY = headerY + 25
-    local fontSize = math.max(0.85, math.min(1.1, screenWidth / 1200))
+    local startY = headerY + 30
     
     for i = 1, rowsToShow do
         local playerData = playerList[i]
@@ -167,18 +155,18 @@ addEventHandler("onClientRender", root, function()
         
         local rowY = startY + (i - 1) * rowHeight
         
-        -- Fondo alternado para mejor legibilidad
+        -- Fondo alternado
         if i % 2 == 0 then
-            dxDrawRectangle(boardX + (boardWidth * 0.02), rowY, boardWidth - (boardWidth * 0.04), rowHeight - 2, tocolor(255, 255, 255, 8), false)
+            dxDrawRectangle(boardX + 15, rowY, boardWidth - 30, rowHeight - 2, tocolor(255, 255, 255, 10), false)
         end
         
         -- ID
         dxDrawText(tostring(playerData.id), 
                    colIdX, rowY, colIdX + colIdW, rowY + rowHeight - 2,
-                   tocolor(200, 200, 200, 255), fontSize, "default", "left", "center",
+                   tocolor(200, 200, 200, 255), 1.0, "default", "left", "center",
                    false, false, false, false, false)
         
-        -- Nombre (verde si es el jugador local)
+        -- Nombre
         local nameColor = tocolor(255, 255, 255, 255)
         if playerData.player == localPlayer then
             nameColor = tocolor(0, 255, 100, 255)
@@ -186,49 +174,47 @@ addEventHandler("onClientRender", root, function()
         
         -- Truncar nombre si es muy largo
         local displayName = playerData.name
-        local maxNameLength = math.floor(boardWidth * 0.6 / (fontSize * 8))  -- Aproximado
-        if string.len(displayName) > maxNameLength then
-            displayName = string.sub(displayName, 1, maxNameLength - 3) .. "..."
+        if string.len(displayName) > 30 then
+            displayName = string.sub(displayName, 1, 27) .. "..."
         end
         
         dxDrawText(displayName, 
                    colNameX, rowY, colNameX + colNameW, rowY + rowHeight - 2,
-                   nameColor, fontSize, "default", "left", "center",
+                   nameColor, 1.0, "default", "left", "center",
                    false, false, false, false, false)
         
-        -- Ping con colores
-        local pingColor = tocolor(0, 255, 0, 255) -- Verde
+        -- Ping
+        local pingColor = tocolor(0, 255, 0, 255)
         if playerData.ping > 200 then
-            pingColor = tocolor(255, 0, 0, 255) -- Rojo
+            pingColor = tocolor(255, 0, 0, 255)
         elseif playerData.ping > 100 then
-            pingColor = tocolor(255, 200, 0, 255) -- Amarillo/Naranja
+            pingColor = tocolor(255, 200, 0, 255)
         end
         
         dxDrawText(tostring(playerData.ping), 
                    colPingX, rowY, colPingX + colPingW, rowY + rowHeight - 2,
-                   pingColor, fontSize, "default", "center", "center",
+                   pingColor, 1.0, "default", "center", "center",
                    false, false, false, false, false)
     end
     
     -- Footer
     local footerY = boardY + boardHeight - footerHeight + 5
-    local footerFontSize = math.max(0.85, math.min(1.0, screenWidth / 1200))
-    dxDrawText("Total: " .. totalPlayers .. " jugador(es)", 
-               boardX + (boardWidth * 0.03), footerY, boardX + boardWidth - (boardWidth * 0.03), footerY + 25,
-               tocolor(180, 180, 180, 255), footerFontSize, "default", "left", "center",
+    dxDrawText("Total: " .. total .. " jugador(es)", 
+               boardX + 20, footerY, boardX + boardWidth - 20, footerY + 25,
+               tocolor(180, 180, 180, 255), 1.0, "default", "left", "center",
                false, false, false, false, false)
 end)
 
--- Actualizar nametags de los jugadores
+-- Actualizar nametags
 function updatePlayerNames()
     for _, player in ipairs(getElementsByType("player")) do
         if isElement(player) and getElementData(player, "character:selected") then
-            local charName = getElementData(player, "character:name")
-            local charSurname = getElementData(player, "character:surname")
-            local charId = getElementData(player, "character:id")
+            local name = getElementData(player, "character:name")
+            local surname = getElementData(player, "character:surname")
+            local id = getElementData(player, "character:id")
             
-            if charName and charSurname and charId then
-                local displayName = charName .. " " .. charSurname .. " (ID: " .. charId .. ")"
+            if name and surname and id then
+                local displayName = name .. " " .. surname .. " (ID: " .. id .. ")"
                 setPlayerNametagText(player, displayName)
                 setPlayerNametagShowing(player, true)
             end
@@ -236,7 +222,6 @@ function updatePlayerNames()
     end
 end
 
--- Actualizar nombres cuando un jugador spawnea
 addEventHandler("onClientPlayerSpawn", root, function()
     if isElement(source) and getElementData(source, "character:selected") then
         setTimer(function()
@@ -247,12 +232,10 @@ addEventHandler("onClientPlayerSpawn", root, function()
     end
 end)
 
--- Actualizar nombres periódicamente
 setTimer(function()
     updatePlayerNames()
 end, 3000, 0)
 
--- Actualizar nombres cuando cambian los datos
 addEventHandler("onClientElementDataChange", root, function(dataName)
     if isElement(source) and getElementType(source) == "player" then
         if dataName == "character:selected" or 
@@ -264,7 +247,6 @@ addEventHandler("onClientElementDataChange", root, function(dataName)
     end
 end)
 
--- Inicializar al cargar
 addEventHandler("onClientResourceStart", resourceRoot, function()
     setTimer(function()
         updatePlayerNames()
