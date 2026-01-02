@@ -93,24 +93,26 @@ function checkMoving()
             end
         else
             -- No se está moviendo o está caminando - recuperar stamina
-            if staminalevel < 25 then
-                if not getElementData(localPlayer, "stamina->animRequested") then
-                    toggleAllControls(false, true, false)
-                    setPedAnimation(localPlayer, "FAT", "idle_tired", 8000, true, false, true, false)
-                    setElementData(localPlayer, "stamina->animRequested", true)
-                end
+            if staminalevel < 100 then
                 local newStamina = math.min(100, math.floor((staminalevel + 0.08) * 10) / 10) -- Redondear a 1 decimal
                 setElementData(localPlayer, "stamina", newStamina)
-            else
-                if staminalevel < 100 then
-                    local newStamina = math.min(100, math.floor((staminalevel + 0.08) * 10) / 10) -- Redondear a 1 decimal
-                    setElementData(localPlayer, "stamina", newStamina)
-                    if getElementData(localPlayer, "stamina->animRequested") then
-                        setElementData(localPlayer, "stamina->animRequested", false)
-                        toggleAllControls(true, true, true)
-                        setPedAnimation(localPlayer, "", "")
-                    end
+                if getElementData(localPlayer, "stamina->animRequested") and staminalevel >= 25 then
+                    setElementData(localPlayer, "stamina->animRequested", false)
+                    toggleAllControls(true, true, true)
+                    setPedAnimation(localPlayer, "", "")
                 end
+            end
+        end
+    else
+        -- Está en un vehículo - recuperar stamina
+        local staminalevel = tonumber(getElementData(localPlayer, "stamina") or 100)
+        if staminalevel < 100 then
+            local newStamina = math.min(100, math.floor((staminalevel + 0.08) * 10) / 10) -- Redondear a 1 decimal
+            setElementData(localPlayer, "stamina", newStamina)
+            if getElementData(localPlayer, "stamina->animRequested") then
+                setElementData(localPlayer, "stamina->animRequested", false)
+                toggleAllControls(true, true, true)
+                setPedAnimation(localPlayer, "", "")
             end
         end
     end

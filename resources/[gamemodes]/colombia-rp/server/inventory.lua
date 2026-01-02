@@ -303,6 +303,7 @@ addEventHandler("useItem", root, function(slot, itemId, itemIndex)
         -- Marcar que el jugador tiene chaleco equipado (para mostrar icono)
         setElementData(source, "has:vest", true)
         setElementData(source, "vest:armor", armorValue) -- Guardar el porcentaje de defensa del chaleco
+        setElementData(source, "vest:itemIndex", item.index) -- Guardar el índice de la BD del chaleco equipado
         
         -- Remover el item del inventario usando el sistema de items
         if take then
@@ -468,6 +469,18 @@ addEventHandler("unequipVest", root, function()
     
     -- Obtener el porcentaje de defensa actual
     local currentArmor = math.floor(getPedArmor(source))
+    if currentArmor < 0 then currentArmor = 0 end
+    if currentArmor > 100 then currentArmor = 100 end
+    
+    -- Si el armor es 0, no devolver el chaleco al inventario
+    if currentArmor <= 0 then
+        setPedArmor(source, 0)
+        removeElementData(source, "has:vest")
+        removeElementData(source, "vest:armor")
+        removeElementData(source, "vest:itemIndex")
+        outputChatBox("El chaleco se ha destruido (0% de defensa restante).", source, 255, 165, 0)
+        return
+    end
     
     -- Quitar el chaleco (poner defensa a 0)
     setPedArmor(source, 0)
@@ -475,12 +488,13 @@ addEventHandler("unequipVest", root, function()
     -- Remover los datos del chaleco
     removeElementData(source, "has:vest")
     removeElementData(source, "vest:armor")
+    removeElementData(source, "vest:itemIndex")
     
     -- Devolver el chaleco al inventario con el porcentaje de defensa restante
     if give then
         -- Usar el sistema de items para dar el chaleco
         -- El valor del item será el porcentaje de defensa restante
-        local result = give(source, 46, currentArmor) -- 46 es el ID del chaleco antibalas
+        local result = give(source, 46, currentArmor, "Chaleco Antibalas") -- 46 es el ID del chaleco antibalas
         if result then
             outputChatBox("Te has quitado el Chaleco Antibalas. Defensa restante: " .. currentArmor .. "%", source, 0, 150, 255)
             -- Recargar items para actualizar el inventario
