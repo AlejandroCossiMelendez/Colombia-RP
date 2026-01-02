@@ -218,6 +218,29 @@ addEventHandler("showCharacterGUI", resourceRoot, function()
     showCharacterGUI()
 end)
 
+-- Comando /changechar para cambiar de personaje
+addCommandHandler("changechar", function()
+    -- Verificar que el jugador tenga un personaje seleccionado
+    if not getElementData(localPlayer, "character:selected") then
+        outputChatBox("Error: No tienes un personaje seleccionado.", 255, 0, 0)
+        return
+    end
+    
+    -- Abrir la GUI de selección de personajes
+    showCharacterGUI()
+end)
+
+-- Bind de tecla Pause/Break para cambiar de personaje
+bindKey("pause", "down", function()
+    -- Verificar que el jugador tenga un personaje seleccionado
+    if not getElementData(localPlayer, "character:selected") then
+        return
+    end
+    
+    -- Abrir la GUI de selección de personajes
+    showCharacterGUI()
+end)
+
 addEvent("hideCharacterGUI", true)
 addEventHandler("hideCharacterGUI", resourceRoot, function()
     hideCharacterGUI()

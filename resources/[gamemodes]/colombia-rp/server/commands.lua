@@ -107,6 +107,18 @@ addCommandHandler("revivir", function(player, cmd, characterIdStr)
     end
 end)
 
+-- Comando /changechar para cambiar de personaje
+addCommandHandler("changechar", function(player, cmd)
+    -- Verificar que el jugador tenga un personaje seleccionado
+    if not getElementData(player, "character:selected") then
+        outputChatBox("Error: No tienes un personaje seleccionado.", player, 255, 0, 0)
+        return
+    end
+    
+    -- Enviar evento al cliente para abrir la GUI de selección de personajes
+    triggerClientEvent(player, "showCharacterGUI", resourceRoot)
+end)
+
 -- Comando start (solo admin)
 addCommandHandler("start", function(player, cmd, resourceName)
     if not isPlayerAdmin(player) then
@@ -180,6 +192,18 @@ addCommandHandler("restart", function(player, cmd, resourceName)
 end)
 
 -- Comando refresh (solo admin)
+-- Comando /changechar para cambiar de personaje
+addCommandHandler("changechar", function(player, cmd)
+    -- Verificar que el jugador tenga un personaje seleccionado
+    if not getElementData(player, "character:selected") then
+        outputChatBox("Error: No tienes un personaje seleccionado.", player, 255, 0, 0)
+        return
+    end
+    
+    -- Enviar evento al cliente para abrir la GUI de selección de personajes
+    triggerClientEvent(player, "showCharacterGUI", resourceRoot)
+end)
+
 addCommandHandler("refresh", function(player, cmd, resourceName)
     if not isPlayerAdmin(player) then
         outputChatBox("No tienes permiso para usar este comando. Solo administradores pueden usar /refresh.", player, 255, 0, 0)
