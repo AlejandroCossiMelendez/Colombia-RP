@@ -386,6 +386,105 @@ function loadContactsFromServer(contactsJson) {
     }
 }
 
+// Función para configurar swipe to delete
+function setupSwipeToDelete(contactItem, index, contactNumber) {
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
+    let hasDeleted = false;
+    
+    contactItem.addEventListener('touchstart', function(e) {
+        if (hasDeleted) return;
+        startX = e.touches[0].clientX;
+        isDragging = true;
+        contactItem.style.transition = 'none';
+    });
+    
+    contactItem.addEventListener('touchmove', function(e) {
+        if (!isDragging || hasDeleted) return;
+        currentX = e.touches[0].clientX - startX;
+        
+        // Solo permitir deslizar hacia la izquierda
+        if (currentX < 0) {
+            const translateX = Math.max(currentX, -100); // Máximo 100px hacia la izquierda
+            contactItem.querySelector('.contact-content').style.transform = `translateX(${translateX}px)`;
+            contactItem.querySelector('.delete-area').style.opacity = Math.min(Math.abs(translateX) / 100, 1);
+        }
+    });
+    
+    contactItem.addEventListener('touchend', function(e) {
+        if (!isDragging || hasDeleted) return;
+        isDragging = false;
+        
+        const translateX = currentX;
+        contactItem.style.transition = 'transform 0.3s ease';
+        
+        // Si se deslizó más de 50px hacia la izquierda, eliminar
+        if (translateX < -50) {
+            hasDeleted = true;
+            contactItem.style.transform = 'translateX(-100%)';
+            contactItem.style.opacity = '0';
+            
+            setTimeout(() => {
+                deleteContact(index, contactNumber);
+            }, 300);
+        } else {
+            // Volver a la posición original
+            contactItem.querySelector('.contact-content').style.transform = 'translateX(0)';
+            contactItem.querySelector('.delete-area').style.opacity = '0';
+        }
+    });
+    
+    // También soportar mouse para pruebas en desktop
+    contactItem.addEventListener('mousedown', function(e) {
+        if (hasDeleted) return;
+        startX = e.clientX;
+        isDragging = true;
+        contactItem.style.transition = 'none';
+        e.preventDefault();
+    });
+    
+    contactItem.addEventListener('mousemove', function(e) {
+        if (!isDragging || hasDeleted) return;
+        currentX = e.clientX - startX;
+        
+        if (currentX < 0) {
+            const translateX = Math.max(currentX, -100);
+            contactItem.querySelector('.contact-content').style.transform = `translateX(${translateX}px)`;
+            contactItem.querySelector('.delete-area').style.opacity = Math.min(Math.abs(translateX) / 100, 1);
+        }
+    });
+    
+    contactItem.addEventListener('mouseup', function(e) {
+        if (!isDragging || hasDeleted) return;
+        isDragging = false;
+        
+        const translateX = currentX;
+        contactItem.style.transition = 'transform 0.3s ease';
+        
+        if (translateX < -50) {
+            hasDeleted = true;
+            contactItem.style.transform = 'translateX(-100%)';
+            contactItem.style.opacity = '0';
+            
+            setTimeout(() => {
+                deleteContact(index, contactNumber);
+            }, 300);
+        } else {
+            contactItem.querySelector('.contact-content').style.transform = 'translateX(0)';
+            contactItem.querySelector('.delete-area').style.opacity = '0';
+        }
+    });
+    
+    contactItem.addEventListener('mouseleave', function(e) {
+        if (!isDragging || hasDeleted) return;
+        isDragging = false;
+        contactItem.style.transition = 'transform 0.3s ease';
+        contactItem.querySelector('.contact-content').style.transform = 'translateX(0)';
+        contactItem.querySelector('.delete-area').style.opacity = '0';
+    });
+}
+
 // Función para cargar contactos
 function loadContacts() {
     const contactsList = get('#contactsList');
@@ -411,19 +510,17 @@ function loadContacts() {
     contacts.forEach((contact, index) => {
         const contactItem = document.createElement('div');
         contactItem.className = 'contact-item';
+        contactItem.setAttribute('data-contact-index', index);
+        contactItem.setAttribute('data-contact-number', contact.number);
         
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'delete-contact';
-        deleteBtn.textContent = '×';
-        deleteBtn.setAttribute('data-contact-index', index);
-        deleteBtn.setAttribute('data-contact-number', contact.number);
-        deleteBtn.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevenir que se propague el evento
-            e.preventDefault();
-            const contactIndex = parseInt(this.getAttribute('data-contact-index'));
-            const contactNumber = this.getAttribute('data-contact-number');
-            deleteContact(contactIndex, contactNumber);
-        });
+        // Contenedor interno para el swipe
+        const contactContent = document.createElement('div');
+        contactContent.className = 'contact-content';
+        
+        // Área de eliminación (se muestra al deslizar)
+        const deleteArea = document.createElement('div');
+        deleteArea.className = 'delete-area';
+        deleteArea.innerHTML = '<span>Eliminar</span>';
         
         const avatar = document.createElement('div');
         avatar.className = 'contact-avatar';
@@ -443,9 +540,14 @@ function loadContacts() {
         info.appendChild(name);
         info.appendChild(number);
         
-        contactItem.appendChild(avatar);
-        contactItem.appendChild(info);
-        contactItem.appendChild(deleteBtn);
+        contactContent.appendChild(avatar);
+        contactContent.appendChild(info);
+        
+        contactItem.appendChild(deleteArea);
+        contactItem.appendChild(contactContent);
+        
+        // Agregar funcionalidad de swipe
+        setupSwipeToDelete(contactItem, index, contact.number);
         
         contactsList.appendChild(contactItem);
     });

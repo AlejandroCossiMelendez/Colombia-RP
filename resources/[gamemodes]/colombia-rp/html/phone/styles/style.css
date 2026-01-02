@@ -371,16 +371,52 @@ input {
 }
 
 .contact-item {
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y;
+}
+
+.contact-content {
     display: flex;
     align-items: center;
     padding: 15px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    cursor: pointer;
-    transition: background-color 0.2s;
+    padding-right: 20px;
+    background-color: transparent;
+    position: relative;
+    z-index: 2;
+    transition: transform 0.3s ease;
+    width: 100%;
+    min-height: 50px;
 }
 
-.contact-item:active {
+.contact-item:active .contact-content {
     background-color: rgba(255, 255, 255, 0.05);
+}
+
+.delete-area {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100px;
+    background-color: #ff3b30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.delete-area span {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
 .contact-avatar {
