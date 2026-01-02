@@ -4,6 +4,7 @@ local hunger = 100
 local thirst = 100
 local health = 100
 local money = 0
+local screenWidth, screenHeight = guiGetScreenSize()
 
 function showHUD()
     hudVisible = true
@@ -46,29 +47,28 @@ addEventHandler("onClientRender", root, function()
     local hudY = screenHeight - 150
     
     -- Dinero
-    dxDrawText("$" .. money, hudX, hudY, screenWidth, screenHeight, tocolor(255, 255, 0, 255), 1.5, "default-bold", "left", "top")
+    dxDrawText("$" .. money, hudX, hudY, screenWidth, screenHeight, tocolor(255, 255, 0, 255), 1.5, "default-bold", "left", "top", false, false, false, false, false)
     
     -- Barra de hambre
     local hungerWidth = 200
     local hungerHeight = 20
     local hungerBarWidth = (hunger / 100) * hungerWidth
     
-    dxDrawRectangle(hudX, hudY + 30, hungerWidth, hungerHeight, tocolor(0, 0, 0, 150))
-    dxDrawRectangle(hudX, hudY + 30, hungerBarWidth, hungerHeight, tocolor(255, 165, 0, 255))
-    dxDrawText("Hambre: " .. math.floor(hunger) .. "%", hudX + 5, hudY + 32, screenWidth, screenHeight, tocolor(255, 255, 255, 255), 1, "default", "left", "top")
+    dxDrawRectangle(hudX, hudY + 30, hungerWidth, hungerHeight, tocolor(0, 0, 0, 150), false)
+    dxDrawRectangle(hudX, hudY + 30, hungerBarWidth, hungerHeight, tocolor(255, 165, 0, 255), false)
+    dxDrawText("Hambre: " .. math.floor(hunger) .. "%", hudX + 5, hudY + 32, screenWidth, screenHeight, tocolor(255, 255, 255, 255), 1, "default", "left", "top", false, false, false, false, false)
     
     -- Barra de sed
     local thirstBarWidth = (thirst / 100) * hungerWidth
     
-    dxDrawRectangle(hudX, hudY + 55, hungerWidth, hungerHeight, tocolor(0, 0, 0, 150))
-    dxDrawRectangle(hudX, hudY + 55, thirstBarWidth, hungerHeight, tocolor(0, 100, 255, 255))
-    dxDrawText("Sed: " .. math.floor(thirst) .. "%", hudX + 5, hudY + 57, screenWidth, screenHeight, tocolor(255, 255, 255, 255), 1, "default", "left", "top")
+    dxDrawRectangle(hudX, hudY + 55, hungerWidth, hungerHeight, tocolor(0, 0, 0, 150), false)
+    dxDrawRectangle(hudX, hudY + 55, thirstBarWidth, hungerHeight, tocolor(0, 100, 255, 255), false)
+    dxDrawText("Sed: " .. math.floor(thirst) .. "%", hudX + 5, hudY + 57, screenWidth, screenHeight, tocolor(255, 255, 255, 255), 1, "default", "left", "top", false, false, false, false, false)
     
     -- Barra de salud
     local healthBarWidth = (health / 100) * hungerWidth
     
-    dxDrawRectangle(hudX, hudY + 80, hungerWidth, hungerHeight, tocolor(0, 0, 0, 150))
-    dxDrawRectangle(hudX, hudY + 80, healthBarWidth, hungerHeight, tocolor(255, 0, 0, 255))
-    dxDrawText("Salud: " .. math.floor(health) .. "%", hudX + 5, hudY + 82, screenWidth, screenHeight, tocolor(255, 255, 255, 255), 1, "default", "left", "top")
+    dxDrawRectangle(hudX, hudY + 80, hungerWidth, hungerHeight, tocolor(0, 0, 0, 150), false)
+    dxDrawRectangle(hudX, hudY + 80, healthBarWidth, hungerHeight, tocolor(255, 0, 0, 255), false)
+    dxDrawText("Salud: " .. math.floor(health) .. "%", hudX + 5, hudY + 82, screenWidth, screenHeight, tocolor(255, 255, 255, 255), 1, "default", "left", "top", false, false, false, false, false)
 end)
-

@@ -77,18 +77,24 @@ addEventHandler("onClientRender", root, function()
     
     -- Filtrar solo jugadores con personaje seleccionado
     for _, player in ipairs(players) do
-        if getElementData(player, "character:selected") then
-            local charName = getElementData(player, "character:name")
-            local charSurname = getElementData(player, "character:surname")
-            local charId = getElementData(player, "character:id")
-            
-            if charName and charSurname and charId then
-                table.insert(playerList, {
-                    player = player,
-                    name = charName .. " " .. charSurname,
-                    id = charId,
-                    ping = getPlayerPing(player)
-                })
+        if isElement(player) then
+            local selected = getElementData(player, "character:selected")
+            if selected == true then
+                local charName = getElementData(player, "character:name")
+                local charSurname = getElementData(player, "character:surname")
+                local charId = getElementData(player, "character:id")
+                
+                -- Validar que todos los datos estén presentes
+                if charName and charName ~= "" and 
+                   charSurname and charSurname ~= "" and 
+                   charId and charId ~= nil then
+                    table.insert(playerList, {
+                        player = player,
+                        name = charName .. " " .. charSurname,
+                        id = tonumber(charId) or 0,
+                        ping = getPlayerPing(player) or 0
+                    })
+                end
             end
         end
     end
@@ -132,44 +138,63 @@ addEventHandler("onClientRender", root, function()
     -- Lista de jugadores
     local startY = headerY + 35
     local rowHeight = 30
-    local maxVisible = math.floor((boardHeight - startY - 20) / rowHeight)
+    local footerHeight = 30
+    local availableHeight = boardHeight - startY - footerHeight - 10
+    local maxVisible = math.max(1, math.floor(availableHeight / rowHeight))
     local totalPlayers = #playerList
     
     -- Mostrar jugadores
-    for i = 1, math.min(maxVisible, totalPlayers) do
-        local playerData = playerList[i]
-        local rowY = startY + (i - 1) * rowHeight
-        
-        -- Fondo alternado para mejor legibilidad
-        if i % 2 == 0 then
-            dxDrawRectangle(boardX + 10, rowY, boardWidth - 20, rowHeight - 2, tocolor(255, 255, 255, 10), false)
+    if totalPlayers > 0 then
+        for i = 1, math.min(maxVisible, totalPlayers) do
+            local playerData = playerList[i]
+            if not playerData then
+                break
+            end
+            
+            local rowY = startY + (i - 1) * rowHeight
+            
+            -- Verificar que la fila esté dentro del área visible
+            if rowY < boardY + boardHeight - footerHeight then
+                -- Fondo alternado para mejor legibilidad
+                if i % 2 == 0 then
+                    dxDrawRectangle(boardX + 10, rowY, boardWidth - 20, rowHeight - 2, tocolor(255, 255, 255, 10), false)
+                end
+                
+                -- ID
+                dxDrawText(tostring(playerData.id), 
+                           boardX + 20, rowY, boardX + 80, rowY + rowHeight, 
+                           tocolor(255, 255, 255, 255), 1.0, "default", "left", "center", false, false, false, false, false)
+                
+                -- Nombre del personaje
+                local nameColor = tocolor(255, 255, 255, 255)
+                if playerData.player == localPlayer then
+                    nameColor = tocolor(0, 255, 0, 255) -- Verde para el jugador local
+                end
+                
+                dxDrawText(playerData.name, 
+                           boardX + 100, rowY, boardX + 400, rowY + rowHeight, 
+                           nameColor, 1.0, "default", "left", "center", false, false, false, false, false)
+                
+                -- Ping
+                local pingColor = tocolor(255, 255, 255, 255)
+                if playerData.ping > 200 then
+                    pingColor = tocolor(255, 0, 0, 255) -- Rojo si ping alto
+                elseif playerData.ping > 100 then
+                    pingColor = tocolor(255, 165, 0, 255) -- Naranja si ping medio
+                else
+                    pingColor = tocolor(0, 255, 0, 255) -- Verde si ping bajo
+                end
+                
+                dxDrawText(tostring(playerData.ping) .. " ms", 
+                           boardX + 420, rowY, boardX + 580, rowY + rowHeight, 
+                           pingColor, 1.0, "default", "center", "center", false, false, false, false, false)
+            end
         end
-        
-        -- ID
-        dxDrawText(tostring(playerData.id), boardX + 20, rowY, boardX + 80, rowY + rowHeight, 
-                   tocolor(255, 255, 255, 255), 1.0, "default", "left", "center", false, false, false, false, false)
-        
-        -- Nombre del personaje
-        local nameColor = tocolor(255, 255, 255, 255)
-        if playerData.player == localPlayer then
-            nameColor = tocolor(0, 255, 0, 255) -- Verde para el jugador local
-        end
-        
-        dxDrawText(playerData.name, boardX + 100, rowY, boardX + 400, rowY + rowHeight, 
-                   nameColor, 1.0, "default", "left", "center", false, false, false, false, false)
-        
-        -- Ping
-        local pingColor = tocolor(255, 255, 255, 255)
-        if playerData.ping > 200 then
-            pingColor = tocolor(255, 0, 0, 255) -- Rojo si ping alto
-        elseif playerData.ping > 100 then
-            pingColor = tocolor(255, 165, 0, 255) -- Naranja si ping medio
-        else
-            pingColor = tocolor(0, 255, 0, 255) -- Verde si ping bajo
-        end
-        
-        dxDrawText(tostring(playerData.ping) .. " ms", boardX + 420, rowY, boardX + 580, rowY + rowHeight, 
-                   pingColor, 1.0, "default", "center", "center", false, false, false, false, false)
+    else
+        -- Mensaje si no hay jugadores
+        dxDrawText("No hay jugadores con personaje seleccionado", 
+                   boardX + 20, startY, boardX + boardWidth - 20, startY + 50,
+                   tocolor(200, 200, 200, 255), 1.0, "default", "center", "center", false, false, false, false, false)
     end
     
     -- Contador de jugadores
