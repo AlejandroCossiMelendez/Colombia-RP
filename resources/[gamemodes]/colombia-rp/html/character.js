@@ -93,7 +93,8 @@ function createCharacter(e) {
     const name = document.getElementById('charName').value.trim();
     const surname = document.getElementById('charSurname').value.trim();
     const age = parseInt(document.getElementById('charAge').value);
-    const gender = parseInt(document.getElementById('charGender').value);
+    const genderSelect = document.getElementById('charGender');
+    const gender = parseInt(genderSelect.value);
     
     if (!name || !surname) {
         showError('Por favor completa todos los campos');
@@ -115,8 +116,11 @@ function createCharacter(e) {
         return;
     }
     
+    // Asignar skin según el género: 0 = masculino (skin 0), 1 = femenino (skin 216)
+    const skin = (gender === 0) ? 0 : 216;
+    
     if (window.mta) {
-        window.mta.triggerEvent('createCharacter', name, surname, age, gender, 0);
+        window.mta.triggerEvent('createCharacter', name, surname, age, gender, skin);
         hideCreateModal();
     } else {
         console.error('MTA no está disponible');
