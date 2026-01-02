@@ -309,6 +309,11 @@ function setupCallVoice(call)
         return
     end
     
+    -- IMPORTANTE: Limpiar cualquier configuración de voz anterior
+    -- Primero, limpiar ignore lists para asegurar que se escuchen
+    setPlayerVoiceIgnoreFrom(call.caller, {})
+    setPlayerVoiceIgnoreFrom(call.receiver, {})
+    
     -- Configurar para que ambos se escuchen sin importar la distancia
     -- Usar setPlayerVoiceBroadcastTo para que se escuchen mutuamente
     setPlayerVoiceBroadcastTo(call.caller, {call.receiver})
@@ -320,7 +325,7 @@ function setupCallVoice(call)
     setElementData(call.receiver, "phone:inCall", true)
     setElementData(call.receiver, "phone:callPartner", call.caller)
     
-    outputServerLog("[PHONE] Chat de voz configurado para llamada")
+    outputServerLog("[PHONE] Chat de voz configurado para llamada entre " .. getPlayerName(call.caller) .. " y " .. getPlayerName(call.receiver))
 end
 
 -- Actualizar chat de voz (para altavoz)
@@ -328,6 +333,14 @@ function updateCallVoice(call)
     if not call or not isElement(call.caller) or not isElement(call.receiver) then
         return
     end
+    
+    -- Asegurar que ambos se escuchen primero
+    setPlayerVoiceBroadcastTo(call.caller, {call.receiver})
+    setPlayerVoiceBroadcastTo(call.receiver, {call.caller})
+    
+    -- Limpiar ignore lists para asegurar que se escuchen
+    setPlayerVoiceIgnoreFrom(call.caller, {})
+    setPlayerVoiceIgnoreFrom(call.receiver, {})
     
     -- Actualizar estado del altavoz
     setElementData(call.caller, "phone:speakerEnabled", call.speaker.caller)
@@ -347,6 +360,7 @@ function endCallVoice(call)
     -- Restaurar voz por proximidad
     if isElement(call.caller) then
         setPlayerVoiceBroadcastTo(call.caller, {})
+        setPlayerVoiceIgnoreFrom(call.caller, {}) -- Limpiar ignore list
         setElementData(call.caller, "phone:inCall", false)
         setElementData(call.caller, "phone:callPartner", nil)
         setElementData(call.caller, "phone:speakerEnabled", false)
@@ -354,6 +368,7 @@ function endCallVoice(call)
     
     if isElement(call.receiver) then
         setPlayerVoiceBroadcastTo(call.receiver, {})
+        setPlayerVoiceIgnoreFrom(call.receiver, {}) -- Limpiar ignore list
         setElementData(call.receiver, "phone:inCall", false)
         setElementData(call.receiver, "phone:callPartner", nil)
         setElementData(call.receiver, "phone:speakerEnabled", false)

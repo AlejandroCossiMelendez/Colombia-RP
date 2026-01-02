@@ -4,20 +4,90 @@ local incomingCallNotification = nil
 local isInCall = false
 local callFrequency = nil
 local callSpeakerEnabled = false
+local incomingCallPushNotification = nil
+local incomingCallSound = nil
 
 -- Evento: Llamada entrante
 addEvent("phone:incomingCall", true)
 addEventHandler("phone:incomingCall", resourceRoot, function(callerNumber, callerName, callId)
-    -- Log para debugging
-    outputChatBox("DEBUG: Llamada entrante recibida - " .. tostring(callerNumber) .. " (" .. tostring(callId) .. ")", 0, 255, 0)
+    -- Reproducir sonido de llamada entrante (usar sonido del juego)
+    playSoundFrontEnd(40) -- Sonido de notificación del juego
     
     -- Mostrar notificación de llamada entrante (sin pausar el juego)
     showIncomingCallNotification(callerNumber, callerName, callId)
+    
+    -- Mostrar notificación push grande en pantalla
+    showIncomingCallPushNotification(callerNumber, callerName)
 end)
+
+-- Mostrar notificación push grande en pantalla
+function showIncomingCallPushNotification(callerNumber, callerName)
+    -- Crear notificación DX grande y visible
+    incomingCallPushNotification = {
+        callerName = callerName,
+        callerNumber = callerNumber,
+        startTime = getTickCount(),
+        alpha = 255
+    }
+    
+    -- Reproducir sonido de llamada (usar un sonido del juego o crear uno)
+    -- Intentar reproducir sonido de notificación
+    if not incomingCallSound then
+        -- Usar un sonido del juego como alternativa
+        playSoundFrontEnd(40) -- Sonido de notificación
+    end
+    
+    -- Crear render para mostrar la notificación DX
+    addEventHandler("onClientRender", root, renderIncomingCallNotification)
+end
+
+-- Renderizar notificación DX de llamada entrante
+function renderIncomingCallNotification()
+    if not incomingCallPushNotification then
+        removeEventHandler("onClientRender", root, renderIncomingCallNotification)
+        return
+    end
+    
+    local screenW, screenH = guiGetScreenSize()
+    local elapsed = getTickCount() - incomingCallPushNotification.startTime
+    
+    -- La notificación aparece desde arriba y se desvanece después de 10 segundos
+    if elapsed > 10000 then
+        incomingCallPushNotification = nil
+        removeEventHandler("onClientRender", root, renderIncomingCallNotification)
+        return
+    end
+    
+    -- Calcular posición Y (animación de entrada)
+    local targetY = 50
+    local startY = -150
+    local progress = math.min(elapsed / 500, 1) -- Animación de 500ms
+    local currentY = startY + (targetY - startY) * progress
+    
+    -- Calcular alpha (parpadeo)
+    local alpha = 255
+    if elapsed > 8000 then
+        -- Desvanecer en los últimos 2 segundos
+        alpha = 255 * (1 - (elapsed - 8000) / 2000)
+    else
+        -- Parpadeo suave
+        alpha = 200 + math.sin(elapsed / 200) * 55
+    end
+    
+    -- Fondo semi-transparente
+    dxDrawRectangle(screenW/2 - 250, currentY, 500, 120, tocolor(0, 0, 0, alpha * 0.8), false)
+    dxDrawRectangle(screenW/2 - 250, currentY, 500, 5, tocolor(0, 150, 255, alpha), false)
+    
+    -- Texto principal
+    dxDrawText("📞 LLAMADA ENTRANTE", screenW/2, currentY + 10, screenW/2, currentY + 10, tocolor(255, 255, 255, alpha), 1.2, "default-bold", "center", "top", false, false, false, true)
+    dxDrawText(incomingCallPushNotification.callerName, screenW/2, currentY + 35, screenW/2, currentY + 35, tocolor(255, 255, 255, alpha), 1.5, "default-bold", "center", "top", false, false, false, true)
+    dxDrawText(incomingCallPushNotification.callerNumber, screenW/2, currentY + 60, screenW/2, currentY + 60, tocolor(200, 200, 200, alpha), 1.0, "default", "center", "top", false, false, false, true)
+    dxDrawText("Presiona R para contestar | C para rechazar", screenW/2, currentY + 85, screenW/2, currentY + 85, tocolor(150, 150, 150, alpha), 0.8, "default", "center", "top", false, false, false, true)
+end
 
 -- Mostrar notificación de llamada entrante
 function showIncomingCallNotification(callerNumber, callerName, callId)
-    -- Crear notificación visual
+    -- Crear notificación visual pequeña en la esquina
     local screenW, screenH = guiGetScreenSize()
     
     if incomingCallNotification then
@@ -53,6 +123,19 @@ function hideIncomingCallNotification()
         destroyElement(incomingCallNotification)
         incomingCallNotification = nil
     end
+    
+    -- Ocultar notificación push
+    if incomingCallPushNotification then
+        incomingCallPushNotification = nil
+        removeEventHandler("onClientRender", root, renderIncomingCallNotification)
+    end
+    
+    -- Detener sonido
+    if incomingCallSound then
+        stopSound(incomingCallSound)
+        incomingCallSound = nil
+    end
+    
     setElementData(localPlayer, "phone:incomingCallId", nil)
 end
 
