@@ -412,7 +412,9 @@ function openInventory()
     
     inventoryVisible = true
     showCursor(true)
-    triggerServerEvent("requestInventory", localPlayer)
+    -- No solicitar inventario de la tabla inventory, ya que usamos el sistema de items
+    -- Los items se cargan automáticamente con syncItems
+    -- triggerServerEvent("requestInventory", localPlayer)
 end
 
 -- Función para cerrar inventario
@@ -430,9 +432,14 @@ function closeInventory()
 end
 
 -- Recibir inventario del servidor (tabla inventory)
+-- NOTA: Este evento se usa para el sistema de inventory, pero nosotros usamos el sistema de items
+-- Por lo tanto, solo actualizamos si no hay items ya cargados desde syncItems
 addEvent("receiveInventory", true)
 addEventHandler("receiveInventory", resourceRoot, function(inventory)
-    playerInventory = inventory or {}
+    -- Solo actualizar si no hay items ya cargados desde syncItems
+    if not playerInventory or #playerInventory == 0 then
+        playerInventory = inventory or {}
+    end
 end)
 
 -- Recibir items del sistema de items (tabla items) y convertirlos al formato del inventario visual
@@ -455,7 +462,6 @@ addEventHandler("syncItems", root, function(...)
         -- Convertir items del sistema items al formato del inventario visual
         playerInventory = {}
         if items and type(items) == "table" then
-            outputChatBox("[DEBUG] Recibidos " .. #items .. " items del servidor", 0, 255, 0)
             for slot, item in ipairs(items) do
                 if item and item.item then
                     -- Obtener el nombre del item
@@ -478,9 +484,6 @@ addEventHandler("syncItems", root, function(...)
                     })
                 end
             end
-            outputChatBox("[DEBUG] Inventario actualizado: " .. #playerInventory .. " items", 0, 255, 0)
-        else
-            outputChatBox("[DEBUG] No se recibieron items o la tabla está vacía", 255, 0, 0)
         end
     end
 end)
