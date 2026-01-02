@@ -38,7 +38,7 @@ body {
     width: 1100px;
     max-width: 90%;
     margin: 0 auto;
-    padding-top: 80px;
+    padding-top: 120px;
     z-index: 10;
 }
 
@@ -86,12 +86,12 @@ body {
 
 .panel {
     flex: 1;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.4);
     padding: 50px 45px;
     border-radius: 0;
     display: block;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(5px);
 }
 
 .login-panel {
@@ -191,24 +191,24 @@ input::placeholder {
 }
 
 .login-btn {
-    background: linear-gradient(135deg, #0096ff 0%, #00b8ff 50%, #00d9ff 100%);
-    box-shadow: 0 4px 20px rgba(0, 150, 255, 0.4);
+    background: linear-gradient(135deg, #0066cc 0%, #0080ff 50%, #0099ff 100%);
+    box-shadow: 0 4px 20px rgba(0, 102, 204, 0.5);
 }
 
 .login-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, #0088e6 0%, #00a8e6 50%, #00c9e6 100%);
-    box-shadow: 0 6px 25px rgba(0, 150, 255, 0.5);
+    background: linear-gradient(135deg, #0055bb 0%, #0070ee 50%, #0088ee 100%);
+    box-shadow: 0 6px 25px rgba(0, 102, 204, 0.6);
     transform: translateY(-2px);
 }
 
 .register-btn {
-    background: linear-gradient(135deg, #00c853 0%, #00e676 50%, #00ff88 100%);
-    box-shadow: 0 4px 20px rgba(0, 200, 83, 0.4);
+    background: linear-gradient(135deg, #00aa44 0%, #00cc55 50%, #00ee66 100%);
+    box-shadow: 0 4px 20px rgba(0, 170, 68, 0.5);
 }
 
 .register-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, #00b843 0%, #00d666 50%, #00e677 100%);
-    box-shadow: 0 6px 25px rgba(0, 200, 83, 0.5);
+    background: linear-gradient(135deg, #009933 0%, #00bb44 50%, #00dd55 100%);
+    box-shadow: 0 6px 25px rgba(0, 170, 68, 0.6);
     transform: translateY(-2px);
 }
 
