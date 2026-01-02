@@ -118,8 +118,19 @@ addEventHandler("admin:teleportToPlayer", root, function(characterId)
     local targetInterior = getElementInterior(target)
     local targetDimension = getElementDimension(target)
     
-    -- Teleportar al admin a la ubicación del jugador objetivo
-    setElementPosition(source, targetX, targetY, targetZ)
+    -- Calcular posición detrás del jugador objetivo
+    -- Convertir rotación a radianes
+    local rotationRad = math.rad(targetRotation)
+    -- Distancia detrás del jugador (2 metros)
+    local distanceBehind = 2.0
+    -- Calcular posición detrás basada en la rotación
+    local behindX = targetX - math.sin(rotationRad) * distanceBehind
+    local behindY = targetY + math.cos(rotationRad) * distanceBehind
+    local behindZ = targetZ
+    
+    -- Teleportar al admin detrás del jugador objetivo
+    setElementPosition(source, behindX, behindY, behindZ)
+    -- Rotar al admin para que mire hacia el jugador objetivo
     setPedRotation(source, targetRotation)
     setElementInterior(source, targetInterior)
     setElementDimension(source, targetDimension)
