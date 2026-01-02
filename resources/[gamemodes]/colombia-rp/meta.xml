@@ -45,6 +45,7 @@
     <script src="client/freecam.lua" type="client" />
     <script src="client/inventory.lua" type="client" />
     <script src="client/cursor_toggle.lua" type="client" />
+    <script src="client/phone.lua" type="client" />
     
     <!-- Scripts del sistema de items (cliente) -->
     <script src="items/items_list.lua" type="client" />
@@ -532,6 +533,36 @@
     <file src="html/character.html"/>
     <file src="html/character.css"/>
     <file src="html/character.js"/>
+    
+    <!-- Archivos del teléfono -->
+    <file src="html/phone.html"/>
+    <file src="html/phone/styles/style.css"/>
+    <file src="html/phone/scripts/script.js"/>
+    <file src="html/phone/styles/fonts/sf-pro-bold.OTF"/>
+    <file src="html/phone/styles/fonts/sf-pro-medium.OTF"/>
+    <file src="html/phone/styles/fonts/sf-pro-regular.OTF"/>
+    <file src="html/phone/styles/backgrounds/1.jpg"/>
+    <file src="html/phone/styles/backgrounds/2.jpg"/>
+    <file src="html/phone/styles/backgrounds/3.jpg"/>
+    <file src="html/phone/styles/backgrounds/4.jpg"/>
+    <file src="html/phone/styles/backgrounds/5.jpg"/>
+    <file src="html/phone/styles/backgrounds/6.jpg"/>
+    <file src="html/phone/styles/svgs/apple-music.svg"/>
+    <file src="html/phone/styles/svgs/apple-tv.svg"/>
+    <file src="html/phone/styles/svgs/calculator.svg"/>
+    <file src="html/phone/styles/svgs/camera.svg"/>
+    <file src="html/phone/styles/svgs/mail.svg"/>
+    <file src="html/phone/styles/svgs/photos.svg"/>
+    <file src="html/phone/styles/svgs/settings.svg"/>
+    <file src="html/phone/styles/svgs/stocks.svg"/>
+    <file src="html/phone/styles/svgs/notes.svg"/>
+    <file src="html/phone/styles/svgs/news.svg"/>
+    <file src="html/phone/styles/svgs/phone.svg"/>
+    <file src="html/phone/styles/svgs/maps.svg"/>
+    <file src="html/phone/styles/svgs/ios-message.svg"/>
+    <file src="html/phone/styles/svgs/contacts.svg"/>
+    <file src="html/phone/styles/svgs/phone-flip.svg"/>
+    <file src="html/phone/styles/svgs/delete.svg"/>
     
     <!-- Archivos -->
     <file src="colombia-rp-login.png" type="client" />

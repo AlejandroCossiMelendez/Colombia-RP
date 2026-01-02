@@ -1,0 +1,107 @@
+-- Sistema de Teléfono Móvil
+-- Basado en phone-example pero integrado en colombia-rp
+
+local sw, sh = guiGetScreenSize()
+local phoneVisible = false
+local phoneBrowser, browserContent, renderTimer = nil
+local w, h = 300, 570
+
+function loadPhoneBrowser() 
+    if source and isElement(source) then
+        loadBrowserURL(source, "http://mta/local/html/phone.html")
+    end
+end
+
+function whenPhoneBrowserReady()
+    -- El navegador está listo
+    if browserContent and isElement(browserContent) then
+        executeBrowserJavascript(browserContent, "updateTime();")
+    end
+end
+
+function renderTime(bool)
+    if bool then         
+        if renderTimer and isTimer(renderTimer) then
+            killTimer(renderTimer)
+        end
+        renderTimer = setTimer(
+            function () 
+                if browserContent and isElement(browserContent) then
+                    executeBrowserJavascript(browserContent, "updateTime();")
+                end
+            end, 1000, 0
+        )
+    else
+        if renderTimer and isTimer(renderTimer) then
+            killTimer(renderTimer)
+            renderTimer = nil
+        end
+    end
+end
+
+function openPhone()
+    if phoneVisible then
+        return
+    end
+    
+    -- Cerrar inventario si está abierto (usar evento para evitar dependencias)
+    triggerEvent("closeInventoryForPhone", localPlayer)
+    
+    phoneVisible = true
+    phoneBrowser = guiCreateBrowser((sw - w), (sh - h) / 2, w, h, true, true, false)
+    browserContent = guiGetBrowser(phoneBrowser)
+    
+    if not phoneBrowser or not browserContent then
+        outputChatBox("Error: No se pudo crear el navegador del teléfono", 255, 0, 0)
+        phoneVisible = false
+        return
+    end
+    
+    guiSetInputMode("no_binds_when_editing")
+    showCursor(true)
+    guiSetInputEnabled(true)
+    
+    addEventHandler("onClientBrowserCreated", phoneBrowser, loadPhoneBrowser)
+    addEventHandler("onClientBrowserDocumentReady", phoneBrowser, whenPhoneBrowserReady)
+    
+    renderTime(true)
+end
+
+function closePhone()
+    if not phoneVisible then
+        return
+    end
+    
+    phoneVisible = false
+    
+    if phoneBrowser and isElement(phoneBrowser) then
+        removeEventHandler("onClientBrowserCreated", phoneBrowser, loadPhoneBrowser)
+        removeEventHandler("onClientBrowserDocumentReady", phoneBrowser, whenPhoneBrowserReady)
+        guiSetInputMode("allow_binds")
+        destroyElement(phoneBrowser)
+        phoneBrowser = nil
+        browserContent = nil
+    end
+    
+    renderTime(false)
+    showCursor(false)
+    guiSetInputEnabled(false)
+end
+
+-- Evento del servidor para abrir el teléfono
+addEvent("openPhone", true)
+addEventHandler("openPhone", resourceRoot, function()
+    openPhone()
+end)
+
+-- Evento del servidor para cerrar el teléfono
+addEvent("closePhone", true)
+addEventHandler("closePhone", resourceRoot, function()
+    closePhone()
+end)
+
+-- Cerrar teléfono al detener el recurso
+addEventHandler("onClientResourceStop", resourceRoot, function()
+    closePhone()
+end)
+

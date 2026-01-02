@@ -90,3 +90,4 @@ operations.forEach((operation, key) => operation.onclick = (e) => {
             break;
     }
 });
+

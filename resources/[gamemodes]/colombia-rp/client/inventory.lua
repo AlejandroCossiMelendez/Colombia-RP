@@ -440,6 +440,13 @@ function closeInventory()
     selectedSlot = nil
     hoveredSlot = nil
     draggedItem = nil
+end
+
+-- Evento para cerrar inventario desde otros scripts
+addEvent("closeInventoryForPhone", true)
+addEventHandler("closeInventoryForPhone", localPlayer, function()
+    closeInventory()
+end)
     draggedSlot = nil
 end
 

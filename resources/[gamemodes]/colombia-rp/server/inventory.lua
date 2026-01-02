@@ -290,6 +290,13 @@ addEventHandler("useItem", root, function(slot, itemId, itemIndex)
     local itemId = tonumber(item.item)
     local itemName = item.name or "Item"
     
+    -- Teléfono Móvil (ID: 7) - Abrir teléfono
+    if itemId == 7 then
+        -- Abrir el teléfono en el cliente
+        triggerClientEvent(source, "openPhone", resourceRoot)
+        return
+    end
+    
     -- Chaleco Antibalas (ID: 46) - Equipar y poner defensa según el valor del item
     if itemId == 46 then
         -- El valor del item es el porcentaje de defensa del chaleco
