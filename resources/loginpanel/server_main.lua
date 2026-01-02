@@ -7,24 +7,34 @@ end
 addEvent("onRequestLoginPanel",true)
 addEventHandler("onRequestLoginPanel",getRootElement(),
 function()
+	local theClient = client -- Guardar client en una variable local
+	if not theClient then
+		outputDebugString("loginpanel: No client available", 2)
+		return
+	end
+	
 	local sqlResource = getResourceFromName("sql")
 	if not sqlResource or getResourceState(sqlResource) ~= "running" then
 		outputDebugString("loginpanel: SQL resource not available, retrying...", 2)
 		setTimer(function()
-			triggerClientEvent(client, "onRequestLoginPanel", client)
+			if theClient and isElement(theClient) then
+				triggerClientEvent(theClient, "onRequestLoginPanel", theClient)
+			end
 		end, 1000, 1)
 		return
 	end
 	
 	-- Usar pcall para capturar errores de exports
 	local success, query = pcall(function()
-		return exports.sql:query_assoc_single("SELECT `userID`  FROM `wcf1_user` WHERE `lastSerial` OR `regSerial` LIKE '%s'", getPlayerSerial(client))
+		return exports.sql:query_assoc_single("SELECT `userID`  FROM `wcf1_user` WHERE `lastSerial` OR `regSerial` LIKE '%s'", getPlayerSerial(theClient))
 	end)
 	
 	if not success then
 		outputDebugString("loginpanel: SQL export not available, retrying...", 2)
 		setTimer(function()
-			triggerClientEvent(client, "onRequestLoginPanel", client)
+			if theClient and isElement(theClient) then
+				triggerClientEvent(theClient, "onRequestLoginPanel", theClient)
+			end
 		end, 1000, 1)
 		return
 	end
@@ -36,7 +46,9 @@ function()
 		end
 	end
 	--serialRegistered
-	triggerClientEvent(client,"client:init:callBack",client,false)
+	if theClient and isElement(theClient) then
+		triggerClientEvent(theClient,"client:init:callBack",theClient,false)
+	end
 end
 )
 
