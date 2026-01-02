@@ -677,19 +677,23 @@ input {
     display: flex;
     flex-direction: column;
     height: 100%;
+    max-height: 100%;
     background-color: #000;
     color: #fff;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .phone-header {
-    padding: 20px;
+    padding: 15px 20px;
     text-align: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
 }
 
 .phone-header h2 {
     margin: 0;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 600;
 }
 
@@ -697,24 +701,29 @@ input {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 15px;
     overflow-y: auto;
+    min-height: 0;
+    box-sizing: border-box;
 }
 
 .dialer-section {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    flex-shrink: 0;
 }
 
 .phone-input {
     width: 100%;
-    padding: 15px;
-    font-size: 28px;
+    padding: 12px 15px;
+    font-size: 24px;
     text-align: center;
     background-color: rgba(255, 255, 255, 0.1);
     border: none;
     border-radius: 10px;
     color: #fff;
     margin-bottom: 10px;
+    box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 .phone-input:focus {
@@ -758,17 +767,25 @@ input {
 .keypad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 15px;
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    justify-items: center;
+    align-items: center;
 }
 
 .keypad-btn {
+    width: 100%;
     aspect-ratio: 1;
+    max-width: 75px;
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.1);
     border: none;
     color: #fff;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -777,6 +794,7 @@ input {
     align-items: center;
     justify-content: center;
     position: relative;
+    box-sizing: border-box;
 }
 
 .keypad-btn:active {
@@ -785,16 +803,20 @@ input {
 }
 
 .keypad-letters {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 400;
-    margin-top: 2px;
+    margin-top: 4px;
     color: rgba(255, 255, 255, 0.6);
+    display: block;
 }
 
 .call-controls {
     display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 15px;
+    flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .call-btn {
@@ -832,7 +854,9 @@ input {
 
 .call-status {
     text-align: center;
-    padding: 20px;
+    padding: 15px;
+    flex-shrink: 0;
+    margin-top: auto;
 }
 
 .call-info {
