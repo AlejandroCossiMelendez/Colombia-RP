@@ -128,6 +128,29 @@ function createAdminPanel()
         end, false)
         table.insert(adminButtons, coordsBtn)
         buttonY = buttonY + buttonSpacing
+        
+        -- Botón: Invisibilidad (actualizar texto según estado)
+        local isInvisible = getElementData(localPlayer, "admin:invisible") or false
+        local invisibleBtnText = isInvisible and "Hacerse Visible" or "Hacerse Invisible"
+        local invisibleBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, invisibleBtnText, false, adminWindow)
+        addEventHandler("onClientGUIClick", invisibleBtn, function()
+            triggerServerEvent("admin:toggleInvisibility", localPlayer)
+            -- Cerrar y reabrir el panel para actualizar el texto del botón
+            closeAdminPanel()
+            setTimer(function()
+                createAdminPanel()
+            end, 100, 1)
+        end, false)
+        table.insert(adminButtons, invisibleBtn)
+        buttonY = buttonY + buttonSpacing
+        
+        -- Botón: Curar Jugador
+        local curarBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Curar Jugador", false, adminWindow)
+        addEventHandler("onClientGUIClick", curarBtn, function()
+            showHealInput()
+        end, false)
+        table.insert(adminButtons, curarBtn)
+        buttonY = buttonY + buttonSpacing
     elseif userType == "staff" then
         -- Botones para staff (se pueden agregar más adelante)
         local staffBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Funciones de Staff", false, adminWindow)
@@ -310,5 +333,64 @@ addEventHandler("admin:teleportResponse", root, function(success, message)
     else
         outputChatBox(message, 255, 0, 0)
     end
+end)
+
+-- Función para mostrar el input de curar
+function showHealInput()
+    if inputWindow and isElement(inputWindow) then
+        destroyElement(inputWindow)
+    end
+    
+    currentAction = "curar"
+    
+    local windowWidth = 350
+    local windowHeight = 150
+    local windowX = (screenW - windowWidth) / 2
+    local windowY = (screenH - windowHeight) / 2
+    
+    inputWindow = guiCreateWindow(windowX, windowY, windowWidth, windowHeight, "Curar Jugador", false)
+    guiWindowSetSizable(inputWindow, false)
+    
+    local label = guiCreateLabel(10, 30, windowWidth - 20, 20, "Ingresa el ID del personaje a curar:", false, inputWindow)
+    
+    inputEdit = guiCreateEdit(10, 55, windowWidth - 20, 30, "", false, inputWindow)
+    guiEditSetMaxLength(inputEdit, 10)
+    
+    local acceptBtn = guiCreateButton(10, 95, (windowWidth - 30) / 2, 30, "Curar", false, inputWindow)
+    addEventHandler("onClientGUIClick", acceptBtn, function()
+        local characterId = guiGetText(inputEdit)
+        if characterId and characterId ~= "" then
+            local id = tonumber(characterId)
+            if id then
+                triggerServerEvent("admin:healPlayer", localPlayer, id)
+                closeInputWindow()
+            else
+                outputChatBox("El ID debe ser un número válido.", 255, 0, 0)
+            end
+        else
+            outputChatBox("Debes ingresar un ID de personaje.", 255, 0, 0)
+        end
+    end, false)
+    
+    local cancelBtn = guiCreateButton((windowWidth - 10) / 2 + 5, 95, (windowWidth - 30) / 2, 30, "Cancelar", false, inputWindow)
+    addEventHandler("onClientGUIClick", cancelBtn, function()
+        closeInputWindow()
+    end, false)
+end
+
+-- Evento para recibir respuesta del servidor (curar)
+addEvent("admin:healResponse", true)
+addEventHandler("admin:healResponse", root, function(success, message)
+    if success then
+        outputChatBox(message, 0, 255, 0)
+    else
+        outputChatBox(message, 255, 0, 0)
+    end
+end)
+
+-- Evento para actualizar el estado de invisibilidad
+addEvent("admin:invisibilityUpdate", true)
+addEventHandler("admin:invisibilityUpdate", root, function(isInvisible, message)
+    outputChatBox(message, 0, 255, 0)
 end)
 

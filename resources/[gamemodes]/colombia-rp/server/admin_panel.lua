@@ -158,6 +158,108 @@ addEventHandler("admin:teleportToPlayer", root, function(characterId)
     outputServerLog("[ADMIN] " .. getPlayerName(source) .. " se teleportó a " .. displayName .. " (ID: " .. characterId .. ")")
 end)
 
+-- Evento para toggle invisibilidad (desde el panel)
+addEvent("admin:toggleInvisibility", true)
+addEventHandler("admin:toggleInvisibility", root, function()
+    if not isElement(source) or getElementType(source) ~= "player" then
+        return
+    end
+    
+    if not isPlayerAdmin(source) then
+        outputChatBox("No tienes permiso para usar esta función.", source, 255, 0, 0)
+        return
+    end
+    
+    local isInvisible = getElementData(source, "admin:invisible") or false
+    
+    if isInvisible then
+        -- Hacer visible
+        setElementAlpha(source, 255)
+        setPlayerNametagShowing(source, true)
+        setElementData(source, "admin:invisible", false)
+        triggerClientEvent(source, "admin:invisibilityUpdate", source, false, "Invisibilidad desactivada. Ahora eres visible.")
+        outputServerLog("[ADMIN] " .. getPlayerName(source) .. " desactivó la invisibilidad")
+    else
+        -- Hacer invisible
+        setElementAlpha(source, 0)
+        setPlayerNametagShowing(source, false)
+        setElementData(source, "admin:invisible", true)
+        triggerClientEvent(source, "admin:invisibilityUpdate", source, true, "Invisibilidad activada. Ahora eres invisible.")
+        outputServerLog("[ADMIN] " .. getPlayerName(source) .. " activó la invisibilidad")
+    end
+end)
+
+-- Evento para curar jugador (desde el panel)
+addEvent("admin:healPlayer", true)
+addEventHandler("admin:healPlayer", root, function(characterId)
+    if not isElement(source) or getElementType(source) ~= "player" then
+        return
+    end
+    
+    if not isPlayerAdmin(source) then
+        triggerClientEvent(source, "admin:healResponse", source, false, "No tienes permiso para usar esta función.")
+        return
+    end
+    
+    if not characterId or not tonumber(characterId) then
+        triggerClientEvent(source, "admin:healResponse", source, false, "ID de personaje inválido.")
+        return
+    end
+    
+    characterId = tonumber(characterId)
+    
+    -- Buscar jugador con ese ID de personaje
+    local target = nil
+    for _, p in ipairs(getElementsByType("player")) do
+        if getElementData(p, "character:selected") then
+            local pCharId = getElementData(p, "character:id")
+            if pCharId and tonumber(pCharId) == characterId then
+                target = p
+                break
+            end
+        end
+    end
+    
+    if not target then
+        triggerClientEvent(source, "admin:healResponse", source, false, "No se encontró ningún jugador con el ID de personaje " .. characterId .. ".")
+        return
+    end
+    
+    -- Curar completamente al jugador
+    setElementHealth(target, 100)
+    setPedArmor(target, 100)
+    
+    -- Actualizar en la base de datos
+    local charId = getElementData(target, "character:id")
+    if charId then
+        executeDatabase("UPDATE characters SET health = ? WHERE id = ?", 100, charId)
+    end
+    
+    local charName = getElementData(target, "character:name")
+    local charSurname = getElementData(target, "character:surname")
+    local displayName = (charName and charSurname) and (charName .. " " .. charSurname) or getPlayerName(target)
+    
+    triggerClientEvent(source, "admin:healResponse", source, true, "Has curado completamente a " .. displayName .. " (ID: " .. characterId .. ").")
+    outputChatBox("Un administrador te ha curado completamente.", target, 0, 255, 0)
+    outputServerLog("[ADMIN] " .. getPlayerName(source) .. " curó completamente a " .. displayName .. " (ID: " .. characterId .. ")")
+end)
+
+-- Restaurar visibilidad al desconectar
+addEventHandler("onPlayerQuit", root, function()
+    if getElementData(source, "admin:invisible") then
+        setElementData(source, "admin:invisible", nil)
+    end
+end)
+
+-- Restaurar visibilidad al cambiar de personaje
+addEventHandler("onPlayerLogout", root, function()
+    if getElementData(source, "admin:invisible") then
+        setElementAlpha(source, 255)
+        setPlayerNametagShowing(source, true)
+        setElementData(source, "admin:invisible", nil)
+    end
+end)
+
 -- Evento para obtener coordenadas (desde el panel)
 addEvent("admin:getCoords", true)
 addEventHandler("admin:getCoords", root, function()
