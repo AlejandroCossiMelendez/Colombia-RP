@@ -426,7 +426,8 @@ function setupSwipeToDelete(contactItem, index, contactNumber) {
             contactItem.style.opacity = '0';
             
             setTimeout(() => {
-                deleteContact(index, contactNumber);
+                // Usar null como índice y el número como identificador principal
+                deleteContact(null, contactNumber, true); // true = skipConfirm
             }, 300);
         } else {
             // Volver a la posición original
@@ -468,7 +469,8 @@ function setupSwipeToDelete(contactItem, index, contactNumber) {
             contactItem.style.opacity = '0';
             
             setTimeout(() => {
-                deleteContact(index, contactNumber);
+                // Usar null como índice y el número como identificador principal
+                deleteContact(null, contactNumber, true); // true = skipConfirm
             }, 300);
         } else {
             contactItem.querySelector('.contact-content').style.transform = 'translateX(0)';
@@ -642,7 +644,7 @@ function addContact() {
 }
 
 // Función para eliminar contacto
-function deleteContact(index, contactNumber) {
+function deleteContact(index, contactNumber, skipConfirm) {
     console.log('deleteContact llamado con índice:', index, 'número:', contactNumber);
     console.log('Contactos antes de eliminar:', contacts);
     
@@ -670,22 +672,39 @@ function deleteContact(index, contactNumber) {
         return;
     }
     
-    if (confirm('¿Eliminar el contacto "' + contactToDelete.name + '"?')) {
+    // Si skipConfirm es true (llamado desde swipe), eliminar directamente
+    // Si es false o undefined, pedir confirmación
+    const shouldDelete = skipConfirm || confirm('¿Eliminar el contacto "' + contactToDelete.name + '"?');
+    
+    if (shouldDelete) {
+        // Eliminar del array
         contacts.splice(deleteIndex, 1);
         console.log('Contacto eliminado. Contactos restantes:', contacts);
-        loadContacts();
         
-        // Guardar en MTA inmediatamente después de eliminar
+        // Guardar en MTA ANTES de recargar la lista
         if (window.mta && window.mta.triggerEvent) {
             try {
                 const jsonString = JSON.stringify(contacts);
                 console.log('Guardando contactos después de eliminar:', contacts.length, 'contactos');
+                console.log('JSON a enviar:', jsonString);
                 window.mta.triggerEvent('saveContacts', jsonString);
                 console.log('Evento saveContacts enviado correctamente después de eliminar');
+                
+                // Recargar la lista después de un pequeño delay para asegurar que el guardado se procese
+                setTimeout(() => {
+                    loadContacts();
+                }, 100);
             } catch (e) {
                 console.error('Error al guardar contactos:', e);
                 alert('Error al guardar contactos. Por favor intenta de nuevo.');
+                // Recargar de todas formas para reflejar el cambio visual
+                loadContacts();
             }
+        } else {
+            console.error('MTA no está disponible para guardar contactos');
+            alert('Error: No se pudo conectar con el servidor para guardar contactos.');
+            // Recargar de todas formas para reflejar el cambio visual
+            loadContacts();
         }
     }
 }
