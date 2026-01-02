@@ -87,26 +87,12 @@ function openPhone()
     renderTime(true)
 end
 
-function closePhone()
-    if not phoneVisible then
-        return
-    end
-    
-    phoneVisible = false
-    -- Actualizar estado del teléfono en elementData
-    setElementData(localPlayer, "phone:visible", false)
-    
-    -- PRIMERO: Ocultar el navegador INMEDIATAMENTE para que desaparezca visualmente
-    if phoneBrowser and isElement(phoneBrowser) then
-        guiSetVisible(phoneBrowser, false)
-    end
-    
-    -- SEGUNDO: Restaurar controles del juego INMEDIATAMENTE
+-- Función auxiliar para restaurar controles del juego
+local function restoreGameControls()
     showCursor(false)
     guiSetInputEnabled(false)
     guiSetInputMode("allow_binds")
     
-    -- TERCERO: Habilitar todos los controles del juego INMEDIATAMENTE
     local controlsToEnable = {
         "fire", "next_weapon", "previous_weapon", "forwards", "backwards", 
         "left", "right", "jump", "sprint", "crouch", "walk", "enter_exit",
@@ -124,17 +110,39 @@ function closePhone()
     for _, control in ipairs(controlsToEnable) do
         toggleControl(control, true)
     end
+end
+
+function closePhone()
+    if not phoneVisible then
+        return
+    end
     
-    -- CUARTO: Detener el renderizado del tiempo
+    phoneVisible = false
+    -- Actualizar estado del teléfono en elementData
+    setElementData(localPlayer, "phone:visible", false)
+    
+    -- PRIMERO: Ocultar el navegador INMEDIATAMENTE para que desaparezca visualmente
+    if phoneBrowser and isElement(phoneBrowser) then
+        guiSetVisible(phoneBrowser, false)
+    end
+    
+    -- SEGUNDO: Restaurar controles del juego INMEDIATAMENTE (múltiples veces para asegurar)
+    restoreGameControls()
+    restoreGameControls() -- Doble verificación
+    
+    -- TERCERO: Detener el renderizado del tiempo
     renderTime(false)
     
-    -- QUINTO: Remover event handlers
+    -- CUARTO: Remover event handlers
     if phoneBrowser and isElement(phoneBrowser) then
         removeEventHandler("onClientBrowserCreated", phoneBrowser, loadPhoneBrowser)
         removeEventHandler("onClientBrowserDocumentReady", phoneBrowser, whenPhoneBrowserReady)
     end
     
-    -- SEXTO: Destruir el navegador después de un pequeño delay para asegurar que se haya ocultado
+    -- QUINTO: Restaurar controles inmediatamente después de remover handlers
+    restoreGameControls()
+    
+    -- SEXTO: Destruir el navegador después de un pequeño delay
     setTimer(function()
         if phoneBrowser and isElement(phoneBrowser) then
             destroyElement(phoneBrowser)
@@ -142,19 +150,29 @@ function closePhone()
             browserContent = nil
         end
         
-        -- Verificación final: asegurar que todo esté correcto
-        showCursor(false)
-        guiSetInputEnabled(false)
-        guiSetInputMode("allow_binds")
-        
-        -- Habilitar controles nuevamente por si acaso
-        for _, control in ipairs(controlsToEnable) do
-            toggleControl(control, true)
-        end
+        -- Restaurar controles nuevamente después de destruir el navegador
+        restoreGameControls()
         
         -- Notificar que el teléfono se cerró
         triggerEvent("phoneClosed", localPlayer)
+    end, 50, 1)
+    
+    -- SÉPTIMO: Restaurar controles múltiples veces con diferentes delays para asegurar
+    setTimer(function()
+        restoreGameControls()
+    end, 10, 1)
+    
+    setTimer(function()
+        restoreGameControls()
+    end, 25, 1)
+    
+    setTimer(function()
+        restoreGameControls()
     end, 100, 1)
+    
+    setTimer(function()
+        restoreGameControls()
+    end, 200, 1)
 end
 
 -- Evento del servidor para abrir el teléfono
