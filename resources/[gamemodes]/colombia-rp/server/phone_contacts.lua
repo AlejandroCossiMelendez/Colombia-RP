@@ -74,15 +74,26 @@ addEventHandler("saveContacts", root, function(contactsJson)
     -- Verificar estructura y convertir si es necesario
     local arrayLength = #contacts
     local pairCount = 0
+    local hasName = false
+    local hasNumber = false
     for k, v in pairs(contacts) do
         pairCount = pairCount + 1
+        if k == "name" then hasName = true end
+        if k == "number" then hasNumber = true end
     end
     
     outputServerLog("[PHONE] Array length (#): " .. arrayLength)
     outputServerLog("[PHONE] Pairs count: " .. pairCount)
+    outputServerLog("[PHONE] Tiene 'name': " .. tostring(hasName) .. ", Tiene 'number': " .. tostring(hasNumber))
     
-    -- Si el array está vacío pero hay pairs, podría ser un objeto en lugar de array
-    if arrayLength == 0 and pairCount > 0 then
+    -- Si el array está vacío pero tiene las propiedades name y number directamente, 
+    -- significa que fromJSON devolvió el objeto del array en lugar del array
+    if arrayLength == 0 and hasName and hasNumber then
+        outputServerLog("[PHONE] fromJSON devolvió objeto directo en lugar de array. Convirtiendo...")
+        -- Convertir el objeto único a un array con un elemento
+        contacts = {contacts}
+        outputServerLog("[PHONE] Convertido a array con " .. #contacts .. " elemento(s)")
+    elseif arrayLength == 0 and pairCount > 0 then
         outputServerLog("[PHONE] WARNING: Array vacío pero hay " .. pairCount .. " pares. Intentando convertir...")
         -- Intentar convertir objeto a array
         local tempArray = {}
