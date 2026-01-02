@@ -53,6 +53,10 @@ function showCharacterGUI()
     characterBrowser = guiCreateBrowser(0, 0, screenWidth, screenHeight, true, true, false)
     browserContent = guiGetBrowser(characterBrowser)
     
+    -- Guardar referencia del browser para el sistema de preview
+    setElementData(localPlayer, "character:browser", characterBrowser)
+    setElementData(localPlayer, "character:browserContent", browserContent)
+    
     if not characterBrowser or not browserContent then
         outputChatBox("Error: No se pudo crear el navegador de personajes", 255, 0, 0)
         return

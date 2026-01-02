@@ -36,6 +36,7 @@
     <!-- Scripts del cliente -->
     <script src="client/login_gui.lua" type="client" />
     <script src="client/character_gui.lua" type="client" />
+    <script src="client/character_skin_preview.lua" type="client" />
     <script src="client/hud.lua" type="client" />
     <script src="client/death_hud.lua" type="client" />
     <script src="client/scoreboard.lua" type="client" />

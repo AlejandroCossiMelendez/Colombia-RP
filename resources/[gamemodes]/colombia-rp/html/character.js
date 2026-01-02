@@ -24,13 +24,15 @@ function loadCharacters(characters) {
             const gender = char.gender || 0;
             const genderText = gender === 0 ? 'Masculino' : 'Femenino';
             
-            // Crear representación visual de la skin
+            // Crear representación visual de la skin con imagen
             const skinColor = getSkinColor(skinId);
             const skinIcon = getSkinIcon(gender);
+            const imageId = `skin-image-${char.id}`;
             card.innerHTML = `
                 <div class="character-skin-preview" style="background: linear-gradient(135deg, ${skinColor.primary} 0%, ${skinColor.secondary} 100%);">
                     <div class="skin-visual">
-                        <div class="skin-icon">${skinIcon}</div>
+                        <img id="${imageId}" src="" alt="Skin ${skinId}" class="skin-image" style="display: none;" />
+                        <div class="skin-icon fallback-icon">${skinIcon}</div>
                         <div class="skin-shadow"></div>
                     </div>
                     <div class="skin-info">
@@ -47,6 +49,11 @@ function loadCharacters(characters) {
                 </div>
             `;
             container.appendChild(card);
+            
+            // Solicitar preview de la skin al cliente
+            if (window.mta && window.mta.triggerEvent) {
+                window.mta.triggerEvent('requestSkinPreview', char.id, skinId);
+            }
         });
     }
 }
@@ -257,6 +264,31 @@ function getSkinIcon(gender) {
         return '👩'; // Femenino
     }
 }
+
+// Función para actualizar la imagen de preview de la skin
+function updateSkinPreviewImage(characterId, imageData) {
+    const imageElement = document.getElementById(`skin-image-${characterId}`);
+    const fallbackIcon = imageElement ? imageElement.parentElement.querySelector('.fallback-icon') : null;
+    
+    if (imageElement && imageData) {
+        imageElement.src = imageData;
+        imageElement.onload = function() {
+            imageElement.style.display = 'block';
+            if (fallbackIcon) {
+                fallbackIcon.style.display = 'none';
+            }
+        };
+        imageElement.onerror = function() {
+            imageElement.style.display = 'none';
+            if (fallbackIcon) {
+                fallbackIcon.style.display = 'block';
+            }
+        };
+    }
+}
+
+// Exponer función para MTA
+window.updateSkinPreviewImage = updateSkinPreviewImage;
 
 // Funciones expuestas para MTA
 window.loadCharacters = loadCharacters;
