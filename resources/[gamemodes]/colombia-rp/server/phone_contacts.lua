@@ -112,15 +112,6 @@ addEventHandler("saveContacts", root, function(contactsJson)
             errorCount = errorCount + 1
         end
     end
-    
-    if isElement(player) and getElementType(player) == "player" then
-        if insertCount > 0 then
-            outputChatBox("✓ " .. insertCount .. " contacto(s) guardado(s) correctamente.", player, 0, 255, 0)
-        end
-        if errorCount > 0 then
-            outputChatBox("⚠ Error al guardar " .. errorCount .. " contacto(s).", player, 255, 165, 0)
-        end
-    end
 end)
 
 -- Evento para cargar contactos
