@@ -28,13 +28,14 @@ function showLoginGUI()
     guiWindowSetSizable(loginWindow, false)
     guiSetAlpha(loginWindow, 0) -- Ventana transparente
     
-    -- Imagen de fondo a pantalla completa
+    -- Imagen de fondo a pantalla completa (crear primero para que quede atrás)
     backgroundImage = guiCreateStaticImage(0, 0, screenWidth, screenHeight, ":colombia-rp/colombia-rp-login.png", false, loginWindow)
     
     -- Panel oscuro semi-transparente sobre el fondo
     local overlayPanel = guiCreateLabel(0, 0, screenWidth, screenHeight, "", false, loginWindow)
     guiLabelSetColor(overlayPanel, 0, 0, 0)
     guiSetAlpha(overlayPanel, 0.3) -- Overlay oscuro ligero
+    guiBringToFront(overlayPanel) -- Asegurar que esté encima de la imagen
     
     -- Contenedor principal centrado
     local containerWidth = 1000
@@ -42,122 +43,146 @@ function showLoginGUI()
     local containerX = (screenWidth - containerWidth) / 2
     local containerY = (screenHeight - containerHeight) / 2
     
-    -- Tabs en la parte superior
+    -- Tabs en la parte superior (traer al frente)
     tabButton = guiCreateButton(containerX, containerY - 50, 200, 45, "Login", false, loginWindow)
     guiSetProperty(tabButton, "NormalTextColour", "FFFFFFFF")
     guiSetProperty(tabButton, "HoverTextColour", "FF00FFFF")
+    guiBringToFront(tabButton)
     
     registerTabButton = guiCreateButton(containerX + 200, containerY - 50, 200, 45, "Register", false, loginWindow)
     guiSetProperty(registerTabButton, "NormalTextColour", "FF888888")
     guiSetProperty(registerTabButton, "HoverTextColour", "FF00FFFF")
+    guiBringToFront(registerTabButton)
     
     -- Panel izquierdo - Login
     local loginPanelBg = guiCreateLabel(containerX, containerY, 480, containerHeight, "", false, loginWindow)
     guiLabelSetColor(loginPanelBg, 0, 0, 0)
     guiSetAlpha(loginPanelBg, 0.7) -- Fondo oscuro semi-transparente
     
-    -- Título Login
+    -- Título Login (traer al frente)
     local loginTitle = guiCreateLabel(containerX, containerY + 20, 480, 40, "Welcome to COLOMBIA RP", false, loginWindow)
     guiLabelSetColor(loginTitle, 255, 255, 255)
     guiSetFont(loginTitle, "default-bold")
     guiLabelSetHorizontalAlign(loginTitle, "center", true)
+    guiBringToFront(loginTitle)
     
-    -- Campos Login
+    -- Campos Login (traer al frente)
     local usernameLabel = guiCreateLabel(containerX + 50, containerY + 80, 380, 25, "Username:", false, loginWindow)
     guiLabelSetColor(usernameLabel, 255, 255, 255)
     guiSetFont(usernameLabel, "default-bold")
+    guiBringToFront(usernameLabel)
     
     usernameEdit = guiCreateEdit(containerX + 50, containerY + 105, 380, 40, "", false, loginWindow)
     guiSetProperty(usernameEdit, "NormalTextColour", "FFFFFFFF")
     guiSetProperty(usernameEdit, "NormalEditboxColour", "FF2A2A2A")
+    guiBringToFront(usernameEdit)
     
     local passwordLabel = guiCreateLabel(containerX + 50, containerY + 160, 380, 25, "Password:", false, loginWindow)
     guiLabelSetColor(passwordLabel, 255, 255, 255)
     guiSetFont(passwordLabel, "default-bold")
+    guiBringToFront(passwordLabel)
     
     passwordEdit = guiCreateEdit(containerX + 50, containerY + 185, 380, 40, "", false, loginWindow)
     guiEditSetMasked(passwordEdit, true)
     guiSetProperty(passwordEdit, "NormalTextColour", "FFFFFFFF")
     guiSetProperty(passwordEdit, "NormalEditboxColour", "FF2A2A2A")
+    guiBringToFront(passwordEdit)
     
     -- Checkbox Remember Me
     local rememberCheckbox = guiCreateCheckBox(containerX + 50, containerY + 240, 200, 25, "Remember Me", false, false, loginWindow)
     guiCheckBoxSetSelected(rememberCheckbox, true)
     guiLabelSetColor(rememberCheckbox, 255, 255, 255)
+    guiBringToFront(rememberCheckbox)
     
     -- Botón Login (azul)
     loginButton = guiCreateButton(containerX + 50, containerY + 280, 380, 50, "Login", false, loginWindow)
     guiSetProperty(loginButton, "NormalTextColour", "FFFFFFFF")
     guiSetProperty(loginButton, "HoverTextColour", "FF00FFFF")
+    guiBringToFront(loginButton)
     
     -- Link Forgot Password
     local forgotPasswordLabel = guiCreateLabel(containerX + 50, containerY + 340, 200, 25, "Forgot Password?", false, loginWindow)
     guiLabelSetColor(forgotPasswordLabel, 150, 200, 255)
     guiSetFont(forgotPasswordLabel, "default-small")
+    guiBringToFront(forgotPasswordLabel)
     
-    -- Panel derecho - Register
+    -- Panel derecho - Register (crear después para que esté encima)
     local registerPanelBg = guiCreateLabel(containerX + 520, containerY, 480, containerHeight, "", false, loginWindow)
     guiLabelSetColor(registerPanelBg, 0, 0, 0)
     guiSetAlpha(registerPanelBg, 0.7) -- Fondo oscuro semi-transparente
+    guiBringToFront(registerPanelBg) -- Traer al frente
     
-    -- Título Register
+    -- Título Register (traer al frente)
     local registerTitle = guiCreateLabel(containerX + 520, containerY + 20, 480, 40, "Create a New Account", false, loginWindow)
     guiLabelSetColor(registerTitle, 255, 255, 255)
     guiSetFont(registerTitle, "default-bold")
     guiLabelSetHorizontalAlign(registerTitle, "center", true)
+    guiBringToFront(registerTitle)
     
-    -- Campos Register
+    -- Campos Register (traer al frente)
     local registerUsernameLabel = guiCreateLabel(containerX + 570, containerY + 80, 380, 25, "Username:", false, loginWindow)
     guiLabelSetColor(registerUsernameLabel, 255, 255, 255)
     guiSetFont(registerUsernameLabel, "default-bold")
+    guiBringToFront(registerUsernameLabel)
     
     local registerUsernameEdit = guiCreateEdit(containerX + 570, containerY + 105, 380, 40, "", false, loginWindow)
     guiSetProperty(registerUsernameEdit, "NormalTextColour", "FFFFFFFF")
     guiSetProperty(registerUsernameEdit, "NormalEditboxColour", "FF2A2A2A")
+    guiBringToFront(registerUsernameEdit)
     
     local emailLabel = guiCreateLabel(containerX + 570, containerY + 160, 380, 25, "E-Mail:", false, loginWindow)
     guiLabelSetColor(emailLabel, 255, 255, 255)
     guiSetFont(emailLabel, "default-bold")
+    guiBringToFront(emailLabel)
     
     emailEdit = guiCreateEdit(containerX + 570, containerY + 185, 380, 40, "", false, loginWindow)
     guiSetProperty(emailEdit, "NormalTextColour", "FFFFFFFF")
     guiSetProperty(emailEdit, "NormalEditboxColour", "FF2A2A2A")
+    guiBringToFront(emailEdit)
     
     local registerPasswordLabel = guiCreateLabel(containerX + 570, containerY + 240, 380, 25, "Password:", false, loginWindow)
     guiLabelSetColor(registerPasswordLabel, 255, 255, 255)
     guiSetFont(registerPasswordLabel, "default-bold")
+    guiBringToFront(registerPasswordLabel)
     
     local registerPasswordEdit = guiCreateEdit(containerX + 570, containerY + 265, 380, 40, "", false, loginWindow)
     guiEditSetMasked(registerPasswordEdit, true)
     guiSetProperty(registerPasswordEdit, "NormalTextColour", "FFFFFFFF")
     guiSetProperty(registerPasswordEdit, "NormalEditboxColour", "FF2A2A2A")
+    guiBringToFront(registerPasswordEdit)
     
     local confirmPasswordLabel = guiCreateLabel(containerX + 570, containerY + 320, 380, 25, "Confirm Password:", false, loginWindow)
     guiLabelSetColor(confirmPasswordLabel, 255, 255, 255)
     guiSetFont(confirmPasswordLabel, "default-bold")
+    guiBringToFront(confirmPasswordLabel)
     
     local confirmPasswordEdit = guiCreateEdit(containerX + 570, containerY + 345, 380, 40, "", false, loginWindow)
     guiEditSetMasked(confirmPasswordEdit, true)
     guiSetProperty(confirmPasswordEdit, "NormalTextColour", "FFFFFFFF")
     guiSetProperty(confirmPasswordEdit, "NormalEditboxColour", "FF2A2A2A")
+    guiBringToFront(confirmPasswordEdit)
     
     -- Botón Register (verde)
     registerButton = guiCreateButton(containerX + 570, containerY + 400, 380, 50, "Register", false, loginWindow)
     guiSetProperty(registerButton, "NormalTextColour", "FFFFFFFF")
     guiSetProperty(registerButton, "HoverTextColour", "FF00FF00")
+    guiBringToFront(registerButton)
     
-    -- Botones inferiores
+    -- Botones inferiores (traer al frente)
     local settingsButton = guiCreateButton(containerX, containerY + containerHeight + 20, 200, 40, "Settings", false, loginWindow)
     guiSetProperty(settingsButton, "NormalTextColour", "FFFFFFFF")
     guiSetProperty(settingsButton, "HoverTextColour", "FF00FFFF")
+    guiBringToFront(settingsButton)
     
     local aboutButton = guiCreateButton(containerX + 400, containerY + containerHeight + 20, 200, 40, "About", false, loginWindow)
     guiSetProperty(aboutButton, "NormalTextColour", "FFFFFFFF")
     guiSetProperty(aboutButton, "HoverTextColour", "FF00FFFF")
+    guiBringToFront(aboutButton)
     
     local quitButton = guiCreateButton(containerX + 800, containerY + containerHeight + 20, 200, 40, "Quit", false, loginWindow)
     guiSetProperty(quitButton, "NormalTextColour", "FFFFFFFF")
     guiSetProperty(quitButton, "HoverTextColour", "FFFF0000")
+    guiBringToFront(quitButton)
     
     -- Mostrar cursor y habilitar input
     showCursor(true)
