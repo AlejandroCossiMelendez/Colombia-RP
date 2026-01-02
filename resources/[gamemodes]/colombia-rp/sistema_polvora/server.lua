@@ -203,11 +203,18 @@ addEventHandler("polvora:crearC4", root, function(x, y, z, rotZ, itemId, itemNam
             -- Aplicar daño a todos los jugadores cercanos
             local explosionRadius = 10 -- Radio de la explosión en metros
             
+            -- Notificar explosión a TODOS los jugadores (para efectos visuales)
             for _, p in ipairs(getElementsByType("player")) do
                 if isElement(p) and getElementType(p) == "player" then
                     local px, py, pz = getElementPosition(p)
                     local distance = getDistanceBetweenPoints3D(objX, objY, objZ, px, py, pz)
                     
+                    -- Enviar efectos visuales a todos los jugadores dentro del rango
+                    if distance < 100 then
+                        triggerClientEvent(p, "polvora:notificarExplosion", p, objX, objY, objZ, explosionType)
+                    end
+                    
+                    -- Aplicar daño solo a jugadores dentro del radio de explosión
                     if distance <= explosionRadius then
                         -- Calcular daño según la distancia (más cerca = más daño)
                         local distanceFactor = 1 - (distance / explosionRadius) -- 1.0 en el centro, 0.0 en el borde
@@ -227,11 +234,6 @@ addEventHandler("polvora:crearC4", root, function(x, y, z, rotZ, itemId, itemNam
                         if newHealth <= 0 then
                             killPed(p)
                         end
-                    end
-                    
-                    -- Notificar explosión a todos los jugadores cercanos
-                    if distance < 50 then
-                        triggerClientEvent(p, "polvora:notificarExplosion", p, objX, objY, objZ, explosionType)
                     end
                 end
             end

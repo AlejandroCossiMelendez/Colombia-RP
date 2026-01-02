@@ -343,17 +343,30 @@ addEventHandler("polvora:notificarExplosion", root, function(x, y, z, explosionT
     local px, py, pz = getElementPosition(localPlayer)
     local distance = getDistanceBetweenPoints3D(x, y, z, px, py, pz)
     
-    if distance < 50 then
-        outputChatBox("💥 ¡BOOM! Una explosión ha ocurrido cerca.", 255, 100, 0)
+    if distance < 100 then
+        -- Crear explosión visual en el cliente (más visible)
+        createExplosion(x, y, z, explosionType or 6, true, 1.0, false)
         
-        -- Crear efectos visuales de la explosión
-        if distance < 30 then
-            -- Efectos de partículas cercanas
-            for i = 1, 20 do
-                setTimer(function()
-                    fxAddSparks(x + math.random(-3, 3), y + math.random(-3, 3), z + math.random(0, 2), 0, 0, 0, 5, 1, 255, 100, 0, false, 0.5, 1)
-                end, 50 * i, 1)
-            end
+        -- Efectos de partículas intensos
+        for i = 1, 50 do
+            setTimer(function()
+                -- Chispas de fuego
+                fxAddSparks(x + math.random(-5, 5), y + math.random(-5, 5), z + math.random(0, 3), 0, 0, 0, 8, 1, 255, 100, 0, false, 1, 1)
+            end, 30 * i, 1)
+        end
+        
+        -- Efecto de humo
+        for i = 1, 15 do
+            setTimer(function()
+                fxAddGunshot(x + math.random(-3, 3), y + math.random(-3, 3), z + math.random(0, 2), 0, 0, 0, false)
+            end, 100 * i, 1)
+        end
+        
+        -- Sonido de explosión
+        playSoundFrontEnd(1)
+        
+        if distance < 50 then
+            outputChatBox("💥 ¡BOOM! Una explosión ha ocurrido cerca.", 255, 100, 0)
         end
     end
 end)
