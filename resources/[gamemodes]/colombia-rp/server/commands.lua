@@ -57,37 +57,53 @@ addCommandHandler("pos", function(player, cmd)
     outputServerLog("[COORDS] " .. getPlayerName(player) .. " - " .. coordsString)
 end)
 
--- Comando para revivir jugador en el lugar donde murió (solo admin)
-addCommandHandler("revivir", function(player, cmd, targetName)
+-- Comando para revivir jugador en el lugar donde murió (solo admin) - Por ID de personaje
+addCommandHandler("revivir", function(player, cmd, characterIdStr)
     if not isPlayerAdmin(player) then
         outputChatBox("No tienes permiso para usar este comando.", player, 255, 0, 0)
         return
     end
     
-    if not targetName then
-        outputChatBox("Uso: /revivir [nombre del jugador]", player, 255, 255, 0)
+    if not characterIdStr then
+        outputChatBox("Uso: /revivir [ID del personaje]", player, 255, 255, 0)
+        outputChatBox("Ejemplo: /revivir 1", player, 255, 255, 0)
         return
     end
     
-    local target = getPlayerFromName(targetName)
+    local characterId = tonumber(characterIdStr)
+    if not characterId then
+        outputChatBox("El ID debe ser un número. Uso: /revivir [ID del personaje]", player, 255, 0, 0)
+        return
+    end
+    
+    -- Buscar jugador con ese ID de personaje
+    local target = nil
+    for _, p in ipairs(getElementsByType("player")) do
+        if getElementData(p, "character:selected") then
+            local pCharId = getElementData(p, "character:id")
+            if pCharId and tonumber(pCharId) == characterId then
+                target = p
+                break
+            end
+        end
+    end
+    
     if not target then
-        outputChatBox("Jugador '" .. targetName .. "' no encontrado.", player, 255, 0, 0)
-        return
-    end
-    
-    -- Verificar que el jugador tenga un personaje seleccionado
-    if not getElementData(target, "character:selected") then
-        outputChatBox("El jugador " .. getPlayerName(target) .. " no tiene un personaje seleccionado.", player, 255, 0, 0)
+        outputChatBox("No se encontró ningún jugador con el ID de personaje " .. characterId .. ".", player, 255, 0, 0)
         return
     end
     
     -- Intentar revivir en el lugar donde murió
     if respawnAtDeathLocation(target) then
-        outputChatBox("Has revivido a " .. getPlayerName(target) .. " en el lugar donde murió.", player, 0, 255, 0)
+        local charName = getElementData(target, "character:name")
+        local charSurname = getElementData(target, "character:surname")
+        local displayName = (charName and charSurname) and (charName .. " " .. charSurname) or getPlayerName(target)
+        
+        outputChatBox("Has revivido a " .. displayName .. " (ID: " .. characterId .. ") en el lugar donde murió.", player, 0, 255, 0)
         outputChatBox("Un administrador te ha revivido en el lugar donde moriste.", target, 0, 255, 0)
-        outputServerLog("[ADMIN] " .. getPlayerName(player) .. " revivió a " .. getPlayerName(target) .. " en el lugar donde murió")
+        outputServerLog("[ADMIN] " .. getPlayerName(player) .. " revivió al personaje ID " .. characterId .. " (" .. displayName .. ") en el lugar donde murió")
     else
-        outputChatBox("No se pudo revivir a " .. getPlayerName(target) .. ". El jugador no está muerto o no hay posición de muerte guardada.", player, 255, 0, 0)
+        outputChatBox("No se pudo revivir al personaje ID " .. characterId .. ". El jugador no está muerto o no hay posición de muerte guardada.", player, 255, 0, 0)
     end
 end)
 

@@ -42,6 +42,24 @@ addEventHandler("onClientRender", root, function()
         return
     end
     
+    -- Actualizar salud en tiempo real desde el elemento del jugador
+    if isElement(localPlayer) then
+        local currentHealth = getElementHealth(localPlayer)
+        if currentHealth then
+            health = currentHealth
+        end
+    end
+    
+    -- Actualizar hambre y sed desde elementData (se actualizan desde el servidor)
+    local charHunger = getElementData(localPlayer, "character:hunger")
+    local charThirst = getElementData(localPlayer, "character:thirst")
+    if charHunger then
+        hunger = charHunger
+    end
+    if charThirst then
+        thirst = charThirst
+    end
+    
     -- Fondo del HUD
     local hudX = 20
     local hudY = screenHeight - 150
@@ -65,7 +83,7 @@ addEventHandler("onClientRender", root, function()
     dxDrawRectangle(hudX, hudY + 55, thirstBarWidth, hungerHeight, tocolor(0, 100, 255, 255), false)
     dxDrawText("Sed: " .. math.floor(thirst) .. "%", hudX + 5, hudY + 57, screenWidth, screenHeight, tocolor(255, 255, 255, 255), 1, "default", "left", "top", false, false, false, false, false)
     
-    -- Barra de salud
+    -- Barra de salud (actualizada en tiempo real)
     local healthBarWidth = (health / 100) * hungerWidth
     
     dxDrawRectangle(hudX, hudY + 80, hungerWidth, hungerHeight, tocolor(0, 0, 0, 150), false)
