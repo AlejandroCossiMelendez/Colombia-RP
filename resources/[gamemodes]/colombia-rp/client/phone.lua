@@ -15,8 +15,9 @@ end
 function whenPhoneBrowserReady()
     -- El navegador está listo
     if browserContent and isElement(browserContent) then
-        -- Notificar a phone_calls.lua sobre el browserContent
+        -- Notificar a phone_calls.lua y jbl_panel.lua sobre el browserContent
         triggerEvent("phone:setBrowserContent", resourceRoot, browserContent)
+        setElementData(localPlayer, "phone:browserContent", browserContent)
         executeBrowserJavascript(browserContent, "updateTime();")
         -- Asegurar que el teléfono se abra directamente en el home
         executeBrowserJavascript(browserContent, [[

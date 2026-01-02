@@ -224,6 +224,11 @@ function openApp(appId) {
     if (appId === 5) {
         initPhoneApp();
     }
+    
+    // Si es la app de Spotify (appId 8), inicializar Spotify
+    if (appId === 8) {
+        initSpotifyApp();
+    }
 }
 
 let isInHomeScreen = true; // Variable para rastrear si estamos en el home
@@ -706,6 +711,7 @@ function deleteContact(index, contactNumber, skipConfirm) {
 
 // Exponer funciones para MTA
 window.setMyPhoneNumber = setMyPhoneNumber;
+window.openApp = openApp;
 
 // ==================== SISTEMA DE LLAMADAS ====================
 
@@ -1060,4 +1066,264 @@ operations.forEach((operation, key) => operation.onclick = (e) => {
             break;
     }
 });
+
+// ==================== SISTEMA DE SPOTIFY ====================
+
+let spotifyLoggedIn = false;
+let spotifyUsername = '';
+let currentTrack = null;
+let isPlaying = false;
+let spotifyPlaylist = [];
+let currentTrackIndex = -1;
+let progressTimer = null;
+
+// Inicializar app de Spotify
+function initSpotifyApp() {
+    // Verificar si ya está logueado
+    const savedUsername = localStorage.getItem('spotifyUsername');
+    if (savedUsername) {
+        spotifyLoggedIn = true;
+        spotifyUsername = savedUsername;
+        showSpotifyMain();
+    } else {
+        showSpotifyLogin();
+    }
+    
+    // Configurar botones
+    const loginBtn = get('#spotifyLoginBtn');
+    const searchBtn = get('#spotifySearchBtn');
+    const searchInput = get('#spotifySearchInput');
+    const playBtn = get('#playerPlay');
+    const prevBtn = get('#playerPrev');
+    const nextBtn = get('#playerNext');
+    const volumeSlider = get('#playerVolume');
+    
+    if (loginBtn) {
+        loginBtn.addEventListener('click', handleSpotifyLogin);
+    }
+    
+    if (searchBtn) {
+        searchBtn.addEventListener('click', handleSpotifySearch);
+    }
+    
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleSpotifySearch();
+            }
+        });
+    }
+    
+    if (playBtn) {
+        playBtn.addEventListener('click', togglePlay);
+    }
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', playPrevious);
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', playNext);
+    }
+    
+    if (volumeSlider) {
+        volumeSlider.addEventListener('input', function() {
+            const volume = parseInt(this.value);
+            updateVolume(volume);
+        });
+    }
+}
+
+// Mostrar pantalla de login
+function showSpotifyLogin() {
+    const login = get('#spotifyLogin');
+    const main = get('#spotifyMain');
+    
+    if (login) login.style.display = 'flex';
+    if (main) main.style.display = 'none';
+}
+
+// Mostrar pantalla principal
+function showSpotifyMain() {
+    const login = get('#spotifyLogin');
+    const main = get('#spotifyMain');
+    
+    if (login) login.style.display = 'none';
+    if (main) main.style.display = 'flex';
+}
+
+// Manejar login de Spotify
+function handleSpotifyLogin() {
+    const username = get('#spotifyUsername');
+    const password = get('#spotifyPassword');
+    
+    if (!username || !password) return;
+    
+    const user = username.value.trim();
+    const pass = password.value.trim();
+    
+    if (!user || !pass) {
+        alert('Por favor completa todos los campos');
+        return;
+    }
+    
+    // Simular login (en producción, esto se conectaría con la API de Spotify)
+    spotifyLoggedIn = true;
+    spotifyUsername = user;
+    localStorage.setItem('spotifyUsername', user);
+    
+    showSpotifyMain();
+    
+    // Limpiar campos
+    username.value = '';
+    password.value = '';
+}
+
+// Buscar música
+function handleSpotifySearch() {
+    const searchInput = get('#spotifySearchInput');
+    const results = get('#spotifyResults');
+    
+    if (!searchInput || !results) return;
+    
+    const query = searchInput.value.trim();
+    if (!query) return;
+    
+    // Simular búsqueda (en producción, esto se conectaría con la API de Spotify)
+    // Por ahora, mostraremos resultados simulados
+    displaySearchResults([
+        { title: query + ' - Canción 1', artist: 'Artista 1', url: 'https://example.com/track1.mp3' },
+        { title: query + ' - Canción 2', artist: 'Artista 2', url: 'https://example.com/track2.mp3' },
+        { title: query + ' - Canción 3', artist: 'Artista 3', url: 'https://example.com/track3.mp3' }
+    ]);
+}
+
+// Mostrar resultados de búsqueda
+function displaySearchResults(tracks) {
+    const results = get('#spotifyResults');
+    if (!results) return;
+    
+    results.innerHTML = '';
+    spotifyPlaylist = tracks;
+    
+    tracks.forEach((track, index) => {
+        const item = document.createElement('div');
+        item.className = 'spotify-result-item';
+        item.innerHTML = `
+            <div class="spotify-result-artwork">🎵</div>
+            <div class="spotify-result-info">
+                <div class="spotify-result-title">${track.title}</div>
+                <div class="spotify-result-artist">${track.artist}</div>
+            </div>
+        `;
+        item.addEventListener('click', function() {
+            playTrack(index);
+        });
+        results.appendChild(item);
+    });
+}
+
+// Reproducir track
+function playTrack(index) {
+    if (index < 0 || index >= spotifyPlaylist.length) return;
+    
+    currentTrackIndex = index;
+    currentTrack = spotifyPlaylist[index];
+    
+    // Mostrar reproductor
+    const player = get('#spotifyPlayer');
+    if (player) player.style.display = 'block';
+    
+    // Actualizar información
+    const title = get('#playerTitle');
+    const artist = get('#playerArtist');
+    
+    if (title) title.textContent = currentTrack.title;
+    if (artist) artist.textContent = currentTrack.artist;
+    
+    // Reproducir en el JBL
+    if (window.mta && window.mta.triggerEvent) {
+        window.mta.triggerEvent('jbl:playFromSpotify', currentTrack.url, currentTrack.title);
+    }
+    
+    isPlaying = true;
+    updatePlayButton();
+    startProgressTimer();
+}
+
+// Toggle play/pause
+function togglePlay() {
+    isPlaying = !isPlaying;
+    updatePlayButton();
+    
+    if (window.mta && window.mta.triggerEvent) {
+        if (isPlaying) {
+            window.mta.triggerEvent('jbl:resumeMusic');
+        } else {
+            window.mta.triggerEvent('jbl:pauseMusic');
+        }
+    }
+}
+
+// Actualizar botón de play
+function updatePlayButton() {
+    const playBtn = get('#playerPlay');
+    if (playBtn) {
+        playBtn.textContent = isPlaying ? '⏸' : '▶';
+    }
+}
+
+// Reproducir anterior
+function playPrevious() {
+    if (currentTrackIndex > 0) {
+        playTrack(currentTrackIndex - 1);
+    }
+}
+
+// Reproducir siguiente
+function playNext() {
+    if (currentTrackIndex < spotifyPlaylist.length - 1) {
+        playTrack(currentTrackIndex + 1);
+    }
+}
+
+// Actualizar volumen
+function updateVolume(volume) {
+    const volumeValue = get('#volumeValue');
+    if (volumeValue) {
+        volumeValue.textContent = volume + '%';
+    }
+    
+    if (window.mta && window.mta.triggerEvent) {
+        window.mta.triggerEvent('jbl:setVolume', volume / 100);
+    }
+}
+
+// Iniciar temporizador de progreso
+function startProgressTimer() {
+    if (progressTimer) {
+        clearInterval(progressTimer);
+    }
+    
+    let currentSeconds = 0;
+    progressTimer = setInterval(function() {
+        if (isPlaying && currentTrack) {
+            currentSeconds++;
+            const minutes = Math.floor(currentSeconds / 60);
+            const seconds = currentSeconds % 60;
+            const currentTime = get('#currentTime');
+            if (currentTime) {
+                currentTime.textContent = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+            }
+            
+            // Simular progreso (en producción, esto se actualizaría desde el audio real)
+            const progressFill = get('#progressFill');
+            if (progressFill) {
+                // Simular duración total de 180 segundos
+                const progress = Math.min((currentSeconds / 180) * 100, 100);
+                progressFill.style.width = progress + '%';
+            }
+        }
+    }, 1000);
+}
 

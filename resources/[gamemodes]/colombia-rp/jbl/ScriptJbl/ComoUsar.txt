@@ -1,0 +1,6 @@
+Necessario bone_attach
+/jbl -- Pegar JBL
+/musica LinkMusica  -- Botar Musica no JBL
+/soltarjbl -- Soltar o JBL no chão
+/pegarjbl -- Pegar o JBL do chão
+/guardarjbl -- Guardar o JBL

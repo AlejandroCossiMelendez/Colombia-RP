@@ -1,0 +1,8 @@
+<meta>
+	<info author="Cross" version="1.0" type="Script" name="Crs JBL" />
+
+	<script src="Crs_C.luac" type="client" cache="false" />
+	<script src="Crs_S.luac" type="server" />
+	
+
+</meta>

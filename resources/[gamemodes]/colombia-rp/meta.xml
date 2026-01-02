@@ -28,6 +28,7 @@
     <script src="server/items_integration.lua" type="server" />
     <script src="server/phone_contacts.lua" type="server" />
     <script src="server/phone_calls.lua" type="server" />
+    <script src="server/jbl_system.lua" type="server" />
     <script src="server/main.lua" type="server" />
     
     <!-- Scripts del cliente -->
@@ -49,6 +50,7 @@
     <script src="client/cursor_toggle.lua" type="client" />
     <script src="client/phone.lua" type="client" />
     <script src="client/phone_calls.lua" type="client" />
+    <script src="client/jbl_panel.lua" type="client" />
     
     <!-- Scripts del sistema de items (cliente) -->
     <script src="items/items_list.lua" type="client" />

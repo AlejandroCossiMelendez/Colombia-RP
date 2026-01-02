@@ -54,6 +54,9 @@
                     <button class="app" type="button">
                         <img src="./phone/styles/svgs/gallery.svg" alt="">
                     </button>
+                    <button class="app" type="button">
+                        <img src="./phone/styles/svgs/spotify.svg" alt="">
+                    </button>
                 </div>
             </section>
 
@@ -154,6 +157,61 @@
                         </div>
                         <div class="gallery-grid" id="galleryGrid">
                             <!-- Las imágenes se cargarán aquí -->
+                        </div>
+                    </div>
+                </div>
+                <div class="app-interface" style="display: none;" data-app-id="8"> <!-- Spotify App -->
+                    <div class="spotify-app">
+                        <div class="spotify-header">
+                            <h2>Spotify</h2>
+                        </div>
+                        <div class="spotify-content" id="spotifyContent">
+                            <!-- Pantalla de login -->
+                            <div class="spotify-login" id="spotifyLogin">
+                                <div class="spotify-logo">🎵</div>
+                                <h3>Iniciar sesión en Spotify</h3>
+                                <input type="text" id="spotifyUsername" class="spotify-input" placeholder="Usuario o Email" />
+                                <input type="password" id="spotifyPassword" class="spotify-input" placeholder="Contraseña" />
+                                <button class="spotify-btn" id="spotifyLoginBtn">Iniciar sesión</button>
+                                <p class="spotify-note">O usa Link para reproducir desde YouTube</p>
+                            </div>
+                            
+                            <!-- Pantalla principal (oculta inicialmente) -->
+                            <div class="spotify-main" id="spotifyMain" style="display: none;">
+                                <div class="spotify-search">
+                                    <input type="text" id="spotifySearchInput" class="spotify-search-input" placeholder="Buscar música..." />
+                                    <button class="spotify-search-btn" id="spotifySearchBtn">🔍</button>
+                                </div>
+                                <div class="spotify-results" id="spotifyResults"></div>
+                                <div class="spotify-player" id="spotifyPlayer" style="display: none;">
+                                    <div class="player-info">
+                                        <div class="player-artwork" id="playerArtwork">🎵</div>
+                                        <div class="player-details">
+                                            <div class="player-title" id="playerTitle">Título</div>
+                                            <div class="player-artist" id="playerArtist">Artista</div>
+                                        </div>
+                                    </div>
+                                    <div class="player-controls">
+                                        <button class="player-btn" id="playerPrev">⏮</button>
+                                        <button class="player-btn player-play" id="playerPlay">▶</button>
+                                        <button class="player-btn" id="playerNext">⏭</button>
+                                    </div>
+                                    <div class="player-volume">
+                                        <span>🔊</span>
+                                        <input type="range" id="playerVolume" min="0" max="100" value="50" class="volume-slider" />
+                                        <span id="volumeValue">50%</span>
+                                    </div>
+                                    <div class="player-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" id="progressFill"></div>
+                                        </div>
+                                        <div class="progress-time">
+                                            <span id="currentTime">0:00</span>
+                                            <span id="totalTime">0:00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
