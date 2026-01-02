@@ -389,7 +389,34 @@ addEventHandler( getResourceName( resource ) .. ":login", root,
 		if (source == client) or (source and not client) then
 			triedTokenAuth[ source ] = true
 			if username and password and #username > 0 and #password > 0 then
-				local info, error = exports.sql:query_assoc_single( "SELECT CONCAT(SHA1(CONCAT(username, '%s')),SHA1(CONCAT(salt, SHA1(CONCAT('%s',SHA1(CONCAT(salt, SHA1(CONCAT(username, SHA1(password)))))))))) AS token FROM wcf1_user WHERE `username` = '%s' AND password = SHA1(CONCAT(salt, SHA1(CONCAT(salt, '" .. hash("sha1", password) .. "'))))", getPlayerHash( source ), getPlayerHash( source ), username )
+				-- Verificar que el recurso SQL esté disponible
+				local sqlResource = getResourceFromName("sql")
+				if not sqlResource or getResourceState(sqlResource) ~= "running" then
+					outputDebugString("players: SQL resource not available for login, retrying...", 2)
+					setTimer(function()
+						if source and isElement(source) then
+							triggerEvent(getResourceName( resource ) .. ":login", source, username, password)
+						end
+					end, 1000, 1)
+					return
+				end
+				
+				-- Usar pcall para capturar errores de exports
+				local success, result = pcall(function()
+					return exports.sql:query_assoc_single( "SELECT CONCAT(SHA1(CONCAT(username, '%s')),SHA1(CONCAT(salt, SHA1(CONCAT('%s',SHA1(CONCAT(salt, SHA1(CONCAT(username, SHA1(password)))))))))) AS token FROM wcf1_user WHERE `username` = '%s' AND password = SHA1(CONCAT(salt, SHA1(CONCAT(salt, '" .. hash("sha1", password) .. "'))))", getPlayerHash( source ), getPlayerHash( source ), username )
+				end)
+				
+				if not success then
+					outputDebugString("players: SQL export not available for login, retrying...", 2)
+					setTimer(function()
+						if source and isElement(source) then
+							triggerEvent(getResourceName( resource ) .. ":login", source, username, password)
+						end
+					end, 1000, 1)
+					return
+				end
+				
+				local info, error = result
 				p[ source ] = nil
 				if not info then
 					triggerClientEvent( source, getResourceName( resource ) .. ":loginResult", source, 1 ) -- Wrong username/password

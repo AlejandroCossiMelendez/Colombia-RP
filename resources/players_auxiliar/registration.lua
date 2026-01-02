@@ -26,13 +26,21 @@ end
 addEvent( "players:register", true )
 addEventHandler( "players:register", root,
 	function( username, password )
-		if (source == client) or not client then
+		local theSource = source -- Guardar source en una variable local
+		if not theSource or not isElement(theSource) then
+			outputDebugString("players_auxiliar: Invalid source in registration", 2)
+			return
+		end
+		
+		if (theSource == client) or not client then
 			-- Verificar que el recurso SQL esté disponible
 			local sqlResource = getResourceFromName("sql")
 			if not sqlResource or getResourceState(sqlResource) ~= "running" then
 				outputDebugString("players_auxiliar: SQL resource not available for registration, retrying...", 2)
 				setTimer(function()
-					triggerEvent("players:register", source, username, password)
+					if theSource and isElement(theSource) then
+						triggerEvent("players:register", theSource, username, password)
+					end
 				end, 1000, 1)
 				return
 			end
