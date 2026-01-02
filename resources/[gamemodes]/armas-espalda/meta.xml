@@ -1,4 +1,0 @@
-<meta>
-	<info author="TheBigTiti" name="fegyver a háton asd" version="v1.2" type="script" description="Ez eft olyan script hogy ha nagy kaliber van az inventorydban akkor a nagy kaliber pl(ak stb) a hátadra kerül" />
-	<script src="carmas.lua" type="client"/>
-</meta>

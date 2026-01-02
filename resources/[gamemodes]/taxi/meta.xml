@@ -1,9 +1,0 @@
-<meta>
-	<script src="taxi.lua"/>
-	<script src="taxi_c.lua" type="client"/>
-
-	<settings>
-		<!-- (Civilian) Vehicles you can use for the taxi job -->
-		<setting name="#vehicles" value="[['Taxi', 'Cabbie']]" />
-	</settings>
-</meta>

@@ -1,8 +1,0 @@
-<meta>
-    <info author="FasTriX" name="PuertasPanel" version="1.0" type="misc"/>
-	
-	
-    <script src="server.lua"/>
-    <script src="client.lua" type="client"/>
-
-</meta>

@@ -1,7 +1,0 @@
-[2021-01-26 15:51:24] Account: thomp - Name: Kim_Carlsson - IP: 201.243.199.132 - Serial: 401640190E3709D5F8CBBD120DED19A3 - setElementData(localPlayer,'musculatura',1000)
-[2021-01-28 23:52:50] Account: thomp - Name: Thomp_Fast - IP: 201.243.199.132 - Serial: 401640190E3709D5F8CBBD120DED19A3 - print(getElementData(localPlayer,'Telefono:emisor'))
-[2021-02-09 01:47:07] Account: thomp - Name: Thomp - IP: 190.202.162.199 - Serial: 401640190E3709D5F8CBBD120DED19A3 - playSoundFrontEnd(1)
-[2021-02-09 01:47:12] Account: thomp - Name: Thomp - IP: 190.202.162.199 - Serial: 401640190E3709D5F8CBBD120DED19A3 - playSoundFrontEnd(3)
-[2021-02-09 01:47:16] Account: thomp - Name: Thomp - IP: 190.202.162.199 - Serial: 401640190E3709D5F8CBBD120DED19A3 - playSoundFrontEnd(40)
-[2021-02-21 14:09:12] Account: thomp - Name: Thomp - IP: 201.211.104.101 - Serial: 401640190E3709D5F8CBBD120DED19A3 - setElementData(localPlayer, 'hambre', 1000)
-[2021-02-21 14:09:23] Account: thomp - Name: Thomp - IP: 201.211.104.101 - Serial: 401640190E3709D5F8CBBD120DED19A3 - setElementData(localPlayer, 'sed', 1000)

@@ -1,8 +1,0 @@
-<meta>
-
-	<script src="client.lua" type="client"/>
-	<script src="server.lua" type="server"/>
-	<file src="Lato-Light.ttf"/>
-	<file src="life-jacket.png"/>
-	
-</meta>

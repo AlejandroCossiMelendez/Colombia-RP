@@ -1,8 +1,0 @@
-<meta>
-
-	<script src="ruta.lua" type="shared"/>
-	
-	<script src="cliente.lua" type="client"/>
-	<script src="servidor.lua" type="server"/>
-
-</meta>

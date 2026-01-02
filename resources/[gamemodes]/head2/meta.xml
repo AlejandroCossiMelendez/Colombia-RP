@@ -1,7 +1,0 @@
-<meta>
-    <info author="Dutchman101" type="script" description="Headshot advanced" version="1.1" />
-    <script src="client.lua" type="client" />
-    <script src="server.lua" type="server" />
-    <file src="blood_1.png"></file>
-    <file src="blood_2.png"></file>
-</meta>

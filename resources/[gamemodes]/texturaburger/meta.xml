@@ -1,6 +1,0 @@
-	<meta>
-	<info type="misc" name="burgking" author="+FernandeS" description="" version="1.0" />
-	<file src="burgsh01_law.txd" />
-	<script type="client" src="replace.lua" />
-
-</meta>

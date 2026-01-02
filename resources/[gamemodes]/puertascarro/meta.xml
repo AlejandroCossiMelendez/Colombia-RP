@@ -1,2 +1,0 @@
-    <script src="cDoor.lua" type="client" cache="false" />
-    <script src="sDoor.lua" type="server" />

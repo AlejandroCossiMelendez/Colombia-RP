@@ -1,6 +1,0 @@
-<meta>
-	<info author="FasTriX" version="1.0.0" type="script" name="" description="" showInResourceBrowser="true" />
-	<script src="idskin.lua" type="client" />
-	<file src="banshee.txd" />
-	<file src="banshee.dff" />
-</meta>
