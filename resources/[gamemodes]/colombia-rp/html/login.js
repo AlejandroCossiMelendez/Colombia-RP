@@ -1,13 +1,5 @@
 function focusLogin() {
-    const loginTab = document.querySelector('.tab:first-child');
-    const registerTab = document.querySelector('.tab:last-child');
-    
-    if (loginTab && registerTab) {
-        loginTab.classList.add('active');
-        registerTab.classList.remove('active');
-    }
-    
-    // Scroll suave al panel de login (opcional)
+    // Mantener ambos tabs activos, solo hacer scroll al panel de login
     const loginPanel = document.querySelector('.login-panel');
     if (loginPanel) {
         loginPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -15,15 +7,7 @@ function focusLogin() {
 }
 
 function focusRegister() {
-    const loginTab = document.querySelector('.tab:first-child');
-    const registerTab = document.querySelector('.tab:last-child');
-    
-    if (loginTab && registerTab) {
-        loginTab.classList.remove('active');
-        registerTab.classList.add('active');
-    }
-    
-    // Scroll suave al panel de register (opcional)
+    // Mantener ambos tabs activos, solo hacer scroll al panel de register
     const registerPanel = document.querySelector('.register-panel');
     if (registerPanel) {
         registerPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
