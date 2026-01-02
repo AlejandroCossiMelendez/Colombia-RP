@@ -91,7 +91,9 @@ function conectarJugadorAFrecuencia(jugador, frecuencia, ignoreAviso)
     -- Si se desconecta de la frecuencia (frecuencia = -1 o >= 2000), volver a voz por proximidad
     if tonumber(frecuencia) == -1 or tonumber(frecuencia) >= 2000 then
         setElementData(jugador, "frecuencia.voz", tonumber(frecuencia))
-        -- Restaurar voz por proximidad (no configurar broadcast)
+        -- Restaurar voz por proximidad: NO configurar setPlayerVoiceBroadcastTo
+        -- En MTA, cuando no se configura broadcast, funciona por proximidad automáticamente
+        -- Para "limpiar" el broadcast anterior, configuramos con tabla vacía
         setPlayerVoiceBroadcastTo(jugador, {})
         removeElementData(jugador, "frecuencia.voz.whisper")
         
@@ -218,13 +220,37 @@ addCommandHandler("voz", function(player)
     outputChatBox(" - Usa /whisper para hablar a toda tu facción (solo con frecuencia activa)", player, 0, 255, 0)
 end)
 
+-- Comando de prueba para verificar el estado de la voz
+addCommandHandler("testvoz", function(player)
+    if not getElementData(player, "character:selected") then
+        outputChatBox("No tienes un personaje seleccionado.", player, 255, 0, 0)
+        return
+    end
+    
+    local frecuencia = getElementData(player, "frecuencia.voz")
+    outputChatBox("=== Estado de Voz ===", player, 255, 255, 0)
+    outputChatBox("Frecuencia actual: " .. tostring(frecuencia or "ninguna"), player, 255, 255, 255)
+    
+    if not frecuencia or tonumber(frecuencia) == -1 or tonumber(frecuencia) >= 2000 then
+        outputChatBox("Modo: Voz por Proximidad", player, 0, 255, 0)
+        outputChatBox("Presiona 'Z' para hablar. Los jugadores cercanos te escucharán.", player, 255, 255, 255)
+        -- Forzar configuración de proximidad
+        setPlayerVoiceBroadcastTo(player, {})
+        outputChatBox("Voz por proximidad configurada.", player, 0, 255, 0)
+    else
+        outputChatBox("Modo: Frecuencia [" .. tostring(frecuencia) .. "]", player, 255, 255, 0)
+        outputChatBox("Presiona 'Z' para hablar en la frecuencia.", player, 255, 255, 255)
+    end
+end)
+
 -- Inicializar voz por proximidad cuando el jugador spawnea
 addEventHandler("onPlayerSpawn", root, function()
     if getElementData(source, "character:selected") then
         -- Si no tiene frecuencia activa, asegurar voz por proximidad
         local frecuencia = getElementData(source, "frecuencia.voz")
         if not frecuencia or tonumber(frecuencia) == -1 or tonumber(frecuencia) >= 2000 then
-            setPlayerVoiceBroadcastTo(source, {}) -- Voz por proximidad
+            -- Configurar con tabla vacía para habilitar voz por proximidad
+            setPlayerVoiceBroadcastTo(source, {})
         end
     end
 end)
@@ -236,7 +262,13 @@ addEventHandler("onCharacterSelected", root, function()
         -- Inicializar sin frecuencia (voz por proximidad)
         if not getElementData(source, "frecuencia.voz") then
             setElementData(source, "frecuencia.voz", -1)
-            setPlayerVoiceBroadcastTo(source, {}) -- Voz por proximidad
+        end
+        
+        -- Verificar si debe estar en proximidad
+        local frecuencia = getElementData(source, "frecuencia.voz")
+        if not frecuencia or tonumber(frecuencia) == -1 or tonumber(frecuencia) >= 2000 then
+            -- Configurar con tabla vacía para habilitar voz por proximidad
+            setPlayerVoiceBroadcastTo(source, {})
         end
     end
 end)
