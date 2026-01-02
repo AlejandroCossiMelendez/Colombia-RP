@@ -26,26 +26,50 @@ function getPlayerPhoneNumber(player)
     return nil
 end
 
+-- Función para normalizar número de teléfono (quitar guiones y espacios)
+function normalizePhoneNumber(phoneNumber)
+    if not phoneNumber then
+        return nil
+    end
+    -- Convertir a string y quitar guiones y espacios
+    local normalized = tostring(phoneNumber):gsub("-", ""):gsub(" ", ""):gsub("%s", "")
+    return normalized
+end
+
 -- Función para encontrar jugador por número de teléfono
 function findPlayerByPhoneNumber(phoneNumber)
     if not phoneNumber then
         return nil
     end
     
-    -- Buscar en la base de datos
-    local query = "SELECT titular FROM tlf_data WHERE numero = ? LIMIT 1"
-    local result = queryDatabase(query, phoneNumber)
+    -- Normalizar el número de búsqueda (quitar guiones)
+    local normalizedSearch = normalizePhoneNumber(phoneNumber)
+    
+    -- Buscar en la base de datos - comparar tanto con formato como sin formato
+    -- Primero intentar con el número tal cual viene
+    local query = "SELECT titular, numero FROM tlf_data WHERE numero = ? OR REPLACE(REPLACE(numero, '-', ''), ' ', '') = ? LIMIT 1"
+    local result = queryDatabase(query, phoneNumber, normalizedSearch)
     
     if result and #result > 0 then
         local characterId = result[1].titular
         
+        -- Log para debugging
+        outputServerLog("[PHONE] Número encontrado: " .. tostring(result[1].numero) .. " para character_id: " .. tostring(characterId))
+        
         -- Buscar jugador con ese character_id
         for _, player in ipairs(getElementsByType("player")) do
-            if getElementData(player, "character:id") == characterId and 
-               getElementData(player, "character:selected") then
+            local playerCharacterId = getElementData(player, "character:id")
+            local playerSelected = getElementData(player, "character:selected")
+            
+            if playerCharacterId == characterId and playerSelected then
+                outputServerLog("[PHONE] Jugador encontrado: " .. getPlayerName(player) .. " (ID: " .. tostring(characterId) .. ")")
                 return player
             end
         end
+        
+        outputServerLog("[PHONE] Jugador con character_id " .. tostring(characterId) .. " no está conectado o no tiene personaje seleccionado")
+    else
+        outputServerLog("[PHONE] Número no encontrado en la base de datos: " .. tostring(phoneNumber) .. " (normalizado: " .. tostring(normalizedSearch) .. ")")
     end
     
     return nil
