@@ -46,24 +46,27 @@ function createVehicleWithoutOwner(vehicleId, x, y, z, rotZ, interior, dimension
     setElementInterior(vehicle, interior)
     setVehiclePlateText(vehicle, plate)
     
-    -- Guardar en base de datos (usar un ID único generado)
-    local vehicleDbId = getTickCount() .. math.random(1000, 9999) -- ID temporal único
-    
+    -- Guardar en base de datos (usar NULL para vehicle_element_id ya que es temporal)
     local query = [[
         INSERT INTO vehicles (vehicle_element_id, model, plate, owner_id, x, y, z, rot_z, interior, dimension, fuel)
-        VALUES (?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, 100)
+        VALUES (NULL, ?, ?, NULL, ?, ?, ?, ?, ?, ?, 100)
     ]]
     
-    local success = executeDatabase(query, vehicleDbId, vehicleId, plate, x, y, z, rotZ, interior, dimension)
+    local success = executeDatabase(query, vehicleId, plate, x, y, z, rotZ, interior, dimension)
     
     if not success then
         destroyElement(vehicle)
         return nil, "Error al guardar el vehículo en la base de datos"
     end
     
-    -- Obtener el ID real de la base de datos
-    local result = queryDatabase("SELECT id FROM vehicles WHERE vehicle_element_id = ?", vehicleDbId)
-    local realId = result and result[1] and result[1].id or vehicleDbId
+    -- Obtener el ID real de la base de datos (usar la matrícula que es única)
+    local result = queryDatabase("SELECT id FROM vehicles WHERE plate = ? ORDER BY id DESC LIMIT 1", plate)
+    local realId = result and result[1] and result[1].id
+    
+    if not realId then
+        destroyElement(vehicle)
+        return nil, "Error al obtener el ID del vehículo guardado"
+    end
     
     -- Guardar ID del vehículo en elementData
     setElementData(vehicle, "vehicle:id", realId)
@@ -91,24 +94,22 @@ function createVehicleForPlayer(vehicleId, x, y, z, rotZ, interior, dimension, c
     setVehiclePlateText(vehicle, plate)
     setVehicleLocked(vehicle, true) -- Bloqueado por defecto
     
-    -- Guardar en base de datos (usar un ID único generado)
-    local vehicleDbId = getTickCount() .. math.random(1000, 9999) -- ID temporal único
-    
+    -- Guardar en base de datos (usar NULL para vehicle_element_id)
     local query = [[
         INSERT INTO vehicles (vehicle_element_id, model, plate, owner_id, x, y, z, rot_z, interior, dimension, fuel, locked)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 100, 1)
+        VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, 100, 1)
     ]]
     
-    local success = executeDatabase(query, vehicleDbId, vehicleId, plate, characterId, x, y, z, rotZ, interior, dimension)
+    local success = executeDatabase(query, vehicleId, plate, characterId, x, y, z, rotZ, interior, dimension)
     
     if not success then
         destroyElement(vehicle)
         return nil, "Error al guardar el vehículo en la base de datos"
     end
     
-    -- Obtener el ID real de la base de datos
-    local result = queryDatabase("SELECT id FROM vehicles WHERE vehicle_element_id = ?", vehicleDbId)
-    local realId = result and result[1] and result[1].id or vehicleDbId
+    -- Obtener el ID real de la base de datos (usar la matrícula que es única)
+    local result = queryDatabase("SELECT id FROM vehicles WHERE plate = ? ORDER BY id DESC LIMIT 1", plate)
+    local realId = result and result[1] and result[1].id
     
     -- Guardar datos en elementData
     setElementData(vehicle, "vehicle:id", realId)
@@ -202,7 +203,7 @@ function saveVehicleToDatabase(vehicle)
     local interior = getElementInterior(vehicle)
     local dimension = getElementDimension(vehicle)
     local fuel = getElementData(vehicle, "vehicle:fuel") or 100
-    local locked = getVehicleLocked(vehicle) and 1 or 0
+    local locked = (getElementData(vehicle, "vehicle:locked") == true) and 1 or 0
     local engine = getVehicleEngineState(vehicle) and 1 or 0
     local lights = getVehicleOverrideLights(vehicle)
     local lightsState = (lights == 2) and 1 or 0
@@ -225,18 +226,17 @@ function saveVehicleToDatabase(vehicle)
             setElementData(vehicle, "vehicle:plate", plate)
         end
         
-        local vehicleDbIdTemp = getTickCount() .. math.random(1000, 9999)
         local success = executeDatabase([[
             INSERT INTO vehicles (vehicle_element_id, model, plate, owner_id, x, y, z, rot_x, rot_y, rot_z, 
                                   interior, dimension, fuel, locked, engine, lights)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ]], vehicleDbIdTemp, model, plate, ownerId, x, y, z, rotX, rotY, rotZ, 
+            VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ]], model, plate, ownerId, x, y, z, rotX, rotY, rotZ, 
             interior, dimension, fuel, locked, engine, lightsState)
         
         if success then
-            -- Obtener el ID real
-            local result = queryDatabase("SELECT id FROM vehicles WHERE vehicle_element_id = ?", vehicleDbIdTemp)
-            local realId = result and result[1] and result[1].id or vehicleDbIdTemp
+            -- Obtener el ID real usando la matrícula (única)
+            local result = queryDatabase("SELECT id FROM vehicles WHERE plate = ? ORDER BY id DESC LIMIT 1", plate)
+            local realId = result and result[1] and result[1].id
             
             setElementData(vehicle, "vehicle:id", realId)
             setElementData(vehicle, "vehicle:db_id", realId)

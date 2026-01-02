@@ -366,8 +366,8 @@ addEventHandler("useItem", root, function(slot, itemId, itemIndex)
             return
         end
         
-        -- Cambiar estado del bloqueo
-        local isLocked = getVehicleLocked(vehicle)
+        -- Cambiar estado del bloqueo (en servidor no existe getVehicleLocked, usar elementData)
+        local isLocked = getElementData(vehicle, "vehicle:locked") or false
         local newState = not isLocked
         
         setVehicleLocked(vehicle, newState)
