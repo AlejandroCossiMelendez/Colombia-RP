@@ -56,11 +56,7 @@ addEventHandler("createCharacter", getRootElement(), function(name, surname, age
     end
     
     gender = gender or 0
-    -- Si no se especifica una skin, usar la skin por defecto según el género
-    -- 0 = masculino (skin 0), 1 = femenino (skin 216)
-    if not skin or skin == 0 then
-        skin = (gender == 1) and 216 or 0
-    end
+    skin = skin or Config.Server.defaultSkin
     
     -- Verificar límite de personajes
     local countQuery = "SELECT COUNT(*) as count FROM characters WHERE username = ?"

@@ -51,13 +51,9 @@ end)
 addEventHandler("onResourceStart", resourceRoot, function()
     setTimer(function()
         for _, player in ipairs(getElementsByType("player")) do
-            -- FORZAR verificación: si no tiene account:userId, no está logueado
-            local userId = getElementData(player, "account:userId")
             local loggedIn = getElementData(player, "account:loggedIn")
-            
-            -- Si no tiene userId o loggedIn es false/nil, inicializar login
-            if not userId or not loggedIn or loggedIn == false then
-                outputServerLog("[LOGIN] Jugador " .. getPlayerName(player) .. " no está logueado, inicializando login...")
+            if not loggedIn or loggedIn == false then
+                outputServerLog("[LOGIN] Jugador " .. getPlayerName(player) .. " ya estaba conectado, inicializando login...")
                 initializePlayerLogin(player)
             end
         end
@@ -91,7 +87,10 @@ addEventHandler("colombiaRP:playerLogin", getRootElement(), function(username, p
             
             outputChatBox("¡Bienvenido, " .. user.username .. "!", source, 0, 255, 0)
             triggerClientEvent(source, "loginResponse", resourceRoot, true, "Login exitoso")
-            -- NO mostrar personajes aquí - el cliente lo hará después de ocultar el login
+            -- Mostrar panel de personajes inmediatamente después del login
+            outputServerLog("[LOGIN] Enviando showCharacterGUI a " .. getPlayerName(source))
+            -- Enviar inmediatamente sin delay para evitar problemas de timing
+            triggerClientEvent(source, "showCharacterGUI", resourceRoot)
         else
             outputServerLog("[LOGIN] Contraseña incorrecta para usuario: " .. username)
             triggerClientEvent(source, "loginResponse", resourceRoot, false, "Contraseña incorrecta")

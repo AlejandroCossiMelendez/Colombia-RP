@@ -12,18 +12,11 @@ function whenBrowserReady()
 end
 
 function showLoginGUI()
-    -- Si ya existe, solo mostrarlo
+    -- Si ya existe, no crear otra vez
     if loginBrowser then
         if isElement(loginBrowser) then
             guiSetVisible(loginBrowser, true)
-            showCursor(true)
-            guiSetInputEnabled(true)
-            guiSetInputMode("no_binds_when_editing")
             return
-        else
-            -- Si el elemento fue destruido, limpiar la referencia
-            loginBrowser = nil
-            browserContent = nil
         end
     end
     
@@ -32,7 +25,7 @@ function showLoginGUI()
     browserContent = guiGetBrowser(loginBrowser)
     
     if not loginBrowser or not browserContent then
-        outputChatBox("Error: No se pudo crear el navegador de login", 255, 0, 0)
+        outputChatBox("Error: No se pudo crear el navegador", 255, 0, 0)
         return
     end
     
@@ -127,40 +120,9 @@ addEventHandler("loginResponse", resourceRoot, function(success, message)
     if browserContent and isElement(browserContent) then
         if success then
             executeBrowserJavascript(browserContent, "showSuccess('Login exitoso'); setLoading('loginBtn', false);")
-            -- Ocultar login y mostrar panel de personajes SOLO después de confirmar login exitoso
             setTimer(function()
-                -- Verificar que el login fue exitoso ANTES de ocultar login
-                local loggedIn = getElementData(localPlayer, "account:loggedIn")
-                local userId = getElementData(localPlayer, "account:userId")
-                
-                if loggedIn == true and userId then
-                    -- Login confirmado, ocultar login
-                    hideLoginGUI()
-                    -- Esperar un momento y luego mostrar panel de personajes
-                    -- IMPORTANTE: Solo mostrar personajes DESPUÉS del login exitoso
-                    setTimer(function()
-                        -- Verificar nuevamente antes de mostrar personajes
-                        local loggedIn2 = getElementData(localPlayer, "account:loggedIn")
-                        local userId2 = getElementData(localPlayer, "account:userId")
-                        
-                        if loggedIn2 == true and userId2 then
-                            -- Ahora sí, mostrar panel de personajes SOLO si está logueado
-                            -- El panel de personajes NO se carga hasta este momento
-                            if showCharacterGUI then
-                                showCharacterGUI()
-                            end
-                        else
-                            outputChatBox("Error: No se pudo verificar el login", 255, 0, 0)
-                            -- Volver a mostrar login si falla la verificación
-                            if showLoginGUI then
-                                showLoginGUI()
-                            end
-                        end
-                    end, 500, 1)
-                else
-                    outputChatBox("Error: No se pudo verificar el login", 255, 0, 0)
-                end
-            end, 1500, 1)
+                hideLoginGUI()
+            end, 1000, 1)
         else
             executeBrowserJavascript(browserContent, "showError('" .. tostring(message) .. "'); setLoading('loginBtn', false);")
         end
@@ -192,9 +154,15 @@ addEventHandler("registerResponse", resourceRoot, function(success, message)
     end
 end)
 
--- NO mostrar login automáticamente al iniciar el recurso
--- El servidor se encarga de mostrar el login cuando el jugador se conecta
--- Esto evita conflictos cuando el recurso se recarga
+-- Mostrar login cuando el recurso se inicia
+addEventHandler("onClientResourceStart", resourceRoot, function()
+    setTimer(function()
+        local loggedIn = getElementData(localPlayer, "account:loggedIn")
+        if loggedIn ~= true then
+            showLoginGUI()
+        end
+    end, 2000, 1)
+end)
 
 -- Limpiar al cerrar el recurso
 addEventHandler("onClientResourceStop", resourceRoot, function()
