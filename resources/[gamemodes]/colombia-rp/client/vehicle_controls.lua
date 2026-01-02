@@ -24,32 +24,52 @@ end)
 bindKey("k", "down", function()
     if not vehicleControlsEnabled then return end
     
+    -- Verificar si hay algún GUI abierto que pueda interferir (inventario, teléfono, etc.)
+    if showCursor() then
+        -- Si el cursor está visible, probablemente hay un GUI abierto, no hacer nada
+        return
+    end
+    
     local vehicle = getPedOccupiedVehicle(localPlayer)
+    
+    -- Si no está en un vehículo, buscar el más cercano
     if not vehicle then
-        -- Verificar si hay un vehículo cerca
         local px, py, pz = getElementPosition(localPlayer)
         local nearbyVehicle = nil
         local minDistance = 5.0
         
         for _, veh in ipairs(getElementsByType("vehicle")) do
-            local vx, vy, vz = getElementPosition(veh)
-            local distance = getDistanceBetweenPoints3D(px, py, pz, vx, vy, vz)
-            if distance < minDistance then
-                nearbyVehicle = veh
-                minDistance = distance
+            -- Verificar que sea un vehículo del sistema (tiene matrícula o dueño)
+            local plate = getElementData(veh, "vehicle:plate")
+            local ownerId = getElementData(veh, "vehicle:owner_id")
+            
+            if plate or ownerId then
+                local vx, vy, vz = getElementPosition(veh)
+                local distance = getDistanceBetweenPoints3D(px, py, pz, vx, vy, vz)
+                if distance < minDistance then
+                    nearbyVehicle = veh
+                    minDistance = distance
+                end
             end
         end
         
         if nearbyVehicle then
             vehicle = nearbyVehicle
         else
-            return
+            return -- No hay vehículo cerca
         end
     end
     
-    -- Verificar llaves en el servidor
+    if not vehicle or not isElement(vehicle) then
+        return
+    end
+    
+    -- Obtener estado actual del bloqueo
     local isLocked = getVehicleLocked(vehicle)
-    triggerServerEvent("vehicle:toggleLock", localPlayer, vehicle, not isLocked)
+    local newState = not isLocked
+    
+    -- Enviar al servidor para verificar llaves y cambiar estado
+    triggerServerEvent("vehicle:toggleLock", localPlayer, vehicle, newState)
 end)
 
 -- Control L: Prender/Apagar luces
@@ -90,29 +110,29 @@ addEventHandler("vehicle:enterCheckResult", root, function(canEnter)
     end
 end)
 
--- Evento para reproducir sonido de bloqueo/desblockeo
+-- Evento para reproducir sonido de bloqueo/desbloqueo
 addEvent("vehicle:playLockSound", true)
-addEventHandler("vehicle:playLockSound", root, function(x, y, z)
-    -- Intentar reproducir el sonido
+addEventHandler("vehicle:playLockSound", resourceRoot, function(x, y, z)
+    -- Siempre reproducir sonido del juego primero (más confiable)
+    playSoundFrontEnd(40)
+    
+    -- Intentar reproducir el sonido personalizado también
     local sound = nil
+    local soundPath = "assents/sound/block-desblock.mp3"
     
     if x and y and z then
         -- Reproducir sonido 3D en la posición del vehículo
-        sound = playSound3D("assents/sound/block-desblock.mp3", x, y, z, false)
-        if sound then
+        sound = playSound3D(soundPath, x, y, z, false)
+        if sound and isElement(sound) then
             setSoundVolume(sound, 0.7)
             setSoundMaxDistance(sound, 30)
+            setSoundMinDistance(sound, 5)
         end
     else
         -- Si no hay posición, reproducir sonido local
-        sound = playSound("assents/sound/block-desblock.mp3", false)
-        if sound then
+        sound = playSound(soundPath, false)
+        if sound and isElement(sound) then
             setSoundVolume(sound, 0.7)
         end
-    end
-    
-    -- Si el sonido no se pudo cargar, usar un sonido del juego como fallback
-    if not sound then
-        playSoundFrontEnd(40) -- Sonido genérico del juego
     end
 end)
