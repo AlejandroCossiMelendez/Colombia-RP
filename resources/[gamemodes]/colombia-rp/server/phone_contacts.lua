@@ -32,18 +32,26 @@ addEventHandler("saveContacts", root, function(contactsJson)
     end
     
     -- Parsear JSON de contactos
+    -- CRÍTICO: fromJSON en MTA puede tener problemas con arrays JSON
+    -- Intentar primero con parseo manual usando loadstring que es más confiable
     local contacts = nil
     local success, result = pcall(function()
+        -- Primero intentar parseo manual (más confiable para arrays)
+        local luaCode = contactsJson:gsub("%[", "{"):gsub("%]", "}")
+        local func = loadstring("return " .. luaCode)
+        if func then
+            local parsed = func()
+            if parsed and type(parsed) == "table" and #parsed > 0 then
+                return parsed
+            end
+        end
+        
+        -- Si el parseo manual falla, intentar con fromJSON
         if type(fromJSON) == "function" then
             return fromJSON(contactsJson)
-        else
-            -- Fallback: usar loadstring
-            local func = loadstring("return " .. contactsJson)
-            if func then
-                return func()
-            end
-            return nil
         end
+        
+        return nil
     end)
     
     if not success then
@@ -70,31 +78,91 @@ addEventHandler("saveContacts", root, function(contactsJson)
     local pairCount = 0
     local hasName = false
     local hasNumber = false
+    local numericKeys = {}
+    local nonNumericKeys = {}
+    
     for k, v in pairs(contacts) do
         pairCount = pairCount + 1
         if k == "name" then hasName = true end
         if k == "number" then hasNumber = true end
+        
+        -- Clasificar las claves
+        if type(k) == "number" then
+            table.insert(numericKeys, k)
+        else
+            table.insert(nonNumericKeys, k)
+        end
     end
     
     outputServerLog("[PHONE] Estructura del JSON: arrayLength=" .. tostring(arrayLength) .. ", pairCount=" .. tostring(pairCount) .. ", hasName=" .. tostring(hasName) .. ", hasNumber=" .. tostring(hasNumber))
+    outputServerLog("[PHONE] Claves numéricas: " .. #numericKeys .. ", Claves no numéricas: " .. #nonNumericKeys)
     
-    -- Si el array está vacío pero tiene las propiedades name y number directamente, 
-    -- significa que fromJSON devolvió el objeto del array en lugar del array
-    if arrayLength == 0 and hasName and hasNumber then
-        -- Convertir el objeto único a un array con un elemento
-        contacts = {contacts}
-        outputServerLog("[PHONE] Convertido objeto único a array")
+    -- CRÍTICO: fromJSON puede devolver el JSON de diferentes maneras
+    -- Necesitamos reconstruir el array correctamente desde el objeto parseado
+    
+    -- Si arrayLength es 0 pero hay claves numéricas, significa que fromJSON devolvió un objeto con índices numéricos
+    -- pero el operador # no los cuenta correctamente
+    if arrayLength == 0 and #numericKeys > 0 then
+        -- Reconstruir el array desde las claves numéricas
+        local tempArray = {}
+        table.sort(numericKeys)
+        for _, key in ipairs(numericKeys) do
+            if type(contacts[key]) == "table" then
+                table.insert(tempArray, contacts[key])
+            end
+        end
+        if #tempArray > 0 then
+            contacts = tempArray
+            outputServerLog("[PHONE] Reconstruido array desde claves numéricas: " .. #contacts .. " contactos")
+        end
+    -- Si arrayLength es 0 pero tiene name y number, fromJSON devolvió solo el primer objeto del array
+    elseif arrayLength == 0 and hasName and hasNumber then
+        -- fromJSON devolvió solo el primer objeto, necesitamos parsear el JSON manualmente
+        outputServerLog("[PHONE] fromJSON devolvió solo el primer objeto, parseando manualmente...")
+        
+        -- Intentar parsear el JSON manualmente usando loadstring
+        local success2, result2 = pcall(function()
+            -- Reemplazar corchetes y llaves para que Lua pueda parsearlo
+            local luaCode = contactsJson:gsub("%[", "{"):gsub("%]", "}")
+            local func = loadstring("return " .. luaCode)
+            if func then
+                return func()
+            end
+            return nil
+        end)
+        
+        if success2 and result2 and type(result2) == "table" then
+            -- Verificar si ahora tenemos un array válido
+            local newArrayLength = #result2
+            if newArrayLength > 0 then
+                contacts = result2
+                outputServerLog("[PHONE] Parseado manual exitoso: " .. newArrayLength .. " contactos")
+            else
+                -- Intentar extraer contactos desde el objeto parseado
+                local tempArray = {}
+                for k, v in pairs(result2) do
+                    if type(k) == "number" and type(v) == "table" and v.name and v.number then
+                        table.insert(tempArray, v)
+                    end
+                end
+                if #tempArray > 0 then
+                    contacts = tempArray
+                    outputServerLog("[PHONE] Extraídos " .. #tempArray .. " contactos del parseo manual")
+                end
+            end
+        else
+            -- Si el parseo manual falla, convertir el objeto único a array
+            contacts = {contacts}
+            outputServerLog("[PHONE] Convertido objeto único a array (fallback)")
+        end
     elseif arrayLength == 0 and pairCount > 0 then
         -- Intentar convertir objeto a array
         local tempArray = {}
         for k, v in pairs(contacts) do
             if type(k) == "number" and type(v) == "table" then
                 table.insert(tempArray, v)
-            elseif type(v) == "table" then
-                -- Podría ser un objeto con propiedades name y number
-                if v.name and v.number then
-                    table.insert(tempArray, v)
-                end
+            elseif type(v) == "table" and v.name and v.number then
+                table.insert(tempArray, v)
             end
         end
         if #tempArray > 0 then
@@ -109,44 +177,23 @@ addEventHandler("saveContacts", root, function(contactsJson)
         return
     end
     
-    -- Contar contactos válidos usando ipairs
-    local validContacts = {}
-    for i, contact in ipairs(contacts) do
-        if type(contact) == "table" and contact.name and contact.number then
-            table.insert(validContacts, contact)
-        end
-    end
-    
-    -- Si encontramos contactos válidos con ipairs pero el array length es diferente, usar los válidos
-    if #validContacts > 0 and #validContacts ~= #contacts then
-        outputServerLog("[PHONE] Usando contactos válidos encontrados con ipairs: " .. #validContacts .. " contactos")
-        contacts = validContacts
-    end
-    
-    outputServerLog("[PHONE] Contactos finales después del procesamiento: " .. #contacts)
-    
-    -- Si después de todo el procesamiento el array está vacío, está bien (no hay contactos)
-    -- No necesitamos hacer nada especial, simplemente continuar con el proceso de eliminación e inserción
-    
-    -- CRÍTICO: Asegurarnos de que todos los contactos se procesen correctamente
-    -- Usar pairs en lugar de ipairs para capturar todos los elementos, incluso si los índices no son consecutivos
+    -- CRÍTICO: Extraer todos los contactos usando pairs para asegurar que no se pierda ninguno
     local allContacts = {}
     for k, v in pairs(contacts) do
-        if type(k) == "number" and type(v) == "table" then
-            -- Es un elemento del array con índice numérico
+        if type(k) == "number" and type(v) == "table" and v.name and v.number then
+            -- Es un elemento del array con índice numérico y tiene name/number
             table.insert(allContacts, v)
-        elseif type(v) == "table" and v.name and v.number then
-            -- Es un objeto con propiedades name y number
+        elseif type(v) == "table" and v.name and v.number and type(k) ~= "string" then
+            -- Es un objeto con propiedades name y number (no es una propiedad del objeto)
             table.insert(allContacts, v)
         end
     end
     
-    -- Si encontramos contactos con pairs pero no con ipairs, usar los encontrados con pairs
-    if #allContacts > #contacts then
-        outputServerLog("[PHONE] Encontrados " .. #allContacts .. " contactos con pairs vs " .. #contacts .. " con ipairs")
-        contacts = allContacts
-    elseif #allContacts > 0 and #allContacts == #contacts then
-        -- Ambos métodos encontraron la misma cantidad, usar los de pairs para asegurar
+    -- Si encontramos contactos con pairs, usar esos
+    if #allContacts > 0 then
+        if #allContacts ~= #contacts then
+            outputServerLog("[PHONE] Encontrados " .. #allContacts .. " contactos con pairs vs " .. #contacts .. " con ipairs, usando pairs")
+        end
         contacts = allContacts
     end
     
