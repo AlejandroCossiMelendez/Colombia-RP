@@ -13,41 +13,28 @@ function()
 		return
 	end
 	
-	local sqlResource = getResourceFromName("sql")
-	if not sqlResource or getResourceState(sqlResource) ~= "running" then
-		outputDebugString("loginpanel: SQL resource not available, retrying...", 2)
-		setTimer(function()
-			if theClient and isElement(theClient) then
-				triggerClientEvent(theClient, "onRequestLoginPanel", theClient)
-			end
-		end, 1000, 1)
-		return
-	end
-	
-	-- Usar pcall para capturar errores de exports
-	local success, query = pcall(function()
-		return exports.sql:query_assoc_single("SELECT `userID`  FROM `wcf1_user` WHERE `lastSerial` OR `regSerial` LIKE '%s'", getPlayerSerial(theClient))
-	end)
-	
-	if not success then
-		outputDebugString("loginpanel: SQL export not available, retrying...", 2)
-		setTimer(function()
-			if theClient and isElement(theClient) then
-				triggerClientEvent(theClient, "onRequestLoginPanel", theClient)
-			end
-		end, 1000, 1)
-		return
-	end
-	
+	-- Mostrar el panel inmediatamente, incluso si SQL no está disponible
+	-- Si SQL no está disponible, asumimos que el usuario no tiene cuenta
 	local serialRegistered = false
-	if query then
-		if query.userID then
+	
+	local sqlResource = getResourceFromName("sql")
+	if sqlResource and getResourceState(sqlResource) == "running" then
+		-- Intentar verificar si el serial está registrado
+		local success, query = pcall(function()
+			return exports.sql:query_assoc_single("SELECT `userID`  FROM `wcf1_user` WHERE `lastSerial` OR `regSerial` LIKE '%s'", getPlayerSerial(theClient))
+		end)
+		
+		if success and query and query.userID then
 			serialRegistered = true
 		end
+	else
+		-- SQL no está disponible, mostrar panel de todas formas
+		outputDebugString("loginpanel: SQL resource not available, showing panel anyway", 2)
 	end
-	--serialRegistered
+	
+	-- Mostrar el panel siempre, independientemente del estado de SQL
 	if theClient and isElement(theClient) then
-		triggerClientEvent(theClient,"client:init:callBack",theClient,false)
+		triggerClientEvent(theClient,"client:init:callBack",theClient,serialRegistered)
 	end
 end
 )
