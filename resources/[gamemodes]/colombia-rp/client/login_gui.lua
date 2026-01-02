@@ -1,0 +1,95 @@
+-- GUI de Login
+local loginBrowser = nil
+local screenWidth, screenHeight = guiGetScreenSize()
+
+function showLoginGUI()
+    if loginBrowser then
+        destroyElement(loginBrowser)
+    end
+    
+    loginBrowser = createBrowser(screenWidth, screenHeight, true, true)
+    
+    addEventHandler("onClientBrowserCreated", loginBrowser, function()
+        loadBrowserURL(loginBrowser, "http://mta/local/login.html")
+        showCursor(true)
+        guiSetInputEnabled(true)
+    end)
+    
+    addEventHandler("onClientBrowserDocumentReady", loginBrowser, function(url)
+        if url == "http://mta/local/login.html" then
+            -- Exponer funciones al navegador usando callRemote
+            executeBrowserJavascript(loginBrowser, [[
+                window.login = function(username, password) {
+                    callRemote('onPlayerLogin', username, password);
+                };
+                window.register = function(username, password, email) {
+                    callRemote('onPlayerRegister', username, password, email);
+                };
+            ]])
+        end
+    end)
+end
+
+function hideLoginGUI()
+    if loginBrowser then
+        destroyElement(loginBrowser)
+        loginBrowser = nil
+    end
+    showCursor(false)
+    guiSetInputEnabled(false)
+end
+
+-- Eventos del servidor
+addEvent("showLoginGUI", true)
+addEventHandler("showLoginGUI", resourceRoot, function()
+    showLoginGUI()
+end)
+
+addEvent("loginResponse", true)
+addEventHandler("loginResponse", resourceRoot, function(success, message)
+    if success then
+        hideLoginGUI()
+    else
+        -- Mostrar mensaje de error en el navegador
+        if loginBrowser then
+            executeBrowserJavascript(loginBrowser, "showError('" .. message:gsub("'", "\\'") .. "')")
+        end
+    end
+end)
+
+addEvent("registerResponse", true)
+addEventHandler("registerResponse", resourceRoot, function(success, message)
+    if loginBrowser then
+        local safeMessage = message:gsub("'", "\\'")
+        if success then
+            executeBrowserJavascript(loginBrowser, "showSuccess('" .. safeMessage .. "')")
+        else
+            executeBrowserJavascript(loginBrowser, "showError('" .. safeMessage .. "')")
+        end
+    end
+end)
+
+-- callRemote handlers (se llaman directamente desde el navegador)
+addEvent("onPlayerLogin", true)
+addEventHandler("onPlayerLogin", root, function(username, password)
+    triggerServerEvent("onPlayerLogin", localPlayer, username, password)
+end)
+
+addEvent("onPlayerRegister", true)
+addEventHandler("onPlayerRegister", root, function(username, password, email)
+    triggerServerEvent("onPlayerRegister", localPlayer, username, password, email)
+end)
+
+addEvent("onClientBrowserNavigate", true)
+addEventHandler("onClientBrowserNavigate", loginBrowser, function(url, isBlocked, isMainFrame)
+    if url ~= "http://mta/local/login.html" and isMainFrame then
+        cancelEvent()
+    end
+end)
+
+-- Renderizar el navegador
+addEventHandler("onClientRender", root, function()
+    if loginBrowser then
+        dxDrawImage(0, 0, screenWidth, screenHeight, loginBrowser, 0, 0, 0, tocolor(255, 255, 255, 255), false)
+    end
+end)

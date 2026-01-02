@@ -1,0 +1,132 @@
+-- Sistema de Login y Registro
+local bcrypt = require("bcrypt")
+
+-- Hash de contraseña (requiere módulo bcrypt o puedes usar otro método)
+function hashPassword(password)
+    -- Si tienes bcrypt instalado, usa: return bcrypt.hash(password, 10)
+    -- Por ahora usamos un hash simple (en producción usa bcrypt)
+    return hash("sha256", password .. "salt_colombia_rp")
+end
+
+function verifyPassword(password, hash)
+    -- Si tienes bcrypt: return bcrypt.verify(password, hash)
+    local testHash = hash("sha256", password .. "salt_colombia_rp")
+    return testHash == hash
+end
+
+-- Evento cuando el jugador se conecta
+addEventHandler("onPlayerConnect", root, function()
+    setElementData(source, "account:loggedIn", false)
+    setElementData(source, "account:username", nil)
+    setElementData(source, "account:userId", nil)
+    setElementData(source, "character:selected", false)
+    setElementData(source, "character:id", nil)
+    
+    -- Mostrar GUI de login al cliente
+    triggerClientEvent(source, "showLoginGUI", resourceRoot)
+end)
+
+-- Evento de login desde el cliente
+addEvent("onPlayerLogin", true)
+addEventHandler("onPlayerLogin", root, function(username, password)
+    if not username or not password then
+        triggerClientEvent(source, "loginResponse", resourceRoot, false, "Usuario y contraseña requeridos")
+        return
+    end
+    
+    -- Buscar usuario en la base de datos
+    local query = "SELECT * FROM users WHERE username = ? LIMIT 1"
+    local result = queryDatabase(query, username)
+    
+    if result and #result > 0 then
+        local user = result[1]
+        
+        -- Verificar contraseña
+        if verifyPassword(password, user.password) then
+            -- Login exitoso
+            setElementData(source, "account:loggedIn", true)
+            setElementData(source, "account:username", user.username)
+            setElementData(source, "account:userId", user.id)
+            setElementData(source, "account:role", user.role)
+            
+            outputChatBox("¡Bienvenido, " .. user.username .. "!", source, 0, 255, 0)
+            triggerClientEvent(source, "loginResponse", resourceRoot, true, "Login exitoso")
+            triggerClientEvent(source, "showCharacterGUI", resourceRoot)
+        else
+            triggerClientEvent(source, "loginResponse", resourceRoot, false, "Contraseña incorrecta")
+        end
+    else
+        triggerClientEvent(source, "loginResponse", resourceRoot, false, "Usuario no encontrado")
+    end
+end)
+
+-- Evento de registro desde el cliente
+addEvent("onPlayerRegister", true)
+addEventHandler("onPlayerRegister", root, function(username, password, email)
+    if not username or not password or not email then
+        triggerClientEvent(source, "registerResponse", resourceRoot, false, "Todos los campos son requeridos")
+        return
+    end
+    
+    -- Validar formato de email
+    if not string.match(email, "^[%w%.%-_]+@[%w%.%-_]+%.%w+$") then
+        triggerClientEvent(source, "registerResponse", resourceRoot, false, "Email inválido")
+        return
+    end
+    
+    -- Validar longitud de usuario y contraseña
+    if string.len(username) < 3 or string.len(username) > 20 then
+        triggerClientEvent(source, "registerResponse", resourceRoot, false, "El usuario debe tener entre 3 y 20 caracteres")
+        return
+    end
+    
+    if string.len(password) < 6 then
+        triggerClientEvent(source, "registerResponse", resourceRoot, false, "La contraseña debe tener al menos 6 caracteres")
+        return
+    end
+    
+    -- Verificar si el usuario ya existe
+    local checkQuery = "SELECT id FROM users WHERE username = ? OR email = ? LIMIT 1"
+    local checkResult = queryDatabase(checkQuery, username, email)
+    
+    if checkResult and #checkResult > 0 then
+        triggerClientEvent(source, "registerResponse", resourceRoot, false, "El usuario o email ya existe")
+        return
+    end
+    
+    -- Crear nuevo usuario
+    local hashedPassword = hashPassword(password)
+    local registerDate = getRealTime()
+    local dateString = string.format("%04d-%02d-%02d %02d:%02d:%02d", 
+        registerDate.year + 1900, registerDate.month + 1, registerDate.monthday,
+        registerDate.hour, registerDate.minute, registerDate.second)
+    
+    local insertQuery = "INSERT INTO users (username, password, email, registerDate, role) VALUES (?, ?, ?, ?, ?)"
+    local success = executeDatabase(insertQuery, username, hashedPassword, email, dateString, "user")
+    
+    if success then
+        outputChatBox("¡Registro exitoso! Ahora puedes iniciar sesión.", source, 0, 255, 0)
+        triggerClientEvent(source, "registerResponse", resourceRoot, true, "Registro exitoso")
+    else
+        triggerClientEvent(source, "registerResponse", resourceRoot, false, "Error al crear la cuenta")
+    end
+end)
+
+-- Evento cuando el jugador se desconecta
+addEventHandler("onPlayerQuit", root, function()
+    local characterId = getElementData(source, "character:id")
+    if characterId then
+        -- Guardar última posición y datos del personaje
+        local x, y, z = getElementPosition(source)
+        local rotation = getPedRotation(source)
+        local interior = getElementInterior(source)
+        local dimension = getElementDimension(source)
+        local health = getElementHealth(source)
+        local hunger = getElementData(source, "character:hunger") or Config.Server.defaultHunger
+        local thirst = getElementData(source, "character:thirst") or Config.Server.defaultThirst
+        
+        local updateQuery = "UPDATE characters SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, health = ?, hunger = ?, thirst = ?, lastLogin = NOW() WHERE id = ?"
+        executeDatabase(updateQuery, x, y, z, rotation, interior, dimension, health, hunger, thirst, characterId)
+    end
+end)
+

@@ -1,0 +1,29 @@
+<meta>
+    <info name="Colombia RP" description="Gamemode moderno con MySQL" author="Colombia RP Team" version="1.0" type="gamemode" />
+    
+    <!-- Habilitar comunicación del navegador -->
+    <browser_src>http://mta/local/</browser_src>
+    
+    <!-- Scripts del servidor -->
+    <script src="server/database.lua" type="server" />
+    <script src="server/config.lua" type="server" />
+    <script src="server/login.lua" type="server" />
+    <script src="server/characters.lua" type="server" />
+    <script src="server/inventory.lua" type="server" />
+    <script src="server/money.lua" type="server" />
+    <script src="server/needs.lua" type="server" />
+    <script src="server/spawn.lua" type="server" />
+    <script src="server/main.lua" type="server" />
+    
+    <!-- Scripts del cliente -->
+    <script src="client/login_gui.lua" type="client" />
+    <script src="client/character_gui.lua" type="client" />
+    <script src="client/hud.lua" type="client" />
+    <script src="client/main.lua" type="client" />
+    
+    <!-- Archivos -->
+    <file src="client/login.html" />
+    <file src="client/character.html" />
+    <file src="client/hud.html" />
+</meta>
+
