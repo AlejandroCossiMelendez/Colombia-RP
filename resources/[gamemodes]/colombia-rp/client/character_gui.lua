@@ -182,7 +182,13 @@ end
 -- Eventos del servidor
 addEvent("showCharacterGUI", true)
 addEventHandler("showCharacterGUI", resourceRoot, function()
+    outputChatBox("[DEBUG] Evento showCharacterGUI recibido - mostrando panel", 0, 255, 0)
     showCharacterGUI()
+end)
+
+-- Registrar el evento al cargar el recurso
+addEventHandler("onClientResourceStart", resourceRoot, function()
+    outputChatBox("[DEBUG] character_gui.lua cargado - showCharacterGUI registrado", 0, 255, 255)
 end)
 
 addEvent("hideCharacterGUI", true)
