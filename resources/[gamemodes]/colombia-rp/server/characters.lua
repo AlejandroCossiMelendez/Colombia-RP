@@ -25,8 +25,10 @@ addEventHandler("createCharacter", getRootElement(), function(name, surname, age
         return
     end
     
+    outputServerLog("[CHARACTERS] ========================================")
     outputServerLog("[CHARACTERS] Evento createCharacter recibido de " .. getPlayerName(source))
-    outputServerLog("[CHARACTERS] Datos recibidos - Nombre: " .. tostring(name) .. ", Apellido: " .. tostring(surname) .. ", Edad: " .. tostring(age))
+    outputServerLog("[CHARACTERS] Datos recibidos - Nombre: " .. tostring(name) .. ", Apellido: " .. tostring(surname) .. ", Edad: " .. tostring(age) .. ", Género: " .. tostring(gender) .. ", Skin: " .. tostring(skin))
+    outputServerLog("[CHARACTERS] ========================================")
     
     local userId = getElementData(source, "account:userId")
     local username = getElementData(source, "account:username")

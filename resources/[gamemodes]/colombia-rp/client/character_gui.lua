@@ -186,7 +186,16 @@ addEventHandler("createCharacter", root, function(name, surname, age, gender, sk
     end
     
     -- Enviar evento al servidor
-    triggerServerEvent("createCharacter", localPlayer, name, surname, age, gender, skin or 0)
+    outputChatBox("[DEBUG] Enviando createCharacter al servidor: name=" .. tostring(name) .. ", surname=" .. tostring(surname) .. ", age=" .. tostring(age) .. ", gender=" .. tostring(gender) .. ", skin=" .. tostring(skin or 0), 0, 255, 255)
+    local success = triggerServerEvent("createCharacter", localPlayer, name, surname, age, gender, skin or 0)
+    if not success then
+        outputChatBox("[DEBUG] ERROR: No se pudo enviar el evento al servidor", 255, 0, 0)
+        if browserContent and isElement(browserContent) then
+            executeBrowserJavascript(browserContent, "showError('Error al enviar los datos al servidor');")
+        end
+    else
+        outputChatBox("[DEBUG] Evento enviado correctamente al servidor", 0, 255, 0)
+    end
 end)
 
 -- Eventos del servidor
