@@ -63,6 +63,8 @@ function openPhone()
     triggerEvent("closeInventoryForPhone", localPlayer)
     
     phoneVisible = true
+    -- Guardar estado del teléfono en elementData para que otros scripts puedan verificar
+    setElementData(localPlayer, "phone:visible", true)
     -- Posición: 30px más a la izquierda y un poco más abajo
     local phoneX = (sw - w) - 130
     local phoneY = (sh - h) / 2 + 180  -- Bajarlo 190px más
@@ -91,6 +93,8 @@ function closePhone()
     end
     
     phoneVisible = false
+    -- Actualizar estado del teléfono en elementData
+    setElementData(localPlayer, "phone:visible", false)
     
     -- PRIMERO: Ocultar el navegador INMEDIATAMENTE para que desaparezca visualmente
     if phoneBrowser and isElement(phoneBrowser) then
@@ -222,9 +226,48 @@ addEventHandler("closePhoneFromBrowser", localPlayer, function()
     closePhone()
 end)
 
--- Cerrar teléfono con tecla ESC
+-- Función para verificar si hay un input activo en el teléfono
+local function isPhoneInputActive()
+    if not browserContent or not isElement(browserContent) or not phoneVisible then
+        return false
+    end
+    
+    -- Intentar ejecutar JavaScript para verificar si hay un input activo
+    -- Como no podemos obtener el resultado directamente, asumimos que si el teléfono está abierto
+    -- y el cursor está visible, podría haber un input activo
+    -- Por ahora, simplemente verificamos si el teléfono está visible
+    return phoneVisible
+end
+
+-- BindKey para la tecla I - igual que el inventario
+-- Si el teléfono está abierto, se cierra con I. Si no está abierto, el inventario se maneja con su propio bindKey
+bindKey("i", "down", function()
+    if not getElementData(localPlayer, "character:selected") then
+        return
+    end
+    
+    -- Solo manejar el caso cuando el teléfono está abierto
+    -- Si no está abierto, retornar temprano para que el bindKey del inventario maneje la apertura
+    if not phoneVisible then
+        return
+    end
+    
+    -- Si el teléfono está abierto, cerrarlo (guardando contactos)
+    -- Guardar contactos antes de cerrar
+    if browserContent and isElement(browserContent) then
+        executeBrowserJavascript(browserContent, "saveContactsToMTA();")
+    end
+    -- Cerrar el teléfono
+    closePhone()
+end)
+
+-- Cerrar teléfono con tecla ESC (mantener por compatibilidad)
 bindKey("escape", "down", function()
     if phoneVisible then
+        -- Guardar contactos antes de cerrar
+        if browserContent and isElement(browserContent) then
+            executeBrowserJavascript(browserContent, "saveContactsToMTA();")
+        end
         closePhone()
     end
 end)

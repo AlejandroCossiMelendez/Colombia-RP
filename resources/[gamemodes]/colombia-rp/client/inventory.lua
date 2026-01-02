@@ -409,6 +409,14 @@ bindKey("i", "down", function()
         return
     end
     
+    -- Verificar si el teléfono está abierto primero
+    -- Si el teléfono está abierto, no hacer nada aquí (el teléfono manejará el cierre)
+    -- Esto se verifica mediante un evento que el teléfono puede disparar
+    local phoneVisible = getElementData(localPlayer, "phone:visible") or false
+    if phoneVisible then
+        return -- El teléfono manejará el cierre
+    end
+    
     if inventoryVisible then
         closeInventory()
     else

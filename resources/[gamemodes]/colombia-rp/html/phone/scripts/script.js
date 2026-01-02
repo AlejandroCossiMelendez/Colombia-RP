@@ -31,8 +31,8 @@ onload = () => {
     // Inicializar isInHomeScreen
     isInHomeScreen = true;
     
-    // Agregar eventos de arrastre para cerrar el teléfono
-    setupDragToClose();
+    // Deshabilitado: El teléfono ahora se cierra con la tecla I, no con gesto de deslizar
+    // setupDragToClose();
 }
 
 // Función para configurar el gesto de arrastre hacia abajo para cerrar
