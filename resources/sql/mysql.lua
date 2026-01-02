@@ -61,26 +61,21 @@ end
 addEventHandler( "onResourceStart", resourceRoot,
 	function( )
 		if not mysql_connect then
-			if hasObjectPermissionTo( resource, "function.shutdown" ) then
-				shutdown( "MySQL module missing." )
-			end
+			outputDebugString( "MySQL module missing. Resource sql will not start.", 1 )
 			cancelEvent( true, "MySQL module missing." )
 		elseif not hasObjectPermissionTo( resource, "function.mysql_connect" ) then
-			if hasObjectPermissionTo( resource, "function.shutdown" ) then
-				shutdown( "Insufficient ACL rights for mysql resource." )
-			end
+			outputDebugString( "Insufficient ACL rights for mysql resource. Resource sql will not start.", 1 )
 			cancelEvent( true, "Insufficient ACL rights for mysql resource." )
 		elseif not connect( ) then
 			if connection then
 				outputDebugString( mysql_error( connection ), 1 )
-			end
-			
-			if hasObjectPermissionTo( resource, "function.shutdown" ) then
-				shutdown( "MySQL failed to connect." )
+			else
+				outputDebugString( "MySQL failed to connect. Resource sql will not start.", 1 )
 			end
 			cancelEvent( true, "MySQL failed to connect." )
 		else
 			null = mysql_null( )
+			outputDebugString( "MySQL connection established successfully.", 3 )
 		end
 	end
 )
