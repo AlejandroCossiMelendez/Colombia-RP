@@ -107,6 +107,14 @@ function respawnAtHospital(player)
     setElementHealth(player, 100)
     setElementData(player, "character:health", 100)
     
+    -- Actualizar nombre del jugador para mostrar personaje + ID
+    local charName = getElementData(player, "character:name")
+    local charSurname = getElementData(player, "character:surname")
+    if charName and charSurname and characterId then
+        local displayName = charName .. " " .. charSurname .. " (ID: " .. characterId .. ")"
+        setPlayerNametagText(player, displayName)
+    end
+    
     -- Activar cámara
     setCameraTarget(player, player)
     fadeCamera(player, true, 1.0)
@@ -164,6 +172,14 @@ function respawnAtDeathLocation(player)
     setElementModel(player, skin)
     setElementHealth(player, 100)
     setElementData(player, "character:health", 100)
+    
+    -- Actualizar nombre del jugador para mostrar personaje + ID
+    local charName = getElementData(player, "character:name")
+    local charSurname = getElementData(player, "character:surname")
+    if charName and charSurname and characterId then
+        local displayName = charName .. " " .. charSurname .. " (ID: " .. characterId .. ")"
+        setPlayerNametagText(player, displayName)
+    end
     
     -- Activar cámara
     setCameraTarget(player, player)

@@ -178,6 +178,10 @@ addEventHandler("createCharacter", getRootElement(), function(name, surname, age
                             -- Actualizar dinero
                             setCharacterMoney(source, character.money)
                             
+                            -- Actualizar nombre del jugador para mostrar personaje + ID
+                            local displayName = character.name .. " " .. character.surname .. " (ID: " .. character.id .. ")"
+                            setPlayerNametagText(source, displayName)
+                            
                             outputChatBox("¡Bienvenido, " .. character.name .. " " .. character.surname .. "!", source, 0, 255, 0)
                             outputChatBox("Has aparecido en el mundo. ¡Disfruta tu aventura!", source, 0, 255, 255)
                         end
@@ -269,6 +273,10 @@ addEventHandler("selectCharacter", getRootElement(), function(characterId)
         
         -- Actualizar dinero
         setCharacterMoney(source, character.money)
+        
+        -- Actualizar nombre del jugador para mostrar personaje + ID
+        local displayName = character.name .. " " .. character.surname .. " (ID: " .. character.id .. ")"
+        setPlayerNametagText(source, displayName)
         
         outputChatBox("¡Bienvenido, " .. character.name .. " " .. character.surname .. "!", source, 0, 255, 0)
         outputChatBox("Has aparecido en el mundo. ¡Disfruta tu aventura!", source, 0, 255, 255)

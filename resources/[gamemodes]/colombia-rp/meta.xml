@@ -23,6 +23,7 @@
     <script src="client/character_gui.lua" type="client" />
     <script src="client/hud.lua" type="client" />
     <script src="client/death_hud.lua" type="client" />
+    <script src="client/scoreboard.lua" type="client" />
     <script src="client/main.lua" type="client" />
     
     <!-- Archivos (ya no necesarios para login, pero se mantienen para character GUI) -->
