@@ -160,6 +160,14 @@ function createAdminPanel()
         table.insert(adminButtons, curarBtn)
         buttonY = buttonY + buttonSpacing
         
+        -- Botón: Dar Item
+        local darItemBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Dar Item", false, adminWindow)
+        addEventHandler("onClientGUIClick", darItemBtn, function()
+            showGiveItemsPanel()
+        end, false)
+        table.insert(adminButtons, darItemBtn)
+        buttonY = buttonY + buttonSpacing
+        
         -- Botón: Freecam
         local freecamEnabled = isFreecamEnabled and isFreecamEnabled() or false
         local freecamBtnText = freecamEnabled and "Desactivar Freecam" or "Activar Freecam"
@@ -229,14 +237,6 @@ function createAdminPanel()
             showHealInput()
         end, false)
         table.insert(adminButtons, curarBtn)
-        buttonY = buttonY + buttonSpacing
-        
-        -- Botón: Dar Item
-        local darItemBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Dar Item", false, adminWindow)
-        addEventHandler("onClientGUIClick", darItemBtn, function()
-            showGiveItemsPanel()
-        end, false)
-        table.insert(adminButtons, darItemBtn)
         buttonY = buttonY + buttonSpacing
         
         -- Botón: Dar Item
