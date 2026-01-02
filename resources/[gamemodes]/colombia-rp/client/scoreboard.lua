@@ -33,16 +33,10 @@ function updatePlayerNames()
     end
 end
 
--- Ocultar el scoreboard por defecto de MTA
+-- El radar se maneja en radar.lua, no lo ocultamos aquí
+-- Solo ocultamos el scoreboard por defecto de MTA
 addEventHandler("onClientResourceStart", resourceRoot, function()
-    -- Ocultar el scoreboard por defecto de MTA
-    setPlayerHudComponentVisible("radar", false)
-end)
-
--- Ocultar el scoreboard por defecto cuando se presiona TAB
-addEventHandler("onClientPlayerSpawn", localPlayer, function()
-    -- Asegurar que el scoreboard por defecto no interfiera
-    setPlayerHudComponentVisible("radar", false)
+    -- El radar se mostrará automáticamente cuando haya un personaje seleccionado
 end)
 
 -- Ocultar el scoreboard por defecto cuando se presiona TAB

@@ -84,18 +84,45 @@ function HudHype()
     local seconds = getTickCount() / 1600
     local angle = math.sin(seconds) * 10
 
-    --<!-- BARRAS --!>--
+    --<!-- BARRAS FONDO --!>--
     dxDrawImage(x*1225, y*154, x*101, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 80), false) -- VIDA
     dxDrawImage(x*1225, y*187, x*101, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 80), false) -- COLETE
     dxDrawImage(x*1225, y*221, x*101, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 80), false) -- STAMINA
     dxDrawImage(x*1002, y*703, x*285, y*41, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 108), false) -- VOICE
     
-    --<!-- BARRINHA --!>--
-    dxDrawImage(x*1225, y*154, x*101/100*Vida, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(237, 0, 5, 134), false)
-    dxDrawImage(x*1225, y*187, x*101/100*Colete, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(7, 239, 247, 113), false)
-    dxDrawImage(x*1225, y*221, x*101/100*Stamina, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(253, 221, 0, 113), false)
+    --<!-- BARRINHA (ajustada para respetar la curva del círculo y mantener forma) --!>--
+    -- Calcular el ancho máximo disponible (antes del círculo)
+    local maxBarWidth = x*101 - x*10 -- Ancho total menos espacio para el círculo
+    local minBarWidth = x*10 -- Ancho mínimo para mantener la forma de la barra
     
-    --<!-- CIRCULO --!>--
+    -- Función auxiliar para dibujar barra con forma mantenida usando la imagen original
+    local function drawBar(barX, barY, value, color, minWidth)
+        if value <= 0 then
+            return
+        end
+        
+        local percent = math.max(0, math.min(100, value)) / 100
+        local calculatedWidth = maxBarWidth * percent
+        
+        -- Si el valor es muy bajo (menos del 20%), usar ancho mínimo fijo para mantener la forma
+        local finalWidth
+        if value < 20 then
+            finalWidth = minWidth
+        else
+            finalWidth = math.max(minWidth, calculatedWidth)
+        end
+        
+        -- Usar la imagen original para mantener la forma, pero con el ancho calculado
+        -- Si el ancho es menor que el mínimo, usar el mínimo pero mantener la proporción visual
+        dxDrawImage(barX, barY, finalWidth, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, color, false)
+    end
+    
+    -- Dibujar barras
+    drawBar(x*1225, y*154, Vida, tocolor(237, 0, 5, 200), minBarWidth) -- VIDA
+    drawBar(x*1225, y*187, Colete, tocolor(7, 239, 247, 150), minBarWidth) -- COLETE
+    drawBar(x*1225, y*221, Stamina, tocolor(253, 221, 0, 150), minBarWidth) -- STAMINA
+    
+    --<!-- CIRCULO (dibujado después de las barras para que esté encima) --!>--
     dxDrawImage(x*1295, y*153, x*38, y*29, "hud-rp/Hype_Hud/imgs/circulo.png", 0, 0, 0, tocolor(255, 0, 0, 255), false) -- VIDA
     dxDrawImage(x*1295, y*186, x*38, y*29, "hud-rp/Hype_Hud/imgs/circulo.png", 0, 0, 0, tocolor(7, 239, 247, 255), false) -- COLETE
     dxDrawImage(x*1295, y*220, x*38, y*29, "hud-rp/Hype_Hud/imgs/circulo.png", 0, 0, 0, tocolor(237, 218, 16, 255), false) -- STAMINA
@@ -114,12 +141,17 @@ function HudHype()
     dxDrawText(Colete, x*1245, y*194, x*1279, y*207, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
     dxDrawText(Stamina, x*1245, y*228, x*1279, y*241, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
     
-    --<!-- DINERO Y BANCO --!>--
-    dxDrawText("$" .. Dinheiro, x*1002, y*50, x*1284, y*70, tocolor(255, 255, 0, 255), 1.00, FontHype, "left", "center", false, false, false, false, false)
-    dxDrawImage(x*1002, y*50, x*20, y*20, "hud-rp/Hype_Hud/imgs/wallet.png", 0, 0, 0, tocolor(255, 255, 255, 255), false)
+    --<!-- DINERO Y BANCO (mejorado y reposicionado) --!>--
+    -- Fondo semi-transparente para el dinero
+    dxDrawRectangle(x*20, y*20, x*200, y*50, tocolor(0, 0, 0, 150), false)
     
-    dxDrawText("$" .. Banco, x*1002, y*70, x*1284, y*90, tocolor(0, 255, 0, 255), 1.00, FontHype, "left", "center", false, false, false, false, false)
-    dxDrawImage(x*1002, y*70, x*20, y*20, "hud-rp/Hype_Hud/imgs/bank.png", 0, 0, 0, tocolor(255, 255, 255, 255), false)
+    -- Icono y texto de dinero en billetera
+    dxDrawImage(x*25, y*25, x*20, y*20, "hud-rp/Hype_Hud/imgs/wallet.png", 0, 0, 0, tocolor(255, 255, 255, 255), false)
+    dxDrawText("$" .. Dinheiro, x*50, y*25, x*200, y*45, tocolor(255, 255, 0, 255), 1.00, FontHype, "left", "center", false, false, false, false, false)
+    
+    -- Icono y texto de dinero en banco
+    dxDrawImage(x*25, y*45, x*20, y*20, "hud-rp/Hype_Hud/imgs/bank.png", 0, 0, 0, tocolor(255, 255, 255, 255), false)
+    dxDrawText("$" .. Banco, x*50, y*45, x*200, y*65, tocolor(0, 255, 0, 255), 1.00, FontHype, "left", "center", false, false, false, false, false)
     
     --<!-- HAMBRE Y SED (opcional, puedes agregar barras si quieres) --!>--
     --<!-- VOICE LADO --!>--

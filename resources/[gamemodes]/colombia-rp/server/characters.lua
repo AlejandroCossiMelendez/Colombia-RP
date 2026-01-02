@@ -129,8 +129,9 @@ addEventHandler("createCharacter", getRootElement(), function(name, surname, age
                             setElementData(source, "character:hunger", character.hunger)
                             setElementData(source, "character:thirst", character.thirst)
                             setElementData(source, "character:health", character.health)
-                            -- Inicializar banco y empleo (valores por defecto)
+                            -- Inicializar banco (valor por defecto para personajes nuevos)
                             setElementData(source, "character:bank", 0)
+                            -- Inicializar empleo (valor por defecto)
                             setElementData(source, "character:job", "Desempleado")
                             -- Inicializar stamina en el cliente
                             triggerClientEvent(source, "initializeStamina", resourceRoot)
@@ -226,10 +227,10 @@ addEventHandler("selectCharacter", getRootElement(), function(characterId)
         setElementData(source, "character:money", character.money)
         setElementData(source, "character:hunger", character.hunger)
         setElementData(source, "character:thirst", character.thirst)
-        -- Inicializar banco y empleo (valores por defecto si no existen)
-        if not getElementData(source, "character:bank") then
-            setElementData(source, "character:bank", 0)
-        end
+        -- Cargar banco desde la base de datos (si existe la columna)
+        local banco = character.banco or 0
+        setElementData(source, "character:bank", banco)
+        -- Inicializar empleo (valor por defecto si no existe)
         if not getElementData(source, "character:job") then
             setElementData(source, "character:job", "Desempleado")
         end
