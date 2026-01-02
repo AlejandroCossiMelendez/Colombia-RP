@@ -106,7 +106,12 @@ function giveItemToPlayer(targetPlayer, itemId, value, name, quantity)
     end
     
     quantity = quantity or 1
-    value = value or 1
+    -- Para el chaleco (ID 46), el valor por defecto debe ser 100 (100% de defensa)
+    if itemId == 46 then
+        value = value or 100
+    else
+        value = value or 1
+    end
     
     local successCount = 0
     local errorMsg = nil
@@ -241,7 +246,17 @@ addEventHandler("admin:giveItems", root, function(characterId, itemsData)
     for _, itemData in ipairs(itemsData) do
         local itemId = tonumber(itemData.itemId)
         local quantity = tonumber(itemData.quantity) or 1
-        local value = itemData.value or 1
+        -- Para el chaleco (ID 46), el valor por defecto debe ser 100 (100% de defensa)
+        local value = itemData.value
+        if not value or value == "" or value == nil then
+            if itemId == 46 then
+                value = 100
+            else
+                value = 1
+            end
+        else
+            value = tonumber(value) or (itemId == 46 and 100 or 1)
+        end
         local name = itemData.name or nil
         
         if itemId then
