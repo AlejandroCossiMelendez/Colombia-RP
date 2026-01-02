@@ -329,10 +329,12 @@ addEventHandler("useItem", root, function(slot, itemId, itemIndex)
     
     -- Teléfono Móvil (ID: 7) - Abrir teléfono
     if itemId == 7 then
-        -- Verificar si el jugador ya tiene un número de teléfono asignado
+        -- Verificar que el personaje esté completamente seleccionado
+        local characterSelected = getElementData(source, "character:selected")
         local characterId = getElementData(source, "character:id")
-        if not characterId then
-            outputChatBox("Error: No se pudo obtener el ID del personaje.", source, 255, 0, 0)
+        
+        if not characterSelected or not characterId then
+            outputChatBox("Espera a que tu personaje esté completamente cargado antes de usar el teléfono.", source, 255, 165, 0)
             return
         end
         

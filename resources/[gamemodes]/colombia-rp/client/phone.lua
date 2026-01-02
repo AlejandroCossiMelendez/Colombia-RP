@@ -32,33 +32,8 @@ function whenPhoneBrowserReady()
             executeBrowserJavascript(browserContent, "setMyPhoneNumber('" .. tostring(phoneNumber) .. "');")
         end
         
-        -- Cargar contactos desde el servidor (con verificación de que el personaje esté completamente seleccionado)
-        setTimer(function()
-            local characterSelected = getElementData(localPlayer, "character:selected")
-            local characterId = getElementData(localPlayer, "character:id")
-            
-            if characterSelected and characterId then
-                triggerServerEvent("loadContacts", resourceRoot)
-            else
-                -- Reintentar después de 1 segundo si character:id aún no está disponible
-                setTimer(function()
-                    local retrySelected = getElementData(localPlayer, "character:selected")
-                    local retryCharacterId = getElementData(localPlayer, "character:id")
-                    if retrySelected and retryCharacterId then
-                        triggerServerEvent("loadContacts", resourceRoot)
-                    else
-                        -- Último intento después de 2 segundos más
-                        setTimer(function()
-                            local finalSelected = getElementData(localPlayer, "character:selected")
-                            local finalCharacterId = getElementData(localPlayer, "character:id")
-                            if finalSelected and finalCharacterId then
-                                triggerServerEvent("loadContacts", resourceRoot)
-                            end
-                        end, 2000, 1)
-                    end
-                end, 1000, 1)
-            end
-        end, 1000, 1)
+        -- Los contactos se cargarán desde el evento openPhone del servidor
+        -- No necesitamos cargarlos aquí porque ya vienen con el evento
     end
 end
 
@@ -215,6 +190,12 @@ end
 -- Evento para guardar contactos (desde el navegador)
 addEvent("saveContacts", true)
 addEventHandler("saveContacts", localPlayer, function(contactsJson)
+    local characterId = getElementData(localPlayer, "character:id")
+    if not characterId then
+        outputChatBox("Error: No se pudo obtener el ID del personaje para guardar contactos.", 255, 0, 0)
+        return
+    end
+    
     if contactsJson and type(contactsJson) == "string" then
         triggerServerEvent("saveContacts", resourceRoot, contactsJson)
     end
@@ -244,9 +225,10 @@ addEventHandler("openPhone", resourceRoot, function(phoneNumber, contactsList)
             if phoneNumber then
                 executeBrowserJavascript(browserContent, "setMyPhoneNumber('" .. tostring(phoneNumber) .. "');")
             end
-            if contactsList and type(contactsList) == "table" and #contactsList > 0 then
-                -- Convertir tabla a JSON manualmente
-                local jsonStr = "["
+            
+            -- Cargar contactos (puede ser una lista vacía)
+            local jsonStr = "["
+            if contactsList and type(contactsList) == "table" then
                 for i, contact in ipairs(contactsList) do
                     if i > 1 then jsonStr = jsonStr .. "," end
                     jsonStr = jsonStr .. "{"
@@ -254,9 +236,9 @@ addEventHandler("openPhone", resourceRoot, function(phoneNumber, contactsList)
                     jsonStr = jsonStr .. "\"number\":\"" .. (contact.number or ""):gsub("\"", "\\\"") .. "\""
                     jsonStr = jsonStr .. "}"
                 end
-                jsonStr = jsonStr .. "]"
-                executeBrowserJavascript(browserContent, "loadContactsFromServer('" .. jsonStr .. "');")
             end
+            jsonStr = jsonStr .. "]"
+            executeBrowserJavascript(browserContent, "loadContactsFromServer('" .. jsonStr .. "');")
         end
     end, 500, 1)
 end)
