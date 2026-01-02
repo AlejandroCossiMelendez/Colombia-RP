@@ -82,9 +82,10 @@ function HudHype()
     local mes = meses[time.month + 1]
 
     -- Animación suave del logo (hover sutil)
-    local seconds = getTickCount() / 2000 -- Más lento para animación suave
-    local hoverOffset = math.sin(seconds) * 3 -- Movimiento más sutil (3 píxeles en lugar de 10)
-    local angle = 0 -- Sin rotación, solo movimiento vertical suave
+    local tickCount = getTickCount()
+    local seconds = tickCount / 2000 -- Más lento para animación suave
+    local hoverOffset = math.sin(seconds) * 4 -- Movimiento suave vertical (4 píxeles arriba/abajo)
+    local angle = math.sin(seconds * 0.5) * 3 -- Rotación sutil (3 grados máximo)
 
     --<!-- BARRAS FONDO --!>--
     dxDrawImage(x*1225, y*154, x*101, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 80), false) -- VIDA
@@ -94,24 +95,31 @@ function HudHype()
     dxDrawImage(x*1225, y*289, x*101, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 80), false) -- SED
     dxDrawImage(x*1002, y*703, x*285, y*41, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 108), false) -- VOICE
     
-    --<!-- BARRINHA (función limpia que no se rompe al bajar) --!>--
+    --<!-- BARRINHA (con bordes redondeados en ambos lados, coherente con el fondo) --!>--
     local barWidth = x*101
     local barHeight = y*28
+    local imageSourceWidth = 101 -- Ancho original de la imagen
+    local imageSourceHeight = 28 -- Alto original de la imagen
     
     local function drawBar(barX, barY, value, color)
         local percent = math.max(0, math.min(100, value)) / 100
         local fillWidth = barWidth * percent
         
-        -- Fondo (ya se dibuja arriba, pero lo mantenemos por si acaso)
-        -- dxDrawImage(barX, barY, barWidth, barHeight, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 120), false)
-        
-        -- Barra (RECTA, sin bordes) - solo dibujar si hay valor
+        -- Solo dibujar si hay valor
         if fillWidth > 0 then
-            dxDrawRectangle(barX, barY, fillWidth, barHeight, color, false)
+            -- Calcular la sección de la imagen a usar (desde el inicio para mantener bordes redondeados)
+            local sectionWidth = (fillWidth / barWidth) * imageSourceWidth
+            sectionWidth = math.min(sectionWidth, imageSourceWidth) -- No exceder el ancho original
+            
+            -- Usar dxDrawImageSection para mantener los bordes redondeados coherentes con el fondo
+            -- La sección siempre empieza desde (0, 0) para mantener el borde redondeado izquierdo
+            -- El borde derecho redondeado se mantiene proporcionalmente
+            dxDrawImageSection(barX, barY, fillWidth, barHeight, 0, 0, sectionWidth, imageSourceHeight, 
+                "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, color, false)
         end
     end
     
-    -- Uso correcto de las barras
+    -- Uso correcto de las barras con bordes redondeados
     drawBar(x*1225, y*154, Vida, tocolor(237, 0, 5, 200))
     drawBar(x*1225, y*187, Colete, tocolor(7, 239, 247, 180))
     drawBar(x*1225, y*221, Stamina, tocolor(253, 221, 0, 180))
