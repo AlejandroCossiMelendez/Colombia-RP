@@ -411,6 +411,42 @@ addEventHandler("admin:giveMoney", root, function(characterId, amount)
     end
 end)
 
+-- Evento para teleportar desde freecam (click derecho)
+addEvent("admin:freecamTeleport", true)
+addEventHandler("admin:freecamTeleport", root, function(x, y, z)
+    if not isElement(source) or getElementType(source) ~= "player" then
+        return
+    end
+    
+    if not isPlayerAdminOrStaff(source) then
+        return
+    end
+    
+    if not x or not y or not z then
+        return
+    end
+    
+    -- Teleportar al admin
+    setElementPosition(source, x, y, z)
+    
+    -- Ajustar altura para evitar caídas
+    setTimer(function()
+        if isElement(source) then
+            local px, py, pz = getElementPosition(source)
+            local hit, hitX, hitY, hitZ = processLineOfSight(px, py, pz + 50, px, py, pz - 50, true, true, false, true, false, false, false, false, source)
+            if hit then
+                if pz - hitZ < 2.0 or pz < hitZ then
+                    setElementPosition(source, px, py, hitZ + 2.0)
+                end
+            elseif pz < 5.0 then
+                setElementPosition(source, px, py, 15.0)
+            end
+        end
+    end, 100, 1)
+    
+    outputServerLog("[ADMIN] " .. getPlayerName(source) .. " se teleportó desde freecam a " .. string.format("%.2f, %.2f, %.2f", x, y, z))
+end)
+
 -- Evento para obtener coordenadas (desde el panel)
 addEvent("admin:getCoords", true)
 addEventHandler("admin:getCoords", root, function()

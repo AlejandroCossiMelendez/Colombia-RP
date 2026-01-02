@@ -48,6 +48,10 @@ function enableFreecam()
     showCursor(true) -- Mostrar cursor pero lo centraremos
     setElementFrozen(localPlayer, true) -- Congelar al jugador
     
+    -- Hacer invisible al jugador mientras usa freecam
+    setElementAlpha(localPlayer, 0)
+    setPlayerNametagShowing(localPlayer, false)
+    
     -- Centrar el cursor inicialmente
     screenW, screenH = guiGetScreenSize()
     setCursorPosition(screenW / 2, screenH / 2)
@@ -83,6 +87,10 @@ function disableFreecam()
     freecamEnabled = false
     showCursor(false)
     setElementFrozen(localPlayer, false) -- Descongelar al jugador
+    
+    -- Restaurar visibilidad del jugador
+    setElementAlpha(localPlayer, 255)
+    setPlayerNametagShowing(localPlayer, true)
     
     -- Restaurar cámara al jugador
     setCameraTarget(localPlayer)
@@ -121,22 +129,19 @@ function updateFreecam()
         moveY = moveY - math.sin(math.rad(freecamRotY)) * freecamSpeed
     end
     
-    -- Movimiento vertical (Q/E o Space/Ctrl)
+    -- Movimiento vertical (Space para subir, Ctrl para bajar)
     if getKeyState("space") then
         moveZ = moveZ + freecamSpeed
     end
     if getKeyState("lctrl") or getKeyState("rctrl") then
-        moveZ = moveZ - freecamSpeed
+        -- Bajar más rápido que subir
+        moveZ = moveZ - freecamSpeed * 1.5
     end
     
     -- Ajustar velocidad según teclas modificadoras
     local currentSpeed = freecamSpeed
     if getKeyState("lshift") or getKeyState("rshift") then
         currentSpeed = freecamSpeed * 3 -- Velocidad rápida
-    elseif getKeyState("lctrl") or getKeyState("rctrl") then
-        if not getKeyState("space") then
-            currentSpeed = freecamSpeed * 0.3 -- Velocidad lenta
-        end
     end
     
     -- Aplicar movimiento
@@ -205,6 +210,73 @@ end)
 addEventHandler("onClientRender", root, function()
     if freecamEnabled then
         updateFreecam()
+    end
+end)
+
+-- Sistema de teleport con click derecho
+local rightClickPressed = false
+
+-- Detectar cuando se presiona click derecho
+addEventHandler("onClientClick", root, function(button, state, absX, absY, worldX, worldY, worldZ, clickedElement)
+    if not freecamEnabled then
+        return
+    end
+    
+    if button == "right" then
+        rightClickPressed = (state == "down")
+        
+        if state == "down" then
+            -- Verificar permisos
+            if not canUseFreecam() then
+                return
+            end
+            
+            -- Obtener posición de la cámara
+            local camX, camY, camZ, lx, ly, lz = getCameraMatrix()
+            if not camX or not camY or not camZ then
+                return
+            end
+            
+            -- Obtener posición del cursor en el mundo usando getWorldFromScreenPosition
+            local screenW, screenH = guiGetScreenSize()
+            local centerX, centerY = screenW / 2, screenH / 2
+            
+            -- Convertir posición del cursor a coordenadas del mundo
+            local worldX, worldY, worldZ = getWorldFromScreenPosition(centerX, centerY, 1000)
+            
+            if worldX and worldY and worldZ then
+                -- Usar processLineOfSight desde la cámara hasta el punto calculado
+                local hit, hitX, hitY, hitZ, hitElement = processLineOfSight(
+                    camX, camY, camZ,
+                    worldX, worldY, worldZ,
+                    true, true, false, true, false, false, false, false, localPlayer
+                )
+                
+                if hit then
+                    -- Ajustar altura para estar sobre el suelo
+                    hitZ = hitZ + 2.0
+                else
+                    -- Si no hay hit, buscar el suelo debajo del punto calculado
+                    local groundHit, groundX, groundY, groundZ = processLineOfSight(
+                        worldX, worldY, worldZ + 50,
+                        worldX, worldY, worldZ - 200,
+                        true, true, false, true, false, false, false, false, localPlayer
+                    )
+                    
+                    if groundHit then
+                        hitX, hitY, hitZ = groundX, groundY, groundZ + 2.0
+                    else
+                        -- Si no se encuentra suelo, usar el punto calculado directamente
+                        hitX, hitY, hitZ = worldX, worldY, worldZ
+                    end
+                end
+                
+                -- Teleportar al admin
+                triggerServerEvent("admin:freecamTeleport", localPlayer, hitX, hitY, hitZ)
+                
+                outputChatBox("Te has teleportado a la posición seleccionada.", 0, 255, 0)
+            end
+        end
     end
 end)
 
