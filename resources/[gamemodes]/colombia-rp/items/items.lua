@@ -140,7 +140,7 @@ function load( element, force )
 				local i = queryDatabase( "SELECT `index`, item, value, value2, name FROM items WHERE owner = " .. elementID .. " ORDER BY `index` ASC" )
 				if i then
 					outputServerLog("[ITEMS] Cargando " .. #i .. " items para el jugador " .. getPlayerName(element) .. " (ID: " .. elementID .. ")")
-					for key, value in ipairs( i ) do
+				for key, value in ipairs( i ) do
 						-- Si name es NULL, obtenerlo usando getName
 						if not value.name or value.name == "NULL" or value.name == "" then
 							if getName and type(getName) == "function" then
@@ -150,7 +150,7 @@ function load( element, force )
 								end
 							end
 						end
-						table.insert( data[ element ].items, value )
+					table.insert( data[ element ].items, value )
 					end
 				else
 					outputServerLog("[ITEMS] No se encontraron items para el jugador " .. getPlayerName(element) .. " (ID: " .. elementID .. ")")
@@ -191,7 +191,7 @@ function give( element, item, val, name, value2 )
 				-- Usar nuestra función de escape o la función global si existe
 				if escapeString then
 					name2 = "'" .. escapeString( tostring( name ) ) .. "'"
-				else
+			else
 					-- Fallback: escape básico
 					local escaped = tostring(name):gsub("'", "\\'")
 					name2 = "'" .. escaped .. "'"
@@ -384,7 +384,7 @@ addEventHandler( "loadItems", root,
 				if playersResource and getResourceState(playersResource) == "running" then
 					local success, result = pcall(function() return exports.players:isLoggedIn(source) end)
 					if success and result then
-						load( source, true )
+				load( source, true )
 					end
 				end
 			end
