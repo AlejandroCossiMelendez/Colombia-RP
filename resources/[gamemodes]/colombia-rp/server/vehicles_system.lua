@@ -149,6 +149,14 @@ function playerHasVehicleKey(player, vehicle)
         return false
     end
     
+    -- LOS ADMINS SIEMPRE TIENEN ACCESO A TODOS LOS VEHÍCULOS
+    if isPlayerAdmin then
+        local isAdmin = isPlayerAdmin(player)
+        if isAdmin then
+            return true
+        end
+    end
+    
     local plate = getElementData(vehicle, "vehicle:plate")
     if not plate then
         return false

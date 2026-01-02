@@ -2,9 +2,8 @@
 -- Maneja los eventos de motor, bloqueo y luces
 
 -- Cargar funciones del sistema de vehículos
-if not playerHasVehicleKey then
-    outputServerLog("[VEHICLES] ERROR: Sistema de vehículos no cargado. Asegúrate de que vehicles_system.lua esté cargado primero.")
-end
+-- Nota: playerHasVehicleKey se define en vehicles_system.lua
+-- Si no está disponible, se mostrará un error pero el sistema seguirá funcionando
 
 -- Evento: Verificar si el jugador tiene las llaves
 addEvent("vehicle:checkKey", true)

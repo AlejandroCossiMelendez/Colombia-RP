@@ -578,7 +578,13 @@ addEventHandler("admin:createVehicleAtPosition", root, function(vehicleId, x, y,
         if vehicle then
             outputChatBox("✓ Vehículo '" .. vehicleName .. "' creado para el jugador (ID: " .. playerId .. ")", source, 0, 255, 0)
             outputChatBox("Matrícula: " .. plate, source, 255, 255, 0)
-            outputChatBox("✓ Has recibido las llaves del vehículo con matrícula: " .. plate, targetPlayer, 0, 255, 0)
+            outputChatBox("✓ El vehículo ha sido generado y las llaves han sido entregadas al jugador.", source, 0, 255, 0)
+            
+            -- Notificar al jugador objetivo
+            if targetPlayer then
+                outputChatBox("✓ Has recibido un vehículo nuevo con matrícula: " .. plate, targetPlayer, 0, 255, 0)
+                outputChatBox("✓ Las llaves han sido agregadas a tu inventario.", targetPlayer, 0, 255, 0)
+            end
         else
             outputChatBox("Error al crear el vehículo: " .. (plate or "Error desconocido"), source, 255, 0, 0)
         end

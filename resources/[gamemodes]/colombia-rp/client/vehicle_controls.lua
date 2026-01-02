@@ -15,8 +15,9 @@ bindKey("j", "down", function()
         return
     end
     
-    -- Verificar llaves en el servidor
-    triggerServerEvent("vehicle:toggleEngine", localPlayer, vehicle, nil)
+    -- Obtener estado actual y enviar al servidor (el servidor verifica llaves y permisos de admin)
+    local engineState = getVehicleEngineState(vehicle)
+    triggerServerEvent("vehicle:toggleEngine", localPlayer, vehicle, not engineState)
 end)
 
 -- Control K: Bloquear/Desbloquear puertas
