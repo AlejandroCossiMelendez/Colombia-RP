@@ -194,18 +194,20 @@ function isGUIOpen()
     return false
 end
 
--- Detectar cuando se presiona M para liberar el cursor
+-- Detectar cuando se presiona M para liberar/ocultar el cursor
 addEventHandler("onClientKey", root, function(key, press)
-    if freecamEnabled and key == "m" then
-        if press then
-            cursorManuallyReleased = true
+    if freecamEnabled and key == "m" and press then
+        -- Toggle: si el cursor está liberado, ocultarlo; si está oculto, liberarlo
+        if cursorManuallyReleased then
+            -- Segunda vez: ocultar cursor y volver al modo de control de cámara
+            cursorManuallyReleased = false
+            showCursor(false)
+            outputChatBox("Cursor ocultado. Modo de control de cámara activado.", 0, 255, 0)
         else
-            -- Cuando se suelta M, esperar un momento antes de volver a centrar
-            setTimer(function()
-                if freecamEnabled and not isGUIOpen() then
-                    cursorManuallyReleased = false
-                end
-            end, 100, 1)
+            -- Primera vez: liberar cursor
+            cursorManuallyReleased = true
+            showCursor(true)
+            outputChatBox("Cursor liberado. Presiona M de nuevo para ocultarlo.", 255, 255, 0)
         end
     end
 end)
