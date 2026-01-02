@@ -8,6 +8,9 @@ local callSpeakerEnabled = false
 -- Evento: Llamada entrante
 addEvent("phone:incomingCall", true)
 addEventHandler("phone:incomingCall", resourceRoot, function(callerNumber, callerName, callId)
+    -- Log para debugging
+    outputChatBox("DEBUG: Llamada entrante recibida - " .. tostring(callerNumber) .. " (" .. tostring(callId) .. ")", 0, 255, 0)
+    
     -- Mostrar notificación de llamada entrante (sin pausar el juego)
     showIncomingCallNotification(callerNumber, callerName, callId)
 end)

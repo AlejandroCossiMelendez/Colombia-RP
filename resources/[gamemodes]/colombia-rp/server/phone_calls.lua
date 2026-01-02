@@ -163,6 +163,21 @@ addEventHandler("phone:makeCall", root, function(phoneNumber)
         callId = callId
     }
     
+    -- Verificar que el receptor esté conectado y tenga personaje seleccionado
+    if not isElement(receiver) or getElementType(receiver) ~= "player" then
+        outputChatBox("El jugador receptor no está disponible.", caller, 255, 0, 0)
+        triggerClientEvent(caller, "phone:callFailed", resourceRoot, "Jugador no disponible")
+        return
+    end
+    
+    if not getElementData(receiver, "character:selected") then
+        outputChatBox("El jugador receptor no tiene un personaje seleccionado.", caller, 255, 0, 0)
+        triggerClientEvent(caller, "phone:callFailed", resourceRoot, "Jugador no disponible")
+        return
+    end
+    
+    -- Enviar notificación al receptor
+    outputServerLog("[PHONE] Enviando notificación de llamada a " .. getPlayerName(receiver) .. " (ID: " .. tostring(callId) .. ")")
     triggerClientEvent(receiver, "phone:incomingCall", resourceRoot, callerNumber, callerName, callId)
     triggerClientEvent(caller, "phone:callRinging", resourceRoot, phoneNumber)
     
