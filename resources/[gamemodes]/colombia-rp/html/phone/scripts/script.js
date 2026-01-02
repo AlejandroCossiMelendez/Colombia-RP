@@ -145,9 +145,6 @@ function handleDragEnd(e) {
         isClosing = true;
         isDragging = false;
         
-        // Guardar contactos antes de cerrar
-        saveContactsToMTA();
-        
         // Animación de cierre suave
         iphone.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out, filter 0.4s ease-out';
         iphone.style.transform = 'translateY(400px)';
@@ -156,8 +153,11 @@ function handleDragEnd(e) {
         
         // Cerrar el teléfono después de la animación
         setTimeout(function() {
-            // Guardar contactos una vez más antes de cerrar
-            saveContactsToMTA();
+            // Guardar contactos solo si estamos en la app de contactos
+            const contactsApp = get('[data-app-id="6"]');
+            if (contactsApp && contactsApp.style.display !== 'none') {
+                saveContactsToMTA();
+            }
             
             // Cerrar el teléfono
             if (window.mta && window.mta.triggerEvent) {
@@ -185,20 +185,15 @@ function handleDragEnd(e) {
 
 // Función para guardar contactos en MTA
 function saveContactsToMTA() {
-    // Guardar siempre, incluso si no hay contactos (para limpiar)
-    if (window.mta && window.mta.triggerEvent) {
+    // Solo guardar si MTA está disponible y contacts está definido
+    if (window.mta && window.mta.triggerEvent && typeof contacts !== 'undefined') {
         try {
             const contactsToSave = contacts || [];
             const jsonString = JSON.stringify(contactsToSave);
-            console.log('Guardando contactos:', contactsToSave.length, 'contactos');
-            console.log('JSON a enviar:', jsonString);
             window.mta.triggerEvent('saveContacts', jsonString);
-            console.log('Evento saveContacts enviado correctamente');
         } catch (e) {
-            console.error('Error al guardar contactos:', e);
+            // Silenciar errores al guardar, no es crítico si falla
         }
-    } else {
-        console.warn('MTA no está disponible para guardar contactos');
     }
 }
 
@@ -235,14 +230,9 @@ function returnToHomePage() {
     
     // Si ya está en el home (unlock visible y interfaces ocultas), cerrar el teléfono
     if (unlockVisible && !interfacesVisible) {
-        // Guardar contactos antes de cerrar
-        saveContactsToMTA();
-        
-        // Cerrar el teléfono enviando evento a MTA
+        // Cerrar el teléfono enviando evento a MTA (no guardar contactos aquí para evitar bugs)
         if (window.mta && window.mta.triggerEvent) {
             window.mta.triggerEvent('closePhoneFromBrowser');
-        } else {
-            console.error('MTA no está disponible');
         }
         return;
     }

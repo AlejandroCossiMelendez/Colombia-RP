@@ -27,8 +27,6 @@ addEventHandler("saveContacts", root, function(contactsJson)
     end
     
     -- Parsear JSON de contactos
-    outputServerLog("[PHONE] Recibiendo JSON de contactos. Longitud: " .. string.len(contactsJson) .. ", Contenido: " .. tostring(contactsJson))
-    
     local contacts = nil
     local success, result = pcall(function()
         if type(fromJSON) == "function" then
@@ -44,22 +42,18 @@ addEventHandler("saveContacts", root, function(contactsJson)
     end)
     
     if not success then
-        outputServerLog("[PHONE] ERROR: Error al parsear JSON. JSON recibido: " .. tostring(contactsJson) .. ", Error: " .. tostring(result))
-        outputChatBox("Error: Formato de contactos inválido. Intenta de nuevo.", player, 255, 0, 0)
+        outputServerLog("[PHONE] ERROR: Error al parsear JSON de contactos")
         return
     end
     
     -- Si result es nil o no es una tabla, verificar si es un array vacío
     if not result then
         -- Array vacío es válido, simplemente no hay contactos
-        outputServerLog("[PHONE] JSON parseado es nil, tratando como array vacío")
         contacts = {}
     elseif type(result) ~= "table" then
-        outputServerLog("[PHONE] ERROR: JSON parseado no es una tabla. Tipo: " .. type(result) .. ", Valor: " .. tostring(result))
-        outputChatBox("Error: Formato de contactos inválido. Intenta de nuevo.", player, 255, 0, 0)
+        outputServerLog("[PHONE] ERROR: JSON parseado no es una tabla")
         return
     else
-        outputServerLog("[PHONE] JSON parseado correctamente. Tipo: table, Longitud: " .. #result)
         contacts = result
     end
     
@@ -112,10 +106,6 @@ addEventHandler("saveContacts", root, function(contactsJson)
     
     -- Si el array está vacío, solo eliminar y terminar
     if #contacts == 0 then
-        outputServerLog("[PHONE] Array de contactos vacío. Todos los contactos eliminados para personaje ID " .. characterId)
-        if isElement(player) and getElementType(player) == "player" then
-            outputChatBox("✓ Contactos eliminados correctamente.", player, 0, 255, 0)
-        end
         return
     end
     
@@ -137,16 +127,6 @@ addEventHandler("saveContacts", root, function(contactsJson)
             end
         else
             errorCount = errorCount + 1
-        end
-    end
-    
-    -- Mostrar mensaje de confirmación al jugador
-    if isElement(player) and getElementType(player) == "player" then
-        if insertCount > 0 then
-            outputChatBox("✓ " .. insertCount .. " contacto(s) guardado(s) correctamente.", player, 0, 255, 0)
-        end
-        if errorCount > 0 then
-            outputChatBox("⚠ Error al guardar " .. errorCount .. " contacto(s).", player, 255, 165, 0)
         end
     end
 end)
