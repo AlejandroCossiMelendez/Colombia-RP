@@ -262,6 +262,18 @@ function drawInventory()
                 end
             end
             
+            -- Dibujar imagen del item
+            local itemId = item.item_id or item.item
+            if itemId then
+                local imagePath = ":colombia-rp/items/images/" .. itemId .. ".png"
+                local imageSize = w - 20 -- Tamaño de la imagen con padding
+                local imageX = x + 10
+                local imageY = y + 10
+                
+                -- Intentar dibujar la imagen (MTA carga las imágenes automáticamente si están en meta.xml)
+                dxDrawImage(imageX, imageY, imageSize, imageSize, imagePath, 0, 0, 0, tocolor(255, 255, 255, 255), false)
+            end
+            
             -- Nombre del item (centrado con múltiples sombras y glow)
             local itemName = item.item_name or "Item"
             local textY = y + h - 18
