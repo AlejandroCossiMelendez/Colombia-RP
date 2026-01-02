@@ -33,16 +33,22 @@ addEventHandler("jbl:activate", root, function()
         return
     end
     
-    -- Adjuntar a la mano derecha (bone 25 - mano derecha)
+    -- Adjuntar a la mano derecha (bone 12 - right hand según functions.txt)
     -- Verificar si bone_attach está disponible
     local boneAttachResource = getResourceFromName("bone_attach")
     if boneAttachResource and getResourceState(boneAttachResource) == "running" then
         if exports.bone_attach then
-            exports.bone_attach:attachElementToBone(jblObject, player, 25, 0.1, 0.05, 0.1, 0, 0, 0)
+            -- Ajustar posición para que se vea bien en la mano
+            -- Bone 12 = mano derecha (right hand)
+            -- Offset: x (lateral derecho), y (adelante), z (arriba)
+            -- Rotación: rx (pitch), ry (yaw), rz (roll)
+            -- Valores ajustados para que el JBL se vea correctamente en la mano
+            exports.bone_attach:attachElementToBone(jblObject, player, 12, 0.15, 0.1, 0.0, 0, 0, 0)
         end
     else
         -- Si bone_attach no está disponible, adjuntar usando attachElements
-        attachElements(jblObject, player, 0.1, 0.05, 0.1, 0, 0, 0)
+        -- Ajustar posición relativa para la mano (lado derecho del jugador)
+        attachElements(jblObject, player, 0.15, 0.1, 0.0, 0, 0, 0)
     end
     
     activeJBLs[player] = {
@@ -86,7 +92,9 @@ addEventHandler("jbl:deactivate", root, function()
             if exports.bone_attach then
                 exports.bone_attach:detachElementFromBone(jblData.object)
             end
-        else
+        end
+        -- Siempre intentar detachElements también por si acaso
+        if isElement(jblData.object) then
             detachElements(jblData.object, player)
         end
         destroyElement(jblData.object)

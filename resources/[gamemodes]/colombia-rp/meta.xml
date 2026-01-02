@@ -51,6 +51,7 @@
     <script src="client/phone.lua" type="client" />
     <script src="client/phone_calls.lua" type="client" />
     <script src="client/jbl_panel.lua" type="client" />
+    <script src="client/jbl_model.lua" type="client" />
     
     <!-- Scripts del sistema de items (cliente) -->
     <script src="items/items_list.lua" type="client" />
