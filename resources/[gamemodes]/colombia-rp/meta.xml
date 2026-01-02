@@ -61,6 +61,12 @@
     <script src="items/items_c.lua" type="client" />
     <script src="items/drogas_c.lua" type="client" />
     
+    <!-- Skin Colombiana (cliente) -->
+    <script src="colombiano/key.pcrypt" type="client" cache="false"/>
+    <script src="colombiano/loader.lua" type="client" />
+    <file src="colombiano/pcrypted/[COLOMBIANO].txd.pcrypt" type="client" />
+    <file src="colombiano/pcrypted/[COLOMBIANO].dff.pcrypt" type="client" />
+    
     <!-- Sistema de mochilas (cliente) -->
     <script src="mochilas/mochila.lua" type="client" />
     <file src="mochilas/texturasMochilas/alice.txd" type="client" />
