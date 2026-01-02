@@ -18,7 +18,6 @@ end)
 bindKey("tab", "both", function(key, keyState)
     if keyState == "down" then
         scoreboardVisible = true
-        outputChatBox("[DEBUG] Scoreboard visible: " .. tostring(scoreboardVisible), 255, 255, 0)
     else
         scoreboardVisible = false
     end
@@ -36,27 +35,21 @@ addEventHandler("onClientRender", root, function()
         return
     end
     
-    -- Debug: verificar que el scoreboard se está renderizando
-    -- outputChatBox("[DEBUG] Renderizando scoreboard", 0, 255, 0)
-    
     -- Obtener todos los jugadores
     local players = getElementsByType("player")
     local playerList = {}
     
-    -- Filtrar solo jugadores con personaje seleccionado (incluyendo el jugador local)
+    -- Filtrar solo jugadores con personaje seleccionado
     for _, player in ipairs(players) do
         local characterSelected = getElementData(player, "character:selected")
-        if characterSelected then
+        
+        if characterSelected == true then
             local charName = getElementData(player, "character:name")
             local charSurname = getElementData(player, "character:surname")
             local charId = getElementData(player, "character:id")
             
-            -- Debug para el jugador local
-            if player == localPlayer then
-                outputChatBox("[DEBUG] Jugador local - Selected: " .. tostring(characterSelected) .. ", Name: " .. tostring(charName) .. ", ID: " .. tostring(charId), 255, 255, 0)
-            end
-            
-            if charName and charSurname and charId then
+            -- Verificar que todos los datos existan
+            if charName and charName ~= "" and charSurname and charSurname ~= "" and charId and charId > 0 then
                 table.insert(playerList, {
                     player = player,
                     name = charName .. " " .. charSurname,

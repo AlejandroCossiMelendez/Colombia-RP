@@ -14,6 +14,8 @@
     <script src="server/inventory.lua" type="server" />
     <script src="server/money.lua" type="server" />
     <script src="server/needs.lua" type="server" />
+    <script src="server/fuel.lua" type="server" />
+    <script src="server/radio.lua" type="server" />
     <script src="server/spawn.lua" type="server" />
     <script src="server/commands.lua" type="server" />
     <script src="server/main.lua" type="server" />
@@ -21,7 +23,10 @@
     <!-- Scripts del cliente -->
     <script src="client/login_gui.lua" type="client" />
     <script src="client/character_gui.lua" type="client" />
-    <script src="client/hud.lua" type="client" />
+    <script src="client/hud_config.lua" type="client" />
+    <script src="client/hud_utils.lua" type="client" />
+    <script src="client/hud_main.lua" type="client" />
+    <!-- <script src="client/hud.lua" type="client" /> --> <!-- HUD antiguo, reemplazado por hud_main.lua -->
     <script src="client/death_hud.lua" type="client" />
     <script src="client/scoreboard.lua" type="client" />
     <script src="client/main.lua" type="client" />
@@ -29,5 +34,25 @@
     <!-- Archivos (ya no necesarios para login, pero se mantienen para character GUI) -->
     <file src="client/character.html" />
     <file src="client/hud.html" />
+    
+    <!-- Archivos del HUD (fuentes e imágenes desde ice_hud) -->
+    <!-- Fonts -->
+    <file src="ice_hud/nui/fonts/Montserrat-Bold.ttf" cache="false" />
+    <file src="ice_hud/nui/fonts/Montserrat-Itali-Bold.ttf" cache="false" />
+    
+    <!-- Images -->
+    <file src="ice_hud/nui/images/fundo.png" cache="false" />
+    <file src="ice_hud/nui/images/velocimetro.png" cache="false" />
+    <file src="ice_hud/nui/images/agua.png" cache="false" />
+    <file src="ice_hud/nui/images/colete.png" cache="false" />
+    <file src="ice_hud/nui/images/comida.png" cache="false" />
+    <file src="ice_hud/nui/images/mic.png" cache="false" />
+    <file src="ice_hud/nui/images/gas.png" cache="false" />
+    <file src="ice_hud/nui/images/vida.png" cache="false" />
+    <file src="ice_hud/nui/images/cinto.png" cache="false" />
+    <file src="ice_hud/nui/images/gps.png" cache="false" />
+    <file src="ice_hud/nui/images/relogio.png" cache="false" />
+    <file src="ice_hud/nui/images/freq.png" cache="false" />
+    <file src="ice_hud/nui/images/muni.png" cache="false" />
 </meta>
 

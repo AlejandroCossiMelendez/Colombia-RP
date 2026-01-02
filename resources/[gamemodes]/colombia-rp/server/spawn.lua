@@ -307,8 +307,6 @@ addEventHandler("onPlayerWasted", root, function(ammo, attacker, weapon, bodypar
     local totalSeconds = Config.Death.respawnTime / 1000
     deathStartTimes[source] = getTickCount()
     
-    outputServerLog("[DEATH] Iniciando cuenta regresiva para " .. getPlayerName(source) .. " - Tiempo total: " .. totalSeconds .. " segundos")
-    
     -- Enviar actualización inicial
     triggerClientEvent(source, "updateDeathTime", resourceRoot, totalSeconds)
     
@@ -322,10 +320,6 @@ addEventHandler("onPlayerWasted", root, function(ammo, attacker, weapon, bodypar
             if remainingSeconds > 0 then
                 -- Enviar actualización al cliente para mostrar en pantalla
                 triggerClientEvent(source, "updateDeathTime", resourceRoot, remainingSeconds)
-                -- Log cada 10 segundos para no saturar
-                if remainingSeconds % 10 == 0 then
-                    outputServerLog("[DEATH] Tiempo restante para " .. getPlayerName(source) .. ": " .. remainingSeconds .. " segundos")
-                end
             else
                 -- Si el tiempo se acabó, detener este timer
                 if isTimer(updateTimer) then
