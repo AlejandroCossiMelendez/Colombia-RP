@@ -525,6 +525,11 @@
     <file src="items/images/vodka.png" type="client" />
     <file src="items/images/vino.png" type="client" />
     
+    <!-- Archivos HTML -->
+    <file src="html/login.html"/>
+    <file src="html/login.css"/>
+    <file src="html/login.js"/>
+    
     <!-- Archivos -->
     <file src="colombia-rp-login.png" type="client" />
     <file src="client/character.html" type="client" />

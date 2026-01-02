@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colombia RP - Login</title>
+    <link rel="stylesheet" href="./login.css">
+    <script src="./login.js" defer></script>
+</head>
+<body>
+    <div class="background-image"></div>
+    <div class="overlay"></div>
+    
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" id="loginTab" onclick="switchTab('login')">Login</button>
+            <button class="tab" id="registerTab" onclick="switchTab('register')">Register</button>
+        </div>
+        
+        <div class="panels">
+            <!-- Panel Login -->
+            <div id="loginPanel" class="panel active">
+                <h2>Welcome to COLOMBIA RP</h2>
+                <form onsubmit="doLogin(event)">
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <input type="text" id="loginUsername" placeholder="Enter your username" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="rememberMe" checked>
+                            <span>Remember Me</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-login" id="loginBtn">
+                        <span>Login</span>
+                    </button>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </form>
+            </div>
+            
+            <!-- Panel Register -->
+            <div id="registerPanel" class="panel">
+                <h2>Create a New Account</h2>
+                <form onsubmit="doRegister(event)">
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <input type="text" id="registerUsername" placeholder="Minimum 3 characters" required>
+                    </div>
+                    <div class="form-group">
+                        <label>E-Mail:</label>
+                        <input type="email" id="registerEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" id="registerPassword" placeholder="Minimum 6 characters" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password:</label>
+                        <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-register" id="registerBtn">
+                        <span>Register</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="bottom-buttons">
+            <button class="bottom-btn" onclick="showSettings()">Settings</button>
+            <button class="bottom-btn" onclick="showAbout()">About</button>
+            <button class="bottom-btn" onclick="quitGame()">Quit</button>
+        </div>
+        
+        <div id="message" class="message"></div>
+    </div>
+</body>
+</html>
+
