@@ -94,65 +94,29 @@ function HudHype()
     dxDrawImage(x*1225, y*289, x*101, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 80), false) -- SED
     dxDrawImage(x*1002, y*703, x*285, y*41, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 108), false) -- VOICE
     
-    --<!-- BARRINHA (con bordes redondeados fijos a la izquierda) --!>--
-    -- Calcular el ancho máximo disponible (antes del círculo)
-    local maxBarWidth = x*101 - x*10 -- Ancho total menos espacio para el círculo
-    local imageSourceWidth = 101 -- Ancho original de la imagen
-    local imageSourceHeight = 28 -- Alto original de la imagen
+    --<!-- BARRINHA (función limpia que no se rompe al bajar) --!>--
+    local barWidth = x*101
+    local barHeight = y*28
     
-    -- Función auxiliar para dibujar barra con bordes redondeados fijos a la izquierda
-    local function drawBar(barX, barY, value, color, barName)
-        if value <= 0 then
-            return
+    local function drawBar(barX, barY, value, color)
+        local percent = math.max(0, math.min(100, value)) / 100
+        local fillWidth = barWidth * percent
+        
+        -- Fondo (ya se dibuja arriba, pero lo mantenemos por si acaso)
+        -- dxDrawImage(barX, barY, barWidth, barHeight, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 120), false)
+        
+        -- Barra (RECTA, sin bordes) - solo dibujar si hay valor
+        if fillWidth > 0 then
+            dxDrawRectangle(barX, barY, fillWidth, barHeight, color, false)
         end
-        
-        -- Asegurar que el valor esté entre 0 y 100
-        local clampedValue = math.max(0, math.min(100, value))
-        local percent = clampedValue / 100
-        
-        -- Calcular el ancho de la barra proporcionalmente al valor
-        local calculatedWidth = maxBarWidth * percent
-        
-        -- Ancho mínimo fijo para mantener el borde redondeado izquierdo siempre visible
-        -- Este ancho mínimo asegura que el borde redondeado izquierdo nunca se pierda o se descuadre
-        local minWidthForRounded = x*12 -- Ancho mínimo fijo para mantener el borde redondeado
-        
-        -- Si el valor es muy bajo, usar el ancho mínimo fijo para mantener el borde redondeado
-        -- Si el valor es normal, usar el ancho calculado (que será mayor al mínimo)
-        local finalWidth
-        if calculatedWidth < minWidthForRounded and clampedValue > 0 then
-            -- Valor bajo: usar ancho mínimo fijo para mantener el borde redondeado izquierdo
-            finalWidth = minWidthForRounded
-        else
-            -- Valor normal: usar ancho proporcional
-            finalWidth = calculatedWidth
-        end
-        
-        -- Calcular la sección de la imagen a usar
-        -- CRÍTICO: Siempre empezamos desde (0, 0) para mantener el borde redondeado izquierdo fijo
-        -- El ancho de la sección es proporcional al ancho final de la barra
-        local sectionWidth = (finalWidth / (x*101)) * imageSourceWidth
-        sectionWidth = math.min(sectionWidth, imageSourceWidth) -- No exceder el ancho original
-        
-        -- Asegurar un mínimo en la sección para mantener el borde redondeado visible
-        local minSectionWidth = (minWidthForRounded / (x*101)) * imageSourceWidth
-        if finalWidth == minWidthForRounded then
-            sectionWidth = minSectionWidth -- Usar mínimo cuando el valor es bajo
-        end
-        
-        -- Usar dxDrawImageSection para mantener el borde redondeado izquierdo siempre fijo
-        -- La sección SIEMPRE empieza desde (0, 0) - esto mantiene el borde redondeado izquierdo fijo
-        dxDrawImageSection(barX, barY, finalWidth, y*28, 0, 0, sectionWidth, imageSourceHeight, 
-            "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, color, false)
     end
     
-    -- Dibujar barras con colores definidos y estructura mantenida
-    -- Colores con opacidad adecuada para mantener visibilidad
-    drawBar(x*1225, y*154, Vida, tocolor(237, 0, 5, 200), "vida") -- VIDA (Rojo intenso)
-    drawBar(x*1225, y*187, Colete, tocolor(7, 239, 247, 150), "colete") -- COLETE (Cyan)
-    drawBar(x*1225, y*221, Stamina, tocolor(253, 221, 0, 150), "stamina") -- STAMINA (Amarillo)
-    drawBar(x*1225, y*255, Hambre, tocolor(255, 165, 0, 200), "hambre") -- HAMBRE (Naranja)
-    drawBar(x*1225, y*289, Sed, tocolor(0, 100, 255, 200), "sed") -- SED (Azul)
+    -- Uso correcto de las barras
+    drawBar(x*1225, y*154, Vida, tocolor(237, 0, 5, 200))
+    drawBar(x*1225, y*187, Colete, tocolor(7, 239, 247, 180))
+    drawBar(x*1225, y*221, Stamina, tocolor(253, 221, 0, 180))
+    drawBar(x*1225, y*255, Hambre, tocolor(255, 165, 0, 200))
+    drawBar(x*1225, y*289, Sed, tocolor(0, 100, 255, 200))
     
     --<!-- CIRCULO (dibujado después de las barras para que esté encima) --!>--
     dxDrawImage(x*1295, y*153, x*38, y*29, "hud-rp/Hype_Hud/imgs/circulo.png", 0, 0, 0, tocolor(255, 0, 0, 255), false) -- VIDA
