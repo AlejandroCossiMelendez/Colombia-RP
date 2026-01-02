@@ -186,14 +186,25 @@ function handleDragEnd(e) {
 // Función para guardar contactos en MTA
 function saveContactsToMTA() {
     // Solo guardar si MTA está disponible y contacts está definido
-    if (window.mta && window.mta.triggerEvent && typeof contacts !== 'undefined') {
-        try {
-            const contactsToSave = contacts || [];
-            const jsonString = JSON.stringify(contactsToSave);
-            window.mta.triggerEvent('saveContacts', jsonString);
-        } catch (e) {
-            // Silenciar errores al guardar, no es crítico si falla
-        }
+    if (!window.mta || !window.mta.triggerEvent) {
+        console.warn('[saveContactsToMTA] MTA no está disponible');
+        return;
+    }
+    
+    if (typeof contacts === 'undefined') {
+        console.warn('[saveContactsToMTA] contacts no está definido');
+        return;
+    }
+    
+    try {
+        const contactsToSave = contacts || [];
+        const jsonString = JSON.stringify(contactsToSave);
+        console.log('[saveContactsToMTA] Guardando', contactsToSave.length, 'contactos');
+        console.log('[saveContactsToMTA] JSON:', jsonString);
+        window.mta.triggerEvent('saveContacts', jsonString);
+        console.log('[saveContactsToMTA] Evento enviado correctamente');
+    } catch (e) {
+        console.error('[saveContactsToMTA] Error al guardar contactos:', e);
     }
 }
 

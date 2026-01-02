@@ -11,6 +11,8 @@ addEventHandler("saveContacts", root, function(contactsJson)
         return
     end
     
+    outputServerLog("[PHONE] Recibido evento saveContacts de " .. getPlayerName(player))
+    
     local characterId = getElementData(player, "character:id")
     
     if not characterId then
@@ -18,6 +20,9 @@ addEventHandler("saveContacts", root, function(contactsJson)
         outputChatBox("Error: No se pudo guardar los contactos. Intenta de nuevo.", player, 255, 0, 0)
         return
     end
+    
+    outputServerLog("[PHONE] character_id: " .. tostring(characterId))
+    outputServerLog("[PHONE] contactsJson recibido: " .. tostring(contactsJson) .. " (longitud: " .. tostring(contactsJson and string.len(contactsJson) or 0) .. ")")
     
     if not contactsJson or contactsJson == "" then
         -- Si no hay contactos, simplemente eliminar todos los existentes
@@ -112,23 +117,32 @@ addEventHandler("saveContacts", root, function(contactsJson)
     -- Insertar nuevos contactos
     local insertCount = 0
     local errorCount = 0
+    outputServerLog("[PHONE] Total de contactos a insertar: " .. tostring(#contacts))
+    
     for i, contact in ipairs(contacts) do
         -- Validar que el contacto tenga los campos necesarios
         local name = contact.name
         local number = contact.number
+        
+        outputServerLog("[PHONE] Procesando contacto " .. tostring(i) .. ": name=" .. tostring(name) .. ", number=" .. tostring(number))
         
         if name and number and type(name) == "string" and type(number) == "string" and name ~= "" and number ~= "" then
             local insertQuery = "INSERT INTO phone_contacts (character_id, contact_name, contact_number) VALUES (?, ?, ?)"
             local insertSuccess = executeDatabase(insertQuery, characterId, name, number)
             if insertSuccess then
                 insertCount = insertCount + 1
+                outputServerLog("[PHONE] Contacto insertado correctamente: " .. name .. " - " .. number)
             else
                 errorCount = errorCount + 1
+                outputServerLog("[PHONE] ERROR al insertar contacto: " .. name .. " - " .. number)
             end
         else
             errorCount = errorCount + 1
+            outputServerLog("[PHONE] Contacto inválido (índice " .. tostring(i) .. "): name=" .. tostring(name) .. ", number=" .. tostring(number))
         end
     end
+    
+    outputServerLog("[PHONE] Contactos guardados: " .. tostring(insertCount) .. " exitosos, " .. tostring(errorCount) .. " errores")
 end)
 
 -- Evento para cargar contactos
