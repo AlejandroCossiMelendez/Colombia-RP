@@ -246,19 +246,20 @@ bindKey("i", "down", function()
         return
     end
     
-    -- Solo manejar el caso cuando el teléfono está abierto
-    -- Si no está abierto, retornar temprano para que el bindKey del inventario maneje la apertura
-    if not phoneVisible then
+    -- Verificar si el teléfono está abierto usando la variable local (más confiable)
+    if phoneVisible then
+        -- Si el teléfono está abierto, cerrarlo (guardando contactos)
+        -- Guardar contactos antes de cerrar
+        if browserContent and isElement(browserContent) then
+            executeBrowserJavascript(browserContent, "saveContactsToMTA();")
+        end
+        -- Cerrar el teléfono inmediatamente
+        closePhone()
+        -- Retornar para evitar que el inventario se abra
         return
     end
-    
-    -- Si el teléfono está abierto, cerrarlo (guardando contactos)
-    -- Guardar contactos antes de cerrar
-    if browserContent and isElement(browserContent) then
-        executeBrowserJavascript(browserContent, "saveContactsToMTA();")
-    end
-    -- Cerrar el teléfono
-    closePhone()
+    -- Si el teléfono no está abierto, no hacer nada aquí
+    -- El bindKey del inventario manejará la apertura del inventario
 end)
 
 -- Cerrar teléfono con tecla ESC (mantener por compatibilidad)

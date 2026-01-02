@@ -410,10 +410,19 @@ bindKey("i", "down", function()
     end
     
     -- Verificar si el teléfono está abierto primero
-    -- Si el teléfono está abierto, no hacer nada aquí (el teléfono manejará el cierre)
-    -- Esto se verifica mediante un evento que el teléfono puede disparar
-    local phoneVisible = getElementData(localPlayer, "phone:visible") or false
-    if phoneVisible then
+    -- Verificar tanto el elementData como si hay un navegador del teléfono activo
+    local phoneVisibleData = getElementData(localPlayer, "phone:visible") or false
+    -- También verificar si hay elementos del teléfono activos (navegador)
+    local phoneBrowserElements = getElementsByType("gui-browser", resourceRoot)
+    local hasPhoneBrowser = false
+    for _, browser in ipairs(phoneBrowserElements) do
+        if isElement(browser) and guiGetVisible(browser) then
+            hasPhoneBrowser = true
+            break
+        end
+    end
+    
+    if phoneVisibleData or hasPhoneBrowser then
         return -- El teléfono manejará el cierre
     end
     
