@@ -92,11 +92,13 @@ function HudHype()
     dxDrawImage(x*1225, y*289, x*101, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 80), false) -- SED
     dxDrawImage(x*1002, y*703, x*285, y*41, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 108), false) -- VOICE
     
-    --<!-- BARRINHA (reorganizada para mantener estructura y colores consistentes) --!>--
+    --<!-- BARRINHA (con bordes redondeados fijos a la izquierda) --!>--
     -- Calcular el ancho máximo disponible (antes del círculo)
     local maxBarWidth = x*101 - x*10 -- Ancho total menos espacio para el círculo
+    local imageSourceWidth = 101 -- Ancho original de la imagen
+    local imageSourceHeight = 28 -- Alto original de la imagen
     
-    -- Función auxiliar para dibujar barra manteniendo estructura y colores
+    -- Función auxiliar para dibujar barra con bordes redondeados fijos
     local function drawBar(barX, barY, value, color, barName)
         if value <= 0 then
             return
@@ -106,31 +108,26 @@ function HudHype()
         local clampedValue = math.max(0, math.min(100, value))
         local percent = clampedValue / 100
         
-        -- Calcular el ancho de la barra proporcionalmente (siempre proporcional, sin mínimo artificial)
+        -- Calcular el ancho de la barra proporcionalmente
         local finalWidth = maxBarWidth * percent
         
-        -- Solo dibujar si hay un ancho mínimo razonable (al menos 2 píxeles)
-        if finalWidth < x*2 then
-            finalWidth = x*2 -- Mínimo absoluto para que sea visible
+        -- Ancho mínimo para mantener el borde redondeado izquierdo visible
+        local minWidthForRounded = x*8 -- Ancho mínimo para que el borde redondeado se vea bien
+        
+        -- Si el valor es muy bajo, usar ancho mínimo pero mantener proporción visual
+        if finalWidth < minWidthForRounded and clampedValue > 0 then
+            finalWidth = minWidthForRounded
         end
         
-        -- Usar dxDrawRectangle con el color especificado para mantener estructura y color consistentes
-        -- Esto asegura que el color se mantenga igual sin importar el tamaño de la barra
-        dxDrawRectangle(barX, barY, finalWidth, y*28, color, false)
+        -- Calcular qué sección de la imagen usar (desde el inicio, manteniendo el borde redondeado izquierdo)
+        -- La sección siempre empieza desde 0 (izquierda) para mantener el borde redondeado fijo
+        local sectionWidth = (finalWidth / maxBarWidth) * imageSourceWidth
+        sectionWidth = math.min(sectionWidth, imageSourceWidth) -- No exceder el ancho original
         
-        -- Agregar un borde sutil para mantener la estructura visual y definir mejor la barra
-        local borderAlpha = 40
-        local borderColor = tocolor(255, 255, 255, borderAlpha)
-        
-        -- Bordes superior e inferior para mantener estructura
-        dxDrawLine(barX, barY, barX + finalWidth, barY, borderColor, 1, false) -- Borde superior
-        dxDrawLine(barX, barY + y*28 - 1, barX + finalWidth, barY + y*28 - 1, borderColor, 1, false) -- Borde inferior
-        
-        -- Bordes laterales solo si la barra es lo suficientemente ancha
-        if finalWidth > x*5 then
-            dxDrawLine(barX, barY, barX, barY + y*28, borderColor, 1, false) -- Borde izquierdo
-            dxDrawLine(barX + finalWidth - 1, barY, barX + finalWidth - 1, barY + y*28, borderColor, 1, false) -- Borde derecho
-        end
+        -- Usar dxDrawImageSection para mantener el borde redondeado izquierdo siempre fijo
+        -- Esto asegura que el borde redondeado de la izquierda siempre se vea, sin importar el valor
+        dxDrawImageSection(barX, barY, finalWidth, y*28, 0, 0, sectionWidth, imageSourceHeight, 
+            "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, color, false)
     end
     
     -- Dibujar barras con colores definidos y estructura mantenida
