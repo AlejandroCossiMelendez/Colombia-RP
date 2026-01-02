@@ -712,6 +712,10 @@ input {
     flex-shrink: 0;
 }
 
+.dialer-section.hidden {
+    display: none !important;
+}
+
 .phone-input {
     width: 100%;
     padding: 12px 15px;
@@ -775,6 +779,12 @@ input {
     box-sizing: border-box;
     justify-items: center;
     align-items: center;
+    min-height: 0;
+    grid-auto-rows: 1fr;
+}
+
+.keypad.hidden {
+    display: none !important;
 }
 
 .keypad-btn {
@@ -817,6 +827,10 @@ input {
     flex-shrink: 0;
     width: 100%;
     box-sizing: border-box;
+}
+
+.call-controls.hidden {
+    display: none !important;
 }
 
 .call-btn {

@@ -838,7 +838,8 @@ function makeCall(number) {
     
     if (window.mta && window.mta.triggerEvent) {
         window.mta.triggerEvent('phone:makeCall', cleanNumber);
-        showCallStatus('Llamando...', cleanNumber);
+        // Mostrar estado de "Llamando..." solo si la llamada se inicia correctamente
+        // El servidor confirmará con onCallStarted o onCallFailed
     }
 }
 
@@ -854,15 +855,15 @@ function showCallStatus(status, number) {
         callInfo.textContent = status + (number ? ' - ' + formatPhoneNumber(number) : '');
         callTimer.textContent = '00:00';
         
-        // Ocultar controles de marcado
+        // Ocultar controles de marcado usando clase CSS para mantener el layout
         if (phoneContent) {
             const dialerSection = phoneContent.querySelector('.dialer-section');
             const keypad = phoneContent.querySelector('.keypad');
             const callControls = phoneContent.querySelector('.call-controls');
             
-            if (dialerSection) dialerSection.style.display = 'none';
-            if (keypad) keypad.style.display = 'none';
-            if (callControls) callControls.style.display = 'none';
+            if (dialerSection) dialerSection.classList.add('hidden');
+            if (keypad) keypad.classList.add('hidden');
+            if (callControls) callControls.classList.add('hidden');
         }
     }
 }
@@ -876,15 +877,23 @@ function hideCallStatus() {
         callStatus.style.display = 'none';
     }
     
-    // Mostrar controles de marcado
+    // Restaurar controles de marcado removiendo la clase hidden
     if (phoneContent) {
         const dialerSection = phoneContent.querySelector('.dialer-section');
         const keypad = phoneContent.querySelector('.keypad');
         const callControls = phoneContent.querySelector('.call-controls');
         
-        if (dialerSection) dialerSection.style.display = 'block';
-        if (keypad) keypad.style.display = 'block';
-        if (callControls) callControls.style.display = 'flex';
+        if (dialerSection) {
+            dialerSection.classList.remove('hidden');
+        }
+        if (keypad) {
+            keypad.classList.remove('hidden');
+            // Forzar reflow para restaurar el grid correctamente
+            void keypad.offsetHeight;
+        }
+        if (callControls) {
+            callControls.classList.remove('hidden');
+        }
     }
 }
 
@@ -967,6 +976,11 @@ function endCall() {
 
 // Eventos desde MTA
 window.onCallStarted = function(callerNumber, receiverNumber, isIncoming) {
+    // Solo mostrar estado si realmente hay una llamada iniciada
+    if (!callerNumber && !receiverNumber) {
+        return; // No hay información de llamada, probablemente es un error
+    }
+    
     currentCall = {
         caller: callerNumber,
         receiver: receiverNumber,
@@ -975,7 +989,7 @@ window.onCallStarted = function(callerNumber, receiverNumber, isIncoming) {
     
     if (isIncoming) {
         showCallStatus('Llamada entrante', callerNumber);
-    } else {
+    } else if (receiverNumber) {
         showCallStatus('Llamando...', receiverNumber);
     }
 };
@@ -990,6 +1004,20 @@ window.onCallAnswered = function() {
 
 window.onCallEnded = function() {
     endCall();
+    // Restaurar controles inmediatamente
+    hideCallStatus();
+    
+    // Asegurar que el keypad se restaure correctamente y mantenga el grid 3x4
+    setTimeout(function() {
+        const keypad = get('.keypad');
+        if (keypad) {
+            // Forzar que el grid se recalcule correctamente
+            keypad.style.display = 'none';
+            void keypad.offsetHeight; // Forzar reflow
+            keypad.style.display = 'grid';
+            void keypad.offsetHeight; // Forzar otro reflow para asegurar
+        }
+    }, 10);
 };
 
 window.onIncomingCall = function(callerNumber, callerName) {

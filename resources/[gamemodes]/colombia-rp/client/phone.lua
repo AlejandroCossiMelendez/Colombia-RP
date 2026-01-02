@@ -375,7 +375,10 @@ end)
 addEvent("phone:callFailed", true)
 addEventHandler("phone:callFailed", resourceRoot, function(reason)
     if browserContent and isElement(browserContent) then
-        executeBrowserJavascript(browserContent, "onCallEnded();")
+        -- Limpiar estado de llamada y restaurar controles
+        executeBrowserJavascript(browserContent, "if (typeof onCallEnded === 'function') { onCallEnded(); }")
+        -- Asegurar que se restauren los controles
+        executeBrowserJavascript(browserContent, "if (typeof hideCallStatus === 'function') { hideCallStatus(); }")
     end
 end)
 
