@@ -86,7 +86,26 @@
                 <div class="app-interface" style="display: none;" data-app-id="3"></div> <!-- News App -->
                 <div class="app-interface" style="display: none;" data-app-id="4"></div> <!-- Settings App -->
                 <div class="app-interface" style="display: none;" data-app-id="5"></div> <!-- Phone App -->
-                <div class="app-interface" style="display: none;" data-app-id="6"></div> <!-- Contacts App -->
+                <div class="app-interface" style="display: none;" data-app-id="6"> <!-- Contacts App -->
+                    <div class="contacts-app">
+                        <div class="contacts-header">
+                            <h2>Contactos</h2>
+                            <button class="add-contact-btn" onclick="showAddContactForm()">+</button>
+                        </div>
+                        <div class="contacts-list" id="contactsList">
+                            <!-- Los contactos se cargarán aquí -->
+                        </div>
+                        <div class="add-contact-form" id="addContactForm" style="display: none;">
+                            <h3>Nuevo Contacto</h3>
+                            <input type="text" id="contactName" placeholder="Nombre" />
+                            <input type="text" id="contactNumber" placeholder="Número (XXX-XXXXXXX)" />
+                            <div class="form-buttons">
+                                <button onclick="addContact()">Guardar</button>
+                                <button onclick="hideAddContactForm()">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <div class="home-button"></div>

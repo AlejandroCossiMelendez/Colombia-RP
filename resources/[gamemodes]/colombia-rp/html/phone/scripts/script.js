@@ -34,15 +34,19 @@ function openApp(appId) {
     unlock.style.display = 'none';
     interfaces.style.display = 'block';
     appsInterfaces.item(appId).style.display = 'block';
+    isInHomeScreen = false;
+    
+    // Si es la app de contactos (appId 6), cargar contactos
+    if (appId === 6) {
+        loadContacts();
+    }
 }
 
+let isInHomeScreen = true; // Variable para rastrear si estamos en el home
+
 function returnToHomePage() {
-    // Verificar si ya está en el home (unlock visible y no hay apps abiertas)
-    const isInHome = unlock && unlock.style.display !== 'none' && 
-                     (interfaces.style.display === 'none' || !interfaces.style.display);
-    
     // Si ya está en el home, cerrar el teléfono
-    if (isInHome) {
+    if (isInHomeScreen) {
         // Cerrar el teléfono enviando evento a MTA
         if (window.mta) {
             window.mta.triggerEvent('closePhoneFromBrowser');
@@ -54,6 +58,7 @@ function returnToHomePage() {
     if (unlock) unlock.style.display = 'flex';
     if (interfaces) interfaces.style.display = 'none';
     appsInterfaces.forEach(e => e.style.display = 'none');
+    isInHomeScreen = true;
 }
 
 let inactivityTimeout;
@@ -79,6 +84,115 @@ function updateTime() {
 
 apps.forEach((app, key) => app.onclick = (e) => openApp(key));
 homeButtom.onclick = (e) => returnToHomePage();
+
+/* Contacts App */
+let contacts = [];
+let myPhoneNumber = '';
+
+// Función para recibir el número de teléfono desde MTA
+function setMyPhoneNumber(number) {
+    myPhoneNumber = number;
+    loadContacts();
+}
+
+// Función para cargar contactos
+function loadContacts() {
+    const contactsList = get('#contactsList');
+    if (!contactsList) return;
+    
+    contactsList.innerHTML = '';
+    
+    // Agregar "Mi contacto" como primer contacto
+    if (myPhoneNumber) {
+        const myContact = document.createElement('div');
+        myContact.className = 'contact-item';
+        myContact.innerHTML = `
+            <div class="contact-avatar">Yo</div>
+            <div class="contact-info">
+                <div class="contact-name">Mi contacto</div>
+                <div class="contact-number">${myPhoneNumber}</div>
+            </div>
+        `;
+        contactsList.appendChild(myContact);
+    }
+    
+    // Agregar otros contactos
+    contacts.forEach((contact, index) => {
+        const contactItem = document.createElement('div');
+        contactItem.className = 'contact-item';
+        contactItem.innerHTML = `
+            <div class="contact-avatar">${contact.name.charAt(0).toUpperCase()}</div>
+            <div class="contact-info">
+                <div class="contact-name">${contact.name}</div>
+                <div class="contact-number">${contact.number}</div>
+            </div>
+            <button class="delete-contact" onclick="deleteContact(${index})">×</button>
+        `;
+        contactsList.appendChild(contactItem);
+    });
+}
+
+// Función para mostrar formulario de agregar contacto
+function showAddContactForm() {
+    const form = get('#addContactForm');
+    if (form) {
+        form.style.display = 'block';
+        get('#contactName').value = '';
+        get('#contactNumber').value = '';
+    }
+}
+
+// Función para ocultar formulario
+function hideAddContactForm() {
+    const form = get('#addContactForm');
+    if (form) {
+        form.style.display = 'none';
+    }
+}
+
+// Función para agregar contacto
+function addContact() {
+    const name = get('#contactName').value.trim();
+    const number = get('#contactNumber').value.trim();
+    
+    if (!name || !number) {
+        alert('Por favor completa todos los campos');
+        return;
+    }
+    
+    // Validar formato del número (XXX-XXXXXXX)
+    const numberRegex = /^\d{3}-\d{7}$/;
+    if (!numberRegex.test(number)) {
+        alert('El número debe tener el formato XXX-XXXXXXX');
+        return;
+    }
+    
+    contacts.push({ name, number });
+    loadContacts();
+    hideAddContactForm();
+    
+    // Guardar en MTA (opcional, para persistencia)
+    if (window.mta) {
+        window.mta.triggerEvent('saveContacts', JSON.stringify(contacts));
+    }
+}
+
+// Función para eliminar contacto
+function deleteContact(index) {
+    if (confirm('¿Eliminar este contacto?')) {
+        contacts.splice(index, 1);
+        loadContacts();
+        
+        // Guardar en MTA
+        if (window.mta) {
+            window.mta.triggerEvent('saveContacts', JSON.stringify(contacts));
+        }
+    }
+}
+
+// Exponer funciones para MTA
+window.setMyPhoneNumber = setMyPhoneNumber;
+window.loadContacts = loadContacts;
 
 /* Calculator App */
 

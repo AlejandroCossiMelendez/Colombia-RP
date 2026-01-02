@@ -25,6 +25,12 @@ function whenPhoneBrowserReady()
                 unlock.style.display = 'flex';
             }
         ]])
+        
+        -- Enviar el número de teléfono al navegador
+        local phoneNumber = getElementData(localPlayer, "phone:number")
+        if phoneNumber then
+            executeBrowserJavascript(browserContent, "setMyPhoneNumber('" .. tostring(phoneNumber) .. "');")
+        end
     end
 end
 
@@ -110,6 +116,13 @@ addEventHandler("openPhone", resourceRoot, function(phoneNumber)
         outputChatBox("Tu número: " .. phoneNumber, 0, 255, 0)
     end
     openPhone()
+    
+    -- Enviar el número al navegador cuando esté listo
+    setTimer(function()
+        if browserContent and isElement(browserContent) and phoneNumber then
+            executeBrowserJavascript(browserContent, "setMyPhoneNumber('" .. tostring(phoneNumber) .. "');")
+        end
+    end, 500, 1)
 end)
 
 -- Evento del servidor para cerrar el teléfono
