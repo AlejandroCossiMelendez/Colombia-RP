@@ -2,6 +2,43 @@
 -- Estructura de la tabla inventory:
 -- id, character_id, slot, item_id, item_name, quantity, item_data
 
+-- Función para generar un número de teléfono único
+function generatePhoneNumber(characterId)
+    -- Generar un número aleatorio de 10 dígitos (formato: 3XX-XXXXXXX)
+    local attempts = 0
+    local maxAttempts = 100
+    
+    while attempts < maxAttempts do
+        -- Generar número: 3XX-XXXXXXX (10 dígitos)
+        local prefix = math.random(300, 399) -- Prefijo 3XX
+        local suffix = math.random(1000000, 9999999) -- Sufijo de 7 dígitos
+        local phoneNumber = string.format("%d-%07d", prefix, suffix)
+        
+        -- Verificar si el número ya existe
+        local checkQuery = "SELECT numero FROM tlf_data WHERE numero = ? LIMIT 1"
+        local checkResult = queryDatabase(checkQuery, phoneNumber)
+        
+        if not checkResult or #checkResult == 0 then
+            -- El número no existe, insertarlo en la base de datos
+            local insertQuery = "INSERT INTO tlf_data (numero, titular, estado, apagado) VALUES (?, ?, 1, 0)"
+            local success = executeDatabase(insertQuery, phoneNumber, characterId)
+            
+            if success then
+                outputServerLog("[PHONE] Número de teléfono asignado: " .. phoneNumber .. " para personaje ID: " .. characterId)
+                return phoneNumber
+            else
+                outputServerLog("[PHONE] ERROR al insertar número de teléfono en la base de datos")
+                return nil
+            end
+        end
+        
+        attempts = attempts + 1
+    end
+    
+    outputServerLog("[PHONE] ERROR: No se pudo generar un número de teléfono único después de " .. maxAttempts .. " intentos")
+    return nil
+end
+
 function getPlayerInventory(player)
     local characterId = getElementData(player, "character:id")
     if not characterId then
@@ -292,8 +329,38 @@ addEventHandler("useItem", root, function(slot, itemId, itemIndex)
     
     -- Teléfono Móvil (ID: 7) - Abrir teléfono
     if itemId == 7 then
-        -- Abrir el teléfono en el cliente
-        triggerClientEvent(source, "openPhone", resourceRoot)
+        -- Verificar si el jugador ya tiene un número de teléfono asignado
+        local characterId = getElementData(source, "character:id")
+        if not characterId then
+            outputChatBox("Error: No se pudo obtener el ID del personaje.", source, 255, 0, 0)
+            return
+        end
+        
+        -- Verificar si ya tiene un número asignado
+        local phoneNumber = getElementData(source, "phone:number")
+        if not phoneNumber then
+            -- Buscar en la base de datos si ya tiene un número
+            local query = "SELECT numero FROM tlf_data WHERE titular = ? LIMIT 1"
+            local result = queryDatabase(query, characterId)
+            
+            if result and #result > 0 then
+                phoneNumber = result[1].numero
+                setElementData(source, "phone:number", phoneNumber)
+            else
+                -- Generar un nuevo número de teléfono
+                phoneNumber = generatePhoneNumber(characterId)
+                if phoneNumber then
+                    setElementData(source, "phone:number", phoneNumber)
+                    outputChatBox("¡Tu número de teléfono es: " .. phoneNumber .. "!", source, 0, 255, 0)
+                else
+                    outputChatBox("Error al asignar número de teléfono. Intenta de nuevo.", source, 255, 0, 0)
+                    return
+                end
+            end
+        end
+        
+        -- Abrir el teléfono en el cliente y enviar el número
+        triggerClientEvent(source, "openPhone", resourceRoot, phoneNumber)
         return
     end
     

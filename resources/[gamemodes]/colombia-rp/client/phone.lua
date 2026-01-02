@@ -4,7 +4,7 @@
 local sw, sh = guiGetScreenSize()
 local phoneVisible = false
 local phoneBrowser, browserContent, renderTimer = nil
-local w, h = 270, 513  -- Reducido un 10% (300*0.9 = 270, 570*0.9 = 513)
+local w, h = 300, 570  -- Reducido un 10% (300*0.9 = 270, 570*0.9 = 513)
 
 function loadPhoneBrowser() 
     if source and isElement(source) then
@@ -102,7 +102,13 @@ end
 
 -- Evento del servidor para abrir el teléfono
 addEvent("openPhone", true)
-addEventHandler("openPhone", resourceRoot, function()
+addEventHandler("openPhone", resourceRoot, function(phoneNumber)
+    if phoneNumber then
+        -- Guardar el número de teléfono en el elemento data del jugador
+        setElementData(localPlayer, "phone:number", phoneNumber)
+        -- Mostrar el número en el teléfono (opcional, puedes agregarlo a la interfaz)
+        outputChatBox("Tu número: " .. phoneNumber, 0, 255, 0)
+    end
     openPhone()
 end)
 
