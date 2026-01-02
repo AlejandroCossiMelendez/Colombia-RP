@@ -2,6 +2,7 @@
 local characterBrowser = nil
 local browserContent = nil
 local screenWidth, screenHeight = guiGetScreenSize()
+local cursorCheckTimer = nil
 
 function loadCharacterBrowser() 
     loadBrowserURL(source, "http://mta/local/html/character.html")
@@ -12,6 +13,19 @@ function whenCharacterBrowserReady()
     showCursor(true)
     guiSetInputEnabled(true)
     guiSetInputMode("no_binds_when_editing")
+    
+            -- Forzar cursor múltiples veces después de que el navegador esté listo
+            setTimer(function()
+                showCursor(true)
+                guiSetInputEnabled(true)
+                guiSetInputMode("no_binds_when_editing")
+            end, 50, 3)
+            
+            -- Asegurar que el timer de verificación esté activo
+            if not cursorCheckTimer or not isTimer(cursorCheckTimer) then
+                cursorCheckTimer = setTimer(ensureCursorVisible, 100, 0)
+            end
+    
     -- Solicitar lista de personajes
     triggerServerEvent("requestCharacters", localPlayer)
 end
@@ -21,9 +35,14 @@ function showCharacterGUI()
     if characterBrowser then
         if isElement(characterBrowser) then
             guiSetVisible(characterBrowser, true)
+            -- Forzar cursor múltiples veces para asegurar
             showCursor(true)
             guiSetInputEnabled(true)
             guiSetInputMode("no_binds_when_editing")
+            setTimer(function()
+                showCursor(true)
+                guiSetInputEnabled(true)
+            end, 50, 3)
             -- Recargar personajes
             triggerServerEvent("requestCharacters", localPlayer)
             return
@@ -39,24 +58,50 @@ function showCharacterGUI()
         return
     end
     
-    -- Configurar input mode
+    -- Configurar input mode inmediatamente
     guiSetInputMode("no_binds_when_editing")
     
     -- Eventos del navegador
     addEventHandler("onClientBrowserCreated", characterBrowser, loadCharacterBrowser)
     addEventHandler("onClientBrowserDocumentReady", characterBrowser, whenCharacterBrowserReady)
     
-    -- Mostrar cursor y habilitar input (también con un pequeño delay para asegurar)
+    -- Mostrar cursor y habilitar input de manera agresiva con múltiples timers
     showCursor(true)
     guiSetInputEnabled(true)
+    
+    -- Múltiples timers para asegurar que el cursor se muestre
     setTimer(function()
         showCursor(true)
         guiSetInputEnabled(true)
         guiSetInputMode("no_binds_when_editing")
-    end, 100, 1)
+    end, 50, 1)
+    
+    setTimer(function()
+        showCursor(true)
+        guiSetInputEnabled(true)
+        guiSetInputMode("no_binds_when_editing")
+    end, 200, 1)
+    
+    setTimer(function()
+        showCursor(true)
+        guiSetInputEnabled(true)
+        guiSetInputMode("no_binds_when_editing")
+    end, 500, 1)
+    
+    -- Timer continuo para verificar que el cursor esté visible
+    if cursorCheckTimer and isTimer(cursorCheckTimer) then
+        killTimer(cursorCheckTimer)
+    end
+    cursorCheckTimer = setTimer(ensureCursorVisible, 100, 0)
 end
 
 function hideCharacterGUI()
+    -- Detener el timer de verificación del cursor
+    if cursorCheckTimer and isTimer(cursorCheckTimer) then
+        killTimer(cursorCheckTimer)
+        cursorCheckTimer = nil
+    end
+    
     if characterBrowser and isElement(characterBrowser) then
         removeEventHandler("onClientBrowserCreated", characterBrowser, loadCharacterBrowser)
         removeEventHandler("onClientBrowserDocumentReady", characterBrowser, whenCharacterBrowserReady)
@@ -67,6 +112,17 @@ function hideCharacterGUI()
     end
     showCursor(false)
     guiSetInputEnabled(false)
+end
+
+-- Función para verificar y forzar el cursor visible
+function ensureCursorVisible()
+    if characterBrowser and isElement(characterBrowser) and guiGetVisible(characterBrowser) then
+        if not isCursorShowing() then
+            showCursor(true)
+            guiSetInputEnabled(true)
+            guiSetInputMode("no_binds_when_editing")
+        end
+    end
 end
 
 -- Eventos desde el navegador
