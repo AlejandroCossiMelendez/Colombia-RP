@@ -33,47 +33,28 @@ addEventHandler("saveContacts", root, function(contactsJson)
     
     -- Parsear JSON de contactos
     -- CRÍTICO: fromJSON en MTA puede tener problemas con arrays JSON
-    -- Usar parseo manual que es más confiable para arrays
+    -- Usar parseo manual robusto usando patrones de string
     local contacts = nil
     local success, result = pcall(function()
-        -- Parseo manual: convertir JSON array a tabla Lua
-        -- Reemplazar [ por { y ] por } para convertir array JSON a tabla Lua
-        local luaCode = contactsJson:gsub("%[", "{"):gsub("%]", "}")
-        outputServerLog("[PHONE] Código Lua generado: " .. string.sub(luaCode, 1, 200))
+        -- Parseo manual usando patrones de string para extraer contactos
+        -- Formato esperado: [{"name":"...","number":"..."},{"name":"...","number":"..."}]
+        local contactArray = {}
+        local pattern = '%{"name":"([^"]+)","number":"([^"]+)"}'
         
-        local func = loadstring("return " .. luaCode)
-        if func then
-            local parsed = func()
-            outputServerLog("[PHONE] Parseo manual exitoso. Tipo: " .. type(parsed) .. ", Longitud: " .. tostring(parsed and #parsed or 0))
-            
-            if parsed and type(parsed) == "table" then
-                -- Verificar que sea un array válido
-                if #parsed > 0 then
-                    outputServerLog("[PHONE] Array válido encontrado con " .. #parsed .. " elementos")
-                    return parsed
-                else
-                    -- Puede ser un objeto, verificar si tiene elementos con índices numéricos
-                    local count = 0
-                    local tempArray = {}
-                    for k, v in pairs(parsed) do
-                        if type(k) == "number" and type(v) == "table" and v.name and v.number then
-                            count = count + 1
-                            table.insert(tempArray, v)
-                        end
-                    end
-                    if count > 0 then
-                        outputServerLog("[PHONE] Parseo manual encontró " .. count .. " elementos con índices numéricos")
-                        return tempArray
-                    end
-                end
+        for name, number in contactsJson:gmatch(pattern) do
+            if name and number and name ~= "" and number ~= "" then
+                table.insert(contactArray, {name = name, number = number})
             end
-        else
-            outputServerLog("[PHONE] ERROR: No se pudo crear función loadstring")
+        end
+        
+        if #contactArray > 0 then
+            outputServerLog("[PHONE] Parseo manual exitoso usando patrones: " .. #contactArray .. " contactos encontrados")
+            return contactArray
         end
         
         -- Si el parseo manual falla, intentar con fromJSON como fallback
         if type(fromJSON) == "function" then
-            outputServerLog("[PHONE] Intentando parseo con fromJSON como fallback...")
+            outputServerLog("[PHONE] Parseo manual falló, intentando con fromJSON...")
             return fromJSON(contactsJson)
         end
         
@@ -309,3 +290,4 @@ addEventHandler("loadContacts", root, function()
     -- Enviar contactos al cliente
     triggerClientEvent(player, "receiveContacts", resourceRoot, contactsList)
 end)
+
