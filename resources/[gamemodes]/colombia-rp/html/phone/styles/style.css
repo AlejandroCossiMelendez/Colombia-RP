@@ -417,10 +417,20 @@ input {
     justify-content: center;
     cursor: pointer;
     transition: background-color 0.2s;
+    border: none;
+    padding: 0;
+    margin: 0;
+    flex-shrink: 0;
+    z-index: 10;
+    position: relative;
+}
+
+.delete-contact:hover {
+    background-color: rgba(255, 59, 48, 0.3);
 }
 
 .delete-contact:active {
-    background-color: rgba(255, 59, 48, 0.4);
+    background-color: rgba(255, 59, 48, 0.5);
 }
 
 .add-contact-form {
