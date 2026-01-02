@@ -11,9 +11,13 @@ addEvent("polvora:colocada", true)
 addEventHandler("polvora:colocada", root, function(obj)
     local x, y, z = getElementPosition(obj)
 
-    playSound3D("sounds/place.wav", x, y, z)
-    local fuse = playSound3D("sounds/fuse.wav", x, y, z)
-    setSoundMaxDistance(fuse, 20)
+    -- Sonidos deshabilitados temporalmente (archivos no encontrados)
+    -- playSound3D("sounds/place.wav", x, y, z)
+    -- local fuse = playSound3D("sounds/fuse.wav", x, y, z)
+    -- setSoundMaxDistance(fuse, 20)
+    
+    -- Usar sonido del juego en su lugar
+    playSoundFrontEnd(1) -- Sonido de explosión del juego
 
     setTimer(function()
         if isElement(obj) then
@@ -25,6 +29,10 @@ end)
 
 addEvent("polvora:explosion", true)
 addEventHandler("polvora:explosion", root, function(x, y, z)
-    playSound3D("sounds/explosion.wav", x, y, z)
+    -- Sonido deshabilitado temporalmente (archivo no encontrado)
+    -- playSound3D("sounds/explosion.wav", x, y, z)
+    
+    -- Usar sonido del juego en su lugar
+    playSoundFrontEnd(1) -- Sonido de explosión del juego
     fxAddExplosion(x, y, z)
 end)

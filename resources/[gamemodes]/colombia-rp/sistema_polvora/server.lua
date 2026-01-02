@@ -142,46 +142,104 @@ addEventHandler("polvora:usarItem", root, function(itemNombre, efecto)
     end
 end)
 
--- Notificar explosión y aplicar daño
-addEvent("polvora:c4Explotado", true)
-addEventHandler("polvora:c4Explotado", root, function(x, y, z, damage, itemId)
-    damage = damage or 50 -- Daño por defecto
-    local explosionRadius = 10 -- Radio de la explosión en metros
+-- Crear C4 en el servidor (visible para todos)
+addEvent("polvora:crearC4", true)
+addEventHandler("polvora:crearC4", root, function(x, y, z, rotZ, itemId, itemName)
+    local player = source
     
-    -- Aplicar daño a todos los jugadores cercanos
-    for _, player in ipairs(getElementsByType("player")) do
-        if isElement(player) and getElementType(player) == "player" then
-            local px, py, pz = getElementPosition(player)
+    -- Crear objeto C4 en el servidor (visible para todos)
+    local c4Object = createObject(1252, x, y, z, 0, 0, rotZ)
+    
+    if not c4Object then
+        outputChatBox("Error: No se pudo colocar el C4.", player, 255, 0, 0)
+        return
+    end
+    
+    -- Configurar dimensiones e interior del C4
+    setElementDimension(c4Object, getElementDimension(player))
+    setElementInterior(c4Object, getElementInterior(player))
+    
+    -- Guardar datos del C4
+    setElementData(c4Object, "c4:active", true)
+    setElementData(c4Object, "c4:owner", player)
+    setElementData(c4Object, "c4:type", itemId)
+    
+    -- Determinar daño según el tipo de C4
+    local damage = 0
+    local explosionType = 6 -- Tipo de explosión grande
+    if itemId == 103 then
+        damage = 20 -- Tipo 1: daño bajo
+        explosionType = 5
+    elseif itemId == 104 then
+        damage = 50 -- Tipo 2: daño medio
+        explosionType = 6
+    elseif itemId == 105 then
+        damage = 100 -- Tipo 3: daño alto
+        explosionType = 7
+    end
+    
+    -- Notificar a todos los jugadores cercanos que se colocó un C4
+    for _, p in ipairs(getElementsByType("player")) do
+        if isElement(p) then
+            local px, py, pz = getElementPosition(p)
             local distance = getDistanceBetweenPoints3D(x, y, z, px, py, pz)
-            
-            if distance <= explosionRadius then
-                -- Calcular daño según la distancia (más cerca = más daño)
-                local distanceFactor = 1 - (distance / explosionRadius) -- 1.0 en el centro, 0.0 en el borde
-                local finalDamage = damage * distanceFactor
-                
-                -- Aplicar daño
-                local currentHealth = getElementHealth(player)
-                local newHealth = math.max(0, currentHealth - finalDamage)
-                setElementHealth(player, newHealth)
-                
-                -- Notificar al jugador
-                if distance < 50 then
-                    triggerClientEvent(player, "polvora:notificarExplosion", player, x, y, z)
-                    if finalDamage > 0 then
-                        outputChatBox("💥 Has recibido " .. math.floor(finalDamage) .. " de daño por la explosión.", player, 255, 100, 0)
-                    end
-                end
-                
-                -- Si el jugador muere por la explosión
-                if newHealth <= 0 then
-                    killPed(player)
-                end
-            elseif distance < 50 then
-                -- Solo notificar si está cerca pero fuera del radio de daño
-                triggerClientEvent(player, "polvora:notificarExplosion", player, x, y, z)
+            if distance < 20 then
+                triggerClientEvent(p, "polvora:c4Colocado", p, c4Object, x, y, z)
             end
         end
     end
+    
+    -- Notificar al jugador que lo colocó
+    outputChatBox("✓ Has colocado un " .. itemName .. ". ¡Explotará en 5 segundos!", player, 255, 200, 0)
+    
+    -- Hacer que explote en 5 segundos
+    setTimer(function()
+        if isElement(c4Object) then
+            local objX, objY, objZ = getElementPosition(c4Object)
+            
+            -- Crear explosión en el servidor (visible para todos)
+            createExplosion(objX, objY, objZ, explosionType, true, 1.0, false)
+            
+            -- Aplicar daño a todos los jugadores cercanos
+            local explosionRadius = 10 -- Radio de la explosión en metros
+            
+            for _, p in ipairs(getElementsByType("player")) do
+                if isElement(p) and getElementType(p) == "player" then
+                    local px, py, pz = getElementPosition(p)
+                    local distance = getDistanceBetweenPoints3D(objX, objY, objZ, px, py, pz)
+                    
+                    if distance <= explosionRadius then
+                        -- Calcular daño según la distancia (más cerca = más daño)
+                        local distanceFactor = 1 - (distance / explosionRadius) -- 1.0 en el centro, 0.0 en el borde
+                        local finalDamage = damage * distanceFactor
+                        
+                        -- Aplicar daño
+                        local currentHealth = getElementHealth(p)
+                        local newHealth = math.max(0, currentHealth - finalDamage)
+                        setElementHealth(p, newHealth)
+                        
+                        -- Notificar al jugador
+                        if finalDamage > 0 then
+                            outputChatBox("💥 Has recibido " .. math.floor(finalDamage) .. " de daño por la explosión.", p, 255, 100, 0)
+                        end
+                        
+                        -- Si el jugador muere por la explosión
+                        if newHealth <= 0 then
+                            killPed(p)
+                        end
+                    end
+                    
+                    -- Notificar explosión a todos los jugadores cercanos
+                    if distance < 50 then
+                        triggerClientEvent(p, "polvora:notificarExplosion", p, objX, objY, objZ, explosionType)
+                    end
+                end
+            end
+            
+            -- Destruir el objeto
+            destroyElement(c4Object)
+        end
+    end, 5000, 1)
 end)
 
 -- Export

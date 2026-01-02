@@ -310,7 +310,7 @@ function efectoDestello(x, y, z)
     playSoundFrontEnd(1)
 end
 
--- Colocar C4 en el suelo
+-- Colocar C4 en el suelo (enviar posición al servidor)
 addEvent("polvora:colocarC4", true)
 addEventHandler("polvora:colocarC4", root, function(itemId, itemName, slotNum)
     -- Cerrar el inventario
@@ -333,57 +333,42 @@ addEventHandler("polvora:colocarC4", root, function(itemId, itemName, slotNum)
         hitZ = z - 0.5 -- Si no hay suelo, usar la posición del jugador menos 0.5
     end
     
-    -- Crear objeto C4 (usar modelo 1252 que es una caja/explosivo)
-    local c4Object = createObject(1252, forwardX, forwardY, hitZ, 0, 0, rotZ)
+    -- Enviar al servidor para crear el C4 (visible para todos)
+    triggerServerEvent("polvora:crearC4", localPlayer, forwardX, forwardY, hitZ, rotZ, itemId, itemName)
+end)
+
+-- Recibir notificación de explosión
+addEvent("polvora:notificarExplosion", true)
+addEventHandler("polvora:notificarExplosion", root, function(x, y, z, explosionType)
+    local px, py, pz = getElementPosition(localPlayer)
+    local distance = getDistanceBetweenPoints3D(x, y, z, px, py, pz)
     
-    if c4Object then
-        setElementData(c4Object, "c4:active", true)
-        setElementData(c4Object, "c4:owner", localPlayer)
-        setElementData(c4Object, "c4:type", itemId)
+    if distance < 50 then
+        outputChatBox("💥 ¡BOOM! Una explosión ha ocurrido cerca.", 255, 100, 0)
         
-        -- Notificar al jugador
-        outputChatBox("✓ Has colocado un " .. itemName .. ". ¡Explotará en 5 segundos!", 255, 200, 0)
-        
-        -- Determinar daño según el tipo de C4
-        local damage = 0
-        local explosionType = 6 -- Tipo de explosión grande
-        if itemId == 103 then
-            damage = 20 -- Tipo 1: daño bajo
-            explosionType = 5
-        elseif itemId == 104 then
-            damage = 50 -- Tipo 2: daño medio
-            explosionType = 6
-        elseif itemId == 105 then
-            damage = 100 -- Tipo 3: daño alto
-            explosionType = 7
-        end
-        
-        -- Hacer que explote en 5 segundos
-        setTimer(function()
-            if isElement(c4Object) then
-                local objX, objY, objZ = getElementPosition(c4Object)
-                
-                -- Crear explosión con el tipo correspondiente
-                createExplosion(objX, objY, objZ, explosionType, true, 1.0, false)
-                
-                -- Enviar al servidor para aplicar daño a jugadores cercanos
-                triggerServerEvent("polvora:c4Explotado", localPlayer, objX, objY, objZ, damage, itemId)
-                
-                -- Destruir el objeto
-                destroyElement(c4Object)
+        -- Crear efectos visuales de la explosión
+        if distance < 30 then
+            -- Efectos de partículas cercanas
+            for i = 1, 20 do
+                setTimer(function()
+                    fxAddSparks(x + math.random(-3, 3), y + math.random(-3, 3), z + math.random(0, 2), 0, 0, 0, 5, 1, 255, 100, 0, false, 0.5, 1)
+                end, 50 * i, 1)
             end
-        end, 5000, 1)
-    else
-        outputChatBox("Error: No se pudo colocar el C4.", 255, 0, 0)
+        end
     end
 end)
 
--- Notificar explosión a todos los jugadores
-addEvent("polvora:notificarExplosion", true)
-addEventHandler("polvora:notificarExplosion", root, function(x, y, z)
-    local px, py, pz = getElementPosition(localPlayer)
-    local distance = getDistanceBetweenPoints3D(x, y, z, px, py, pz)
-    if distance < 50 then
-        outputChatBox("💥 ¡BOOM! Una explosión ha ocurrido cerca.", 255, 100, 0)
+-- Recibir efectos visuales del C4 colocado
+addEvent("polvora:c4Colocado", true)
+addEventHandler("polvora:c4Colocado", root, function(c4Object, x, y, z)
+    -- Efectos visuales mientras el C4 está activo
+    if isElement(c4Object) then
+        -- Chispas mientras cuenta
+        setTimer(function()
+            if isElement(c4Object) then
+                local ox, oy, oz = getElementPosition(c4Object)
+                fxAddSparks(ox, oy, oz + 0.2, 0, 0, 0.5, 2, 0.5, 255, 200, 0, false, 0.3, 1)
+            end
+        end, 1000, 5) -- Chispas cada segundo durante 5 segundos
     end
 end)
