@@ -124,8 +124,9 @@ addEventHandler("admin:teleportToPlayer", root, function(characterId)
     -- Distancia detrás del jugador (2 metros)
     local distanceBehind = 2.0
     -- Calcular posición detrás basada en la rotación
-    local behindX = targetX - math.sin(rotationRad) * distanceBehind
-    local behindY = targetY + math.cos(rotationRad) * distanceBehind
+    -- En MTA, rotación 0 = mirando al norte (Y+), así que detrás es la dirección opuesta
+    local behindX = targetX + math.sin(rotationRad) * distanceBehind
+    local behindY = targetY - math.cos(rotationRad) * distanceBehind
     local behindZ = targetZ
     
     -- Teleportar al admin detrás del jugador objetivo
@@ -257,6 +258,62 @@ addEventHandler("onPlayerLogout", root, function()
         setElementAlpha(source, 255)
         setPlayerNametagShowing(source, true)
         setElementData(source, "admin:invisible", nil)
+    end
+end)
+
+-- Evento para dar dinero a un jugador (desde el panel)
+addEvent("admin:giveMoney", true)
+addEventHandler("admin:giveMoney", root, function(characterId, amount)
+    if not isElement(source) or getElementType(source) ~= "player" then
+        return
+    end
+    
+    if not isPlayerAdmin(source) then
+        triggerClientEvent(source, "admin:giveMoneyResponse", source, false, "No tienes permiso para usar esta función.")
+        return
+    end
+    
+    if not characterId or not tonumber(characterId) then
+        triggerClientEvent(source, "admin:giveMoneyResponse", source, false, "ID de personaje inválido.")
+        return
+    end
+    
+    if not amount or not tonumber(amount) or tonumber(amount) <= 0 then
+        triggerClientEvent(source, "admin:giveMoneyResponse", source, false, "La cantidad debe ser un número mayor a 0.")
+        return
+    end
+    
+    characterId = tonumber(characterId)
+    amount = tonumber(amount)
+    
+    -- Buscar jugador con ese ID de personaje
+    local target = nil
+    for _, p in ipairs(getElementsByType("player")) do
+        if getElementData(p, "character:selected") then
+            local pCharId = getElementData(p, "character:id")
+            if pCharId and tonumber(pCharId) == characterId then
+                target = p
+                break
+            end
+        end
+    end
+    
+    if not target then
+        triggerClientEvent(source, "admin:giveMoneyResponse", source, false, "No se encontró ningún jugador con el ID de personaje " .. characterId .. ".")
+        return
+    end
+    
+    -- Dar dinero al jugador
+    if giveCharacterMoney(target, amount) then
+        local charName = getElementData(target, "character:name")
+        local charSurname = getElementData(target, "character:surname")
+        local displayName = (charName and charSurname) and (charName .. " " .. charSurname) or getPlayerName(target)
+        
+        triggerClientEvent(source, "admin:giveMoneyResponse", source, true, "Has dado $" .. amount .. " a " .. displayName .. " (ID: " .. characterId .. ").")
+        outputChatBox("Un administrador te ha dado $" .. amount .. ".", target, 0, 255, 0)
+        outputServerLog("[ADMIN] " .. getPlayerName(source) .. " dio $" .. amount .. " a " .. displayName .. " (ID: " .. characterId .. ")")
+    else
+        triggerClientEvent(source, "admin:giveMoneyResponse", source, false, "Error al dar el dinero. Inténtalo más tarde.")
     end
 end)
 

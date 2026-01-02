@@ -116,7 +116,7 @@ function createAdminPanel()
         -- Botón: Dar Dinero
         local darDineroBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Dar Dinero", false, adminWindow)
         addEventHandler("onClientGUIClick", darDineroBtn, function()
-            outputChatBox("Función en desarrollo...", 255, 255, 0)
+            showGiveMoneyInput()
         end, false)
         table.insert(adminButtons, darDineroBtn)
         buttonY = buttonY + buttonSpacing
@@ -381,6 +381,64 @@ end
 -- Evento para recibir respuesta del servidor (curar)
 addEvent("admin:healResponse", true)
 addEventHandler("admin:healResponse", root, function(success, message)
+    if success then
+        outputChatBox(message, 0, 255, 0)
+    else
+        outputChatBox(message, 255, 0, 0)
+    end
+end)
+
+-- Función para mostrar el input de dar dinero
+function showGiveMoneyInput()
+    if inputWindow and isElement(inputWindow) then
+        destroyElement(inputWindow)
+    end
+    
+    currentAction = "darDinero"
+    
+    local windowWidth = 350
+    local windowHeight = 180
+    local windowX = (screenW - windowWidth) / 2
+    local windowY = (screenH - windowHeight) / 2
+    
+    inputWindow = guiCreateWindow(windowX, windowY, windowWidth, windowHeight, "Dar Dinero", false)
+    guiWindowSetSizable(inputWindow, false)
+    
+    local label1 = guiCreateLabel(10, 30, windowWidth - 20, 20, "ID del personaje:", false, inputWindow)
+    local idEdit = guiCreateEdit(10, 50, windowWidth - 20, 30, "", false, inputWindow)
+    guiEditSetMaxLength(idEdit, 10)
+    
+    local label2 = guiCreateLabel(10, 85, windowWidth - 20, 20, "Cantidad de dinero:", false, inputWindow)
+    local amountEdit = guiCreateEdit(10, 105, windowWidth - 20, 30, "", false, inputWindow)
+    guiEditSetMaxLength(amountEdit, 15)
+    
+    local acceptBtn = guiCreateButton(10, 145, (windowWidth - 30) / 2, 30, "Dar Dinero", false, inputWindow)
+    addEventHandler("onClientGUIClick", acceptBtn, function()
+        local characterId = guiGetText(idEdit)
+        local amount = guiGetText(amountEdit)
+        if characterId and characterId ~= "" and amount and amount ~= "" then
+            local id = tonumber(characterId)
+            local moneyAmount = tonumber(amount)
+            if id and moneyAmount and moneyAmount > 0 then
+                triggerServerEvent("admin:giveMoney", localPlayer, id, moneyAmount)
+                closeInputWindow()
+            else
+                outputChatBox("El ID y la cantidad deben ser números válidos.", 255, 0, 0)
+            end
+        else
+            outputChatBox("Debes ingresar un ID de personaje y una cantidad.", 255, 0, 0)
+        end
+    end, false)
+    
+    local cancelBtn = guiCreateButton((windowWidth - 10) / 2 + 5, 145, (windowWidth - 30) / 2, 30, "Cancelar", false, inputWindow)
+    addEventHandler("onClientGUIClick", cancelBtn, function()
+        closeInputWindow()
+    end, false)
+end
+
+-- Evento para recibir respuesta del servidor (dar dinero)
+addEvent("admin:giveMoneyResponse", true)
+addEventHandler("admin:giveMoneyResponse", root, function(success, message)
     if success then
         outputChatBox(message, 0, 255, 0)
     else
