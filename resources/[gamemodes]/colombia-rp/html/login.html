@@ -2,73 +2,72 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Colombia RP - Login</title>
     <link rel="stylesheet" href="login.css">
     <script src="login.js" defer></script>
 </head>
 <body>
+    <div class="bg"></div>
+    <div class="overlay"></div>
 
-<div class="bg"></div>
-<div class="overlay"></div>
+    <div class="container">
+        <div class="tabs">
+            <button id="tabLogin" class="tab active" onclick="switchTab('login')">Login</button>
+            <button id="tabRegister" class="tab" onclick="switchTab('register')">Register</button>
+        </div>
 
-<div class="container">
+        <div class="panels">
+            <!-- LOGIN -->
+            <div id="loginPanel" class="panel active">
+                <h2>Welcome to COLOMBIA RP</h2>
 
-    <div class="tabs">
-        <button id="tabLogin" class="tab active" onclick="switchTab('login')">Login</button>
-        <button id="tabRegister" class="tab" onclick="switchTab('register')">Register</button>
-    </div>
+                <form onsubmit="doLogin(event)">
+                    <label>Username</label>
+                    <input id="loginUsername" type="text" placeholder="Enter your username" required>
 
-    <div class="panels">
+                    <label>Password</label>
+                    <input id="loginPassword" type="password" placeholder="Enter your password" required>
 
-        <!-- LOGIN -->
-        <div id="login" class="panel active">
-            <h2>Welcome to COLOMBIA RP</h2>
+                    <div class="checkbox">
+                        <input type="checkbox" id="rememberMe" checked>
+                        <span>Remember Me</span>
+                    </div>
 
-            <label>Username</label>
-            <input id="loginUser" type="text" placeholder="Enter your username">
-
-            <label>Password</label>
-            <input id="loginPass" type="password" placeholder="Enter your password">
-
-            <div class="checkbox">
-                <input type="checkbox" checked>
-                <span>Remember Me</span>
+                    <button type="submit" class="btn login" id="loginBtn">Login</button>
+                    <span class="link" onclick="alert('Feature coming soon')">Forgot password?</span>
+                </form>
             </div>
 
-            <button class="btn login" onclick="doLogin()">Login</button>
-            <span class="link">Forgot password?</span>
+            <!-- REGISTER -->
+            <div id="registerPanel" class="panel">
+                <h2>Create a New Account</h2>
+
+                <form onsubmit="doRegister(event)">
+                    <label>Username</label>
+                    <input id="registerUsername" type="text" placeholder="Minimum 3 characters" required>
+
+                    <label>E-Mail</label>
+                    <input id="registerEmail" type="email" placeholder="your@email.com" required>
+
+                    <label>Password</label>
+                    <input id="registerPassword" type="password" placeholder="Minimum 6 characters" required>
+
+                    <label>Confirm Password</label>
+                    <input id="confirmPassword" type="password" placeholder="Repeat password" required>
+
+                    <button type="submit" class="btn register" id="registerBtn">Register</button>
+                </form>
+            </div>
         </div>
 
-        <!-- REGISTER -->
-        <div id="register" class="panel">
-            <h2>Create Account</h2>
-
-            <label>Username</label>
-            <input id="regUser" type="text" placeholder="Minimum 3 characters">
-
-            <label>Email</label>
-            <input id="regEmail" type="email" placeholder="your@email.com">
-
-            <label>Password</label>
-            <input id="regPass" type="password" placeholder="Minimum 6 characters">
-
-            <label>Confirm Password</label>
-            <input id="regPass2" type="password" placeholder="Repeat password">
-
-            <button class="btn register" onclick="doRegister()">Register</button>
+        <div class="bottom">
+            <button onclick="showSettings()">Settings</button>
+            <button onclick="showAbout()">About</button>
+            <button onclick="quitGame()">Quit</button>
         </div>
 
+        <div id="message"></div>
     </div>
-
-    <div class="bottom">
-        <button>Settings</button>
-        <button>About</button>
-        <button onclick="quitGame()">Quit</button>
-    </div>
-
-    <div id="msg"></div>
-
-</div>
-
 </body>
 </html>

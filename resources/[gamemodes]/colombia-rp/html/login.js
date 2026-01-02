@@ -1,6 +1,6 @@
 function switchTab(tab) {
-    const loginTab = document.getElementById('loginTab');
-    const registerTab = document.getElementById('registerTab');
+    const loginTab = document.getElementById('tabLogin');
+    const registerTab = document.getElementById('tabRegister');
     const loginPanel = document.getElementById('loginPanel');
     const registerPanel = document.getElementById('registerPanel');
     
@@ -98,15 +98,17 @@ function doRegister(e) {
 function showError(message) {
     const msgEl = document.getElementById('message');
     msgEl.textContent = message;
-    msgEl.className = 'message error';
+    msgEl.className = 'error';
     msgEl.style.display = 'block';
+    setTimeout(hideMessage, 5000);
 }
 
 function showSuccess(message) {
     const msgEl = document.getElementById('message');
     msgEl.textContent = message;
-    msgEl.className = 'message success';
+    msgEl.className = 'success';
     msgEl.style.display = 'block';
+    setTimeout(hideMessage, 3000);
 }
 
 function hideMessage() {
@@ -116,18 +118,19 @@ function hideMessage() {
 
 function setLoading(btnId, loading) {
     const btn = document.getElementById(btnId);
-    const span = btn.querySelector('span');
+    
+    if (!btn) return;
     
     if (loading) {
-        span.innerHTML = 'Procesando<span class="loading"></span>';
         btn.disabled = true;
+        btn.textContent = 'Procesando...';
     } else {
-        if (btnId === 'loginBtn') {
-            span.textContent = 'Login';
-        } else {
-            span.textContent = 'Register';
-        }
         btn.disabled = false;
+        if (btnId === 'loginBtn') {
+            btn.textContent = 'Login';
+        } else {
+            btn.textContent = 'Register';
+        }
     }
 }
 
@@ -151,4 +154,3 @@ window.showSuccess = showSuccess;
 window.setLoading = setLoading;
 window.hideMessage = hideMessage;
 window.switchTab = switchTab;
-
