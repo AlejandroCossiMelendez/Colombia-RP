@@ -30,6 +30,7 @@
     <script src="server/voice_proximity.lua" type="server" />
     <script src="server/phone_calls.lua" type="server" />
     <script src="server/jbl_system.lua" type="server" />
+    <script src="server/fuel_system.lua" type="server" />
     <script src="sistema_polvora/server.lua" type="server" />
     <script src="server/main.lua" type="server" />
     
@@ -56,6 +57,7 @@
     <script src="client/phone_calls.lua" type="client" />
     <script src="client/jbl_panel.lua" type="client" />
     <script src="client/jbl_model.lua" type="client" />
+    <script src="client/speedometer.lua" type="client" />
     <script src="sistema_polvora/client.lua" type="client" />
     
     <!-- Scripts del sistema de items (cliente) -->
@@ -548,6 +550,11 @@
     <file src="html/character.html"/>
     <file src="html/character.css"/>
     <file src="html/character.js"/>
+    
+    <!-- Archivos del velocímetro -->
+    <file src="html/speedometer.html"/>
+    <file src="html/speedometer.css"/>
+    <file src="html/speedometer.js"/>
     
     <!-- Archivos del teléfono -->
     <file src="html/phone.html"/>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velocímetro</title>
+    <link rel="stylesheet" href="speedometer.css">
+</head>
+<body>
+    <div id="speedometer-container" class="hidden">
+        <!-- Velocímetro Principal -->
+        <div class="speedometer-wrapper">
+            <div class="speedometer-circle">
+                <svg class="speedometer-svg" viewBox="0 0 200 200">
+                    <!-- Fondo del velocímetro -->
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(0, 0, 0, 0.3)" stroke-width="8"/>
+                    
+                    <!-- Arco de velocidad (verde) -->
+                    <path id="speed-arc" d="M 30 100 A 70 70 0 0 1 170 100" 
+                          fill="none" stroke="#00ff00" stroke-width="6" 
+                          stroke-linecap="round" stroke-dasharray="0 440"/>
+                    
+                    <!-- Arco de RPM (amarillo/naranja) -->
+                    <path id="rpm-arc" d="M 30 100 A 70 70 0 0 1 170 100" 
+                          fill="none" stroke="#ffaa00" stroke-width="4" 
+                          stroke-linecap="round" stroke-dasharray="0 440"/>
+                    
+                    <!-- Aguja de velocidad -->
+                    <line id="speed-needle" x1="100" y1="100" x2="100" y2="30" 
+                          stroke="#ffffff" stroke-width="3" stroke-linecap="round" 
+                          transform-origin="100 100"/>
+                    
+                    <!-- Aguja de RPM -->
+                    <line id="rpm-needle" x1="100" y1="100" x2="100" y2="30" 
+                          stroke="#ffaa00" stroke-width="2" stroke-linecap="round" 
+                          transform-origin="100 100" opacity="0.7"/>
+                    
+                    <!-- Centro del velocímetro -->
+                    <circle cx="100" cy="100" r="8" fill="#1a1a1a" stroke="#ffffff" stroke-width="2"/>
+                </svg>
+                
+                <!-- Velocidad en texto -->
+                <div class="speed-text">
+                    <div id="speed-value" class="speed-number">0</div>
+                    <div class="speed-unit">KM/H</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información del Vehículo -->
+        <div class="vehicle-info">
+            <div id="vehicle-name" class="vehicle-name">Vehículo</div>
+            <div class="vehicle-stats">
+                <div class="stat-item">
+                    <span class="stat-label">RPM</span>
+                    <span id="rpm-value" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">⚡</span>
+                    <span id="engine-status" class="stat-value">ON</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">💡</span>
+                    <span id="lights-status" class="stat-value">OFF</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Indicador de Gasolina -->
+        <div class="fuel-container">
+            <div class="fuel-icon">⛽</div>
+            <div class="fuel-bar-wrapper">
+                <div class="fuel-bar-bg">
+                    <div id="fuel-bar" class="fuel-bar"></div>
+                </div>
+                <div id="fuel-percentage" class="fuel-percentage">100%</div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="speedometer.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,245 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+    user-select: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#speedometer-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 15px;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+/* Velocímetro Principal */
+.speedometer-wrapper {
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+.speedometer-circle {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.speedometer-svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.5));
+}
+
+.speed-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #ffffff;
+    z-index: 10;
+}
+
+.speed-number {
+    font-size: 32px;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.8), 0 0 20px rgba(0, 255, 0, 0.5);
+    line-height: 1;
+}
+
+.speed-unit {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Información del Vehículo */
+.vehicle-info {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(20, 20, 20, 0.9) 100%);
+    border: 2px solid rgba(0, 255, 0, 0.3);
+    border-radius: 10px;
+    padding: 12px 16px;
+    min-width: 200px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 0, 0.2);
+}
+
+.vehicle-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #00ff00;
+    text-align: center;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+.vehicle-stats {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+}
+
+.stat-icon {
+    font-size: 14px;
+}
+
+.stat-value {
+    font-size: 12px;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+.stat-value.engine-on {
+    color: #00ff00;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+.stat-value.engine-off {
+    color: #ff0000;
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+}
+
+.stat-value.lights-on {
+    color: #ffff00;
+    text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+}
+
+.stat-value.lights-off {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Indicador de Gasolina */
+.fuel-container {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(20, 20, 20, 0.9) 100%);
+    border: 2px solid rgba(255, 200, 0, 0.3);
+    border-radius: 10px;
+    padding: 12px 16px;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 200, 0, 0.2);
+}
+
+.fuel-icon {
+    font-size: 24px;
+    filter: drop-shadow(0 0 5px rgba(255, 200, 0, 0.5));
+}
+
+.fuel-bar-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.fuel-bar-bg {
+    width: 100%;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+}
+
+.fuel-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ff0000 0%, #ffaa00 50%, #00ff00 100%);
+    border-radius: 10px;
+    transition: width 0.3s ease, background 0.3s ease;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(255, 200, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.fuel-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        transparent 100%);
+    animation: fuelShine 2s infinite;
+}
+
+@keyframes fuelShine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.fuel-percentage {
+    font-size: 11px;
+    font-weight: bold;
+    color: #ffffff;
+    text-align: center;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+/* Animaciones */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.fuel-bar.low {
+    animation: pulse 1s infinite;
+}
+
+/* Responsive */
+@media (max-width: 1366px) {
+    .speedometer-wrapper {
+        width: 160px;
+        height: 160px;
+    }
+    
+    .speed-number {
+        font-size: 24px;
+    }
+    
+    .vehicle-info,
+    .fuel-container {
+        min-width: 160px;
+        padding: 10px 12px;
+    }
+}
+
