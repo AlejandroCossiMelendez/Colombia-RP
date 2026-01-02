@@ -44,8 +44,31 @@ addEventHandler( "players:register", root,
 					-- client length checks are the same
 					if #username >= 3 and #password >= 8 then
 						-- see if that username is free at all
-						local info, errTest = exports.sql:query_assoc_single( "SELECT COUNT(userID) AS usercount FROM wcf1_user WHERE username = '%s'", username )
-						local info2 = exports.sql:query_assoc( "SELECT regIP, lastIP, regSerial FROM wcf1_user" )
+						-- Usar pcall para capturar errores de exports
+						local success1, info = pcall(function()
+							return exports.sql:query_assoc_single( "SELECT COUNT(userID) AS usercount FROM wcf1_user WHERE username = '%s'", username )
+						end)
+						
+						if not success1 then
+							outputDebugString("players_auxiliar: SQL export not available for registration, retrying...", 2)
+							setTimer(function()
+								triggerEvent("players:register", source, username, password)
+							end, 1000, 1)
+							return
+						end
+						
+						local success2, info2 = pcall(function()
+							return exports.sql:query_assoc( "SELECT regIP, lastIP, regSerial FROM wcf1_user" )
+						end)
+						
+						if not success2 then
+							outputDebugString("players_auxiliar: SQL export not available for registration (info2), retrying...", 2)
+							setTimer(function()
+								triggerEvent("players:register", source, username, password)
+							end, 1000, 1)
+							return
+						end
+						
 						if not info then
 							triggerClientEvent( source, "players:registrationResult", source, 1 )
 						elseif info.usercount == 0 then
@@ -64,17 +87,36 @@ addEventHandler( "players:register", root,
 							for i = 1, 40 do
 								salt = salt .. chars[ math.random( 1, #chars ) ]
 							end
-							local userID, error = exports.sql:query_insertid( "INSERT INTO wcf1_user (username,salt,password) VALUES ('%s', '%s', SHA1(CONCAT('%s', SHA1(CONCAT('%s', '" .. hash("sha1", password) .. "')))))", username, salt, salt, salt )
-							if error then
-								outputDebugString(error)
+							local success3, userID = pcall(function()
+								return exports.sql:query_insertid( "INSERT INTO wcf1_user (username,salt,password) VALUES ('%s', '%s', SHA1(CONCAT('%s', SHA1(CONCAT('%s', '" .. hash("sha1", password) .. "')))))", username, salt, salt, salt )
+							end)
+							
+							if not success3 then
+								outputDebugString("players_auxiliar: SQL export not available for insert, retrying...", 2)
+								setTimer(function()
+									triggerEvent("players:register", source, username, password)
+								end, 1000, 1)
+								return
+							end
+							
+							-- query_insertid retorna userID o false, error
+							-- Si userID es false, significa que hubo un error
+							if not userID or userID == false then
+								outputDebugString("players_auxiliar: SQL insert failed", 2)
 								triggerClientEvent( source, "players:registrationResult", source, 4 )
-							else
-								triggerClientEvent( source, "players:registrationResult", source, 0 ) -- Inicio de sesion automático.
+								return
+							end
+							
+							-- Si llegamos aquí, el insert fue exitoso
+							triggerClientEvent( source, "players:registrationResult", source, 0 ) -- Inicio de sesion automático.
+							pcall(function()
 								exports.sql:query_free( "UPDATE wcf1_user SET regIP = '%s' WHERE username = '%s'", getPlayerIP(source), username )
+							end)
+							pcall(function()
 								exports.sql:query_free( "UPDATE wcf1_user SET regSerial = '%s' WHERE username = '%s'", getPlayerSerial(source), username )
-								outputChatBox ( "Bienvenido por primera vez a DownTown RolePlay.", source, 0, 255, 0 )
-								outputChatBox ( "Te recomendamos que utilices /duda para obtener asistencia", source, 0, 255, 0)
-							end 
+							end)
+							outputChatBox ( "Bienvenido por primera vez a DownTown RolePlay.", source, 0, 255, 0 )
+							outputChatBox ( "Te recomendamos que utilices /duda para obtener asistencia", source, 0, 255, 0) 
 						else
 							triggerClientEvent( source, "players:registrationResult", source, 3 )
 						end
