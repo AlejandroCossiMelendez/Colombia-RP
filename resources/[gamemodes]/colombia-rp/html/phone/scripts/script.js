@@ -21,6 +21,8 @@ onload = () => {
         lock.style.display = 'none';
         unlock.style.display = 'flex';
     }
+    // Inicializar isInHomeScreen
+    isInHomeScreen = true;
 }
 
 const [lock, unlock] = [get('.lock-screen'), get('.unlock-screen')];
@@ -45,11 +47,17 @@ function openApp(appId) {
 let isInHomeScreen = true; // Variable para rastrear si estamos en el home
 
 function returnToHomePage() {
-    // Si ya está en el home, cerrar el teléfono
-    if (isInHomeScreen) {
+    // Verificar si realmente estamos en el home (unlock visible y no hay apps abiertas)
+    const unlockVisible = unlock && unlock.style.display !== 'none' && unlock.style.display !== '';
+    const interfacesVisible = interfaces && (interfaces.style.display === 'block' || interfaces.style.display === 'flex');
+    
+    // Si ya está en el home (unlock visible y interfaces ocultas), cerrar el teléfono
+    if (unlockVisible && !interfacesVisible) {
         // Cerrar el teléfono enviando evento a MTA
-        if (window.mta) {
+        if (window.mta && window.mta.triggerEvent) {
             window.mta.triggerEvent('closePhoneFromBrowser');
+        } else {
+            console.error('MTA no está disponible');
         }
         return;
     }
@@ -57,7 +65,14 @@ function returnToHomePage() {
     if (lock) lock.style.display = 'none';
     if (unlock) unlock.style.display = 'flex';
     if (interfaces) interfaces.style.display = 'none';
-    appsInterfaces.forEach(e => e.style.display = 'none');
+    if (appsInterfaces) {
+        appsInterfaces.forEach(e => {
+            if (e) e.style.display = 'none';
+        });
+    }
+    // Ocultar formulario de agregar contacto si está visible
+    const addForm = get('#addContactForm');
+    if (addForm) addForm.style.display = 'none';
     isInHomeScreen = true;
 }
 
