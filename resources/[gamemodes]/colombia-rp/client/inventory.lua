@@ -1,11 +1,11 @@
 -- Sistema de Inventario Visual - Tecla I
--- Diseño moderno y exótico con drag & drop
+-- Diseño moderno y exótico con drag & drop - Versión Mejorada
 
 local inventoryVisible = false
 local playerInventory = {}
 local inventorySlots = 50 -- 5 filas x 10 columnas
-local slotSize = 60
-local slotSpacing = 5
+local slotSize = 70 -- Aumentado para mejor visualización
+local slotSpacing = 8 -- Más espaciado
 local inventoryRows = 5
 local inventoryCols = 10
 
@@ -21,26 +21,36 @@ local animationTime = 0
 local pulseAlpha = 0
 local pulseDirection = 1
 
--- Colores y estilos
+-- Colores y estilos mejorados
 local colors = {
-    background = tocolor(15, 15, 25, 245),
-    slotEmpty = tocolor(35, 35, 50, 200),
-    slotFilled = tocolor(50, 70, 110, 230),
-    slotHover = tocolor(80, 120, 180, 255),
-    slotSelected = tocolor(120, 170, 220, 255),
-    border = tocolor(100, 150, 255, 255),
-    borderGlow = tocolor(150, 200, 255, 150),
+    background = tocolor(10, 10, 20, 250),
+    backgroundGradient = tocolor(20, 25, 35, 240),
+    slotEmpty = tocolor(30, 35, 50, 180),
+    slotEmptyGlow = tocolor(50, 60, 80, 100),
+    slotFilled = tocolor(45, 65, 100, 240),
+    slotFilledGlow = tocolor(70, 100, 150, 180),
+    slotHover = tocolor(70, 110, 170, 255),
+    slotHoverGlow = tocolor(100, 150, 220, 200),
+    slotSelected = tocolor(110, 160, 210, 255),
+    slotSelectedGlow = tocolor(140, 190, 240, 220),
+    border = tocolor(80, 130, 200, 255),
+    borderGlow = tocolor(120, 180, 255, 180),
+    borderInner = tocolor(200, 220, 255, 100),
     text = tocolor(255, 255, 255, 255),
-    textShadow = tocolor(0, 0, 0, 200),
-    quantity = tocolor(255, 255, 0, 255),
-    title = tocolor(150, 200, 255, 255)
+    textGlow = tocolor(200, 220, 255, 255),
+    textShadow = tocolor(0, 0, 0, 220),
+    quantity = tocolor(255, 220, 100, 255),
+    quantityGlow = tocolor(255, 240, 150, 255),
+    title = tocolor(150, 200, 255, 255),
+    titleGlow = tocolor(200, 230, 255, 255),
+    accent = tocolor(100, 150, 255, 255)
 }
 
 -- Función para obtener posición del slot en pantalla
 function getSlotPosition(slot)
     local screenW, screenH = guiGetScreenSize()
-    local inventoryWidth = (inventoryCols * slotSize) + ((inventoryCols - 1) * slotSpacing) + 40
-    local inventoryHeight = (inventoryRows * slotSize) + ((inventoryRows - 1) * slotSpacing) + 80
+    local inventoryWidth = (inventoryCols * slotSize) + ((inventoryCols - 1) * slotSpacing) + 60
+    local inventoryHeight = (inventoryRows * slotSize) + ((inventoryRows - 1) * slotSpacing) + 140
     
     local startX = (screenW - inventoryWidth) / 2
     local startY = (screenH - inventoryHeight) / 2
@@ -48,8 +58,8 @@ function getSlotPosition(slot)
     local row = math.floor((slot - 1) / inventoryCols)
     local col = (slot - 1) % inventoryCols
     
-    local x = startX + 20 + (col * (slotSize + slotSpacing))
-    local y = startY + 60 + (row * (slotSize + slotSpacing))
+    local x = startX + 30 + (col * (slotSize + slotSpacing))
+    local y = startY + 80 + (row * (slotSize + slotSpacing))
     
     return x, y, slotSize, slotSize
 end
@@ -91,113 +101,218 @@ function drawInventory()
     end
     
     local screenW, screenH = guiGetScreenSize()
-    local inventoryWidth = (inventoryCols * slotSize) + ((inventoryCols - 1) * slotSpacing) + 40
-    local inventoryHeight = (inventoryRows * slotSize) + ((inventoryRows - 1) * slotSpacing) + 100
+    local inventoryWidth = (inventoryCols * slotSize) + ((inventoryCols - 1) * slotSpacing) + 60
+    local inventoryHeight = (inventoryRows * slotSize) + ((inventoryRows - 1) * slotSpacing) + 140
     
     local startX = (screenW - inventoryWidth) / 2
     local startY = (screenH - inventoryHeight) / 2
     
-    -- Fondo principal con sombra
-    dxDrawRectangle(startX - 2, startY - 2, inventoryWidth + 4, inventoryHeight + 4, tocolor(0, 0, 0, 150), false)
+    -- Sombra exterior múltiple para efecto de profundidad
+    for i = 1, 5 do
+        local shadowAlpha = 30 - (i * 5)
+        dxDrawRectangle(startX - i, startY - i, inventoryWidth + (i * 2), inventoryHeight + (i * 2), tocolor(0, 0, 0, shadowAlpha), false)
+    end
+    
+    -- Fondo principal con gradiente simulado
     dxDrawRectangle(startX, startY, inventoryWidth, inventoryHeight, colors.background, false)
+    -- Capa de gradiente superior
+    dxDrawRectangle(startX, startY, inventoryWidth, 80, colors.backgroundGradient, false)
     
-    -- Borde decorativo con efecto glow
-    local glowAlpha = math.floor(100 + math.sin(animationTime * 2) * 50)
+    -- Borde decorativo con efecto glow animado
+    local glowAlpha = math.floor(120 + math.sin(animationTime * 2) * 60)
     local glowColor = tocolor(100, 150, 255, glowAlpha)
+    local innerGlow = tocolor(150, 200, 255, math.floor(80 + math.sin(animationTime * 3) * 40))
     
-    -- Bordes principales
-    dxDrawRectangle(startX, startY, inventoryWidth, 4, colors.border, false)
-    dxDrawRectangle(startX, startY + inventoryHeight - 4, inventoryWidth, 4, colors.border, false)
-    dxDrawRectangle(startX, startY, 4, inventoryHeight, colors.border, false)
-    dxDrawRectangle(startX + inventoryWidth - 4, startY, 4, inventoryHeight, colors.border, false)
+    -- Sombra del borde
+    dxDrawRectangle(startX - 2, startY - 2, inventoryWidth + 4, 6, tocolor(0, 0, 0, 100), false)
+    dxDrawRectangle(startX - 2, startY + inventoryHeight - 4, inventoryWidth + 4, 6, tocolor(0, 0, 0, 100), false)
+    dxDrawRectangle(startX - 2, startY - 2, 6, inventoryHeight + 4, tocolor(0, 0, 0, 100), false)
+    dxDrawRectangle(startX + inventoryWidth - 4, startY - 2, 6, inventoryHeight + 4, tocolor(0, 0, 0, 100), false)
     
-    -- Efecto glow en los bordes
-    dxDrawRectangle(startX - 1, startY - 1, inventoryWidth + 2, 2, glowColor, false)
-    dxDrawRectangle(startX - 1, startY + inventoryHeight - 1, inventoryWidth + 2, 2, glowColor, false)
-    dxDrawRectangle(startX - 1, startY - 1, 2, inventoryHeight + 2, glowColor, false)
-    dxDrawRectangle(startX + inventoryWidth - 1, startY - 1, 2, inventoryHeight + 2, glowColor, false)
+    -- Bordes principales con grosor
+    dxDrawRectangle(startX, startY, inventoryWidth, 5, colors.border, false)
+    dxDrawRectangle(startX, startY + inventoryHeight - 5, inventoryWidth, 5, colors.border, false)
+    dxDrawRectangle(startX, startY, 5, inventoryHeight, colors.border, false)
+    dxDrawRectangle(startX + inventoryWidth - 5, startY, 5, inventoryHeight, colors.border, false)
     
-    -- Título con efecto
-    local titleGlow = tocolor(150, 200, 255, math.floor(150 + math.sin(animationTime * 3) * 50))
-    dxDrawText("INVENTARIO", startX + inventoryWidth / 2 + 2, startY + 12, startX + inventoryWidth / 2 + 2, startY + 37, tocolor(0, 0, 0, 150), 1.3, "default-bold", "center", "center", false, false, false, false, false)
-    dxDrawText("INVENTARIO", startX + inventoryWidth / 2, startY + 10, startX + inventoryWidth / 2, startY + 35, titleGlow, 1.3, "default-bold", "center", "center", false, false, false, false, false)
+    -- Borde interno brillante
+    dxDrawRectangle(startX + 5, startY + 5, inventoryWidth - 10, 2, colors.borderInner, false)
+    dxDrawRectangle(startX + 5, startY + inventoryHeight - 7, inventoryWidth - 10, 2, colors.borderInner, false)
+    dxDrawRectangle(startX + 5, startY + 5, 2, inventoryHeight - 10, colors.borderInner, false)
+    dxDrawRectangle(startX + inventoryWidth - 7, startY + 5, 2, inventoryHeight - 10, colors.borderInner, false)
     
-    -- Dibujar slots
+    -- Efecto glow exterior animado
+    dxDrawRectangle(startX - 3, startY - 3, inventoryWidth + 6, 3, glowColor, false)
+    dxDrawRectangle(startX - 3, startY + inventoryHeight, inventoryWidth + 6, 3, glowColor, false)
+    dxDrawRectangle(startX - 3, startY - 3, 3, inventoryHeight + 6, glowColor, false)
+    dxDrawRectangle(startX + inventoryWidth, startY - 3, 3, inventoryHeight + 6, glowColor, false)
+    
+    -- Título mejorado con múltiples efectos
+    local titleY = startY + 15
+    local titlePulse = math.sin(animationTime * 3) * 0.1
+    local titleScale = 1.4 + titlePulse
+    
+    -- Sombra del título (múltiples capas)
+    for i = 1, 3 do
+        dxDrawText("INVENTARIO", startX + inventoryWidth / 2 + (i * 2), titleY + (i * 2), startX + inventoryWidth / 2 + (i * 2), titleY + 30 + (i * 2), tocolor(0, 0, 0, 100 - (i * 30)), titleScale, "default-bold", "center", "center", false, false, false, false, false)
+    end
+    
+    -- Título principal con glow
+    local titleGlow = tocolor(150, 200, 255, math.floor(200 + math.sin(animationTime * 3) * 55))
+    dxDrawText("INVENTARIO", startX + inventoryWidth / 2, titleY, startX + inventoryWidth / 2, titleY + 30, titleGlow, titleScale, "default-bold", "center", "center", false, false, false, false, false)
+    
+    -- Línea decorativa bajo el título
+    local lineY = titleY + 35
+    dxDrawRectangle(startX + 30, lineY, inventoryWidth - 60, 2, colors.border, false)
+    dxDrawRectangle(startX + 30, lineY, inventoryWidth - 60, 1, innerGlow, false)
+    
+    -- Dibujar slots con mejor diseño
     for slot = 1, inventorySlots do
         local x, y, w, h = getSlotPosition(slot)
         local item = getItemInSlot(slot)
         
-        -- Efecto de animación para slots con hover
+        -- Efecto de animación para slots con hover (más suave)
         local animOffset = 0
+        local scale = 1.0
         if hoveredSlot == slot then
-            animOffset = math.sin(animationTime * 5) * 2
+            animOffset = math.sin(animationTime * 6) * 1.5
+            scale = 1.05
+            w = w * scale
+            h = h * scale
+            x = x - (w * (scale - 1)) / 2
+            y = y - (h * (scale - 1)) / 2
         end
         
-        -- Color del slot según estado
+        -- Color del slot según estado (con gradiente simulado)
         local slotColor = colors.slotEmpty
+        local slotGlow = colors.slotEmptyGlow
         if item then
             slotColor = colors.slotFilled
+            slotGlow = colors.slotFilledGlow
         end
         if hoveredSlot == slot then
             slotColor = colors.slotHover
-            -- Efecto de brillo al hacer hover
-            local glowSize = 3
-            dxDrawRectangle(x - glowSize, y - glowSize, w + glowSize * 2, h + glowSize * 2, tocolor(100, 150, 255, 50), false)
+            slotGlow = colors.slotHoverGlow
+            -- Efecto de brillo exterior más pronunciado
+            for i = 1, 4 do
+                local glowAlpha = 60 - (i * 10)
+                dxDrawRectangle(x - i, y - i, w + (i * 2), h + (i * 2), tocolor(100, 150, 255, glowAlpha), false)
+            end
         end
         if selectedSlot == slot then
             slotColor = colors.slotSelected
+            slotGlow = colors.slotSelectedGlow
         end
         
-        -- Fondo del slot con sombra
-        dxDrawRectangle(x + 2, y + 2, w, h, tocolor(0, 0, 0, 100), false)
+        -- Sombra del slot (múltiples capas)
+        for i = 1, 3 do
+            dxDrawRectangle(x + i + 2, y + i + 2, w, h, tocolor(0, 0, 0, 80 - (i * 20)), false)
+        end
+        
+        -- Fondo del slot con efecto de profundidad
+        dxDrawRectangle(x + 3, y + 3, w, h, tocolor(0, 0, 0, 120), false)
+        
+        -- Gradiente simulado en el slot (parte superior más clara)
+        dxDrawRectangle(x + animOffset, y + animOffset, w, h * 0.3, slotGlow, false)
         dxDrawRectangle(x + animOffset, y + animOffset, w, h, slotColor, false)
         
-        -- Borde del slot con efecto
+        -- Borde del slot con efecto mejorado
         local borderColor = colors.border
         local borderGlow = colors.borderGlow
+        local borderInner = colors.borderInner
+        
         if hoveredSlot == slot or selectedSlot == slot then
             borderColor = tocolor(150, 200, 255, 255)
-            borderGlow = tocolor(200, 230, 255, 200)
-            -- Efecto de pulso en el borde
-            local pulseSize = 1 + math.sin(animationTime * 4) * 0.5
-            dxDrawRectangle(x - pulseSize, y - pulseSize, w + pulseSize * 2, 2 + pulseSize * 2, borderGlow, false)
-            dxDrawRectangle(x - pulseSize, y + h - 2 - pulseSize, w + pulseSize * 2, 2 + pulseSize * 2, borderGlow, false)
-            dxDrawRectangle(x - pulseSize, y - pulseSize, 2 + pulseSize * 2, h + pulseSize * 2, borderGlow, false)
-            dxDrawRectangle(x + w - 2 - pulseSize, y - pulseSize, 2 + pulseSize * 2, h + pulseSize * 2, borderGlow, false)
+            borderGlow = tocolor(200, 230, 255, 220)
+            borderInner = tocolor(220, 240, 255, 180)
+            
+            -- Efecto de pulso en el borde (más visible)
+            local pulseSize = 2 + math.sin(animationTime * 5) * 1.5
+            local pulseAlpha = math.floor(150 + math.sin(animationTime * 4) * 100)
+            
+            -- Glow exterior animado
+            dxDrawRectangle(x - pulseSize, y - pulseSize, w + pulseSize * 2, 3 + pulseSize * 2, tocolor(100, 150, 255, pulseAlpha), false)
+            dxDrawRectangle(x - pulseSize, y + h - 3 - pulseSize, w + pulseSize * 2, 3 + pulseSize * 2, tocolor(100, 150, 255, pulseAlpha), false)
+            dxDrawRectangle(x - pulseSize, y - pulseSize, 3 + pulseSize * 2, h + pulseSize * 2, tocolor(100, 150, 255, pulseAlpha), false)
+            dxDrawRectangle(x + w - 3 - pulseSize, y - pulseSize, 3 + pulseSize * 2, h + pulseSize * 2, tocolor(100, 150, 255, pulseAlpha), false)
         end
         
-        -- Bordes principales
-        dxDrawRectangle(x, y, w, 2, borderColor, false)
-        dxDrawRectangle(x, y + h - 2, w, 2, borderColor, false)
-        dxDrawRectangle(x, y, 2, h, borderColor, false)
-        dxDrawRectangle(x + w - 2, y, 2, h, borderColor, false)
+        -- Bordes principales (más gruesos)
+        dxDrawRectangle(x, y, w, 3, borderColor, false)
+        dxDrawRectangle(x, y + h - 3, w, 3, borderColor, false)
+        dxDrawRectangle(x, y, 3, h, borderColor, false)
+        dxDrawRectangle(x + w - 3, y, 3, h, borderColor, false)
+        
+        -- Borde interno brillante
+        dxDrawRectangle(x + 3, y + 3, w - 6, 1, borderInner, false)
+        dxDrawRectangle(x + 3, y + h - 4, w - 6, 1, borderInner, false)
+        dxDrawRectangle(x + 3, y + 3, 1, h - 6, borderInner, false)
+        dxDrawRectangle(x + w - 4, y + 3, 1, h - 6, borderInner, false)
         
         -- Dibujar item si existe
         if item then
-            -- Efecto de brillo para items
+            -- Efecto de brillo mejorado para items
             if hoveredSlot == slot then
-                dxDrawRectangle(x + 5, y + 5, w - 10, h - 10, tocolor(255, 255, 255, 20), false)
+                -- Brillo interior animado
+                local shineAlpha = math.floor(40 + math.sin(animationTime * 4) * 20)
+                dxDrawRectangle(x + 6, y + 6, w - 12, h - 12, tocolor(255, 255, 255, shineAlpha), false)
+                -- Efecto de resplandor
+                for i = 1, 2 do
+                    dxDrawRectangle(x + 5 + i, y + 5 + i, w - 10 - (i * 2), h - 10 - (i * 2), tocolor(150, 200, 255, 30 - (i * 10)), false)
+                end
             end
             
-            -- Nombre del item (centrado con sombra)
+            -- Nombre del item (centrado con múltiples sombras y glow)
             local itemName = item.item_name or "Item"
-            local textY = y + h - 15
-            dxDrawText(itemName, x + 3, textY + 1, x + w - 1, y + h, tocolor(0, 0, 0, 150), 0.7, "default", "center", "bottom", false, false, false, true, false)
-            dxDrawText(itemName, x + 2, textY, x + w - 2, y + h - 2, colors.text, 0.7, "default", "center", "bottom", false, false, false, true, false)
+            local textY = y + h - 18
             
-            -- Cantidad (esquina inferior derecha con sombra)
-            if item.quantity and item.quantity > 1 then
-                dxDrawText("x" .. item.quantity, x + w - 4, y + h - 4, x + w - 4, y + h - 4, tocolor(0, 0, 0, 200), 0.85, "default-bold", "right", "bottom", false, false, false, false, false)
-                dxDrawText("x" .. item.quantity, x + w - 5, y + h - 5, x + w - 5, y + h - 5, colors.quantity, 0.8, "default-bold", "right", "bottom", false, false, false, false, false)
+            -- Sombra del texto (múltiples capas para efecto 3D)
+            for i = 1, 3 do
+                dxDrawText(itemName, x + 4 + i, textY + 1 + i, x + w - 2, y + h, tocolor(0, 0, 0, 120 - (i * 30)), 0.75, "default-bold", "center", "bottom", false, false, false, true, false)
             end
             
-            -- Número de slot (esquina superior izquierda, pequeño)
-            dxDrawText(tostring(slot), x + 4, y + 4, x + 4, y + 4, tocolor(0, 0, 0, 100), 0.65, "default", "left", "top", false, false, false, false, false)
-            dxDrawText(tostring(slot), x + 3, y + 3, x + 3, y + 3, tocolor(200, 200, 200, 150), 0.6, "default", "left", "top", false, false, false, false, false)
+            -- Texto principal con glow
+            local textGlow = colors.textGlow
+            if hoveredSlot == slot then
+                textGlow = tocolor(255, 255, 255, 255)
+            end
+            dxDrawText(itemName, x + 2, textY, x + w - 2, y + h - 2, textGlow, 0.75, "default-bold", "center", "bottom", false, false, false, true, false)
+            
+            -- Cantidad (esquina inferior derecha con mejor diseño)
+            if item.quantity and item.quantity > 1 then
+                local qtyText = "x" .. item.quantity
+                -- Fondo para la cantidad
+                local qtyWidth = dxGetTextWidth(qtyText, 0.9, "default-bold") + 8
+                local qtyX = x + w - qtyWidth - 4
+                local qtyY = y + h - 18
+                dxDrawRectangle(qtyX - 2, qtyY - 2, qtyWidth, 14, tocolor(0, 0, 0, 180), false)
+                dxDrawRectangle(qtyX, qtyY, qtyWidth - 4, 12, tocolor(255, 200, 50, 200), false)
+                
+                -- Sombra del texto de cantidad
+                dxDrawText(qtyText, qtyX + 1, qtyY + 1, qtyX + qtyWidth - 2, qtyY + 12, tocolor(0, 0, 0, 200), 0.9, "default-bold", "center", "center", false, false, false, false, false)
+                -- Texto de cantidad
+                dxDrawText(qtyText, qtyX, qtyY, qtyX + qtyWidth - 4, qtyY + 12, colors.quantity, 0.9, "default-bold", "center", "center", false, false, false, false, false)
+            end
+            
+            -- Número de slot (esquina superior izquierda, más elegante)
+            local slotText = tostring(slot)
+            -- Fondo pequeño para el número
+            dxDrawRectangle(x + 4, y + 4, 18, 14, tocolor(0, 0, 0, 150), false)
+            dxDrawRectangle(x + 5, y + 5, 16, 12, tocolor(50, 70, 100, 180), false)
+            -- Sombra del número
+            dxDrawText(slotText, x + 6, y + 6, x + 20, y + 18, tocolor(0, 0, 0, 150), 0.65, "default-bold", "center", "center", false, false, false, false, false)
+            -- Número
+            dxDrawText(slotText, x + 5, y + 5, x + 19, y + 17, tocolor(200, 220, 255, 200), 0.65, "default-bold", "center", "center", false, false, false, false, false)
         else
-            -- Número de slot vacío con efecto sutil
-            local slotAlpha = 80 + math.sin(animationTime + slot) * 20
-            dxDrawText(tostring(slot), x + w / 2, y + h / 2, x + w / 2, y + h / 2, tocolor(100, 100, 100, slotAlpha), 0.7, "default", "center", "center", false, false, false, false, false)
+            -- Número de slot vacío con efecto más elegante
+            local slotAlpha = 60 + math.sin(animationTime * 2 + slot * 0.5) * 25
+            local slotText = tostring(slot)
+            -- Fondo sutil para slots vacíos
+            dxDrawRectangle(x + w / 2 - 12, y + h / 2 - 8, 24, 16, tocolor(0, 0, 0, 80), false)
+            -- Sombra del número
+            dxDrawText(slotText, x + w / 2 + 1, y + h / 2 + 1, x + w / 2 + 1, y + h / 2 + 1, tocolor(0, 0, 0, 100), 0.75, "default", "center", "center", false, false, false, false, false)
+            -- Número con efecto de pulso
+            dxDrawText(slotText, x + w / 2, y + h / 2, x + w / 2, y + h / 2, tocolor(100, 120, 150, slotAlpha), 0.75, "default", "center", "center", false, false, false, false, false)
         end
     end
     
@@ -258,9 +373,18 @@ function drawInventory()
         end
     end
     
-    -- Instrucciones
+    -- Línea decorativa sobre las instrucciones
+    local lineY = startY + inventoryHeight - 35
+    dxDrawRectangle(startX + 30, lineY, inventoryWidth - 60, 2, colors.border, false)
+    dxDrawRectangle(startX + 30, lineY, inventoryWidth - 60, 1, innerGlow, false)
+    
+    -- Instrucciones mejoradas
     local instructionsY = startY + inventoryHeight - 25
-    dxDrawText("Click izquierdo: Usar | Click derecho: Arrastrar | I: Cerrar", startX + inventoryWidth / 2, instructionsY, startX + inventoryWidth / 2, instructionsY, tocolor(200, 200, 200, 200), 0.7, "default", "center", "center", false, false, false, false, false)
+    local instructionsText = "Click izquierdo: Usar | Click derecho: Arrastrar | I: Cerrar"
+    -- Sombra de las instrucciones
+    dxDrawText(instructionsText, startX + inventoryWidth / 2 + 1, instructionsY + 1, startX + inventoryWidth / 2 + 1, instructionsY + 1, tocolor(0, 0, 0, 150), 0.75, "default", "center", "center", false, false, false, false, false)
+    -- Texto de las instrucciones
+    dxDrawText(instructionsText, startX + inventoryWidth / 2, instructionsY, startX + inventoryWidth / 2, instructionsY, tocolor(180, 200, 220, 220), 0.75, "default", "center", "center", false, false, false, false, false)
 end
 
 -- Renderizar inventario
