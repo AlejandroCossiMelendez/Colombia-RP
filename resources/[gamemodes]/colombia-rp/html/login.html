@@ -2,82 +2,73 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Colombia RP - Login</title>
-    <link rel="stylesheet" href="./login.css">
-    <script src="./login.js" defer></script>
+    <link rel="stylesheet" href="login.css">
+    <script src="login.js" defer></script>
 </head>
 <body>
-    <div class="background-image"></div>
-    <div class="overlay"></div>
-    
-    <div class="container">
-        <div class="tabs">
-            <button class="tab active" id="loginTab" onclick="switchTab('login')"><span>Login</span></button>
-            <button class="tab" id="registerTab" onclick="switchTab('register')"><span>Register</span></button>
-        </div>
-        
-        <div class="panels">
-            <!-- Panel Login -->
-            <div id="loginPanel" class="panel active">
-                <h2>Welcome to COLOMBIA RP</h2>
-                <form onsubmit="doLogin(event)">
-                    <div class="form-group">
-                        <label>Username:</label>
-                        <input type="text" id="loginUsername" placeholder="Enter your username" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Password:</label>
-                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
-                    </div>
-                    <div class="form-group checkbox-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="rememberMe" checked>
-                            <span>Remember Me</span>
-                        </label>
-                    </div>
-                    <button type="submit" class="btn btn-login" id="loginBtn">
-                        <span>Login</span>
-                    </button>
-                    <a href="#" class="forgot-password">Forgot Password?</a>
-                </form>
-            </div>
-            
-            <!-- Panel Register -->
-            <div id="registerPanel" class="panel">
-                <h2>Create a New Account</h2>
-                <form onsubmit="doRegister(event)">
-                    <div class="form-group">
-                        <label>Username:</label>
-                        <input type="text" id="registerUsername" placeholder="Minimum 3 characters" required>
-                    </div>
-                    <div class="form-group">
-                        <label>E-Mail:</label>
-                        <input type="email" id="registerEmail" placeholder="your@email.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Password:</label>
-                        <input type="password" id="registerPassword" placeholder="Minimum 6 characters" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Confirm Password:</label>
-                        <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
-                    </div>
-                    <button type="submit" class="btn btn-register" id="registerBtn">
-                        <span>Register</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-        
-        <div class="bottom-buttons">
-            <button class="bottom-btn" onclick="showSettings()">Settings</button>
-            <button class="bottom-btn" onclick="showAbout()">About</button>
-            <button class="bottom-btn" onclick="quitGame()">Quit</button>
-        </div>
-        
-        <div id="message" class="message"></div>
+
+<div class="bg"></div>
+<div class="overlay"></div>
+
+<div class="container">
+
+    <div class="tabs">
+        <button id="tabLogin" class="tab active" onclick="switchTab('login')">Login</button>
+        <button id="tabRegister" class="tab" onclick="switchTab('register')">Register</button>
     </div>
+
+    <div class="panels">
+
+        <!-- LOGIN -->
+        <div id="login" class="panel active">
+            <h2>Welcome to COLOMBIA RP</h2>
+
+            <label>Username</label>
+            <input id="loginUser" type="text" placeholder="Enter your username">
+
+            <label>Password</label>
+            <input id="loginPass" type="password" placeholder="Enter your password">
+
+            <div class="checkbox">
+                <input type="checkbox" checked>
+                <span>Remember Me</span>
+            </div>
+
+            <button class="btn login" onclick="doLogin()">Login</button>
+            <span class="link">Forgot password?</span>
+        </div>
+
+        <!-- REGISTER -->
+        <div id="register" class="panel">
+            <h2>Create Account</h2>
+
+            <label>Username</label>
+            <input id="regUser" type="text" placeholder="Minimum 3 characters">
+
+            <label>Email</label>
+            <input id="regEmail" type="email" placeholder="your@email.com">
+
+            <label>Password</label>
+            <input id="regPass" type="password" placeholder="Minimum 6 characters">
+
+            <label>Confirm Password</label>
+            <input id="regPass2" type="password" placeholder="Repeat password">
+
+            <button class="btn register" onclick="doRegister()">Register</button>
+        </div>
+
+    </div>
+
+    <div class="bottom">
+        <button>Settings</button>
+        <button>About</button>
+        <button onclick="quitGame()">Quit</button>
+    </div>
+
+    <div id="msg"></div>
+
+</div>
+
 </body>
 </html>
-
