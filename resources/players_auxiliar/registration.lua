@@ -27,6 +27,16 @@ addEvent( "players:register", true )
 addEventHandler( "players:register", root,
 	function( username, password )
 		if (source == client) or not client then
+			-- Verificar que el recurso SQL esté disponible
+			local sqlResource = getResourceFromName("sql")
+			if not sqlResource or getResourceState(sqlResource) ~= "running" then
+				outputDebugString("players_auxiliar: SQL resource not available for registration, retrying...", 2)
+				setTimer(function()
+					triggerEvent("players:register", source, username, password)
+				end, 1000, 1)
+				return
+			end
+			
 			if allowRegistration then
 				if username and password then
 					username = trim( username )

@@ -7,6 +7,15 @@ end
 addEvent("onRequestLoginPanel",true)
 addEventHandler("onRequestLoginPanel",getRootElement(),
 function()
+	local sqlResource = getResourceFromName("sql")
+	if not sqlResource or getResourceState(sqlResource) ~= "running" then
+		outputDebugString("loginpanel: SQL resource not available, retrying...", 2)
+		setTimer(function()
+			triggerClientEvent(client, "onRequestLoginPanel", client)
+		end, 1000, 1)
+		return
+	end
+	
 	local query = exports.sql:query_assoc_single("SELECT `userID`  FROM `wcf1_user` WHERE `lastSerial` OR `regSerial` LIKE '%s'", getPlayerSerial(client))
 	local serialRegistered = false
 	if query then
@@ -36,6 +45,13 @@ end
 addEvent("server:forgotpass",true)
 addEventHandler("server:forgotpass",root,
 function(username)
+	local sqlResource = getResourceFromName("sql")
+	if not sqlResource or getResourceState(sqlResource) ~= "running" then
+		outputDebugString("loginpanel: SQL resource not available for forgotpass", 2)
+		triggerClientEvent(client,"client:forgotpass:callBack",client,false)
+		return
+	end
+	
 	local query = exports.sql:query_assoc_single("SELECT `username` FROM `wcf1_user` WHERE `regSerial` LIKE '%s'", getPlayerSerial(client))
 	local usernameValidation = false
 	if query then
@@ -50,6 +66,13 @@ end
 addEvent("server:changePassword",true)
 addEventHandler("server:changePassword",root,
 function(username,password)
+	local sqlResource = getResourceFromName("sql")
+	if not sqlResource or getResourceState(sqlResource) ~= "running" then
+		outputDebugString("loginpanel: SQL resource not available for changePassword", 2)
+		triggerClientEvent(client,"client:recoverFailed",client,false)
+		return
+	end
+	
 	local query = exports.sql:query_assoc_single("SELECT `username` FROM `wcf1_user` WHERE `regSerial` LIKE '%s'", getPlayerSerial(client))
 	local usernameValidation = false
 	if query then
