@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="JKING" type="misc" name="Gang" description="Gang" />
+     <script src="script.lua" type="client" />
+     <file src="Gang.txd" />
+     <file src="Gang.dff" />
+</meta>
