@@ -59,7 +59,8 @@ function checkMoving()
             if speed > 8.5 then
                 -- Corriendo (sprint) - consume más stamina
                 if staminalevel >= 0.2 then
-                    setElementData(localPlayer, "stamina", staminalevel - 0.06) -- Reducido de 0.11 a 0.06
+                    local newStamina = math.max(0, math.floor((staminalevel - 0.06) * 10) / 10) -- Redondear a 1 decimal
+                    setElementData(localPlayer, "stamina", newStamina)
                     if getElementData(localPlayer, "stamina->animRequested") then
                         toggleAllControls(true, true, true)
                         setElementData(localPlayer, "stamina->animRequested", false)
@@ -75,7 +76,8 @@ function checkMoving()
             else
                 -- Trotando - consume menos stamina
                 if staminalevel >= 0.2 then
-                    setElementData(localPlayer, "stamina", staminalevel - 0.025) -- Consumo mucho menor al trotar
+                    local newStamina = math.max(0, math.floor((staminalevel - 0.025) * 10) / 10) -- Redondear a 1 decimal
+                    setElementData(localPlayer, "stamina", newStamina)
                     if getElementData(localPlayer, "stamina->animRequested") then
                         toggleAllControls(true, true, true)
                         setElementData(localPlayer, "stamina->animRequested", false)
@@ -97,10 +99,12 @@ function checkMoving()
                     setPedAnimation(localPlayer, "FAT", "idle_tired", 8000, true, false, true, false)
                     setElementData(localPlayer, "stamina->animRequested", true)
                 end
-                setElementData(localPlayer, "stamina", staminalevel + 0.08) -- Recuperación ligeramente más rápida
+                local newStamina = math.min(100, math.floor((staminalevel + 0.08) * 10) / 10) -- Redondear a 1 decimal
+                setElementData(localPlayer, "stamina", newStamina)
             else
                 if staminalevel < 100 then
-                    setElementData(localPlayer, "stamina", staminalevel + 0.08) -- Recuperación ligeramente más rápida
+                    local newStamina = math.min(100, math.floor((staminalevel + 0.08) * 10) / 10) -- Redondear a 1 decimal
+                    setElementData(localPlayer, "stamina", newStamina)
                     if getElementData(localPlayer, "stamina->animRequested") then
                         setElementData(localPlayer, "stamina->animRequested", false)
                         toggleAllControls(true, true, true)

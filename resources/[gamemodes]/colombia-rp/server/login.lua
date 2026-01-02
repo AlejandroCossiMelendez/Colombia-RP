@@ -169,28 +169,33 @@ addEventHandler("onPlayerQuit", root, function()
         local hunger = getElementData(source, "character:hunger") or Config.Server.defaultHunger
         local thirst = getElementData(source, "character:thirst") or Config.Server.defaultThirst
         
-        -- Guardar armor del chaleco si tiene uno equipado
-        local hasVest = getElementData(source, "has:vest")
-        local vestArmor = 0
-        if hasVest then
-            vestArmor = math.floor(getPedArmor(source))
-            if vestArmor < 0 then vestArmor = 0 end
-        end
+        -- Guardar armor del chaleco (siempre guardar el armor actual, incluso si no tiene chaleco equipado)
+        local vestArmor = math.floor(getPedArmor(source))
+        if vestArmor < 0 then vestArmor = 0 end
         
-        -- Intentar actualizar con la columna armor, si no existe, solo actualizar sin ella
+        -- Intentar guardar con armor primero
         local updateQuery = "UPDATE characters SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, health = ?, hunger = ?, thirst = ?, armor = ?, lastLogin = NOW() WHERE id = ?"
         local success = executeDatabase(updateQuery, x, y, z, rotation, interior, dimension, health, hunger, thirst, vestArmor, characterId)
         
-        -- Si falla (probablemente porque la columna no existe), intentar sin la columna armor
         if not success then
-            updateQuery = "UPDATE characters SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, health = ?, hunger = ?, thirst = ?, lastLogin = NOW() WHERE id = ?"
-            executeDatabase(updateQuery, x, y, z, rotation, interior, dimension, health, hunger, thirst, characterId)
-            -- Intentar agregar la columna si no existe
-            executeDatabase("ALTER TABLE characters ADD COLUMN armor INT NOT NULL DEFAULT 0")
-            -- Intentar guardar de nuevo
-            if vestArmor > 0 then
-                executeDatabase("UPDATE characters SET armor = ? WHERE id = ?", vestArmor, characterId)
+            -- Si falla, probablemente la columna no existe, intentar crearla
+            local alterSuccess = executeDatabase("ALTER TABLE characters ADD COLUMN armor INT NOT NULL DEFAULT 0")
+            if alterSuccess then
+                -- Si se creó la columna, intentar guardar de nuevo
+                success = executeDatabase(updateQuery, x, y, z, rotation, interior, dimension, health, hunger, thirst, vestArmor, characterId)
+            end
+            
+            -- Si aún falla, guardar sin armor
+            if not success then
+                updateQuery = "UPDATE characters SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, health = ?, hunger = ?, thirst = ?, lastLogin = NOW() WHERE id = ?"
+                executeDatabase(updateQuery, x, y, z, rotation, interior, dimension, health, hunger, thirst, characterId)
+                -- Intentar guardar el armor por separado
+                if vestArmor > 0 then
+                    executeDatabase("UPDATE characters SET armor = ? WHERE id = ?", vestArmor, characterId)
+                end
             end
         end
+        
+        outputServerLog("[LOGIN] Armor guardado para personaje ID " .. characterId .. ": " .. vestArmor .. " (éxito: " .. tostring(success) .. ")")
     end
 end)

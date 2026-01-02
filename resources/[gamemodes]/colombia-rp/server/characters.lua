@@ -158,12 +158,14 @@ addEventHandler("createCharacter", getRootElement(), function(name, surname, age
                             setElementModel(source, character.skin)
                             
                             -- Cargar y equipar chaleco si tiene armor guardado
-                            local savedArmor = character.armor or 0
+                            local savedArmor = tonumber(character.armor) or 0
+                            outputServerLog("[CHARACTERS] Armor guardado para personaje recién creado " .. newCharacterId .. ": " .. savedArmor)
                             if savedArmor and savedArmor > 0 then
                                 setPedArmor(source, savedArmor)
                                 setElementData(source, "has:vest", true)
                                 setElementData(source, "vest:armor", savedArmor)
                                 outputChatBox("Chaleco Antibalas restaurado. Defensa: " .. savedArmor .. "%", source, 0, 150, 255)
+                                outputServerLog("[CHARACTERS] Chaleco restaurado para " .. getPlayerName(source) .. " con " .. savedArmor .. "% de defensa")
                             end
                             
                             -- Asegurar que el jugador esté en una posición segura después del spawn
@@ -229,6 +231,9 @@ addEventHandler("selectCharacter", getRootElement(), function(characterId)
         return
     end
     
+    -- Asegurar que la columna armor existe antes de consultar
+    executeDatabase("ALTER TABLE characters ADD COLUMN armor INT NOT NULL DEFAULT 0")
+    
     local query = "SELECT * FROM characters WHERE id = ? AND username = (SELECT username FROM users WHERE id = ?) LIMIT 1"
     local result = queryDatabase(query, characterId, userId)
     
@@ -276,12 +281,14 @@ addEventHandler("selectCharacter", getRootElement(), function(characterId)
         setElementModel(source, character.skin)
         
         -- Cargar y equipar chaleco si tiene armor guardado
-        local savedArmor = character.armor or 0
+        local savedArmor = tonumber(character.armor) or 0
+        outputServerLog("[CHARACTERS] Armor guardado para personaje " .. characterId .. ": " .. savedArmor)
         if savedArmor and savedArmor > 0 then
             setPedArmor(source, savedArmor)
             setElementData(source, "has:vest", true)
             setElementData(source, "vest:armor", savedArmor)
             outputChatBox("Chaleco Antibalas restaurado. Defensa: " .. savedArmor .. "%", source, 0, 150, 255)
+            outputServerLog("[CHARACTERS] Chaleco restaurado para " .. getPlayerName(source) .. " con " .. savedArmor .. "% de defensa")
         end
         
         outputServerLog("[CHARACTERS] Personaje spawneado en: " .. character.posX .. ", " .. character.posY .. ", " .. spawnZ)

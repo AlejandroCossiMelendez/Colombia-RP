@@ -62,7 +62,7 @@ function HudHype()
     local Emprego = getElementData(localPlayer, "character:job") or "Desempleado"
     local Vida = math.floor(getElementHealth(localPlayer))
     local Colete = math.floor(getPedArmor(localPlayer))
-    local Stamina = tonumber(getElementData(localPlayer, "stamina") or 100)
+    local Stamina = math.floor(tonumber(getElementData(localPlayer, "stamina") or 100)) -- Redondear a número entero
     local Hambre = tonumber(getElementData(localPlayer, "character:hunger") or 100)
     local Sed = tonumber(getElementData(localPlayer, "character:thirst") or 100)
     
@@ -122,7 +122,7 @@ function HudHype()
     --<!-- DX2 --!>--
     dxDrawText(Vida, x*1245, y*161, x*1279, y*174, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
     dxDrawText(Colete, x*1245, y*194, x*1279, y*207, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
-    dxDrawText(Stamina, x*1245, y*228, x*1279, y*241, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
+    dxDrawText(math.floor(Stamina), x*1245, y*228, x*1279, y*241, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
     dxDrawText(math.floor(Hambre), x*1245, y*262, x*1279, y*275, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
     dxDrawText(math.floor(Sed), x*1245, y*296, x*1279, y*309, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
     
