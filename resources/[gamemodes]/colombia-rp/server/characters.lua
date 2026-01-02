@@ -19,10 +19,16 @@ end)
 
 -- Crear nuevo personaje
 addEventHandler("createCharacter", resourceRoot, function(name, surname, age, gender, skin)
+    outputServerLog("[CHARACTERS] Evento createCharacter recibido de " .. getPlayerName(source))
+    outputServerLog("[CHARACTERS] Datos recibidos - Nombre: " .. tostring(name) .. ", Apellido: " .. tostring(surname) .. ", Edad: " .. tostring(age))
+    
     local userId = getElementData(source, "account:userId")
     local username = getElementData(source, "account:username")
     
+    outputServerLog("[CHARACTERS] userId: " .. tostring(userId) .. ", username: " .. tostring(username))
+    
     if not userId or not username then
+        outputServerLog("[CHARACTERS] ERROR: Usuario no logueado")
         triggerClientEvent(source, "characterCreateResponse", resourceRoot, false, "Debes estar logueado")
         return
     end
@@ -71,6 +77,10 @@ addEventHandler("createCharacter", resourceRoot, function(name, surname, age, ge
         createdDate.hour, createdDate.minute, createdDate.second)
     
     local insertQuery = "INSERT INTO characters (username, name, surname, age, gender, skin, money, created, posX, posY, posZ, rotation, interior, dimension, health, hunger, thirst) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    outputServerLog("[CHARACTERS] Ejecutando INSERT en base de datos...")
+    outputServerLog("[CHARACTERS] Query: " .. insertQuery)
+    outputServerLog("[CHARACTERS] Parámetros: username=" .. username .. ", name=" .. name .. ", surname=" .. surname .. ", age=" .. age)
+    
     local success = executeDatabase(insertQuery, 
         username, name, surname, age, gender, skin, 
         Config.Server.defaultMoney, dateString,
@@ -78,6 +88,8 @@ addEventHandler("createCharacter", resourceRoot, function(name, surname, age, ge
         Config.Server.defaultRotation, Config.Server.defaultInterior, Config.Server.defaultDimension,
         Config.Server.defaultHealth, Config.Server.defaultHunger, Config.Server.defaultThirst
     )
+    
+    outputServerLog("[CHARACTERS] Resultado de executeDatabase: " .. tostring(success))
     
     if success then
         -- Obtener el ID del personaje recién creado

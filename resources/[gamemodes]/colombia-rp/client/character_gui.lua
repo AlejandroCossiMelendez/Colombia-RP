@@ -152,6 +152,7 @@ function showCreateCharacterGUI()
             return
         end
         
+        outputChatBox("[DEBUG] Enviando createCharacter: " .. name .. " " .. surname .. " (" .. age .. " años)", 255, 255, 0)
         triggerServerEvent("createCharacter", resourceRoot, name, surname, age, gender, 0)
         hideCreateCharacterGUI()
     end, false)
