@@ -197,7 +197,8 @@ addEventHandler("saveContacts", resourceRoot, function(contactsJson)
     end
     
     if contactsJson and type(contactsJson) == "string" then
-        triggerServerEvent("saveContacts", resourceRoot, contactsJson)
+        -- Enviar al servidor usando localPlayer como fuente
+        triggerServerEvent("saveContacts", localPlayer, contactsJson)
     end
 end)
 
