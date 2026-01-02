@@ -23,42 +23,29 @@ function getCharacterDisplayName(player)
     end
 end
 
--- Interceptar mensajes de chat normales y comandos
+-- Interceptar mensajes de chat normales
 addEventHandler("onPlayerChat", root, function(message, messageType)
-    -- Procesar mensajes de chat normales (tipo 0)
-    if messageType == 0 then
-        cancelEvent()
-        local displayName = getCharacterDisplayName(source)
-        local chatMessage = displayName .. ": " .. message
-        
-        for _, player in ipairs(getElementsByType("player")) do
-            if getElementDimension(player) == getElementDimension(source) and 
-               getElementInterior(player) == getElementInterior(source) then
-                outputChatBox(chatMessage, player, 255, 255, 255, false)
-            end
-        end
-    -- Procesar mensajes de comandos (tipo 1) - esto incluye /me, /do, etc.
-    elseif messageType == 1 then
-        -- Verificar si el mensaje es de un comando de roleplay
-        if getElementData(source, "character:selected") then
-            local messageLower = string.lower(message)
-            local playerName = getPlayerName(source)
-            
-            -- Si el mensaje empieza con "* " seguido del nombre del jugador, es un /me
-            local mePattern = "^%* " .. playerName .. " "
-            if string.find(message, mePattern) then
-                cancelEvent()
-                local charName = getCharacterNameOnly(source)
-                -- Extraer la acción del mensaje (quitar el "* NombreMTA ")
-                local action = string.gsub(message, "^%* " .. playerName .. " ", "")
-                
-                for _, player in ipairs(getElementsByType("player")) do
-                    if getElementDimension(player) == getElementDimension(source) and 
-                       getElementInterior(player) == getElementInterior(source) then
-                        outputChatBox("* " .. charName .. " " .. action, player, 200, 100, 200, false)
-                    end
-                end
-            end
+    -- Solo procesar mensajes de chat normales (tipo 0)
+    if messageType ~= 0 then
+        return
+    end
+    
+    -- Cancelar el mensaje por defecto
+    cancelEvent()
+    
+    -- Obtener el nombre del personaje
+    local displayName = getCharacterDisplayName(source)
+    
+    -- Enviar el mensaje con el nombre del personaje a todos los jugadores
+    -- Usar formato estándar de MTA para el chat
+    local chatMessage = displayName .. ": " .. message
+    
+    -- Enviar el mensaje a todos los jugadores visibles
+    for _, player in ipairs(getElementsByType("player")) do
+        -- Verificar si están en la misma dimensión e interior
+        if getElementDimension(player) == getElementDimension(source) and 
+           getElementInterior(player) == getElementInterior(source) then
+            outputChatBox(chatMessage, player, 255, 255, 255, false)
         end
     end
 end)
@@ -84,64 +71,10 @@ function getCharacterNameOnly(player)
     end
 end
 
--- Interceptar comandos de roleplay usando onPlayerCommand (se ejecuta antes que el comando nativo)
-addEventHandler("onPlayerCommand", root, function(command, ...)
-    local cmdLower = string.lower(tostring(command))
-    
-    -- Solo procesar comandos de roleplay
-    if cmdLower ~= "me" and cmdLower ~= "do" then
-        return
-    end
-    
-    -- Solo procesar si el jugador tiene personaje seleccionado
-    if not getElementData(source, "character:selected") then
-        return
-    end
-    
-    local args = {...}
-    local message = table.concat(args, " ")
-    
-    if cmdLower == "me" then
-        if not message or message == "" then
-            outputChatBox("Uso: /me [acción]", source, 255, 255, 255)
-            cancelEvent()
-            return
-        end
-        
-        -- Cancelar el comando nativo de MTA
-        cancelEvent()
-        
-        local charName = getCharacterNameOnly(source)
-        
-        -- Enviar a todos los jugadores en la misma dimensión e interior
-        for _, targetPlayer in ipairs(getElementsByType("player")) do
-            if getElementDimension(targetPlayer) == getElementDimension(source) and 
-               getElementInterior(targetPlayer) == getElementInterior(source) then
-                outputChatBox("* " .. charName .. " " .. message, targetPlayer, 200, 100, 200, false)
-            end
-        end
-    elseif cmdLower == "do" then
-        if not message or message == "" then
-            outputChatBox("Uso: /do [descripción]", source, 255, 255, 255)
-            cancelEvent()
-            return
-        end
-        
-        cancelEvent()
-        local charName = getCharacterNameOnly(source)
-        
-        for _, targetPlayer in ipairs(getElementsByType("player")) do
-            if getElementDimension(targetPlayer) == getElementDimension(source) and 
-               getElementInterior(targetPlayer) == getElementInterior(source) then
-                outputChatBox("* " .. message .. " (( " .. charName .. " ))", targetPlayer, 100, 200, 200, false)
-            end
-        end
-    end
-end)
-
--- Command handlers adicionales como respaldo
+-- Comando /me (acción de roleplay)
 addCommandHandler("me", function(player, cmd, ...)
     if not getElementData(player, "character:selected") then
+        -- Si no tiene personaje, usar el comando por defecto
         return
     end
     
@@ -151,17 +84,22 @@ addCommandHandler("me", function(player, cmd, ...)
         return
     end
     
+    -- Cancelar el comando por defecto
     cancelEvent()
+    
+    -- Obtener el nombre del personaje
     local charName = getCharacterNameOnly(player)
     
+    -- Enviar el mensaje a todos los jugadores en la misma dimensión e interior
     for _, targetPlayer in ipairs(getElementsByType("player")) do
         if getElementDimension(targetPlayer) == getElementDimension(player) and 
            getElementInterior(targetPlayer) == getElementInterior(player) then
             outputChatBox("* " .. charName .. " " .. message, targetPlayer, 200, 100, 200, false)
         end
     end
-end, false)
+end)
 
+-- Comando /do (descripción de roleplay)
 addCommandHandler("do", function(player, cmd, ...)
     if not getElementData(player, "character:selected") then
         return
@@ -173,16 +111,20 @@ addCommandHandler("do", function(player, cmd, ...)
         return
     end
     
+    -- Cancelar el comando por defecto
     cancelEvent()
+    
+    -- Obtener el nombre del personaje
     local charName = getCharacterNameOnly(player)
     
+    -- Enviar el mensaje a todos los jugadores en la misma dimensión e interior
     for _, targetPlayer in ipairs(getElementsByType("player")) do
         if getElementDimension(targetPlayer) == getElementDimension(player) and 
            getElementInterior(targetPlayer) == getElementInterior(player) then
             outputChatBox("* " .. message .. " (( " .. charName .. " ))", targetPlayer, 100, 200, 200, false)
         end
     end
-end, false)
+end)
 
 -- Comando /ame (acción con emote)
 addCommandHandler("ame", function(player, cmd, ...)
@@ -196,14 +138,18 @@ addCommandHandler("ame", function(player, cmd, ...)
         return
     end
     
+    -- Cancelar el comando por defecto si existe
     cancelEvent()
+    
+    -- Obtener el nombre del personaje
     local charName = getCharacterNameOnly(player)
     
+    -- Enviar el mensaje a todos los jugadores en la misma dimensión e interior
     for _, targetPlayer in ipairs(getElementsByType("player")) do
         if getElementDimension(targetPlayer) == getElementDimension(player) and 
            getElementInterior(targetPlayer) == getElementInterior(player) then
             outputChatBox("** " .. charName .. " " .. message, targetPlayer, 255, 200, 100, false)
         end
     end
-end, false)
+end)
 
