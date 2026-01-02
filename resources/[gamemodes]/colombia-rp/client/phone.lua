@@ -32,8 +32,20 @@ function whenPhoneBrowserReady()
             executeBrowserJavascript(browserContent, "setMyPhoneNumber('" .. tostring(phoneNumber) .. "');")
         end
         
-        -- Cargar contactos desde el servidor
-        triggerServerEvent("loadContacts", resourceRoot)
+        -- Cargar contactos desde el servidor (con un pequeño delay para asegurar que character:id esté disponible)
+        setTimer(function()
+            local characterId = getElementData(localPlayer, "character:id")
+            if characterId then
+                triggerServerEvent("loadContacts", resourceRoot)
+            else
+                -- Reintentar después de 1 segundo si character:id aún no está disponible
+                setTimer(function()
+                    if getElementData(localPlayer, "character:id") then
+                        triggerServerEvent("loadContacts", resourceRoot)
+                    end
+                end, 1000, 1)
+            end
+        end, 500, 1)
     end
 end
 

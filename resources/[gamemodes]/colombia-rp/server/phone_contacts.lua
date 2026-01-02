@@ -66,7 +66,35 @@ addEventHandler("loadContacts", root, function()
     local characterId = getElementData(player, "character:id")
     
     if not characterId then
-        outputServerLog("[PHONE] ERROR: No se pudo obtener character_id para cargar contactos")
+        outputServerLog("[PHONE] WARNING: No se pudo obtener character_id para cargar contactos. Reintentando en 1 segundo...")
+        -- Reintentar después de 1 segundo en caso de que el character:id aún no esté establecido
+        setTimer(function()
+            if isElement(player) then
+                local retryCharacterId = getElementData(player, "character:id")
+                if retryCharacterId then
+                    -- Cargar contactos desde la base de datos
+                    local query = "SELECT contact_name, contact_number FROM phone_contacts WHERE character_id = ? ORDER BY id ASC"
+                    local result = queryDatabase(query, retryCharacterId)
+                    
+                    local contactsList = {}
+                    if result and #result > 0 then
+                        for _, contact in ipairs(result) do
+                            table.insert(contactsList, {
+                                name = contact.contact_name,
+                                number = contact.contact_number
+                            })
+                        end
+                    end
+                    
+                    -- Enviar contactos al cliente
+                    triggerClientEvent(player, "receiveContacts", resourceRoot, contactsList)
+                else
+                    outputServerLog("[PHONE] ERROR: No se pudo obtener character_id después del reintento")
+                    -- Enviar lista vacía
+                    triggerClientEvent(player, "receiveContacts", resourceRoot, {})
+                end
+            end
+        end, 1000, 1)
         return
     end
     
