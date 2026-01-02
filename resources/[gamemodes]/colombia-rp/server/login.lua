@@ -1,7 +1,9 @@
 -- ==================== REGISTRAR EVENTOS PRIMERO ====================
 -- CRÍTICO: Estos eventos DEBEN estar al inicio absoluto del archivo
+-- El segundo parámetro 'true' marca el evento como remotamente activable
 addEvent("onPlayerLogin", true)
 addEvent("onPlayerRegister", true)
+outputServerLog("[LOGIN] Eventos onPlayerLogin y onPlayerRegister registrados con addEvent")
 
 -- Sistema de Login y Registro
 
@@ -64,8 +66,8 @@ addEventHandler("onResourceStart", resourceRoot, function()
     end, 2000, 1)
 end)
 
--- Evento de login desde el cliente
-addEventHandler("onPlayerLogin", root, function(username, password)
+-- Evento de login desde el cliente (usando getRootElement() como en el ejemplo que funciona)
+addEventHandler("onPlayerLogin", getRootElement(), function(username, password)
     outputServerLog("[LOGIN] Evento onPlayerLogin recibido de " .. getPlayerName(source) .. " con usuario: " .. tostring(username))
     
     if not username or not password then
@@ -107,8 +109,8 @@ addEventHandler("onPlayerLogin", root, function(username, password)
     end
 end)
 
--- Evento de registro desde el cliente
-addEventHandler("onPlayerRegister", root, function(username, password, email)
+-- Evento de registro desde el cliente (usando getRootElement() como en el ejemplo que funciona)
+addEventHandler("onPlayerRegister", getRootElement(), function(username, password, email)
     outputServerLog("[LOGIN] Evento onPlayerRegister recibido de " .. getPlayerName(source))
     
     if not username or not password or not email then

@@ -131,8 +131,9 @@ function performLogin()
         return
     end
     
-    -- Activar evento del servidor (usando root para enviar a todos los recursos del servidor)
-    triggerServerEvent("onPlayerLogin", root, username, password)
+    -- Activar evento del servidor (usando getLocalPlayer() como en el ejemplo que funciona)
+    outputChatBox("[DEBUG] Enviando evento onPlayerLogin con usuario: " .. username, 255, 255, 0)
+    triggerServerEvent("onPlayerLogin", getLocalPlayer(), username, password)
 end
 
 function performRegister()
@@ -160,8 +161,9 @@ function performRegister()
         return
     end
     
-    -- Activar evento del servidor (usando root para enviar a todos los recursos del servidor)
-    triggerServerEvent("onPlayerRegister", root, username, password, email)
+    -- Activar evento del servidor (usando getLocalPlayer() como en el ejemplo que funciona)
+    outputChatBox("[DEBUG] Enviando evento onPlayerRegister", 255, 255, 0)
+    triggerServerEvent("onPlayerRegister", getLocalPlayer(), username, password, email)
 end
 
 function hideLoginGUI()
