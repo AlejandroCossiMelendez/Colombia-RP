@@ -1,78 +1,79 @@
--- Sistema de Velocímetro Personalizado Avanzado con DX
--- Mejoras: Optimización, animaciones, efectos visuales y más información
+-- ============================================
+-- Sistema de Velocímetro Personalizado Avanzado
+-- Diseño profesional y elaborado con DX
+-- ============================================
 
+-- ============================================
+-- CONFIGURACIÓN Y VARIABLES GLOBALES
+-- ============================================
 local isInVehicle = false
 local currentVehicle = nil
 local fuelLevel = 100
 local speedometerVisible = false
 local lastSpeed = 0
-local needleSmooth = 0
-local fuelWarningActive = false
-local fuelWarningTime = 0
-local vehicleHealth = 1000
-local gear = 0
-local odometer = 0
-local tripMeter = 0
-local lastPositionX, lastPositionY, lastPositionZ = 0, 0, 0
+local smoothSpeed = 0
+local smoothRPM = 0
 
--- Configuración del velocímetro (fácil de personalizar)
-local config = {
-    position = {x = 0.85, y = 0.85}, -- Posición relativa a la pantalla
-    size = {width = 300, height = 350},
+-- Configuración visual
+local CONFIG = {
+    position = {x = 0.85, y = 0.85}, -- Posición relativa (0-1)
+    size = {width = 280, height = 400},
     colors = {
-        background = {20, 20, 30, 220},
-        speedArc = {0, 255, 0, 255},
-        rpmArc = {255, 165, 0, 255},
-        fuelLow = {255, 50, 50, 255},
-        fuelMedium = {255, 165, 0, 255},
-        fuelHigh = {0, 200, 0, 255},
-        text = {255, 255, 255, 255},
-        textSecondary = {180, 180, 180, 220},
+        background = {10, 10, 20, 240},
+        backgroundSecondary = {20, 25, 35, 250},
+        border = {0, 255, 100, 200},
+        speedArc = {0, 255, 100, 255},
+        speedArcSecondary = {0, 200, 80, 200},
+        rpmArc = {255, 150, 0, 255},
+        rpmArcSecondary = {255, 200, 0, 200},
+        dangerZone = {255, 0, 0, 255},
         needle = {255, 255, 255, 255},
-        healthGood = {0, 255, 0, 255},
-        healthMedium = {255, 165, 0, 255},
-        healthBad = {255, 50, 50, 255}
+        text = {255, 255, 255, 255},
+        textSecondary = {200, 200, 200, 200},
+        fuelHigh = {0, 255, 100, 255},
+        fuelMedium = {255, 150, 0, 255},
+        fuelLow = {255, 0, 0, 255},
+        engineOn = {0, 255, 100, 255},
+        engineOff = {255, 50, 50, 255},
+        lightsOn = {255, 255, 0, 255},
+        lightsOff = {150, 150, 150, 200}
     },
-    animationSpeed = 0.15, -- Suavizado de aguja (0-1)
+    animationSpeed = 0.1, -- Suavizado (0-1)
     enableShadows = true,
     enableAnimations = true
 }
 
--- Deshabilitar el velocímetro nativo
+-- ============================================
+-- INICIALIZACIÓN
+-- ============================================
 addEventHandler("onClientResourceStart", resourceRoot, function()
     setPlayerHudComponentVisible("vehicle_name", false)
     setPlayerHudComponentVisible("area_name", false)
-    setPlayerHudComponentVisible("radar", false)
-    
-    -- Inicializar posición del jugador para el odómetro
-    local x, y, z = getElementPosition(localPlayer)
-    lastPositionX, lastPositionY, lastPositionZ = x, y, z
 end)
 
--- Función optimizada para obtener velocidad
+-- ============================================
+-- FUNCIONES DE UTILIDAD
+-- ============================================
+
+-- Obtener velocidad en km/h
 function getVehicleSpeedKMH(vehicle)
-    if not isElement(vehicle) then return 0 end
+    if not vehicle or not isElement(vehicle) then return 0 end
     local vx, vy, vz = getElementVelocity(vehicle)
     return math.floor(math.sqrt(vx*vx + vy*vy + vz*vz) * 180)
 end
 
--- Función mejorada para RPM (más realista)
+-- Obtener RPM (simulado)
 function getVehicleRPM(vehicle)
-    if not isElement(vehicle) then return 0 end
-    
+    if not vehicle or not isElement(vehicle) then return 0 end
     local speed = getVehicleSpeedKMH(vehicle)
     local engineState = getVehicleEngineState(vehicle)
-    
     if not engineState then return 0 end
     
-    -- Simulación más realista de RPM
-    local gearRatio = gear > 0 and (1 / gear) or 1
-    local rpm = (speed * gearRatio * 50) + math.random(-50, 50)
-    
-    -- Límites de RPM
+    local maxSpeed = 200
+    local rpm = (speed / maxSpeed) * 8000
     rpm = math.max(800, math.min(8000, rpm))
     
-    -- RPM en ralentí cuando está parado
+    -- RPM en ralentí
     if speed < 5 then
         rpm = 800 + math.sin(getTickCount() * 0.001) * 50
     end
@@ -80,341 +81,356 @@ function getVehicleRPM(vehicle)
     return math.floor(rpm)
 end
 
--- Función para estimar la marcha
+-- Obtener nombre del vehículo
+function getVehicleDisplayName(vehicle)
+    if not vehicle or not isElement(vehicle) then return "Vehículo" end
+    local model = getElementModel(vehicle)
+    return getVehicleNameFromModel(model) or "Vehículo"
+end
+
+-- Estimar marcha
 function estimateGear(vehicle, speed)
-    if speed < 20 then return 1
-    elseif speed < 40 then return 2
-    elseif speed < 60 then return 3
-    elseif speed < 90 then return 4
+    if speed < 15 then return 1
+    elseif speed < 35 then return 2
+    elseif speed < 55 then return 3
+    elseif speed < 85 then return 4
     elseif speed < 130 then return 5
     else return 6 end
 end
 
--- Función mejorada para dibujar círculo con relleno
-function drawCircle(x, y, radius, color, thickness, segments, filled)
-    segments = segments or 32
+-- ============================================
+-- FUNCIONES DE DIBUJO
+-- ============================================
+
+-- Dibujar círculo
+function drawCircle(x, y, radius, color, thickness, segments)
+    segments = segments or 64
+    thickness = thickness or 1
+    local prevX, prevY = x + radius, y
+    for i = 1, segments do
+        local angle = (i / segments) * 2 * math.pi
+        local newX = x + math.cos(angle) * radius
+        local newY = y + math.sin(angle) * radius
+        dxDrawLine(prevX, prevY, newX, newY, color, thickness)
+        prevX, prevY = newX, newY
+    end
+end
+
+-- Dibujar arco
+function drawArc(x, y, radius, startAngle, endAngle, color, thickness, segments)
+    segments = segments or 64
     thickness = thickness or 2
+    local angleStep = (endAngle - startAngle) / segments
+    for i = 0, segments do
+        local angle = math.rad(startAngle + (i * angleStep))
+        local x1 = x + math.cos(angle) * radius
+        local y1 = y + math.sin(angle) * radius
+        local x2 = x + math.cos(angle) * (radius - thickness)
+        local y2 = y + math.sin(angle) * (radius - thickness)
+        dxDrawLine(x1, y1, x2, y2, color, thickness)
+    end
+end
+
+-- Dibujar texto con sombra
+function drawTextWithShadow(text, x, y, color, scale, font, alignX, alignY)
+    if CONFIG.enableShadows then
+        dxDrawText(text, x + 2, y + 2, x + 2, y + 2, tocolor(0, 0, 0, 200), scale, font, alignX, alignY, false, false, false, false, false)
+    end
+    dxDrawText(text, x, y, x, y, color, scale, font, alignX, alignY, false, false, false, false, false)
+end
+
+-- Dibujar rectángulo con borde
+function drawBorderedRectangle(x, y, width, height, bgColor, borderColor, borderWidth)
+    borderWidth = borderWidth or 2
+    dxDrawRectangle(x, y, width, height, bgColor, false)
+    if borderColor then
+        dxDrawRectangle(x, y, width, borderWidth, borderColor, false) -- Top
+        dxDrawRectangle(x, y + height - borderWidth, width, borderWidth, borderColor, false) -- Bottom
+        dxDrawRectangle(x, y, borderWidth, height, borderColor, false) -- Left
+        dxDrawRectangle(x + width - borderWidth, y, borderWidth, height, borderColor, false) -- Right
+    end
+end
+
+-- ============================================
+-- COMPONENTES DEL VELOCÍMETRO
+-- ============================================
+
+-- Velocímetro principal (círculo)
+function drawSpeedometerGauge(centerX, centerY, radius, speed, rpm)
+    -- Fondo exterior (sombra)
+    if CONFIG.enableShadows then
+        drawCircle(centerX + 2, centerY + 2, radius + 2, tocolor(0, 0, 0, 150), 1, 64)
+    end
     
-    if filled then
-        dxDrawCircle(x, y, radius, color, 0, 360, segments)
+    -- Fondo principal (múltiples capas para profundidad)
+    drawCircle(centerX, centerY, radius, tocolor(15, 15, 25, 240), 3, 64)
+    drawCircle(centerX, centerY, radius - 3, tocolor(25, 25, 35, 250), 2, 64)
+    drawCircle(centerX, centerY, radius - 8, tocolor(10, 10, 20, 200), 1, 64)
+    
+    -- Marcas del velocímetro (0-200 km/h)
+    for i = 0, 200, 10 do
+        local angle = math.rad(-90 + (i / 200) * 180)
+        local markLength = (i % 20 == 0) and ((i % 40 == 0) and 14 or 10) or 6
+        local markRadius = radius - 8
+        local x1 = centerX + math.cos(angle) * markRadius
+        local y1 = centerY + math.sin(angle) * markRadius
+        local x2 = centerX + math.cos(angle) * (markRadius - markLength)
+        local y2 = centerY + math.sin(angle) * (markRadius - markLength)
+        local markColor = (i % 40 == 0) and tocolor(200, 200, 200, 255) or tocolor(150, 150, 150, 180)
+        dxDrawLine(x1, y1, x2, y2, markColor, (i % 40 == 0) and 2 or 1)
+        
+        -- Números cada 40 km/h
+        if i % 40 == 0 and i > 0 then
+            local textX = centerX + math.cos(angle) * (markRadius - 28)
+            local textY = centerY + math.sin(angle) * (markRadius - 28)
+            drawTextWithShadow(tostring(i), textX, textY, tocolor(220, 220, 220, 255), 0.65, "default-bold", "center", "center")
+        end
+    end
+    
+    -- Arco de velocidad (verde)
+    local speedPercent = math.min(speed / 200, 1.0)
+    local speedAngle = speedPercent * 180
+    if speedAngle > 0 then
+        drawArc(centerX, centerY, radius - 5, -90, -90 + speedAngle, tocolor(unpack(CONFIG.colors.speedArc)), 8, 64)
+        drawArc(centerX, centerY, radius - 3, -90, -90 + speedAngle, tocolor(unpack(CONFIG.colors.speedArcSecondary)), 4, 64)
+    end
+    
+    -- Zona de peligro (rojo) cuando velocidad > 85%
+    if speedPercent > 0.85 then
+        local dangerAngle = (speedPercent - 0.85) * 180 / 0.15
+        drawArc(centerX, centerY, radius - 5, -90 + (0.85 * 180), -90 + speedAngle, tocolor(unpack(CONFIG.colors.dangerZone)), 8, 32)
+    end
+    
+    -- Arco de RPM (naranja/amarillo)
+    local rpmPercent = math.min(rpm / 8000, 1.0)
+    local rpmAngle = rpmPercent * 180
+    if rpmAngle > 0 then
+        -- Color dinámico según RPM
+        local r = 255
+        local g = math.max(0, 255 - (rpmPercent * 200))
+        local b = 0
+        drawArc(centerX, centerY, radius - 12, -90, -90 + rpmAngle, tocolor(r, g, b, 255), 5, 64)
+        drawArc(centerX, centerY, radius - 10, -90, -90 + rpmAngle, tocolor(255, 200, 0, 200), 3, 64)
+    end
+    
+    -- Aguja de velocidad (suavizada)
+    local needleAngle = math.rad(-90 + smoothSpeed)
+    local needleLength = radius - 25
+    local needleEndX = centerX + math.cos(needleAngle) * needleLength
+    local needleEndY = centerY + math.sin(needleAngle) * needleLength
+    
+    -- Aguja principal
+    dxDrawLine(centerX, centerY, needleEndX, needleEndY, tocolor(unpack(CONFIG.colors.needle)), 4)
+    -- Aguja secundaria (efecto 3D)
+    local needleEndX2 = centerX + math.cos(needleAngle) * (needleLength - 6)
+    local needleEndY2 = centerY + math.sin(needleAngle) * (needleLength - 6)
+    dxDrawLine(centerX, centerY, needleEndX2, needleEndY2, tocolor(200, 200, 200, 200), 2)
+    
+    -- Centro del velocímetro
+    drawCircle(centerX, centerY, 12, tocolor(255, 255, 255, 255), 2, 16)
+    dxDrawRectangle(centerX - 10, centerY - 10, 20, 20, tocolor(20, 20, 30, 255), false)
+    drawCircle(centerX, centerY, 7, tocolor(50, 50, 60, 255), 1, 16)
+    
+    -- Velocidad en texto (grande)
+    local speedText = string.format("%03d", speed)
+    drawTextWithShadow(speedText, centerX, centerY - 25, tocolor(unpack(CONFIG.colors.text)), 2.8, "default-bold", "center", "center")
+    drawTextWithShadow("KM/H", centerX, centerY + 18, tocolor(unpack(CONFIG.colors.textSecondary)), 0.95, "default", "center", "center")
+    
+    -- RPM en texto (debajo del velocímetro)
+    local rpmText = "RPM: " .. tostring(rpm):gsub("(%d)(%d%d%d)$", "%1,%2")
+    drawTextWithShadow(rpmText, centerX, centerY + 45, tocolor(255, 150, 0, 255), 1.0, "default-bold", "center", "center")
+end
+
+-- Panel de información del vehículo
+function drawVehicleInfo(x, y, width, height, vehicleName, rpm, engineState, lightsState, health, gear)
+    -- Fondo con borde
+    drawBorderedRectangle(x, y, width, height, tocolor(unpack(CONFIG.colors.background)), tocolor(unpack(CONFIG.colors.border)), 3)
+    dxDrawRectangle(x + 2, y + 2, width - 4, height - 4, tocolor(unpack(CONFIG.colors.backgroundSecondary)), false)
+    
+    -- Nombre del vehículo (centrado, destacado)
+    drawTextWithShadow(vehicleName, x + width / 2, y + 10, tocolor(unpack(CONFIG.colors.border)), 1.3, "default-bold", "center", "top")
+    
+    -- Separador
+    dxDrawLine(x + 15, y + 35, x + width - 15, y + 35, tocolor(100, 100, 100, 100), 1)
+    
+    -- Información en dos columnas
+    local col1X = x + 20
+    local col2X = x + width / 2 + 10
+    
+    -- Columna 1: Motor y Luces
+    local engineColor = engineState and tocolor(unpack(CONFIG.colors.engineOn)) or tocolor(unpack(CONFIG.colors.engineOff))
+    local engineText = engineState and "ENCENDIDO" or "APAGADO"
+    drawTextWithShadow("⚡ Motor: " .. engineText, col1X, y + 45, engineColor, 0.95, "default", "left", "top")
+    
+    local lightsColor = (lightsState == 2) and tocolor(unpack(CONFIG.colors.lightsOn)) or tocolor(unpack(CONFIG.colors.lightsOff))
+    local lightsText = (lightsState == 2) and "ENCENDIDAS" or "APAGADAS"
+    drawTextWithShadow("💡 Luces: " .. lightsText, col1X, y + 65, lightsColor, 0.95, "default", "left", "top")
+    
+    -- Columna 2: Marcha y Salud
+    local gearText = (speed > 5) and tostring(gear) or "N"
+    drawTextWithShadow("🎛️  Marcha: " .. gearText, col2X, y + 45, tocolor(unpack(CONFIG.colors.text)), 0.95, "default", "left", "top")
+    
+    local healthPercent = (health / 1000) * 100
+    local healthColor
+    if healthPercent > 70 then
+        healthColor = tocolor(unpack(CONFIG.colors.fuelHigh))
+    elseif healthPercent > 30 then
+        healthColor = tocolor(unpack(CONFIG.colors.fuelMedium))
     else
-        local prevX, prevY = x + radius, y
-        for i = 1, segments do
-            local angle = (i / segments) * 2 * math.pi
-            local newX = x + math.cos(angle) * radius
-            local newY = y + math.sin(angle) * radius
-            dxDrawLine(prevX, prevY, newX, newY, color, thickness)
-            prevX, prevY = newX, newY
+        healthColor = tocolor(unpack(CONFIG.colors.fuelLow))
+    end
+    drawTextWithShadow("🔧 Salud: " .. math.floor(healthPercent) .. "%", col2X, y + 65, healthColor, 0.95, "default", "left", "top")
+end
+
+-- Indicador de gasolina
+function drawFuelIndicator(x, y, width, height, fuel)
+    local fuelPercent = math.max(0, math.min(100, fuel))
+    
+    -- Fondo con borde
+    drawBorderedRectangle(x, y, width, height, tocolor(unpack(CONFIG.colors.background)), tocolor(255, 200, 0, 200), 3)
+    dxDrawRectangle(x + 2, y + 2, width - 4, height - 4, tocolor(unpack(CONFIG.colors.backgroundSecondary)), false)
+    
+    -- Icono de gasolina
+    local fuelIconColor = fuelPercent <= 20 and tocolor(unpack(CONFIG.colors.fuelLow)) or tocolor(255, 200, 0, 255)
+    drawTextWithShadow("⛽", x + 25, y + 15, fuelIconColor, 2.2, "default", "left", "top")
+    
+    -- Barra de gasolina
+    local fuelBarX = x + 60
+    local fuelBarY = y + 20
+    local fuelBarWidth = width - 75
+    local fuelBarHeight = 28
+    local fuelBarFillWidth = (fuelPercent / 100) * fuelBarWidth
+    
+    -- Fondo de la barra
+    dxDrawRectangle(fuelBarX - 2, fuelBarY - 2, fuelBarWidth + 4, fuelBarHeight + 4, tocolor(0, 0, 0, 200), false)
+    dxDrawRectangle(fuelBarX, fuelBarY, fuelBarWidth, fuelBarHeight, tocolor(30, 30, 40, 255), false)
+    
+    -- Barra de gasolina con gradiente
+    if fuelBarFillWidth > 0 then
+        local fuelColor
+        if fuelPercent <= 20 then
+            fuelColor = tocolor(unpack(CONFIG.colors.fuelLow))
+        elseif fuelPercent <= 50 then
+            fuelColor = tocolor(unpack(CONFIG.colors.fuelMedium))
+        else
+            fuelColor = tocolor(unpack(CONFIG.colors.fuelHigh))
+        end
+        
+        -- Barra principal
+        dxDrawRectangle(fuelBarX, fuelBarY, fuelBarFillWidth, fuelBarHeight, fuelColor, false)
+        
+        -- Efecto de brillo (superior)
+        if fuelBarFillWidth > 5 then
+            dxDrawRectangle(fuelBarX, fuelBarY, fuelBarFillWidth, 4, tocolor(255, 255, 255, 120), false)
+        end
+        
+        -- Efecto de parpadeo si está bajo
+        if fuelPercent <= 20 then
+            local blinkAlpha = math.sin(getTickCount() / 200) * 100 + 155
+            dxDrawRectangle(fuelBarX, fuelBarY, fuelBarFillWidth, fuelBarHeight, tocolor(255, 0, 0, blinkAlpha), false)
         end
     end
+    
+    -- Porcentaje de gasolina
+    local fuelText = math.floor(fuelPercent) .. "%"
+    local fuelTextColor = fuelPercent <= 20 and tocolor(255, 100, 100, 255) or tocolor(unpack(CONFIG.colors.text))
+    drawTextWithShadow(fuelText, fuelBarX + fuelBarWidth / 2, fuelBarY + fuelBarHeight + 10, fuelTextColor, 1.1, "default-bold", "center", "top")
 end
 
--- Función para dibujar texto con sombra
-function dxDrawTextShadow(text, x, y, width, height, color, scale, font, alignX, alignY)
-    if config.enableShadows then
-        dxDrawText(text, x + 2, y + 2, width + 2, height + 2, tocolor(0, 0, 0, 150), scale, font, alignX, alignY)
-    end
-    dxDrawText(text, x, y, width, height, color, scale, font, alignX, alignY)
-end
-
--- Función para dibujar barra con gradiente
-function drawProgressBar(x, y, width, height, percent, color1, color2)
-    local fillWidth = (percent / 100) * width
-    
-    -- Fondo
-    dxDrawRectangle(x, y, width, height, tocolor(0, 0, 0, 180), false)
-    
-    -- Barra de progreso con gradiente
-    if fillWidth > 0 then
-        for i = 0, fillWidth - 1 do
-            local ratio = i / width
-            local r = color1[1] + (color2[1] - color1[1]) * ratio
-            local g = color1[2] + (color2[2] - color1[2]) * ratio
-            local b = color1[3] + (color2[3] - color1[3]) * ratio
-            dxDrawRectangle(x + i, y, 1, height, tocolor(r, g, b, 255), false)
-        end
-    end
-    
-    -- Borde
-    dxDrawRectangle(x, y, width, 1, tocolor(255, 255, 255, 50), false)
-    dxDrawRectangle(x, y + height - 1, width, 1, tocolor(255, 255, 255, 50), false)
-    dxDrawRectangle(x, y, 1, height, tocolor(255, 255, 255, 50), false)
-    dxDrawRectangle(x + width - 1, y, 1, height, tocolor(255, 255, 255, 50), false)
-end
-
--- Función principal para dibujar el velocímetro
+-- ============================================
+-- FUNCIÓN PRINCIPAL DE RENDERIZADO
+-- ============================================
 function drawSpeedometer()
     if not speedometerVisible or not isInVehicle or not currentVehicle then return end
     
     local screenW, screenH = guiGetScreenSize()
     local speed = getVehicleSpeedKMH(currentVehicle)
     local rpm = getVehicleRPM(currentVehicle)
-    local vehicleName = getVehicleName(currentVehicle) or "Vehículo"
+    local vehicleName = getVehicleDisplayName(currentVehicle)
     local engineState = getVehicleEngineState(currentVehicle)
     local lightsState = getVehicleOverrideLights(currentVehicle)
     local vehicleFuel = getElementData(currentVehicle, "vehicle:fuel") or fuelLevel
     local health = getElementHealth(currentVehicle)
+    local gear = estimateGear(currentVehicle, speed)
     
-    -- Suavizar la aguja
-    local targetAngle = (speed / 200) * 180
-    needleSmooth = needleSmooth + (targetAngle - needleSmooth) * config.animationSpeed
+    -- Suavizar valores para animaciones
+    if CONFIG.enableAnimations then
+        smoothSpeed = smoothSpeed + ((speed / 200) * 180 - smoothSpeed) * CONFIG.animationSpeed
+        smoothRPM = smoothRPM + (rpm - smoothRPM) * 0.2
+    else
+        smoothSpeed = (speed / 200) * 180
+        smoothRPM = rpm
+    end
     
     -- Calcular posición
-    local posX = screenW * config.position.x - config.size.width
-    local posY = screenH * config.position.y - config.size.height
+    local posX = screenW * CONFIG.position.x - CONFIG.size.width
+    local posY = screenH * CONFIG.position.y - CONFIG.size.height
     
-    -- Dibujar velocímetro
-    drawMainSpeedometer(posX, posY, speed, rpm, needleSmooth)
-    drawVehicleInfo(posX + 10, posY + 220, vehicleName, speed, rpm, engineState, lightsState, health, vehicleFuel)
-    drawFuelGauge(posX + 10, posY + 320, vehicleFuel)
+    -- Velocímetro principal
+    local centerX = posX + 140
+    local centerY = posY + 130
+    local radius = 115
+    drawSpeedometerGauge(centerX, centerY, radius, speed, rpm)
     
-    -- Advertencia de gasolina baja
+    -- Panel de información
+    local infoY = posY + 260
+    local infoWidth = 260
+    local infoHeight = 110
+    drawVehicleInfo(posX + 10, infoY, infoWidth, infoHeight, vehicleName, rpm, engineState, lightsState, health, gear)
+    
+    -- Indicador de gasolina
+    local fuelY = infoY + infoHeight + 15
+    local fuelWidth = 260
+    local fuelHeight = 65
+    drawFuelIndicator(posX + 10, fuelY, fuelWidth, fuelHeight, vehicleFuel)
+    
+    -- Advertencia de gasolina baja (pantalla completa)
     if vehicleFuel <= 15 then
-        drawFuelWarning(posX, posY, screenW, screenH, vehicleFuel)
-    end
-    
-    -- Actualizar odómetro
-    updateOdometer()
-end
-
-function drawMainSpeedometer(x, y, speed, rpm, needleAngle)
-    local centerX = x + 150
-    local centerY = y + 100
-    local radius = 85
-    
-    -- Fondo del velocímetro con sombra
-    if config.enableShadows then
-        drawCircle(centerX + 3, centerY + 3, radius, tocolor(0, 0, 0, 100), 2, 64, true)
-    end
-    
-    -- Fondo principal
-    drawCircle(centerX, centerY, radius, tocolor(unpack(config.colors.background)), 2, 64, true)
-    
-    -- Marcas de velocidad
-    for i = 0, 180, 20 do
-        local angle = math.rad(-90 + i)
-        local length = (i % 40 == 0) and 15 or 8
-        local startX = centerX + math.cos(angle) * (radius - 5)
-        local startY = centerY + math.sin(angle) * (radius - 5)
-        local endX = centerX + math.cos(angle) * (radius - 5 - length)
-        local endY = centerY + math.sin(angle) * (radius - 5 - length)
-        
-        dxDrawLine(startX, startY, endX, endY, tocolor(255, 255, 255, 100), 2)
-        
-        -- Números cada 40 km/h
-        if i % 40 == 0 then
-            local textX = centerX + math.cos(angle) * (radius - 25)
-            local textY = centerY + math.sin(angle) * (radius - 25)
-            dxDrawTextShadow(tostring(i), textX, textY, textX, textY, 
-                tocolor(255, 255, 255, 200), 0.7, "default", "center", "center")
+        local currentTime = getTickCount()
+        if vehicleFuel <= 5 and currentTime % 1000 < 500 then
+            dxDrawRectangle(0, 0, screenW, screenH, tocolor(255, 0, 0, 50), false)
+            drawTextWithShadow("⚠ GASOLINA MUY BAJA ⚠", screenW / 2, screenH / 2 - 50, tocolor(255, 50, 50, 255), 2.2, "default-bold", "center", "center")
+            drawTextWithShadow("Busca una gasolinera pronto!", screenW / 2, screenH / 2 + 20, tocolor(255, 255, 255, 200), 1.3, "default", "center", "center")
+        elseif vehicleFuel <= 15 then
+            drawTextWithShadow("Gasolina baja", screenW / 2, 100, tocolor(255, 165, 0, 200), 1.6, "default-bold", "center", "center")
         end
     end
-    
-    -- Arco de RPM
-    local rpmPercent = math.min(rpm / 8000, 1.0)
-    local rpmAngle = rpmPercent * 180
-    drawRPMArc(centerX, centerY, radius - 10, rpmAngle)
-    
-    -- Aguja principal
-    local needleRad = math.rad(-90 + needleAngle)
-    local needleEndX = centerX + math.cos(needleRad) * (radius - 20)
-    local needleEndY = centerY + math.sin(needleRad) * (radius - 20)
-    
-    dxDrawLine(centerX, centerY, needleEndX, needleEndY, 
-        tocolor(unpack(config.colors.needle)), 4)
-    
-    -- Centro de la aguja
-    drawCircle(centerX, centerY, 8, tocolor(0, 0, 0, 200), 2, 16, true)
-    drawCircle(centerX, centerY, 6, tocolor(255, 255, 255, 255), 2, 16, true)
-    
-    -- Velocidad actual
-    dxDrawTextShadow(string.format("%03d", speed), centerX, centerY - 20, centerX, centerY - 20,
-        tocolor(255, 255, 255, 255), 2.5, "default-bold", "center", "center")
-    dxDrawTextShadow("KM/H", centerX, centerY + 15, centerX, centerY + 15,
-        tocolor(180, 180, 180, 200), 0.8, "default", "center", "center")
-    
-    -- RPM actual
-    dxDrawTextShadow("RPM: " .. tostring(rpm), centerX, centerY + 40, centerX, centerY + 40,
-        tocolor(255, 165, 0, 255), 0.9, "default-bold", "center", "center")
 end
 
-function drawRPMArc(x, y, radius, angle)
-    local segments = 32
-    local thickness = 6
-    
-    for i = 0, angle, angle/segments do
-        local currentAngle = math.rad(-90 + i)
-        local startX = x + math.cos(currentAngle) * radius
-        local startY = y + math.sin(currentAngle) * radius
-        local endX = x + math.cos(currentAngle) * (radius - thickness)
-        local endY = y + math.sin(currentAngle) * (radius - thickness)
-        
-        -- Color que cambia con las RPM
-        local r = 255
-        local g = math.max(0, 255 - (i/180)*200)
-        local b = 0
-        
-        dxDrawLine(startX, startY, endX, endY, tocolor(r, g, b, 200), 2)
-    end
-end
-
-function drawVehicleInfo(x, y, vehicleName, speed, rpm, engineState, lightsState, health, fuel)
-    local width = 280
-    local height = 90
-    
-    -- Fondo
-    dxDrawRectangle(x, y, width, height, tocolor(0, 0, 0, 150), false)
-    dxDrawRectangle(x + 2, y + 2, width - 4, height - 4, tocolor(20, 20, 30, 200), false)
-    
-    -- Nombre del vehículo
-    dxDrawTextShadow(vehicleName, x + width/2, y + 10, x + width/2, y + 10,
-        tocolor(0, 255, 255, 255), 1.2, "default-bold", "center", "top")
-    
-    -- Información en dos columnas
-    local column1X = x + 20
-    local column2X = x + width/2 + 10
-    
-    -- Columna 1
-    dxDrawTextShadow("⚡ " .. (engineState and "ENCENDIDO" or "APAGADO"), 
-        column1X, y + 35, column1X, y + 35,
-        engineState and tocolor(0, 255, 0, 255) or tocolor(255, 50, 50, 255),
-        0.9, "default", "left", "top")
-    
-    dxDrawTextShadow("💡 " .. (lightsState == 2 and "ENCENDIDAS" or "APAGADAS"), 
-        column1X, y + 55, column1X, y + 55,
-        lightsState == 2 and tocolor(255, 255, 0, 255) or tocolor(180, 180, 180, 200),
-        0.9, "default", "left", "top")
-    
-    -- Columna 2
-    gear = estimateGear(currentVehicle, speed)
-    dxDrawTextShadow("🎛️  Marcha: " .. (speed > 5 and gear or "N"), 
-        column2X, y + 35, column2X, y + 35,
-        tocolor(255, 255, 255, 255), 0.9, "default", "left", "top")
-    
-    local healthPercent = (health/1000)*100
-    local healthColor = healthPercent > 70 and config.colors.healthGood or 
-                       healthPercent > 30 and config.colors.healthMedium or 
-                       config.colors.healthBad
-    
-    dxDrawTextShadow("🔧 Salud: " .. math.floor(healthPercent) .. "%", 
-        column2X, y + 55, column2X, y + 55,
-        healthColor, 0.9, "default", "left", "top")
-end
-
-function drawFuelGauge(x, y, fuel)
-    local width = 280
-    local height = 40
-    
-    -- Fondo
-    dxDrawRectangle(x, y, width, height, tocolor(0, 0, 0, 150), false)
-    dxDrawRectangle(x + 2, y + 2, width - 4, height - 4, tocolor(20, 20, 30, 200), false)
-    
-    -- Icono de gasolina
-    dxDrawTextShadow("⛽", x + 10, y + 10, x + 10, y + 10,
-        fuel <= 15 and tocolor(255, 50, 50, 255) or tocolor(255, 200, 0, 255),
-        1.5, "default", "left", "top")
-    
-    -- Barra de combustible
-    local barX = x + 40
-    local barY = y + 15
-    local barWidth = 230
-    local barHeight = 12
-    
-    local fuelColor1, fuelColor2
-    if fuel <= 15 then
-        fuelColor1 = config.colors.fuelLow
-        fuelColor2 = {255, 100, 100, 255}
-    elseif fuel <= 50 then
-        fuelColor1 = config.colors.fuelMedium
-        fuelColor2 = {255, 200, 0, 255}
-    else
-        fuelColor1 = config.colors.fuelHigh
-        fuelColor2 = {100, 255, 100, 255}
-    end
-    
-    drawProgressBar(barX, barY, barWidth, barHeight, fuel, fuelColor1, fuelColor2)
-    
-    -- Porcentaje
-    dxDrawTextShadow(math.floor(fuel) .. "%", barX + barWidth/2, barY + barHeight + 5,
-        barX + barWidth/2, barY + barHeight + 5, tocolor(255, 255, 255, 255),
-        0.8, "default", "center", "top")
-    
-    -- Odómetro
-    dxDrawTextShadow(string.format("ODO: %.1f km", odometer/1000), 
-        x + width - 10, y + 5, x + width - 10, y + 5,
-        tocolor(180, 180, 180, 200), 0.8, "default", "right", "top")
-end
-
-function drawFuelWarning(x, y, screenW, screenH, fuel)
-    local currentTime = getTickCount()
-    
-    -- Efecto de parpadeo cada 500ms cuando está muy bajo
-    if fuel <= 5 and currentTime % 1000 < 500 then
-        dxDrawRectangle(0, 0, screenW, screenH, tocolor(255, 0, 0, 50), false)
-        
-        dxDrawText("⚠ GASOLINA MUY BAJA ⚠", 
-            screenW/2, screenH/2 - 50, screenW/2, screenH/2 - 50,
-            tocolor(255, 50, 50, 255), 2.0, "default-bold", "center", "center", true)
-        
-        dxDrawText("Busca una gasolinera pronto!", 
-            screenW/2, screenH/2 + 20, screenW/2, screenH/2 + 20,
-            tocolor(255, 255, 255, 200), 1.2, "default", "center", "center", true)
-    elseif fuel <= 15 then
-        dxDrawText("Gasolina baja", 
-            screenW/2, 100, screenW/2, 100,
-            tocolor(255, 165, 0, 200), 1.5, "default-bold", "center", "center", true)
-    end
-end
-
-function updateOdometer()
-    if not isInVehicle or not currentVehicle then return end
-    
-    local x, y, z = getElementPosition(currentVehicle)
-    local distance = getDistanceBetweenPoints3D(lastPositionX, lastPositionY, lastPositionZ, x, y, z)
-    
-    odometer = odometer + distance
-    tripMeter = tripMeter + distance
-    
-    lastPositionX, lastPositionY, lastPositionZ = x, y, z
-end
-
--- Sistema de actualización optimizado
-local lastUpdate = 0
+-- ============================================
+-- SISTEMA DE ACTUALIZACIÓN
+-- ============================================
 function updateSpeedometer()
-    local currentTime = getTickCount()
-    if currentTime - lastUpdate < 50 then return end -- Actualizar cada 50ms
-    lastUpdate = currentTime
-    
     local vehicle = getPedOccupiedVehicle(localPlayer)
     
-    if vehicle then
-        local seat = getPedOccupiedVehicleSeat(localPlayer)
-        if seat == 0 then
-            if not isInVehicle or vehicle ~= currentVehicle then
-                isInVehicle = true
-                currentVehicle = vehicle
-                speedometerVisible = true
-                triggerServerEvent("speedometer:getVehicleData", localPlayer, vehicle)
-            end
-            
-            -- Actualizar salud del vehículo
-            vehicleHealth = getElementHealth(vehicle)
-        end
-    elseif isInVehicle then
+    if vehicle and vehicle ~= currentVehicle then
+        isInVehicle = true
+        currentVehicle = vehicle
+        speedometerVisible = true
+        smoothSpeed = 0
+        smoothRPM = 0
+        triggerServerEvent("speedometer:getFuel", localPlayer, vehicle)
+    elseif not vehicle and isInVehicle then
         isInVehicle = false
         currentVehicle = nil
         speedometerVisible = false
     end
 end
 
--- Eventos optimizados
+-- ============================================
+-- EVENTOS
+-- ============================================
+setTimer(updateSpeedometer, 50, 0)
+addEventHandler("onClientRender", root, drawSpeedometer)
+
 addEventHandler("onClientPlayerVehicleEnter", localPlayer, function(vehicle, seat)
     if seat == 0 then
         isInVehicle = true
         currentVehicle = vehicle
         speedometerVisible = true
-        needleSmooth = 0
-        triggerServerEvent("speedometer:getVehicleData", localPlayer, vehicle)
+        smoothSpeed = 0
+        smoothRPM = 0
+        triggerServerEvent("speedometer:getFuel", localPlayer, vehicle)
     end
 end)
 
@@ -426,19 +442,14 @@ addEventHandler("onClientPlayerVehicleExit", localPlayer, function(vehicle, seat
     end
 end)
 
--- Receptor de datos del servidor
-addEvent("speedometer:receiveVehicleData", true)
-addEventHandler("speedometer:receiveVehicleData", root, function(fuel, odometerValue)
+addEvent("speedometer:receiveFuel", true)
+addEventHandler("speedometer:receiveFuel", root, function(fuel)
     fuelLevel = fuel or 100
-    odometer = odometerValue or odometer
-    
     if currentVehicle then
         setElementData(currentVehicle, "vehicle:fuel", fuelLevel)
-        setElementData(currentVehicle, "vehicle:odometer", odometer)
     end
 end)
 
--- Actualización en tiempo real
 addEvent("speedometer:updateFuel", true)
 addEventHandler("speedometer:updateFuel", root, function(fuel)
     fuelLevel = fuel or fuelLevel
@@ -447,25 +458,7 @@ addEventHandler("speedometer:updateFuel", root, function(fuel)
     end
 end)
 
--- Comandos de depuración (opcional)
-addCommandHandler("resetodo", function()
-    odometer = 0
-    tripMeter = 0
-    outputChatBox("Odómetro reiniciado", 0, 255, 0)
-end)
-
-addCommandHandler("trip", function()
-    outputChatBox("Viaje actual: " .. string.format("%.2f", tripMeter/1000) .. " km", 0, 255, 255)
-    tripMeter = 0
-end)
-
--- Limpieza
 addEventHandler("onClientResourceStop", resourceRoot, function()
     setPlayerHudComponentVisible("vehicle_name", true)
     setPlayerHudComponentVisible("area_name", true)
-    setPlayerHudComponentVisible("radar", true)
 end)
-
--- Iniciar el sistema
-setTimer(updateSpeedometer, 50, 0)
-addEventHandler("onClientRender", root, drawSpeedometer)
