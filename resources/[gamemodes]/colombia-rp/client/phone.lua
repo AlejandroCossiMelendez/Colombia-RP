@@ -4,7 +4,7 @@
 local sw, sh = guiGetScreenSize()
 local phoneVisible = false
 local phoneBrowser, browserContent, renderTimer = nil
-local w, h = 300, 570
+local w, h = 270, 513  -- Reducido un 10% (300*0.9 = 270, 570*0.9 = 513)
 
 function loadPhoneBrowser() 
     if source and isElement(source) then
@@ -16,6 +16,15 @@ function whenPhoneBrowserReady()
     -- El navegador está listo
     if browserContent and isElement(browserContent) then
         executeBrowserJavascript(browserContent, "updateTime();")
+        -- Asegurar que el teléfono se abra directamente en el home
+        executeBrowserJavascript(browserContent, [[
+            const lock = document.querySelector('.lock-screen');
+            const unlock = document.querySelector('.unlock-screen');
+            if (lock && unlock) {
+                lock.style.display = 'none';
+                unlock.style.display = 'flex';
+            }
+        ]])
     end
 end
 

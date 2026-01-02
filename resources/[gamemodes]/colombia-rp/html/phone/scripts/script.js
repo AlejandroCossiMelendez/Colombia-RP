@@ -14,6 +14,13 @@ const config = {
 onload = () => {
     config.battery.setValue(48);
     get('.battery .bar').style.width = `${config.battery.currentValue}%`;
+    // Abrir directamente en el home (no en la pantalla de bloqueo)
+    const lock = get('.lock-screen');
+    const unlock = get('.unlock-screen');
+    if (lock && unlock) {
+        lock.style.display = 'none';
+        unlock.style.display = 'flex';
+    }
 }
 
 const [lock, unlock] = [get('.lock-screen'), get('.unlock-screen')];
@@ -30,8 +37,12 @@ function openApp(appId) {
 }
 
 function returnToHomePage() {
-    // Si ya está en el home (unlock visible), cerrar el teléfono
-    if (unlock.style.display !== 'none') {
+    // Verificar si ya está en el home (unlock visible y no hay apps abiertas)
+    const isInHome = unlock && unlock.style.display !== 'none' && 
+                     (interfaces.style.display === 'none' || !interfaces.style.display);
+    
+    // Si ya está en el home, cerrar el teléfono
+    if (isInHome) {
         // Cerrar el teléfono enviando evento a MTA
         if (window.mta) {
             window.mta.triggerEvent('closePhoneFromBrowser');
@@ -39,9 +50,9 @@ function returnToHomePage() {
         return;
     }
     // Si está en una app, volver al home
-    lock.style.display = 'none';
-    unlock.style.display = 'flex';
-    interfaces.style.display = 'none';
+    if (lock) lock.style.display = 'none';
+    if (unlock) unlock.style.display = 'flex';
+    if (interfaces) interfaces.style.display = 'none';
     appsInterfaces.forEach(e => e.style.display = 'none');
 }
 
