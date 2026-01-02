@@ -19,6 +19,29 @@ addEventHandler("showHUD", resourceRoot, function()
     showHUD()
 end)
 
+-- Verificar automáticamente si el jugador tiene un personaje seleccionado
+setTimer(function()
+    if not hudVisible and getElementData(localPlayer, "character:selected") then
+        showHUD()
+    end
+end, 1000, 0)
+
+-- Mostrar HUD cuando el jugador spawnea con un personaje seleccionado
+addEventHandler("onClientPlayerSpawn", localPlayer, function()
+    if getElementData(localPlayer, "character:selected") then
+        showHUD()
+    end
+end)
+
+-- Verificar al iniciar el recurso si ya hay un personaje seleccionado
+addEventHandler("onClientResourceStart", resourceRoot, function()
+    setTimer(function()
+        if getElementData(localPlayer, "character:selected") then
+            showHUD()
+        end
+    end, 500, 1)
+end)
+
 addEvent("updateNeeds", true)
 addEventHandler("updateNeeds", resourceRoot, function(newHunger, newThirst, newHealth)
     hunger = newHunger or hunger
