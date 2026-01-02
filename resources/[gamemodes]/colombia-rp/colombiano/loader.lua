@@ -13,8 +13,8 @@ addEventHandler("onClientResourceStart", root, function(resource)
         end
         
         local files = {
-            { "pcrypted/[COLOMBIANO].txd.pcrypt", 0 },
-            { "pcrypted/[COLOMBIANO].dff.pcrypt", 0 },
+            { "pcrypted/[COLOMBIANO].txd.pcrypt", 30 },
+            { "pcrypted/[COLOMBIANO].dff.pcrypt", 30 },
         }
         
         local currentIndex = 1
