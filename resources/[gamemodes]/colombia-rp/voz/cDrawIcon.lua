@@ -58,6 +58,29 @@ function dxDrawVoice ( posX, posY, color, distance )
 	dxDrawImage ( posX - iconHalfWidth*distance, posY - iconHalfWidth*distance, ICON_WIDTH*distance, ICON_WIDTH*distance, ICON_PATH, 0, 0, 0, color, false )
 end
 
+-- Función para obtener el nombre del personaje
+local function getCharacterDisplayName(player)
+    if not isElement(player) or getElementType(player) ~= "player" then
+        return getPlayerName(player)
+    end
+    
+    if not getElementData(player, "character:selected") then
+        return getPlayerName(player)
+    end
+    
+    local charName = getElementData(player, "character:name")
+    local charSurname = getElementData(player, "character:surname")
+    local charId = getElementData(player, "character:id")
+    
+    if charName and charSurname and charId then
+        return charName .. " " .. charSurname .. " (ID: " .. charId .. ")"
+    elseif charName and charSurname then
+        return charName .. " " .. charSurname
+    else
+        return getPlayerName(player)
+    end
+end
+
 function dxDrawVoiceLabel ( player, index, color )
 	local sx, sy = guiGetScreenSize ()
 	local scale = sy / 800
@@ -69,20 +92,20 @@ function dxDrawVoiceLabel ( player, index, color )
 
 	px = px + spacing
 
+	-- Obtener nombre del personaje
+	local displayName = getCharacterDisplayName(player)
+
 	-- shadows
-	dxDrawText ( getPlayerName ( player ), px + 1, py + 1, px, py, ICON_TEXT_SHADOW, scale )
+	dxDrawText ( displayName, px + 1, py + 1, px, py, ICON_TEXT_SHADOW, scale )
 	-- text
-	dxDrawText ( getPlayerName ( player ), px, py, px, py, color, scale )
+	dxDrawText ( displayName, px, py, px, py, color, scale )
 end
 
 ---
+-- El sistema de voz por proximidad funciona por defecto, no cancelamos el evento
 addEventHandler ( "onClientPlayerVoiceStart", root,
 	function()
-		if not getElementData(source, "frecuencia.voz") or getElementData(source, "frecuencia.voz") == -1 then
-			cancelEvent()
-			--outputChatBox("Utiliza /misf para unirte a un canal de voz antes de poder hablar.", 255, 0, 0)
-			return
-		end
+		-- Permitir voz por proximidad (no requiere frecuencia)
 		voicePlayers[source] = true
 	end
 )
