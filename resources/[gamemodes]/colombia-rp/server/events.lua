@@ -28,6 +28,7 @@ addEvent("requestInventory", true)
 addEvent("useItem", true)
 addEvent("moveInventoryItem", true)
 addEvent("dropInventoryItem", true)
+addEvent("unequipVest", true)
 outputServerLog("[EVENTS] Eventos de inventario registrados")
 
 -- Eventos de muerte (para el HUD del cliente)

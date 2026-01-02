@@ -295,23 +295,9 @@ addEventHandler("useItem", root, function(slot, itemId, itemIndex)
         setPedArmor(source, 100)
         outputChatBox("Has equipado un Chaleco Antibalas. Tu defensa está al máximo.", source, 0, 150, 255)
         
-        -- Crear objeto visual del chaleco y adjuntarlo al jugador
-        -- Modelo 3026 es un chaleco antibalas en MTA
-        local vestObject = getElementData(source, "equipped:vest")
-        if isElement(vestObject) then
-            destroyElement(vestObject)
-        end
-        
-        local x, y, z = getElementPosition(source)
-        local vest = createObject(3026, x, y, z)
-        if vest then
-            -- Adjuntar el chaleco al jugador en el torso
-            attachElements(vest, source, 0, 0, 0.1, 0, 0, 0)
-            setElementCollisionsEnabled(vest, false)
-            setElementAlpha(vest, 255)
-            setElementData(source, "equipped:vest", vest)
-            setElementData(source, "has:vest", true)
-        end
+        -- Marcar que el jugador tiene chaleco equipado (para mostrar icono)
+        setElementData(source, "has:vest", true)
+        setElementData(source, "vest:armor", 100) -- Guardar el porcentaje de defensa del chaleco
         
         -- Remover el item del inventario usando el sistema de items
         if take then
@@ -463,5 +449,43 @@ addCommandHandler("darme", function(player, cmd, itemName, quantity)
         outputChatBox("Recibiste: " .. itemName .. " x" .. quantity, player, 0, 255, 0)
     else
         outputChatBox(message, player, 255, 0, 0)
+    end
+end)
+
+-- Evento para quitarse el chaleco
+addEvent("unequipVest", true)
+addEventHandler("unequipVest", root, function()
+    local hasVest = getElementData(source, "has:vest")
+    if not hasVest then
+        outputChatBox("No tienes un chaleco equipado", source, 255, 0, 0)
+        return
+    end
+    
+    -- Obtener el porcentaje de defensa actual
+    local currentArmor = math.floor(getPedArmor(source))
+    
+    -- Quitar el chaleco (poner defensa a 0)
+    setPedArmor(source, 0)
+    
+    -- Remover los datos del chaleco
+    removeElementData(source, "has:vest")
+    removeElementData(source, "vest:armor")
+    
+    -- Devolver el chaleco al inventario con el porcentaje de defensa restante
+    if give then
+        -- Usar el sistema de items para dar el chaleco
+        -- El valor del item será el porcentaje de defensa restante
+        local result = give(source, 46, currentArmor) -- 46 es el ID del chaleco antibalas
+        if result then
+            outputChatBox("Te has quitado el Chaleco Antibalas. Defensa restante: " .. currentArmor .. "%", source, 0, 150, 255)
+            -- Recargar items para actualizar el inventario
+            if load then
+                load(source, true)
+            end
+        else
+            outputChatBox("Error al devolver el chaleco al inventario", source, 255, 0, 0)
+        end
+    else
+        outputChatBox("Error: Sistema de items no disponible", source, 255, 0, 0)
     end
 end)

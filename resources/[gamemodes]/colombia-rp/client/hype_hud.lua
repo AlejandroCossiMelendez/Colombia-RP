@@ -237,3 +237,37 @@ function convertNumber(number)
     return formatted 
 end
 
+-- Detectar click en el icono de defensa/chaleco
+local vestClickArea = {
+    x = 0, -- Se calculará dinámicamente
+    y = 0,
+    width = 0,
+    height = 0
+}
+
+addEventHandler("onClientClick", root, function(button, state, absX, absY)
+    if button == "left" and state == "down" then
+        -- Verificar si el jugador tiene chaleco equipado
+        local hasVest = getElementData(localPlayer, "has:vest")
+        if not hasVest then
+            return
+        end
+        
+        -- Calcular área clickeable del icono de defensa
+        local screenW, screenH = guiGetScreenSize()
+        local x, y = (screenW/1366), (screenH/768)
+        
+        -- Área del icono de defensa (armor.png)
+        local iconX = x * 1303
+        local iconY = y * 191
+        local iconW = x * 24
+        local iconH = y * 19
+        
+        -- Verificar si el click está dentro del área del icono
+        if absX >= iconX and absX <= iconX + iconW and absY >= iconY and absY <= iconY + iconH then
+            -- Enviar evento al servidor para quitarse el chaleco
+            triggerServerEvent("unequipVest", localPlayer)
+        end
+    end
+end)
+
