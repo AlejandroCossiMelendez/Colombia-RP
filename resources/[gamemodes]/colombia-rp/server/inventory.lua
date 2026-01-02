@@ -235,35 +235,111 @@ addEventHandler("requestInventory", root, function()
 end)
 
 addEvent("useItem", true)
-addEventHandler("useItem", root, function(slot)
+addEventHandler("useItem", root, function(slot, itemId, itemIndex)
     local characterId = getElementData(source, "character:id")
     if not characterId then
         return
     end
     
-    local item = getPlayerInventoryBySlot(source, slot)
+    -- Obtener item del sistema de items (tabla items) en lugar de inventory
+    local items = get(source)
+    if not items or type(items) ~= "table" then
+        outputChatBox("No se pudo cargar tu inventario", source, 255, 0, 0)
+        return
+    end
+    
+    -- Buscar el item por itemIndex (index de la BD) o por itemId
+    local item = nil
+    if itemIndex then
+        -- Buscar por index de la BD
+        for _, it in ipairs(items) do
+            if tonumber(it.index) == tonumber(itemIndex) then
+                item = it
+                break
+            end
+        end
+    end
+    
+    -- Si no se encontró por index, buscar por item_id y slot visual
+    if not item and itemId then
+        -- Buscar el item que coincida con el item_id y esté en la posición del slot
+        local slotNum = tonumber(slot)
+        if slotNum and items[slotNum] and tonumber(items[slotNum].item) == tonumber(itemId) then
+            item = items[slotNum]
+        else
+            -- Buscar en toda la tabla
+            for _, it in ipairs(items) do
+                if tonumber(it.item) == tonumber(itemId) then
+                    item = it
+                    break
+                end
+            end
+        end
+    end
+    
+    -- Si aún no se encontró, usar el slot directamente
+    if not item and slot then
+        item = items[tonumber(slot)]
+    end
+    
     if not item then
         outputChatBox("No hay ningún item en ese slot", source, 255, 0, 0)
         return
     end
     
-    -- Aquí puedes agregar lógica para usar items específicos
-    -- Por ejemplo: comida, bebida, armas, etc.
-    outputChatBox("Usaste: " .. item.item_name .. " (x" .. item.quantity .. ")", source, 0, 255, 0)
+    local itemId = tonumber(item.item)
+    local itemName = item.name or "Item"
     
-    -- Ejemplo: si es comida, aumentar hambre
-    if string.find(string.lower(item.item_name), "comida") or string.find(string.lower(item.item_name), "food") then
-        -- Llamar a la función feedPlayer del sistema de necesidades
-        if feedPlayer then
-            feedPlayer(source, 30)
-            removeItemFromInventory(source, slot, 1)
+    -- Verificar si las funciones de necesidades están disponibles
+    if not feedPlayer or not hydratePlayer then
+        outputChatBox("El sistema de necesidades no está disponible", source, 255, 0, 0)
+        return
+    end
+    
+    -- Mapeo de items y sus efectos
+    local itemEffects = {
+        -- Items que restauran hambre
+        [3] = { type = "hunger", amount = 50, name = "Comida" }, -- Comida
+        [56] = { type = "hunger", amount = 40, name = "Pescado chico" }, -- Pescado chico
+        [94] = { type = "hunger", amount = 50, name = "Bandeja Paisa" }, -- Bandeja Paisa
+        [95] = { type = "hunger", amount = 30, name = "Salchipapa" }, -- Salchipapa
+        [97] = { type = "hunger", amount = 40, name = "Carne Con Oro" }, -- Carne Con Oro
+        [99] = { type = "hunger", amount = 30, name = "Hamburguesa" }, -- Hamburguesa
+        [100] = { type = "hunger", amount = 20, name = "Arepa" }, -- Arepa
+        
+        -- Items que restauran sed
+        [4] = { type = "thirst", amount = 35, name = "Bebida sin alcohol" }, -- Bebida sin alcohol
+        [71] = { type = "thirst", amount = 30, name = "Cafe" }, -- Café
+        [72] = { type = "thirst", amount = 30, name = "Pony Malta" }, -- Pony Malta
+        [93] = { type = "thirst", amount = 40, name = "Amper" }, -- Amper
+        [98] = { type = "thirst", amount = 30, name = "Jugo Hit" }, -- Jugo Hit
+    }
+    
+    -- Buscar efecto del item
+    local effect = itemEffects[itemId]
+    
+    if effect then
+        if effect.type == "hunger" then
+            feedPlayer(source, effect.amount)
+            outputChatBox("Has consumido " .. effect.name .. ". Hambre restaurada: +" .. effect.amount .. "%", source, 0, 255, 0)
+        elseif effect.type == "thirst" then
+            hydratePlayer(source, effect.amount)
+            outputChatBox("Has consumido " .. effect.name .. ". Sed restaurada: +" .. effect.amount .. "%", source, 0, 255, 0)
         end
-    -- Ejemplo: si es bebida, aumentar sed
-    elseif string.find(string.lower(item.item_name), "bebida") or string.find(string.lower(item.item_name), "agua") or string.find(string.lower(item.item_name), "water") or string.find(string.lower(item.item_name), "drink") then
-        if hydratePlayer then
-            hydratePlayer(source, 30)
-            removeItemFromInventory(source, slot, 1)
+        
+        -- Remover el item del inventario usando el sistema de items
+        -- La función take() usa el slot (posición en la tabla), no el index de la BD
+        if take then
+            local result = take(source, tonumber(slot))
+            if result then
+                -- Recargar items para actualizar el inventario
+                if load then
+                    load(source, true)
+                end
+            end
         end
+    else
+        outputChatBox("Este item no se puede consumir", source, 255, 255, 0)
     end
 end)
 

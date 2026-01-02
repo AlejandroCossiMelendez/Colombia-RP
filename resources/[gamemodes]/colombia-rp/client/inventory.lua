@@ -517,8 +517,8 @@ addEventHandler("onClientClick", root, function(button, state, absX, absY, world
         if slot then
             local item = getItemInSlot(slot)
             if item then
-                -- Usar item
-                triggerServerEvent("useItem", localPlayer, slot)
+                -- Usar item - enviar el slot visual, item_id e id (index de BD) para que el servidor pueda encontrarlo
+                triggerServerEvent("useItem", localPlayer, slot, item.item_id, item.id)
                 selectedSlot = slot
             end
         end
