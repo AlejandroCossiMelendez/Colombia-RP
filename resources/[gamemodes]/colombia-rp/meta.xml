@@ -21,6 +21,10 @@
     <script src="server/voice.lua" type="server" />
     <script src="server/admin_panel.lua" type="server" />
     <script src="server/items_integration.lua" type="server" />
+    <!-- Incluir scripts del sistema de items -->
+    <script src="items/items_list.lua" type="server" />
+    <script src="items/items.lua" type="server" />
+    <script src="items/mochilas_suelo.lua" type="server" />
     <script src="server/main.lua" type="server" />
     
     <!-- Scripts del cliente -->
@@ -39,6 +43,11 @@
     <script src="client/freecam.lua" type="client" />
     <script src="client/inventory.lua" type="client" />
     <script src="client/cursor_toggle.lua" type="client" />
+    
+    <!-- Scripts del sistema de items (cliente) -->
+    <script src="items/items_list.lua" type="client" />
+    <script src="items/items_c.lua" type="client" />
+    <script src="items/drogas_c.lua" type="client" />
     
     <!-- Radar HD -->
     <script src="client/radar.lua" type="client" />

@@ -5,17 +5,34 @@
 function getAllItemsList()
     local itemsList = {}
     
-    -- Verificar si el recurso items está disponible
-    local itemsResource = getResourceFromName("items")
-    if not itemsResource or getResourceState(itemsResource) ~= "running" then
-        outputServerLog("[ITEMS] El recurso 'items' no está disponible. Asegúrate de que el recurso 'items' esté iniciado.")
+    -- Las funciones de items están incluidas directamente en el gamemode
+    -- Intentar usar exports primero, si no funciona, usar las funciones directamente
+    local getNameFunc = nil
+    local success, result = pcall(function() return exports.items:getName(1) end)
+    if success then
+        getNameFunc = function(id) return exports.items:getName(id) end
+    else
+        -- Si exports no funciona, las funciones están disponibles globalmente
+        -- getName está definida en items_list.lua
+        getNameFunc = getName
+    end
+    
+    if not getNameFunc then
+        outputServerLog("[ITEMS] ERROR: No se pueden acceder a las funciones del sistema de items.")
         return itemsList
     end
     
-    -- Obtener la lista de items usando la función exportada getName
+    -- Obtener la lista de items
     for i = 1, 102 do -- Basado en item_list que tiene 102 items
-        local success, itemName = pcall(function() return exports.items:getName(i) end)
-        if success and itemName and itemName ~= " " and itemName ~= "" then
+        local itemName = nil
+        if getNameFunc then
+            local success, result = pcall(function() return getNameFunc(i) end)
+            if success then
+                itemName = result
+            end
+        end
+        
+        if itemName and itemName ~= " " and itemName ~= "" then
             table.insert(itemsList, {
                 id = i,
                 name = itemName
@@ -36,10 +53,9 @@ function giveItemToPlayer(targetPlayer, itemId, value, name, quantity)
         return false, "El jugador no tiene un personaje seleccionado"
     end
     
-    -- Verificar si el recurso items está disponible
-    local itemsResource = getResourceFromName("items")
-    if not itemsResource or getResourceState(itemsResource) ~= "running" then
-        return false, "El sistema de items no está disponible. Asegúrate de que el recurso 'items' esté iniciado."
+    local giveFunc = getItemGiveFunc()
+    if not giveFunc then
+        return false, "El sistema de items no está disponible. Asegúrate de que los scripts de items estén incluidos en meta.xml."
     end
     
     quantity = quantity or 1
@@ -50,24 +66,17 @@ function giveItemToPlayer(targetPlayer, itemId, value, name, quantity)
     
     -- Dar el item la cantidad de veces especificada
     for i = 1, quantity do
-        local success, result = pcall(function() 
-            return exports.items:give(targetPlayer, itemId, value, name) 
-        end)
+        local result = giveFunc(targetPlayer, itemId, value, name)
         
-        if success then
-            if result == true then
-                successCount = successCount + 1
-            else
-                -- result puede ser false o un string con el error
-                if type(result) == "string" then
-                    errorMsg = result
-                else
-                    errorMsg = "Error al dar el item"
-                end
-            end
+        if result == true then
+            successCount = successCount + 1
         else
-            -- Error en pcall
-            errorMsg = result or "Error al llamar a la función give"
+            -- result puede ser false o un string con el error
+            if type(result) == "string" then
+                errorMsg = result
+            else
+                errorMsg = "Error al dar el item"
+            end
         end
     end
     
@@ -77,6 +86,42 @@ function giveItemToPlayer(targetPlayer, itemId, value, name, quantity)
         return false, errorMsg or "No se pudo dar el item"
     end
 end
+
+-- Intentar iniciar el recurso items si no está disponible
+local function ensureItemsResource()
+    local itemsResource = getResourceFromName("items")
+    if not itemsResource then
+        -- Intentar buscar en la ruta relativa dentro del gamemode
+        itemsResource = getResourceFromName("colombia-rp/items")
+    end
+    if not itemsResource then
+        -- Intentar buscar todos los recursos y encontrar items
+        local allResources = getResources()
+        for _, res in ipairs(allResources) do
+            local resName = getResourceName(res)
+            if resName == "items" or string.find(resName, "items") then
+                itemsResource = res
+                break
+            end
+        end
+    end
+    
+    if itemsResource then
+        local itemsState = getResourceState(itemsResource)
+        if itemsState == "loaded" or itemsState == "stopped" then
+            startResource(itemsResource)
+            -- Esperar un momento para que el recurso se inicie
+            setTimer(function()
+                outputServerLog("[ITEMS] Recurso 'items' iniciado automáticamente")
+            end, 500, 1)
+        end
+    end
+end
+
+-- Intentar iniciar items cuando se inicia este recurso
+addEventHandler("onResourceStart", resourceRoot, function()
+    ensureItemsResource()
+end)
 
 -- Evento para obtener la lista de items (para el panel)
 addEvent("admin:getItemsList", true)
@@ -90,6 +135,9 @@ addEventHandler("admin:getItemsList", root, function()
     if role ~= "admin" and role ~= "staff" and role ~= "moderator" then
         return
     end
+    
+    -- Intentar iniciar items si no está disponible
+    ensureItemsResource()
     
     local itemsList = getAllItemsList()
     triggerClientEvent(source, "admin:receiveItemsList", resourceRoot, itemsList)
@@ -154,17 +202,23 @@ addEventHandler("admin:giveItems", root, function(characterId, itemsData)
             if success then
                 successCount = successCount + 1
                 local itemName = "Item " .. itemId
-                local success2, nameResult = pcall(function() return exports.items:getName(itemId) end)
-                if success2 and nameResult and nameResult ~= " " and nameResult ~= "" then
-                    itemName = nameResult
+                local getNameFunc = getItemNameFunc()
+                if getNameFunc then
+                    local nameResult = getNameFunc(itemId)
+                    if nameResult and nameResult ~= " " and nameResult ~= "" then
+                        itemName = nameResult
+                    end
                 end
                 table.insert(messages, "✓ " .. itemName .. " x" .. quantity)
             else
                 failCount = failCount + 1
                 local itemName = "Item " .. itemId
-                local success2, nameResult = pcall(function() return exports.items:getName(itemId) end)
-                if success2 and nameResult and nameResult ~= " " and nameResult ~= "" then
-                    itemName = nameResult
+                local getNameFunc = getItemNameFunc()
+                if getNameFunc then
+                    local nameResult = getNameFunc(itemId)
+                    if nameResult and nameResult ~= " " and nameResult ~= "" then
+                        itemName = nameResult
+                    end
                 end
                 table.insert(messages, "✗ " .. itemName .. ": " .. (errorMsg or "Error"))
             end
