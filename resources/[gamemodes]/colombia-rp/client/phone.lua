@@ -270,8 +270,8 @@ addEventHandler("onClientKey", root, function(key, press)
         return
     end
     
-    -- Procesar tecla "i" para cerrar el teléfono
-    if key == "i" then
+    -- Procesar tecla "m" para cerrar el teléfono
+    if key == "m" then
         -- Verificar si hay un personaje seleccionado
         if not getElementData(localPlayer, "character:selected") then
             return
@@ -283,7 +283,7 @@ addEventHandler("onClientKey", root, function(key, press)
         end
         -- Cerrar el teléfono inmediatamente
         closePhone()
-        -- Cancelar el evento para evitar que el navegador lo procese
+        -- Cancelar el evento para evitar que el navegador lo procese y que el cursor toggle lo procese
         cancelEvent()
         return
     end
