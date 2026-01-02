@@ -1,6 +1,6 @@
 -- Sistema de Personajes
 -- Nota: Los eventos están registrados en server/events.lua
-addEventHandler("requestCharacters", resourceRoot, function()
+addEventHandler("requestCharacters", getRootElement(), function()
     local userId = getElementData(source, "account:userId")
     if not userId then
         triggerClientEvent(source, "receiveCharacters", resourceRoot, {})
@@ -18,7 +18,13 @@ addEventHandler("requestCharacters", resourceRoot, function()
 end)
 
 -- Crear nuevo personaje
-addEventHandler("createCharacter", resourceRoot, function(name, surname, age, gender, skin)
+addEventHandler("createCharacter", getRootElement(), function(name, surname, age, gender, skin)
+    -- Verificar que source sea un jugador
+    if not isElement(source) or getElementType(source) ~= "player" then
+        outputServerLog("[CHARACTERS] ERROR: createCharacter recibido de elemento inválido")
+        return
+    end
+    
     outputServerLog("[CHARACTERS] Evento createCharacter recibido de " .. getPlayerName(source))
     outputServerLog("[CHARACTERS] Datos recibidos - Nombre: " .. tostring(name) .. ", Apellido: " .. tostring(surname) .. ", Edad: " .. tostring(age))
     
@@ -166,7 +172,7 @@ addEventHandler("createCharacter", resourceRoot, function(name, surname, age, ge
 end)
 
 -- Seleccionar personaje
-addEventHandler("selectCharacter", resourceRoot, function(characterId)
+addEventHandler("selectCharacter", getRootElement(), function(characterId)
     local userId = getElementData(source, "account:userId")
     if not userId then
         return
@@ -226,7 +232,7 @@ addEventHandler("selectCharacter", resourceRoot, function(characterId)
 end)
 
 -- Eliminar personaje
-addEventHandler("deleteCharacter", resourceRoot, function(characterId)
+addEventHandler("deleteCharacter", getRootElement(), function(characterId)
     local userId = getElementData(source, "account:userId")
     if not userId then
         return

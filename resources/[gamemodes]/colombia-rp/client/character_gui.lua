@@ -50,7 +50,7 @@ function showCharacterGUI()
         if selectedRow ~= -1 then
             local characterId = guiGridListGetItemData(characterList, selectedRow, 1)
             if characterId then
-                triggerServerEvent("selectCharacter", resourceRoot, characterId)
+                triggerServerEvent("selectCharacter", getLocalPlayer(), characterId)
             else
                 outputChatBox("Selecciona un personaje de la lista", 255, 0, 0)
             end
@@ -69,7 +69,7 @@ function showCharacterGUI()
             local characterId = guiGridListGetItemData(characterList, selectedRow, 1)
             if characterId then
                 if confirm("¿Estás seguro de eliminar este personaje?") then
-                    triggerServerEvent("deleteCharacter", resourceRoot, characterId)
+                    triggerServerEvent("deleteCharacter", getLocalPlayer(), characterId)
                 end
             end
         else
@@ -78,7 +78,7 @@ function showCharacterGUI()
     end, false)
     
     -- Solicitar lista de personajes
-    triggerServerEvent("requestCharacters", resourceRoot)
+    triggerServerEvent("requestCharacters", getLocalPlayer())
 end
 
 function hideCharacterGUI()
@@ -153,7 +153,7 @@ function showCreateCharacterGUI()
         end
         
         outputChatBox("[DEBUG] Enviando createCharacter: " .. name .. " " .. surname .. " (" .. age .. " años)", 255, 255, 0)
-        triggerServerEvent("createCharacter", resourceRoot, name, surname, age, gender, 0)
+        triggerServerEvent("createCharacter", getLocalPlayer(), name, surname, age, gender, 0)
         hideCreateCharacterGUI()
     end, false)
     
@@ -236,7 +236,7 @@ addEvent("characterDeleteResponse", true)
 addEventHandler("characterDeleteResponse", resourceRoot, function(success, message)
     if success then
         outputChatBox(message, 0, 255, 0)
-        triggerServerEvent("requestCharacters", resourceRoot)
+        triggerServerEvent("requestCharacters", getLocalPlayer())
     else
         outputChatBox("Error: " .. message, 255, 0, 0)
     end
