@@ -184,8 +184,12 @@ function saveContactsToMTA() {
     // Guardar siempre, incluso si no hay contactos (para limpiar)
     if (window.mta && window.mta.triggerEvent) {
         try {
-            window.mta.triggerEvent('saveContacts', JSON.stringify(contacts || []));
-            console.log('Contactos guardados:', (contacts || []).length, 'contactos');
+            const contactsToSave = contacts || [];
+            const jsonString = JSON.stringify(contactsToSave);
+            console.log('Guardando contactos:', contactsToSave.length, 'contactos');
+            console.log('JSON a enviar:', jsonString);
+            window.mta.triggerEvent('saveContacts', jsonString);
+            console.log('Evento saveContacts enviado correctamente');
         } catch (e) {
             console.error('Error al guardar contactos:', e);
         }
@@ -280,6 +284,28 @@ let myPhoneNumber = '';
 function setMyPhoneNumber(number) {
     myPhoneNumber = number;
     loadContacts();
+}
+
+// Función para cargar contactos desde el servidor
+function loadContactsFromServer(contactsJson) {
+    try {
+        if (contactsJson && contactsJson !== '[]' && contactsJson !== '') {
+            const parsedContacts = JSON.parse(contactsJson);
+            if (Array.isArray(parsedContacts)) {
+                contacts = parsedContacts;
+                console.log('Contactos cargados desde el servidor:', contacts.length);
+                loadContacts();
+            }
+        } else {
+            contacts = [];
+            console.log('No hay contactos guardados, iniciando con lista vacía');
+            loadContacts();
+        }
+    } catch (e) {
+        console.error('Error al cargar contactos desde el servidor:', e);
+        contacts = [];
+        loadContacts();
+    }
 }
 
 // Función para cargar contactos

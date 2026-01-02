@@ -359,8 +359,21 @@ addEventHandler("useItem", root, function(slot, itemId, itemIndex)
             end
         end
         
-        -- Abrir el teléfono en el cliente y enviar el número
-        triggerClientEvent(source, "openPhone", resourceRoot, phoneNumber)
+        -- Cargar contactos desde la base de datos
+        local contactsQuery = "SELECT contact_name, contact_number FROM phone_contacts WHERE character_id = ? ORDER BY id ASC"
+        local contactsResult = queryDatabase(contactsQuery, characterId)
+        local contactsList = {}
+        if contactsResult and #contactsResult > 0 then
+            for _, contact in ipairs(contactsResult) do
+                table.insert(contactsList, {
+                    name = contact.contact_name,
+                    number = contact.contact_number
+                })
+            end
+        end
+        
+        -- Abrir el teléfono en el cliente y enviar el número y contactos
+        triggerClientEvent(source, "openPhone", resourceRoot, phoneNumber, contactsList)
         return
     end
     

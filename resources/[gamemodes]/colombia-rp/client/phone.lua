@@ -95,34 +95,117 @@ function closePhone()
     if phoneBrowser and isElement(phoneBrowser) then
         removeEventHandler("onClientBrowserCreated", phoneBrowser, loadPhoneBrowser)
         removeEventHandler("onClientBrowserDocumentReady", phoneBrowser, whenPhoneBrowserReady)
-        guiSetInputMode("allow_binds")
         destroyElement(phoneBrowser)
         phoneBrowser = nil
         browserContent = nil
     end
     
     renderTime(false)
+    
+    -- Restaurar controles del juego
     showCursor(false)
     guiSetInputEnabled(false)
+    guiSetInputMode("allow_binds")
+    
+    -- Asegurar que el jugador pueda moverse y usar controles
+    setTimer(function()
+        -- Forzar restauración de controles
+        toggleControl("fire", true)
+        toggleControl("next_weapon", true)
+        toggleControl("previous_weapon", true)
+        toggleControl("forwards", true)
+        toggleControl("backwards", true)
+        toggleControl("left", true)
+        toggleControl("right", true)
+        toggleControl("jump", true)
+        toggleControl("sprint", true)
+        toggleControl("crouch", true)
+        toggleControl("walk", true)
+        toggleControl("enter_exit", true)
+        toggleControl("vehicle_fire", true)
+        toggleControl("vehicle_secondary_fire", true)
+        toggleControl("steer_forward", true)
+        toggleControl("steer_back", true)
+        toggleControl("accelerate", true)
+        toggleControl("brake_reverse", true)
+        toggleControl("handbrake", true)
+        toggleControl("horn", true)
+        toggleControl("sub_mission", true)
+        toggleControl("radio_next", true)
+        toggleControl("radio_previous", true)
+        toggleControl("radio_user_track_skip", true)
+        toggleControl("vehicle_look_left", true)
+        toggleControl("vehicle_look_right", true)
+        toggleControl("vehicle_look_behind", true)
+        toggleControl("vehicle_mouse_look", true)
+        toggleControl("special_control_left", true)
+        toggleControl("special_control_right", true)
+        toggleControl("special_control_up", true)
+        toggleControl("special_control_down", true)
+        toggleControl("aim_weapon", true)
+        toggleControl("conversation_yes", true)
+        toggleControl("conversation_no", true)
+        toggleControl("group_control_forwards", true)
+        toggleControl("group_control_back", true)
+        toggleControl("enter_passenger", true)
+        toggleControl("cycle_weapon_left", true)
+        toggleControl("cycle_weapon_right", true)
+        toggleControl("change_camera", true)
+        toggleControl("vehicle_next_radio", true)
+        toggleControl("vehicle_prev_radio", true)
+    end, 100, 1)
 end
 
 -- Evento del servidor para abrir el teléfono
 addEvent("openPhone", true)
-addEventHandler("openPhone", resourceRoot, function(phoneNumber)
+addEventHandler("openPhone", resourceRoot, function(phoneNumber, contactsList)
     if phoneNumber then
         -- Guardar el número de teléfono en el elemento data del jugador
         setElementData(localPlayer, "phone:number", phoneNumber)
-        -- Mostrar el número en el teléfono (opcional, puedes agregarlo a la interfaz)
-        outputChatBox("Tu número: " .. phoneNumber, 0, 255, 0)
     end
     openPhone()
     
-    -- Enviar el número al navegador cuando esté listo
+    -- Enviar el número y contactos al navegador cuando esté listo
     setTimer(function()
-        if browserContent and isElement(browserContent) and phoneNumber then
-            executeBrowserJavascript(browserContent, "setMyPhoneNumber('" .. tostring(phoneNumber) .. "');")
+        if browserContent and isElement(browserContent) then
+            if phoneNumber then
+                executeBrowserJavascript(browserContent, "setMyPhoneNumber('" .. tostring(phoneNumber) .. "');")
+            end
+            if contactsList and type(contactsList) == "table" and #contactsList > 0 then
+                -- Convertir tabla a JSON manualmente
+                local jsonStr = "["
+                for i, contact in ipairs(contactsList) do
+                    if i > 1 then jsonStr = jsonStr .. "," end
+                    jsonStr = jsonStr .. "{"
+                    jsonStr = jsonStr .. "\"name\":\"" .. (contact.name or ""):gsub("\"", "\\\"") .. "\","
+                    jsonStr = jsonStr .. "\"number\":\"" .. (contact.number or ""):gsub("\"", "\\\"") .. "\""
+                    jsonStr = jsonStr .. "}"
+                end
+                jsonStr = jsonStr .. "]"
+                executeBrowserJavascript(browserContent, "loadContactsFromServer('" .. jsonStr .. "');")
+            end
         end
     end, 500, 1)
+end)
+
+-- Evento para recibir contactos del servidor
+addEvent("receiveContacts", true)
+addEventHandler("receiveContacts", resourceRoot, function(contactsList)
+    if browserContent and isElement(browserContent) and contactsList then
+        -- Convertir tabla a JSON manualmente
+        local jsonStr = "["
+        if contactsList and #contactsList > 0 then
+            for i, contact in ipairs(contactsList) do
+                if i > 1 then jsonStr = jsonStr .. "," end
+                jsonStr = jsonStr .. "{"
+                jsonStr = jsonStr .. "\"name\":\"" .. (contact.name or ""):gsub("\"", "\\\"") .. "\","
+                jsonStr = jsonStr .. "\"number\":\"" .. (contact.number or ""):gsub("\"", "\\\"") .. "\""
+                jsonStr = jsonStr .. "}"
+            end
+        end
+        jsonStr = jsonStr .. "]"
+        executeBrowserJavascript(browserContent, "loadContactsFromServer('" .. jsonStr .. "');")
+    end
 end)
 
 -- Evento del servidor para cerrar el teléfono
@@ -134,7 +217,14 @@ end)
 -- Evento para cerrar el teléfono desde el navegador (botón home cuando ya está en home)
 addEvent("closePhoneFromBrowser", true)
 addEventHandler("closePhoneFromBrowser", localPlayer, function()
-    closePhone()
+    -- Guardar contactos antes de cerrar
+    if browserContent and isElement(browserContent) then
+        executeBrowserJavascript(browserContent, "saveContactsToMTA();")
+    end
+    -- Pequeño delay para asegurar que se guarden los contactos
+    setTimer(function()
+        closePhone()
+    end, 100, 1)
 end)
 
 -- Cerrar teléfono con tecla ESC

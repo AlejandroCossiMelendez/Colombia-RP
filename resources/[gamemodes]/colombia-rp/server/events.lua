@@ -68,4 +68,11 @@ addEvent("admin:giveMoneyResponse", true)
 addEvent("admin:invisibilityUpdate", true)
 outputServerLog("[EVENTS] Eventos del panel de administración registrados: admin:revivePlayer, admin:teleportToPlayer, admin:bringPlayer, admin:toggleInvisibility, admin:healPlayer, admin:giveMoney, admin:getCoords, admin:getItemsList, admin:giveItems, admin:reviveResponse, admin:teleportResponse, admin:healResponse, admin:giveMoneyResponse, admin:giveItemsResponse, admin:invisibilityUpdate")
 
+-- Eventos del teléfono
+addEvent("saveContacts", true)
+addEvent("loadContacts", true)
+addEvent("receiveContacts", true)
+addEvent("closePhoneFromBrowser", true)
+outputServerLog("[EVENTS] Eventos del teléfono registrados: saveContacts, loadContacts, receiveContacts, closePhoneFromBrowser")
+
 outputServerLog("[EVENTS] Todos los eventos registrados correctamente")

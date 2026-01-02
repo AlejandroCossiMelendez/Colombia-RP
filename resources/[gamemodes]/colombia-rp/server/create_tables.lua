@@ -99,6 +99,26 @@ function createItemsTables()
         outputServerLog("[TABLES] ✗ ERROR al crear tabla 'tlf_data'")
     end
     
+    -- Tabla: phone_contacts (contactos de teléfonos)
+    local phoneContactsTableSQL = [[
+        CREATE TABLE IF NOT EXISTS `phone_contacts` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `character_id` INT NOT NULL,
+            `contact_name` VARCHAR(100) NOT NULL,
+            `contact_number` VARCHAR(20) NOT NULL,
+            `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX `idx_character_id` (`character_id`),
+            INDEX `idx_contact_number` (`contact_number`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ]]
+    
+    success = executeDatabase(phoneContactsTableSQL)
+    if success then
+        outputServerLog("[TABLES] ✓ Tabla 'phone_contacts' creada o ya existe")
+    else
+        outputServerLog("[TABLES] ✗ ERROR al crear tabla 'phone_contacts'")
+    end
+    
     -- Tabla: maleteros (items en maleteros de vehículos)
     local maleterosTableSQL = [[
         CREATE TABLE IF NOT EXISTS `maleteros` (
