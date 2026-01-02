@@ -207,10 +207,7 @@ addEventHandler("saveContacts", resourceRoot, function(contactsJson)
     
     if contactsJson and type(contactsJson) == "string" then
         -- Enviar al servidor usando localPlayer como fuente
-        outputChatBox("[DEBUG] Enviando contactos al servidor: " .. string.sub(contactsJson, 1, 100) .. "...", 0, 255, 0)
         triggerServerEvent("saveContacts", localPlayer, contactsJson)
-    else
-        outputChatBox("[DEBUG] Error: contactsJson no es string o está vacío", 255, 0, 0)
     end
 end)
 

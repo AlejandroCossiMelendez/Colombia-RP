@@ -32,31 +32,49 @@ addEventHandler("saveContacts", root, function(contactsJson)
     end
     
     -- Parsear JSON de contactos
+    -- CRÍTICO: fromJSON en MTA puede tener problemas con arrays JSON
+    -- Usar parseo manual robusto usando patrones de string
     local contacts = nil
     local success, result = pcall(function()
-        if type(fromJSON) == "function" then
-            return fromJSON(contactsJson)
-        else
-            -- Fallback: usar loadstring
-            local func = loadstring("return " .. contactsJson)
-            if func then
-                return func()
+        -- Parseo manual usando patrones de string para extraer contactos
+        -- Formato esperado: [{"name":"...","number":"..."},{"name":"...","number":"..."}]
+        local contactArray = {}
+        local pattern = '%{"name":"([^"]+)","number":"([^"]+)"}'
+        
+        for name, number in contactsJson:gmatch(pattern) do
+            if name and number and name ~= "" and number ~= "" then
+                table.insert(contactArray, {name = name, number = number})
             end
-            return nil
         end
+        
+        if #contactArray > 0 then
+            outputServerLog("[PHONE] Parseo manual exitoso usando patrones: " .. #contactArray .. " contactos encontrados")
+            return contactArray
+        end
+        
+        -- Si el parseo manual falla, intentar con fromJSON como fallback
+        if type(fromJSON) == "function" then
+            outputServerLog("[PHONE] Parseo manual falló, intentando con fromJSON...")
+            return fromJSON(contactsJson)
+        end
+        
+        return nil
     end)
     
     if not success then
-        outputServerLog("[PHONE] ERROR: Error al parsear JSON de contactos")
+        outputServerLog("[PHONE] ERROR: Error al parsear JSON de contactos: " .. tostring(result))
         return
     end
+    
+    outputServerLog("[PHONE] JSON parseado exitosamente. Tipo: " .. type(result))
     
     -- Si result es nil o no es una tabla, verificar si es un array vacío
     if not result then
         -- Array vacío es válido, simplemente no hay contactos
         contacts = {}
+        outputServerLog("[PHONE] Result es nil, usando array vacío")
     elseif type(result) ~= "table" then
-        outputServerLog("[PHONE] ERROR: JSON parseado no es una tabla")
+        outputServerLog("[PHONE] ERROR: JSON parseado no es una tabla, es: " .. type(result))
         return
     else
         contacts = result
@@ -67,37 +85,126 @@ addEventHandler("saveContacts", root, function(contactsJson)
     local pairCount = 0
     local hasName = false
     local hasNumber = false
+    local numericKeys = {}
+    local nonNumericKeys = {}
+    
     for k, v in pairs(contacts) do
         pairCount = pairCount + 1
         if k == "name" then hasName = true end
         if k == "number" then hasNumber = true end
+        
+        -- Clasificar las claves
+        if type(k) == "number" then
+            table.insert(numericKeys, k)
+        else
+            table.insert(nonNumericKeys, k)
+        end
     end
     
-    -- Si el array está vacío pero tiene las propiedades name y number directamente, 
-    -- significa que fromJSON devolvió el objeto del array en lugar del array
-    if arrayLength == 0 and hasName and hasNumber then
-        -- Convertir el objeto único a un array con un elemento
-        contacts = {contacts}
+    outputServerLog("[PHONE] Estructura del JSON: arrayLength=" .. tostring(arrayLength) .. ", pairCount=" .. tostring(pairCount) .. ", hasName=" .. tostring(hasName) .. ", hasNumber=" .. tostring(hasNumber))
+    outputServerLog("[PHONE] Claves numéricas: " .. #numericKeys .. ", Claves no numéricas: " .. #nonNumericKeys)
+    
+    -- CRÍTICO: fromJSON puede devolver el JSON de diferentes maneras
+    -- Necesitamos reconstruir el array correctamente desde el objeto parseado
+    
+    -- Si arrayLength es 0 pero hay claves numéricas, significa que fromJSON devolvió un objeto con índices numéricos
+    -- pero el operador # no los cuenta correctamente
+    if arrayLength == 0 and #numericKeys > 0 then
+        -- Reconstruir el array desde las claves numéricas
+        local tempArray = {}
+        table.sort(numericKeys)
+        for _, key in ipairs(numericKeys) do
+            if type(contacts[key]) == "table" then
+                table.insert(tempArray, contacts[key])
+            end
+        end
+        if #tempArray > 0 then
+            contacts = tempArray
+            outputServerLog("[PHONE] Reconstruido array desde claves numéricas: " .. #contacts .. " contactos")
+        end
+    -- Si arrayLength es 0 pero tiene name y number, fromJSON devolvió solo el primer objeto del array
+    elseif arrayLength == 0 and hasName and hasNumber then
+        -- fromJSON devolvió solo el primer objeto, necesitamos parsear el JSON manualmente
+        outputServerLog("[PHONE] fromJSON devolvió solo el primer objeto, parseando manualmente...")
+        
+        -- Intentar parsear el JSON manualmente usando loadstring
+        local success2, result2 = pcall(function()
+            -- Reemplazar corchetes y llaves para que Lua pueda parsearlo
+            local luaCode = contactsJson:gsub("%[", "{"):gsub("%]", "}")
+            local func = loadstring("return " .. luaCode)
+            if func then
+                return func()
+            end
+            return nil
+        end)
+        
+        if success2 and result2 and type(result2) == "table" then
+            -- Verificar si ahora tenemos un array válido
+            local newArrayLength = #result2
+            if newArrayLength > 0 then
+                contacts = result2
+                outputServerLog("[PHONE] Parseado manual exitoso: " .. newArrayLength .. " contactos")
+            else
+                -- Intentar extraer contactos desde el objeto parseado
+                local tempArray = {}
+                for k, v in pairs(result2) do
+                    if type(k) == "number" and type(v) == "table" and v.name and v.number then
+                        table.insert(tempArray, v)
+                    end
+                end
+                if #tempArray > 0 then
+                    contacts = tempArray
+                    outputServerLog("[PHONE] Extraídos " .. #tempArray .. " contactos del parseo manual")
+                end
+            end
+        else
+            -- Si el parseo manual falla, convertir el objeto único a array
+            contacts = {contacts}
+            outputServerLog("[PHONE] Convertido objeto único a array (fallback)")
+        end
     elseif arrayLength == 0 and pairCount > 0 then
         -- Intentar convertir objeto a array
         local tempArray = {}
         for k, v in pairs(contacts) do
             if type(k) == "number" and type(v) == "table" then
                 table.insert(tempArray, v)
-            elseif type(v) == "table" then
-                -- Podría ser un objeto con propiedades name y number
-                if v.name and v.number then
-                    table.insert(tempArray, v)
-                end
+            elseif type(v) == "table" and v.name and v.number then
+                table.insert(tempArray, v)
             end
         end
         if #tempArray > 0 then
             contacts = tempArray
+            outputServerLog("[PHONE] Convertido objeto a array con " .. #tempArray .. " elementos")
         end
     end
     
-    -- Si después de todo el procesamiento el array está vacío, está bien (no hay contactos)
-    -- No necesitamos hacer nada especial, simplemente continuar con el proceso de eliminación e inserción
+    -- Verificar que contacts sea un array válido
+    if type(contacts) ~= "table" then
+        outputServerLog("[PHONE] ERROR: contacts no es una tabla después del procesamiento")
+        return
+    end
+    
+    -- CRÍTICO: Extraer todos los contactos usando pairs para asegurar que no se pierda ninguno
+    local allContacts = {}
+    for k, v in pairs(contacts) do
+        if type(k) == "number" and type(v) == "table" and v.name and v.number then
+            -- Es un elemento del array con índice numérico y tiene name/number
+            table.insert(allContacts, v)
+        elseif type(v) == "table" and v.name and v.number and type(k) ~= "string" then
+            -- Es un objeto con propiedades name y number (no es una propiedad del objeto)
+            table.insert(allContacts, v)
+        end
+    end
+    
+    -- Si encontramos contactos con pairs, usar esos
+    if #allContacts > 0 then
+        if #allContacts ~= #contacts then
+            outputServerLog("[PHONE] Encontrados " .. #allContacts .. " contactos con pairs vs " .. #contacts .. " con ipairs, usando pairs")
+        end
+        contacts = allContacts
+    end
+    
+    outputServerLog("[PHONE] Contactos finales después del procesamiento completo: " .. #contacts)
     
     -- Eliminar contactos antiguos del personaje
     local deleteQuery = "DELETE FROM phone_contacts WHERE character_id = ?"
@@ -111,6 +218,7 @@ addEventHandler("saveContacts", root, function(contactsJson)
     
     -- Si el array está vacío, solo eliminar y terminar
     if #contacts == 0 then
+        outputServerLog("[PHONE] No hay contactos para insertar, solo se eliminaron los antiguos")
         return
     end
     
@@ -119,6 +227,7 @@ addEventHandler("saveContacts", root, function(contactsJson)
     local errorCount = 0
     outputServerLog("[PHONE] Total de contactos a insertar: " .. tostring(#contacts))
     
+    -- Usar ipairs para procesar en orden
     for i, contact in ipairs(contacts) do
         -- Validar que el contacto tenga los campos necesarios
         local name = contact.name
@@ -143,6 +252,13 @@ addEventHandler("saveContacts", root, function(contactsJson)
     end
     
     outputServerLog("[PHONE] Contactos guardados: " .. tostring(insertCount) .. " exitosos, " .. tostring(errorCount) .. " errores")
+    
+    -- Mostrar mensaje de confirmación al jugador
+    if insertCount > 0 then
+        outputChatBox("✓ " .. tostring(insertCount) .. " contacto(s) guardado(s) correctamente.", player, 0, 255, 0)
+    elseif errorCount > 0 then
+        outputChatBox("Error: No se pudieron guardar algunos contactos. Intenta de nuevo.", player, 255, 0, 0)
+    end
 end)
 
 -- Evento para cargar contactos
@@ -181,3 +297,4 @@ addEventHandler("loadContacts", root, function()
     -- Enviar contactos al cliente
     triggerClientEvent(player, "receiveContacts", resourceRoot, contactsList)
 end)
+
