@@ -630,7 +630,7 @@ function showGiveItemsPanel()
     local deselectBtn = guiCreateButton(140, 500, 120, 30, "Deseleccionar", false, itemsPanel)
     local clearBtn = guiCreateButton(270, 500, 120, 30, "Limpiar Todo", false, itemsPanel)
     local giveBtn = guiCreateButton(500, 500, 140, 30, "Dar Items", false, itemsPanel)
-    local cancelBtn = guiCreateButton(500, 510, 140, 30, "Cancelar", false, itemsPanel)
+    local cancelBtn = guiCreateButton(500, 540, 140, 30, "Cancelar", false, itemsPanel)
     
     -- Función para actualizar el label de items seleccionados
     local function updateSelectedLabel()
