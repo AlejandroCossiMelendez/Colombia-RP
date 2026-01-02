@@ -42,7 +42,21 @@ end
 -- Eventos del servidor
 addEvent("showLoginGUI", true)
 addEventHandler("showLoginGUI", resourceRoot, function()
-    showLoginGUI()
+    outputChatBox("Mostrando GUI de login...", 255, 255, 0)
+    if not loginBrowser then
+        showLoginGUI()
+    end
+end)
+
+-- También mostrar login cuando el recurso se inicia y el jugador ya está conectado
+addEventHandler("onClientResourceStart", resourceRoot, function()
+    if getElementData(localPlayer, "account:loggedIn") ~= true then
+        setTimer(function()
+            if not loginBrowser then
+                showLoginGUI()
+            end
+        end, 1000, 1)
+    end
 end)
 
 addEvent("loginResponse", true)

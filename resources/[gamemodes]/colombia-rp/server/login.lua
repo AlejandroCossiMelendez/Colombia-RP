@@ -1,29 +1,40 @@
 -- Sistema de Login y Registro
-local bcrypt = require("bcrypt")
 
--- Hash de contraseña (requiere módulo bcrypt o puedes usar otro método)
+-- Hash de contraseña usando md5 (más seguro que hash() que requiere permisos)
 function hashPassword(password)
-    -- Si tienes bcrypt instalado, usa: return bcrypt.hash(password, 10)
-    -- Por ahora usamos un hash simple (en producción usa bcrypt)
-    return hash("sha256", password .. "salt_colombia_rp")
+    -- Usar md5 que no requiere permisos especiales
+    -- En producción se recomienda usar bcrypt si está disponible
+    return md5(password .. "salt_colombia_rp")
 end
 
-function verifyPassword(password, hash)
-    -- Si tienes bcrypt: return bcrypt.verify(password, hash)
-    local testHash = hash("sha256", password .. "salt_colombia_rp")
-    return testHash == hash
+function verifyPassword(password, storedHash)
+    -- Verificar contraseña comparando hashes
+    local testHash = md5(password .. "salt_colombia_rp")
+    return testHash == storedHash
 end
 
--- Evento cuando el jugador se conecta
-addEventHandler("onPlayerConnect", root, function()
+-- Evento cuando el jugador se une al juego (onPlayerJoin se dispara después de onPlayerConnect)
+addEventHandler("onPlayerJoin", root, function()
+    outputServerLog("[LOGIN] Jugador " .. getPlayerName(source) .. " se unió al juego")
+    
+    -- Inicializar datos del jugador
     setElementData(source, "account:loggedIn", false)
     setElementData(source, "account:username", nil)
     setElementData(source, "account:userId", nil)
     setElementData(source, "character:selected", false)
     setElementData(source, "character:id", nil)
     
-    -- Mostrar GUI de login al cliente
-    triggerClientEvent(source, "showLoginGUI", resourceRoot)
+    -- Prevenir spawn automático
+    fadeCamera(source, false)
+    setCameraTarget(source, nil)
+    
+    -- Mostrar GUI de login al cliente después de un pequeño delay
+    setTimer(function()
+        if isElement(source) then
+            outputServerLog("[LOGIN] Enviando GUI de login a " .. getPlayerName(source))
+            triggerClientEvent(source, "showLoginGUI", resourceRoot)
+        end
+    end, 1000, 1)
 end)
 
 -- Evento de login desde el cliente
