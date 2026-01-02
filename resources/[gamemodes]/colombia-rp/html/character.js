@@ -63,11 +63,62 @@ function showCreateModal() {
 // Función para ocultar modal
 function hideCreateModal() {
     document.getElementById('createModal').classList.remove('active');
+    // Cerrar dropdown si está abierto
+    closeGenderDropdown();
     // Limpiar formulario
     document.getElementById('charName').value = '';
     document.getElementById('charSurname').value = '';
     document.getElementById('charAge').value = '25';
     document.getElementById('charGender').value = '0';
+    document.getElementById('genderDisplay').textContent = 'Masculino';
+    // Resetear selección de género
+    document.querySelectorAll('.select-option').forEach((option, index) => {
+        if (index === 0) {
+            option.classList.add('selected');
+        } else {
+            option.classList.remove('selected');
+        }
+    });
+}
+
+// Funciones para el selector personalizado de género
+function toggleGenderDropdown() {
+    const customSelect = document.querySelector('.custom-select');
+    const isActive = customSelect.classList.contains('active');
+    
+    // Cerrar otros dropdowns si están abiertos
+    document.querySelectorAll('.custom-select').forEach(select => {
+        if (select !== customSelect) {
+            select.classList.remove('active');
+        }
+    });
+    
+    // Toggle del dropdown actual
+    if (isActive) {
+        customSelect.classList.remove('active');
+    } else {
+        customSelect.classList.add('active');
+    }
+}
+
+function closeGenderDropdown() {
+    document.querySelectorAll('.custom-select').forEach(select => {
+        select.classList.remove('active');
+    });
+}
+
+function selectGender(value, text, event) {
+    document.getElementById('charGender').value = value;
+    document.getElementById('genderDisplay').textContent = text;
+    closeGenderDropdown();
+    
+    // Actualizar clase selected en las opciones
+    document.querySelectorAll('.select-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    if (event && event.target) {
+        event.target.classList.add('selected');
+    }
 }
 
 // Función para crear personaje
@@ -103,11 +154,25 @@ function createCharacter(e) {
     // Asignar skin según el género: 0 = masculino (skin 0), 1 = femenino (skin 216)
     const skin = (gender === 0) ? 0 : 216;
     
-    if (window.mta) {
-        window.mta.triggerEvent('createCharacter', name, surname, age, gender, skin);
-        hideCreateModal();
+    // Validar que gender sea un número válido
+    if (isNaN(gender) || (gender !== 0 && gender !== 1)) {
+        showError('Por favor selecciona un género válido');
+        return;
+    }
+    
+    console.log('Enviando createCharacter:', { name, surname, age, gender, skin });
+    
+    if (window.mta && window.mta.triggerEvent) {
+        try {
+            window.mta.triggerEvent('createCharacter', name, surname, age, gender, skin);
+            console.log('Evento createCharacter enviado correctamente');
+            hideCreateModal();
+        } catch (error) {
+            console.error('Error al enviar evento:', error);
+            showError('Error al enviar los datos. Intenta nuevamente.');
+        }
     } else {
-        console.error('MTA no está disponible');
+        console.error('MTA no está disponible o triggerEvent no existe');
         showError('Error de conexión con el juego');
     }
 }
@@ -144,6 +209,12 @@ document.addEventListener('click', function(e) {
     if (e.target === modal) {
         hideCreateModal();
     }
+    
+    // Cerrar dropdown si se hace clic fuera
+    const customSelect = document.querySelector('.custom-select');
+    if (customSelect && !customSelect.contains(e.target)) {
+        closeGenderDropdown();
+    }
 });
 
 // Funciones expuestas para MTA
@@ -155,4 +226,7 @@ window.selectCharacter = selectCharacter;
 window.createCharacter = createCharacter;
 window.showCreateModal = showCreateModal;
 window.hideCreateModal = hideCreateModal;
+window.toggleGenderDropdown = toggleGenderDropdown;
+window.selectGender = selectGender;
+window.closeGenderDropdown = closeGenderDropdown;
 

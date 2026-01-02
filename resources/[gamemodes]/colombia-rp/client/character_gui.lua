@@ -127,7 +127,7 @@ end
 
 -- Eventos desde el navegador
 addEvent("selectCharacter", true)
-addEventHandler("selectCharacter", resourceRoot, function(characterId)
+addEventHandler("selectCharacter", root, function(characterId)
     if not characterId then
         if browserContent and isElement(browserContent) then
             executeBrowserJavascript(browserContent, "showError('ID de personaje inválido');")
@@ -140,7 +140,7 @@ addEventHandler("selectCharacter", resourceRoot, function(characterId)
 end)
 
 addEvent("deleteCharacter", true)
-addEventHandler("deleteCharacter", resourceRoot, function(characterId)
+addEventHandler("deleteCharacter", root, function(characterId)
     if not characterId then
         if browserContent and isElement(browserContent) then
             executeBrowserJavascript(browserContent, "showError('ID de personaje inválido');")
@@ -153,8 +153,11 @@ addEventHandler("deleteCharacter", resourceRoot, function(characterId)
 end)
 
 addEvent("createCharacter", true)
-addEventHandler("createCharacter", resourceRoot, function(name, surname, age, gender, skin)
+addEventHandler("createCharacter", root, function(name, surname, age, gender, skin)
+    outputChatBox("[DEBUG] createCharacter recibido: name=" .. tostring(name) .. ", surname=" .. tostring(surname) .. ", age=" .. tostring(age) .. ", gender=" .. tostring(gender) .. ", skin=" .. tostring(skin), 255, 255, 0)
+    
     if not name or not surname or not age then
+        outputChatBox("[DEBUG] Error: Faltan campos requeridos", 255, 0, 0)
         if browserContent and isElement(browserContent) then
             executeBrowserJavascript(browserContent, "showError('Por favor completa todos los campos');")
         end
