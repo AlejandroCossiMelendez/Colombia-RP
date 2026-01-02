@@ -7,7 +7,8 @@ const getAll = (element) => { return document.querySelectorAll(element) };
 let isDragging = false;
 let startY = 0;
 let currentY = 0;
-let dragThreshold = 50; // Píxeles que debe arrastrar para cerrar
+let dragThreshold = 80; // Píxeles que debe arrastrar para cerrar (aumentado para mejor UX)
+let isClosing = false; // Flag para evitar múltiples cierres
 
 const config = {
     battery: {
@@ -77,7 +78,7 @@ function handleDragStart(e) {
 }
 
 function handleDragMove(e) {
-    if (!isDragging) return;
+    if (!isDragging || isClosing) return;
     
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     currentY = clientY;
@@ -89,14 +90,21 @@ function handleDragMove(e) {
         const iphone = get('.iphone');
         if (iphone) {
             // Mover el teléfono visualmente mientras se arrastra
-            const maxMove = 200; // Máximo movimiento en píxeles
+            const maxMove = 300; // Máximo movimiento en píxeles (aumentado)
             const moveAmount = Math.min(deltaY, maxMove);
             iphone.style.transform = `translateY(${moveAmount}px)`;
             iphone.style.transition = 'none';
             
             // Cambiar opacidad mientras se arrastra
-            const opacity = 1 - (moveAmount / maxMove) * 0.5;
+            const opacity = Math.max(0.3, 1 - (moveAmount / maxMove) * 0.7);
             iphone.style.opacity = opacity;
+            
+            // Si se arrastra más del umbral, cambiar el color para indicar que se cerrará
+            if (deltaY > dragThreshold) {
+                iphone.style.filter = 'brightness(0.7)';
+            } else {
+                iphone.style.filter = 'brightness(1)';
+            }
         }
         
         // Prevenir scroll
@@ -107,33 +115,45 @@ function handleDragMove(e) {
 }
 
 function handleDragEnd(e) {
-    if (!isDragging) return;
+    if (!isDragging || isClosing) return;
     
-    isDragging = false;
     const deltaY = currentY - startY;
-    
     const iphone = get('.iphone');
-    if (iphone) {
-        // Restaurar transición
-        iphone.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+    
+    // Si se arrastró lo suficiente, cerrar el teléfono
+    if (deltaY > dragThreshold && iphone) {
+        isClosing = true;
+        isDragging = false;
         
-        // Si se arrastró lo suficiente, cerrar el teléfono
-        if (deltaY > dragThreshold) {
-            // Guardar contactos antes de cerrar
-            saveContactsToMTA();
-            
-            // Cerrar el teléfono
+        // Guardar contactos antes de cerrar
+        saveContactsToMTA();
+        
+        // Animación de cierre suave
+        iphone.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out, filter 0.4s ease-out';
+        iphone.style.transform = 'translateY(400px)';
+        iphone.style.opacity = '0';
+        iphone.style.filter = 'brightness(0.5)';
+        
+        // Cerrar el teléfono después de la animación
+        setTimeout(function() {
             if (window.mta && window.mta.triggerEvent) {
                 window.mta.triggerEvent('closePhoneFromBrowser');
             }
-            // Resetear posición
-            iphone.style.transform = 'translateY(0)';
-            iphone.style.opacity = '1';
-        } else {
-            // Volver a la posición original
-            iphone.style.transform = 'translateY(0)';
-            iphone.style.opacity = '1';
-        }
+            // Resetear estilos
+            if (iphone) {
+                iphone.style.transform = 'translateY(0)';
+                iphone.style.opacity = '1';
+                iphone.style.filter = 'brightness(1)';
+            }
+            isClosing = false;
+        }, 400);
+    } else if (iphone) {
+        // Volver a la posición original con animación
+        isDragging = false;
+        iphone.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out, filter 0.3s ease-out';
+        iphone.style.transform = 'translateY(0)';
+        iphone.style.opacity = '1';
+        iphone.style.filter = 'brightness(1)';
     }
     
     startY = 0;
