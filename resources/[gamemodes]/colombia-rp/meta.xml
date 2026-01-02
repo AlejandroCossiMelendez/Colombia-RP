@@ -525,8 +525,8 @@
     <file src="items/images/vodka.png" type="client" />
     <file src="items/images/vino.png" type="client" />
     
-    <!-- Archivos HTML -->
-    <file src="client/login.html" type="client" />
+    <!-- Archivos -->
+    <file src="colombia-rp-login.png" type="client" />
     <file src="client/character.html" type="client" />
 </meta>
 

@@ -1,165 +1,345 @@
--- GUI de Login usando Navegador Web (HTML/CSS/JS)
-local loginBrowser = nil
-local loginBrowserElement = nil -- Referencia al elemento browser interno
-local isBrowserReady = false
+-- GUI de Login Nativa con diseño moderno
+local loginWindow = nil
+local usernameEdit = nil
+local passwordEdit = nil
+local emailEdit = nil
+local loginButton = nil
+local registerButton = nil
+local tabButton = nil
+local registerTabButton = nil
+local isRegisterMode = false
+local screenWidth, screenHeight = guiGetScreenSize()
+
+-- Imagen de fondo
+local backgroundImage = nil
 
 function showLoginGUI()
     -- Si ya existe, no crear otra vez
-    if loginBrowser then
-        if isElement(loginBrowser) then
-            guiSetVisible(loginBrowser, true)
-            setBrowserRenderingPaused(loginBrowser, false)
+    if loginWindow then
+        if isElement(loginWindow) then
+            guiSetVisible(loginWindow, true)
             return
         end
     end
     
-    outputChatBox("Cargando interfaz de login...", 255, 255, 0)
+    -- Calcular posición centrada
+    local windowWidth = 500
+    local windowHeight = 600
+    local x = (screenWidth - windowWidth) / 2
+    local y = (screenHeight - windowHeight) / 2
     
-    -- Crear navegador web usando guiCreateBrowser (se dibuja automáticamente)
-    local screenWidth, screenHeight = guiGetScreenSize()
-    loginBrowser = guiCreateBrowser(0, 0, screenWidth, screenHeight, true, false)
+    -- Crear ventana (transparente para mostrar el fondo)
+    loginWindow = guiCreateWindow(x, y, windowWidth, windowHeight, "", false)
+    guiWindowSetMovable(loginWindow, false)
+    guiWindowSetSizable(loginWindow, false)
+    guiSetAlpha(loginWindow, 0) -- Ventana transparente, solo usamos los elementos internos
     
-    if not loginBrowser then
-        outputChatBox("Error: No se pudo crear el navegador. Usando GUI alternativa.", 255, 0, 0)
-        -- Fallback a GUI nativa si el navegador no está disponible
-        showLoginGUIFallback()
-        return
-    end
+    -- Cargar imagen de fondo
+    backgroundImage = guiCreateStaticImage(0, 0, windowWidth, windowHeight, ":colombia-rp/colombia-rp-login.png", false, loginWindow)
     
-    -- Obtener el elemento browser del GUI browser
-    local browser = guiGetBrowser(loginBrowser)
+    -- Panel principal (semi-transparente sobre el fondo)
+    local mainPanel = guiCreateLabel(0, 0, windowWidth, windowHeight, "", false, loginWindow)
+    guiLabelSetColor(mainPanel, 0, 0, 0)
+    guiSetAlpha(mainPanel, 0.7) -- Fondo oscuro semi-transparente
     
-    if not browser then
-        outputChatBox("Error: No se pudo obtener el navegador del GUI.", 255, 0, 0)
-        showLoginGUIFallback()
-        return
-    end
+    -- Título
+    local titleLabel = guiCreateLabel(0, 30, windowWidth, 50, "COLOMBIA RP", false, loginWindow)
+    guiLabelSetColor(titleLabel, 255, 255, 255)
+    guiSetFont(titleLabel, "default-bold")
+    guiLabelSetHorizontalAlign(titleLabel, "center", true)
     
-    -- Hacer visible el navegador
-    guiSetVisible(loginBrowser, true)
-    setBrowserRenderingPaused(browser, false)
+    -- Subtítulo
+    local subtitleLabel = guiCreateLabel(0, 75, windowWidth, 25, "Sistema de Acceso", false, loginWindow)
+    guiLabelSetColor(subtitleLabel, 200, 200, 200)
+    guiSetFont(subtitleLabel, "default")
+    guiLabelSetHorizontalAlign(subtitleLabel, "center", true)
     
-    -- Cargar HTML
-    loadBrowserURL(browser, "http://mta/local/login.html")
+    -- Tabs
+    tabButton = guiCreateButton(50, 120, 200, 40, "Iniciar Sesión", false, loginWindow)
+    guiSetProperty(tabButton, "NormalTextColour", "FF00FFFF") -- Cyan
+    registerTabButton = guiCreateButton(250, 120, 200, 40, "Registrarse", false, loginWindow)
+    guiSetProperty(registerTabButton, "NormalTextColour", "FFFFFFFF") -- Blanco
+    
+    -- Panel de Login (visible inicialmente)
+    local loginPanel = guiCreateLabel(50, 180, 400, 350, "", false, loginWindow)
+    guiLabelSetColor(loginPanel, 0, 0, 0)
+    guiSetAlpha(loginPanel, 0.5)
+    
+    -- Labels y campos para Login
+    local usernameLabel = guiCreateLabel(70, 200, 100, 20, "Usuario:", false, loginWindow)
+    guiLabelSetColor(usernameLabel, 255, 255, 255)
+    guiSetFont(usernameLabel, "default-bold")
+    usernameEdit = guiCreateEdit(70, 225, 360, 35, "", false, loginWindow)
+    guiSetProperty(usernameEdit, "NormalTextColour", "FFFFFFFF")
+    guiSetProperty(usernameEdit, "NormalEditboxColour", "AA000000")
+    
+    local passwordLabel = guiCreateLabel(70, 275, 100, 20, "Contraseña:", false, loginWindow)
+    guiLabelSetColor(passwordLabel, 255, 255, 255)
+    guiSetFont(passwordLabel, "default-bold")
+    passwordEdit = guiCreateEdit(70, 300, 360, 35, "", false, loginWindow)
+    guiEditSetMasked(passwordEdit, true)
+    guiSetProperty(passwordEdit, "NormalTextColour", "FFFFFFFF")
+    guiSetProperty(passwordEdit, "NormalEditboxColour", "AA000000")
+    
+    -- Checkbox "Remember Me"
+    local rememberCheckbox = guiCreateCheckBox(70, 350, 200, 20, "Recordar sesión", false, false, loginWindow)
+    guiCheckBoxSetSelected(rememberCheckbox, true)
+    guiLabelSetColor(rememberCheckbox, 255, 255, 255)
+    
+    -- Botón Login
+    loginButton = guiCreateButton(70, 390, 360, 45, "Iniciar Sesión", false, loginWindow)
+    guiSetProperty(loginButton, "NormalTextColour", "FFFFFFFF")
+    guiSetProperty(loginButton, "HoverTextColour", "FF00FFFF")
+    
+    -- Link "Forgot Password?"
+    local forgotPasswordLabel = guiCreateLabel(70, 445, 200, 20, "¿Olvidaste tu contraseña?", false, loginWindow)
+    guiLabelSetColor(forgotPasswordLabel, 0, 150, 255)
+    guiSetFont(forgotPasswordLabel, "default-small")
+    
+    -- Panel de Registro (oculto inicialmente)
+    local registerPanel = guiCreateLabel(50, 180, 400, 400, "", false, loginWindow)
+    guiLabelSetColor(registerPanel, 0, 0, 0)
+    guiSetAlpha(registerPanel, 0.5)
+    guiSetVisible(registerPanel, false)
+    
+    -- Labels y campos para Registro
+    local registerUsernameLabel = guiCreateLabel(70, 200, 100, 20, "Usuario:", false, loginWindow)
+    guiLabelSetColor(registerUsernameLabel, 255, 255, 255)
+    guiSetFont(registerUsernameLabel, "default-bold")
+    guiSetVisible(registerUsernameLabel, false)
+    
+    local registerUsernameEdit = guiCreateEdit(70, 225, 360, 35, "", false, loginWindow)
+    guiSetProperty(registerUsernameEdit, "NormalTextColour", "FFFFFFFF")
+    guiSetProperty(registerUsernameEdit, "NormalEditboxColour", "AA000000")
+    guiSetVisible(registerUsernameEdit, false)
+    
+    local registerEmailLabel = guiCreateLabel(70, 325, 100, 20, "Email:", false, loginWindow)
+    guiLabelSetColor(registerEmailLabel, 255, 255, 255)
+    guiSetFont(registerEmailLabel, "default-bold")
+    guiSetVisible(registerEmailLabel, false)
+    emailEdit = guiCreateEdit(70, 350, 360, 35, "", false, loginWindow)
+    guiSetProperty(emailEdit, "NormalTextColour", "FFFFFFFF")
+    guiSetProperty(emailEdit, "NormalEditboxColour", "AA000000")
+    guiSetVisible(emailEdit, false)
+    
+    local registerPasswordLabel = guiCreateLabel(70, 400, 150, 20, "Contraseña:", false, loginWindow)
+    guiLabelSetColor(registerPasswordLabel, 255, 255, 255)
+    guiSetFont(registerPasswordLabel, "default-bold")
+    guiSetVisible(registerPasswordLabel, false)
+    
+    local registerPasswordEdit = guiCreateEdit(70, 425, 360, 35, "", false, loginWindow)
+    guiEditSetMasked(registerPasswordEdit, true)
+    guiSetProperty(registerPasswordEdit, "NormalTextColour", "FFFFFFFF")
+    guiSetProperty(registerPasswordEdit, "NormalEditboxColour", "AA000000")
+    guiSetVisible(registerPasswordEdit, false)
+    
+    local confirmPasswordLabel = guiCreateLabel(70, 475, 200, 20, "Confirmar Contraseña:", false, loginWindow)
+    guiLabelSetColor(confirmPasswordLabel, 255, 255, 255)
+    guiSetFont(confirmPasswordLabel, "default-bold")
+    guiSetVisible(confirmPasswordLabel, false)
+    
+    local confirmPasswordEdit = guiCreateEdit(70, 500, 360, 35, "", false, loginWindow)
+    guiEditSetMasked(confirmPasswordEdit, true)
+    guiSetProperty(confirmPasswordEdit, "NormalTextColour", "FFFFFFFF")
+    guiSetProperty(confirmPasswordEdit, "NormalEditboxColour", "AA000000")
+    guiSetVisible(confirmPasswordEdit, false)
+    
+    -- Botón Register
+    registerButton = guiCreateButton(70, 550, 360, 45, "Registrarse", false, loginWindow)
+    guiSetProperty(registerButton, "NormalTextColour", "FFFFFFFF")
+    guiSetProperty(registerButton, "HoverTextColour", "FF00FF00")
+    guiSetVisible(registerButton, false)
+    
+    -- Botones inferiores
+    local settingsButton = guiCreateButton(50, 550, 120, 30, "Configuración", false, loginWindow)
+    guiSetProperty(settingsButton, "NormalTextColour", "FFFFFFFF")
+    
+    local aboutButton = guiCreateButton(190, 550, 120, 30, "Acerca de", false, loginWindow)
+    guiSetProperty(aboutButton, "NormalTextColour", "FFFFFFFF")
+    
+    local quitButton = guiCreateButton(330, 550, 120, 30, "Salir", false, loginWindow)
+    guiSetProperty(quitButton, "NormalTextColour", "FFFFFFFF")
     
     -- Mostrar cursor y habilitar input
     showCursor(true)
     guiSetInputEnabled(true)
     
-    -- Guardar referencia al browser para uso posterior
-    loginBrowserElement = browser
+    -- Eventos
+    addEventHandler("onClientGUIClick", tabButton, function()
+        switchToLoginMode()
+    end, false)
     
-    -- Manejar cuando el navegador se carga completamente
-    addEventHandler("onClientBrowserDocumentReady", browser, function(url)
-        if url == "http://mta/local/login.html" then
-            isBrowserReady = true
-            outputChatBox("Interfaz de login cargada correctamente", 0, 255, 0)
-            injectBrowserFunctions()
+    addEventHandler("onClientGUIClick", registerTabButton, function()
+        switchToRegisterMode()
+    end, false)
+    
+    addEventHandler("onClientGUIClick", loginButton, function()
+        performLogin()
+    end, false)
+    
+    addEventHandler("onClientGUIClick", registerButton, function()
+        performRegister()
+    end, false)
+    
+    addEventHandler("onClientGUIClick", quitButton, function()
+        triggerServerEvent("onPlayerQuit", localPlayer)
+    end, false)
+    
+    -- Enter key handler
+    bindKey("enter", "down", function()
+        if loginWindow and guiGetVisible(loginWindow) then
+            if isRegisterMode then
+                performRegister()
+            else
+                performLogin()
+            end
         end
     end)
     
-    -- Manejar errores de carga
-    addEventHandler("onClientBrowserCreated", browser, function()
-        isBrowserReady = true
-        outputChatBox("Navegador creado, cargando interfaz...", 255, 255, 0)
-    end)
+    -- Guardar referencias para uso posterior
+    loginWindowElements = {
+        loginPanel = loginPanel,
+        registerPanel = registerPanel,
+        registerUsernameLabel = registerUsernameLabel,
+        registerUsernameEdit = registerUsernameEdit,
+        emailLabel = registerEmailLabel,
+        registerPasswordLabel = registerPasswordLabel,
+        registerPasswordEdit = registerPasswordEdit,
+        confirmPasswordLabel = confirmPasswordLabel,
+        confirmPasswordEdit = confirmPasswordEdit,
+        rememberCheckbox = rememberCheckbox,
+        forgotPasswordLabel = forgotPasswordLabel
+    }
 end
 
--- Inyectar funciones JavaScript para comunicación
-function injectBrowserFunctions()
-    local browser = loginBrowserElement or (loginBrowser and guiGetBrowser(loginBrowser))
+function switchToLoginMode()
+    isRegisterMode = false
+    guiSetProperty(tabButton, "NormalTextColour", "FF00FFFF") -- Cyan activo
+    guiSetProperty(registerTabButton, "NormalTextColour", "FFFFFFFF") -- Blanco inactivo
     
-    if not browser or not isElement(browser) then
-        outputChatBox("Error: Navegador no disponible para inyectar funciones", 255, 0, 0)
-        return
+    -- Ocultar elementos de registro
+    if loginWindowElements then
+        guiSetVisible(loginWindowElements.registerPanel, false)
+        guiSetVisible(loginWindowElements.registerUsernameLabel, false)
+        guiSetVisible(loginWindowElements.registerUsernameEdit, false)
+        guiSetVisible(emailLabel, false)
+        guiSetVisible(emailEdit, false)
+        guiSetVisible(loginWindowElements.registerPasswordLabel, false)
+        guiSetVisible(loginWindowElements.registerPasswordEdit, false)
+        guiSetVisible(loginWindowElements.confirmPasswordLabel, false)
+        guiSetVisible(loginWindowElements.confirmPasswordEdit, false)
+        guiSetVisible(registerButton, false)
     end
     
-    -- Las funciones window.login y window.register ya están definidas en el HTML
-    -- Solo necesitamos asegurarnos de que el navegador esté listo
-    -- La comunicación se hace a través de eventos MTA nativos
-    outputChatBox("Funciones JavaScript listas", 0, 255, 0)
+    -- Mostrar elementos de login
+    if loginWindowElements then
+        guiSetVisible(loginWindowElements.loginPanel, true)
+        guiSetVisible(loginWindowElements.rememberCheckbox, true)
+        guiSetVisible(loginWindowElements.forgotPasswordLabel, true)
+    end
+    guiSetVisible(loginButton, true)
 end
 
--- Función de fallback (GUI nativa) si el navegador no está disponible
-function showLoginGUIFallback()
-    -- Implementación básica de GUI nativa como respaldo
-    outputChatBox("Por favor, contacta a un administrador si ves este mensaje.", 255, 255, 0)
-end
-
--- Función helper para obtener el browser element
-local function getBrowserElement()
-    return loginBrowserElement or (loginBrowser and guiGetBrowser(loginBrowser))
-end
-
--- Eventos desde el navegador
-addEvent("doLogin", true)
-addEventHandler("doLogin", resourceRoot, function(username, password)
-    local browser = getBrowserElement()
+function switchToRegisterMode()
+    isRegisterMode = true
+    guiSetProperty(tabButton, "NormalTextColour", "FFFFFFFF") -- Blanco inactivo
+    guiSetProperty(registerTabButton, "NormalTextColour", "FF00FFFF") -- Cyan activo
     
-    if not username or not password then
-        if browser and isElement(browser) then
-            executeJavaScript(browser, "showError('Por favor completa todos los campos'); setLoading('loginBtn', false);")
-        end
+    -- Ocultar elementos de login
+    if loginWindowElements then
+        guiSetVisible(loginWindowElements.loginPanel, false)
+        guiSetVisible(loginWindowElements.rememberCheckbox, false)
+        guiSetVisible(loginWindowElements.forgotPasswordLabel, false)
+    end
+    guiSetVisible(loginButton, false)
+    
+    -- Mostrar elementos de registro
+    if loginWindowElements then
+        guiSetVisible(loginWindowElements.registerPanel, true)
+        guiSetVisible(loginWindowElements.registerUsernameLabel, true)
+        guiSetVisible(loginWindowElements.registerUsernameEdit, true)
+        guiSetVisible(loginWindowElements.emailLabel, true)
+        guiSetVisible(emailEdit, true)
+        guiSetVisible(loginWindowElements.registerPasswordLabel, true)
+        guiSetVisible(loginWindowElements.registerPasswordEdit, true)
+        guiSetVisible(loginWindowElements.confirmPasswordLabel, true)
+        guiSetVisible(loginWindowElements.confirmPasswordEdit, true)
+    end
+    guiSetVisible(registerButton, true)
+end
+
+function performLogin()
+    local username = guiGetText(usernameEdit)
+    local password = guiGetText(passwordEdit)
+    
+    if username == "" or password == "" then
+        outputChatBox("Por favor completa todos los campos", 255, 0, 0)
         return
     end
     
     if string.len(username) < 3 then
-        if browser and isElement(browser) then
-            executeJavaScript(browser, "showError('El usuario debe tener al menos 3 caracteres'); setLoading('loginBtn', false);")
-        end
+        outputChatBox("El usuario debe tener al menos 3 caracteres", 255, 0, 0)
         return
     end
     
-    -- Enviar evento al servidor
+    -- Activar evento del servidor
     triggerServerEvent("colombiaRP:playerLogin", localPlayer, username, password)
-end)
+end
 
-addEvent("doRegister", true)
-addEventHandler("doRegister", resourceRoot, function(username, password, email)
-    local browser = getBrowserElement()
+function performRegister()
+    local username = guiGetText(loginWindowElements.registerUsernameEdit)
+    local password = guiGetText(loginWindowElements.registerPasswordEdit)
+    local confirmPassword = guiGetText(loginWindowElements.confirmPasswordEdit)
+    local email = guiGetText(emailEdit)
     
-    if not username or not password or not email then
-        if browser and isElement(browser) then
-            executeJavaScript(browser, "showError('Por favor completa todos los campos'); setLoading('registerBtn', false);")
-        end
+    if username == "" or password == "" or email == "" or confirmPassword == "" then
+        outputChatBox("Por favor completa todos los campos", 255, 0, 0)
         return
     end
     
     if string.len(username) < 3 or string.len(username) > 20 then
-        if browser and isElement(browser) then
-            executeJavaScript(browser, "showError('El usuario debe tener entre 3 y 20 caracteres'); setLoading('registerBtn', false);")
-        end
+        outputChatBox("El usuario debe tener entre 3 y 20 caracteres", 255, 0, 0)
         return
     end
     
     if string.len(password) < 6 then
-        if browser and isElement(browser) then
-            executeJavaScript(browser, "showError('La contraseña debe tener al menos 6 caracteres'); setLoading('registerBtn', false);")
-        end
+        outputChatBox("La contraseña debe tener al menos 6 caracteres", 255, 0, 0)
+        return
+    end
+    
+    if password ~= confirmPassword then
+        outputChatBox("Las contraseñas no coinciden", 255, 0, 0)
         return
     end
     
     if not string.match(email, "^[%w%.%-_]+@[%w%.%-_]+%.%w+$") then
-        if browser and isElement(browser) then
-            executeJavaScript(browser, "showError('Email inválido'); setLoading('registerBtn', false);")
-        end
+        outputChatBox("Email inválido", 255, 0, 0)
         return
     end
     
-    -- Enviar evento al servidor
+    -- Activar evento del servidor
     triggerServerEvent("colombiaRP:playerRegister", localPlayer, username, password, email)
-end)
+end
 
 function hideLoginGUI()
-    if loginBrowser and isElement(loginBrowser) then
-        guiSetVisible(loginBrowser, false)
-        destroyElement(loginBrowser)
-        loginBrowser = nil
-        loginBrowserElement = nil
-        isBrowserReady = false
+    if loginWindow then
+        if isElement(loginWindow) then
+            destroyElement(loginWindow)
+        end
+        loginWindow = nil
+        usernameEdit = nil
+        passwordEdit = nil
+        emailEdit = nil
+        loginButton = nil
+        registerButton = nil
+        tabButton = nil
+        registerTabButton = nil
+        loginWindowElements = nil
+        backgroundImage = nil
     end
     showCursor(false)
     guiSetInputEnabled(false)
+    unbindKey("enter", "down")
 end
 
 -- Eventos del servidor
@@ -170,44 +350,30 @@ end)
 
 addEvent("loginResponse", true)
 addEventHandler("loginResponse", resourceRoot, function(success, message)
-    local browser = getBrowserElement()
-    
-    if browser and isElement(browser) then
-        if success then
-            executeJavaScript(browser, "showSuccess('Login exitoso'); setLoading('loginBtn', false);")
-            setTimer(function()
-                hideLoginGUI()
-            end, 1000, 1)
-        else
-            executeJavaScript(browser, "showError('" .. tostring(message) .. "'); setLoading('loginBtn', false);")
-        end
+    if success then
+        hideLoginGUI()
+        -- El panel de personajes se mostrará automáticamente desde el servidor
+    else
+        outputChatBox("Error: " .. message, 255, 0, 0)
     end
 end)
 
 addEvent("registerResponse", true)
 addEventHandler("registerResponse", resourceRoot, function(success, message)
-    local browser = getBrowserElement()
-    
-    if browser and isElement(browser) then
-        if success then
-            executeJavaScript(browser, "showSuccess('" .. tostring(message) .. "'); setLoading('registerBtn', false);")
-            -- Cambiar a modo login después de registro exitoso
-            setTimer(function()
-                local browser2 = getBrowserElement()
-                if browser2 and isElement(browser2) then
-                    executeJavaScript(browser2, "switchTab('login'); hideMessage();")
-                    executeJavaScript(browser2, [[
-                        document.getElementById('loginUsername').value = '';
-                        document.getElementById('loginPassword').value = '';
-                        document.getElementById('registerUsername').value = '';
-                        document.getElementById('registerEmail').value = '';
-                        document.getElementById('registerPassword').value = '';
-                    ]])
-                end
-            end, 2000, 1)
-        else
-            executeJavaScript(browser, "showError('" .. tostring(message) .. "'); setLoading('registerBtn', false);")
+    if success then
+        outputChatBox(message, 0, 255, 0)
+        -- Cambiar a modo login después de registro exitoso
+        switchToLoginMode()
+        if loginWindowElements then
+            guiSetText(usernameEdit, "")
+            guiSetText(passwordEdit, "")
+            guiSetText(loginWindowElements.registerUsernameEdit, "")
+            guiSetText(emailEdit, "")
+            guiSetText(loginWindowElements.registerPasswordEdit, "")
+            guiSetText(loginWindowElements.confirmPasswordEdit, "")
         end
+    else
+        outputChatBox("Error: " .. message, 255, 0, 0)
     end
 end)
 
@@ -219,13 +385,4 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
             showLoginGUI()
         end
     end, 2000, 1)
-end)
-
--- Limpiar al cerrar el recurso
-addEventHandler("onClientResourceStop", resourceRoot, function()
-    if loginBrowser and isElement(loginBrowser) then
-        destroyElement(loginBrowser)
-        loginBrowser = nil
-        loginBrowserElement = nil
-    end
 end)
