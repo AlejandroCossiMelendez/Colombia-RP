@@ -156,14 +156,9 @@ function HudHype()
 end
 addEventHandler("onClientRender", getRootElement(), HudHype)
 
-function CorMicroFoneHype()
-    if getElementData(localPlayer, "Hype>Voice", true) then
-        setElementData(localPlayer, "Hype>Voice", false)
-    else
-        setElementData(localPlayer, "Hype>Voice", true)
-    end
-end
-bindKey("z", "both", CorMicroFoneHype)
+-- El sistema de voz ahora se maneja automáticamente con onClientPlayerVoiceStart/Stop
+-- No necesitamos el bindKey manual, el icono se actualiza automáticamente cuando hablas
+-- bindKey("z", "both", CorMicroFoneHype) -- Desactivado, se maneja en voice.lua
 
 function VisibleHudHype(state)
     if HypeHudVisible == false then

@@ -40,4 +40,10 @@ outputServerLog("[EVENTS] Eventos de muerte registrados: onClientPlayerDeath, up
 addEvent("initializeStamina", true)
 outputServerLog("[EVENTS] Eventos del HUD registrados: initializeStamina")
 
+-- Eventos de voz
+addEvent("onConectarAFrecuencia", true)
+addEvent("onAbrirMisFrecuencias", true)
+addEvent("onCerrarMisFrecuencias", true)
+outputServerLog("[EVENTS] Eventos de voz registrados: onConectarAFrecuencia, onAbrirMisFrecuencias, onCerrarMisFrecuencias")
+
 outputServerLog("[EVENTS] Todos los eventos registrados correctamente")

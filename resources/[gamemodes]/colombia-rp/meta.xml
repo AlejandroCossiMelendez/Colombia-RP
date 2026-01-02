@@ -18,6 +18,7 @@
     <script src="server/commands.lua" type="server" />
     <script src="server/bank.lua" type="server" />
     <script src="server/chat.lua" type="server" />
+    <script src="server/voice.lua" type="server" />
     <script src="server/main.lua" type="server" />
     
     <!-- Scripts del cliente -->
@@ -31,6 +32,7 @@
     <!-- HUD Hype (nuevo sistema) -->
     <script src="client/hype_hud.lua" type="client" />
     <script src="client/hype_stamina.lua" type="client" />
+    <script src="client/voice.lua" type="client" />
     
     <!-- Radar HD -->
     <script src="client/radar.lua" type="client" />
