@@ -92,48 +92,14 @@ function HudHype()
     dxDrawImage(x*1225, y*289, x*101, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 80), false) -- SED
     dxDrawImage(x*1002, y*703, x*285, y*41, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 108), false) -- VOICE
     
-    --<!-- BARRINHA (ajustada para respetar la curva del círculo y mantener forma) --!>--
-    -- Calcular el ancho máximo disponible (antes del círculo)
-    local maxBarWidth = x*101 - x*10 -- Ancho total menos espacio para el círculo
-    local minBarWidth = x*12 -- Ancho mínimo para mantener la forma de la barra (aumentado)
-    
-    -- Función auxiliar para dibujar barra con forma mantenida usando sección de imagen
-    local function drawBar(barX, barY, value, color, minWidth)
-        if value <= 0 then
-            return
-        end
-        
-        local percent = math.max(0, math.min(100, value)) / 100
-        local calculatedWidth = maxBarWidth * percent
-        
-        -- Si el valor es muy bajo (menos del 25%), usar ancho mínimo fijo para mantener la forma
-        local finalWidth
-        if value < 25 then
-            finalWidth = minWidth
-        else
-            finalWidth = math.max(minWidth, calculatedWidth)
-        end
-        
-        -- Usar dxDrawImageSection para mantener la forma original de la imagen
-        -- Esto evita que la imagen se estire y pierda su forma
-        local imageSourceWidth = 101 -- Ancho original de la imagen fuente
-        local imageSourceHeight = 28 -- Alto original de la imagen fuente
-        
-        -- Calcular qué sección de la imagen usar (desde el inicio hasta el porcentaje)
-        local sectionWidth = (finalWidth / maxBarWidth) * imageSourceWidth
-        sectionWidth = math.min(sectionWidth, imageSourceWidth) -- No exceder el ancho original
-        
-        -- Dibujar solo la sección necesaria de la imagen para mantener la forma
-        dxDrawImageSection(barX, barY, finalWidth, y*28, 0, 0, sectionWidth, imageSourceHeight, 
-            "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, color, false)
-    end
-    
-    -- Dibujar barras
-    drawBar(x*1225, y*154, Vida, tocolor(237, 0, 5, 200), minBarWidth) -- VIDA
-    drawBar(x*1225, y*187, Colete, tocolor(7, 239, 247, 150), minBarWidth) -- COLETE
-    drawBar(x*1225, y*221, Stamina, tocolor(253, 221, 0, 150), minBarWidth) -- STAMINA
-    drawBar(x*1225, y*255, Hambre, tocolor(255, 165, 0, 200), minBarWidth) -- HAMBRE
-    drawBar(x*1225, y*289, Sed, tocolor(0, 100, 255, 200), minBarWidth) -- SED
+    --<!-- BARRINHA (usando el mismo método del código original para mantener bordes redondeados) --!>--
+    -- Usar dxDrawImage directamente como en el código original para mantener los bordes redondeados perfectos
+    -- La imagen 0.png tiene bordes redondeados en todas las esquinas, al estirarla proporcionalmente los mantiene
+    dxDrawImage(x*1225, y*154, x*101/100*Vida, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(237, 0, 5, 200), false) -- VIDA
+    dxDrawImage(x*1225, y*187, x*101/100*Colete, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(7, 239, 247, 180), false) -- COLETE
+    dxDrawImage(x*1225, y*221, x*101/100*Stamina, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(253, 221, 0, 180), false) -- STAMINA
+    dxDrawImage(x*1225, y*255, x*101/100*Hambre, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(255, 165, 0, 200), false) -- HAMBRE
+    dxDrawImage(x*1225, y*289, x*101/100*Sed, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 100, 255, 200), false) -- SED
     
     --<!-- CIRCULO (dibujado después de las barras para que esté encima) --!>--
     dxDrawImage(x*1295, y*153, x*38, y*29, "hud-rp/Hype_Hud/imgs/circulo.png", 0, 0, 0, tocolor(255, 0, 0, 255), false) -- VIDA
