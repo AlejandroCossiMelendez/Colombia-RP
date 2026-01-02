@@ -415,10 +415,15 @@ function loadContacts() {
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'delete-contact';
         deleteBtn.textContent = '×';
-        deleteBtn.onclick = function(e) {
+        deleteBtn.setAttribute('data-contact-index', index);
+        deleteBtn.setAttribute('data-contact-number', contact.number);
+        deleteBtn.addEventListener('click', function(e) {
             e.stopPropagation(); // Prevenir que se propague el evento
-            deleteContact(index);
-        };
+            e.preventDefault();
+            const contactIndex = parseInt(this.getAttribute('data-contact-index'));
+            const contactNumber = this.getAttribute('data-contact-number');
+            deleteContact(contactIndex, contactNumber);
+        });
         
         const avatar = document.createElement('div');
         avatar.className = 'contact-avatar';
@@ -535,28 +540,36 @@ function addContact() {
 }
 
 // Función para eliminar contacto
-function deleteContact(index) {
-    console.log('deleteContact llamado con índice:', index);
+function deleteContact(index, contactNumber) {
+    console.log('deleteContact llamado con índice:', index, 'número:', contactNumber);
     console.log('Contactos antes de eliminar:', contacts);
     
-    if (index === undefined || index === null || isNaN(index)) {
-        console.error('Índice inválido:', index);
-        return;
+    let contactToDelete = null;
+    let deleteIndex = -1;
+    
+    // Intentar usar el índice primero
+    if (index !== undefined && index !== null && !isNaN(index) && index >= 0 && index < contacts.length) {
+        contactToDelete = contacts[index];
+        deleteIndex = index;
     }
     
-    if (index < 0 || index >= contacts.length) {
-        console.error('Índice fuera de rango:', index, 'Total contactos:', contacts.length);
-        return;
+    // Si el índice no funciona o el contacto no coincide, buscar por número
+    if (!contactToDelete && contactNumber) {
+        deleteIndex = contacts.findIndex(c => c.number === contactNumber);
+        if (deleteIndex !== -1) {
+            contactToDelete = contacts[deleteIndex];
+        }
     }
     
-    const contactToDelete = contacts[index];
-    if (!contactToDelete) {
-        console.error('Contacto no encontrado en el índice:', index);
+    // Si aún no se encontró, mostrar error
+    if (!contactToDelete || deleteIndex === -1) {
+        console.error('No se pudo encontrar el contacto a eliminar. Índice:', index, 'Número:', contactNumber);
+        alert('Error: No se pudo encontrar el contacto a eliminar.');
         return;
     }
     
     if (confirm('¿Eliminar el contacto "' + contactToDelete.name + '"?')) {
-        contacts.splice(index, 1);
+        contacts.splice(deleteIndex, 1);
         console.log('Contacto eliminado. Contactos restantes:', contacts);
         loadContacts();
         
@@ -565,7 +578,6 @@ function deleteContact(index) {
             try {
                 const jsonString = JSON.stringify(contacts);
                 console.log('Guardando contactos después de eliminar:', contacts.length, 'contactos');
-                console.log('JSON a enviar:', jsonString);
                 window.mta.triggerEvent('saveContacts', jsonString);
                 console.log('Evento saveContacts enviado correctamente después de eliminar');
             } catch (e) {
