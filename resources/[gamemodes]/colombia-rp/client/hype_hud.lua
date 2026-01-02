@@ -213,7 +213,7 @@ local hudTable =
 addEventHandler("onClientResourceStart", resourceRoot,
     function()
         for id, hudComponents in ipairs(hudTable) do
-            showPlayerHudComponent(hudComponents, false)
+            setPlayerHudComponentVisible(hudComponents, false)
         end
     end
 )
@@ -221,7 +221,7 @@ addEventHandler("onClientResourceStart", resourceRoot,
 addEventHandler("onClientResourceStop", resourceRoot,
     function()
         for id, hudComponents in ipairs(hudTable) do
-            showPlayerHudComponent(hudComponents, true)
+            setPlayerHudComponentVisible(hudComponents, true)
         end
     end
 )

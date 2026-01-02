@@ -64,8 +64,8 @@ function setCharacterBank(player, amount)
     return true
 end
 
--- Comando para ingresar dinero
-addCommandHandler({"ingresar", "depositar"}, function(player, cmd, cantidad)
+-- Función para ingresar dinero
+local function ingresarDinero(player, cmd, cantidad)
     if not getElementData(player, "character:selected") then
         outputChatBox("No tienes un personaje seleccionado.", player, 255, 0, 0)
         return
@@ -109,10 +109,14 @@ addCommandHandler({"ingresar", "depositar"}, function(player, cmd, cantidad)
     else
         outputChatBox("No tienes tanto dinero para ingresar.", player, 255, 0, 0)
     end
-end)
+end
 
--- Comando para retirar dinero
-addCommandHandler({"retirar", "sacar"}, function(player, cmd, cantidad)
+-- Comandos para ingresar dinero
+addCommandHandler("ingresar", ingresarDinero)
+addCommandHandler("depositar", ingresarDinero)
+
+-- Función para retirar dinero
+local function retirarDinero(player, cmd, cantidad)
     if not getElementData(player, "character:selected") then
         outputChatBox("No tienes un personaje seleccionado.", player, 255, 0, 0)
         return
@@ -153,10 +157,14 @@ addCommandHandler({"retirar", "sacar"}, function(player, cmd, cantidad)
     else
         outputChatBox("Error al retirar el dinero. Inténtalo más tarde.", player, 255, 0, 0)
     end
-end)
+end
 
--- Comando para consultar saldo
-addCommandHandler({"saldo", "balance"}, function(player)
+-- Comandos para retirar dinero
+addCommandHandler("retirar", retirarDinero)
+addCommandHandler("sacar", retirarDinero)
+
+-- Función para consultar saldo
+local function consultarSaldo(player)
     if not getElementData(player, "character:selected") then
         outputChatBox("No tienes un personaje seleccionado.", player, 255, 0, 0)
         return
@@ -169,7 +177,11 @@ addCommandHandler({"saldo", "balance"}, function(player)
     
     local balance = getCharacterBank(player)
     outputChatBox("El balance de tu cuenta es de $" .. balance .. ".", player, 0, 255, 0)
-end)
+end
+
+-- Comandos para consultar saldo
+addCommandHandler("saldo", consultarSaldo)
+addCommandHandler("balance", consultarSaldo)
 
 -- Cargar bancos desde la base de datos al iniciar
 addEventHandler("onResourceStart", resourceRoot, function()
