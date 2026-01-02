@@ -1,9 +1,0 @@
-<meta>
-    <info author="PablihOFF" name="Polvora con NPC" version="1.0" />
-    <script src="server.lua" type="server" />
-    <script src="client.lua" type="client" />
-    <!-- Archivos de sonido deshabilitados temporalmente (no encontrados) -->
-    <!-- <file src="sounds/place.wav" /> -->
-    <!-- <file src="sounds/fuse.wav" /> -->
-    <!-- <file src="sounds/explosion.wav" /> -->
-</meta>
