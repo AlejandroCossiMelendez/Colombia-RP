@@ -154,61 +154,61 @@ end)
 
 addEvent("createCharacter", true)
 addEventHandler("createCharacter", root, function(name, surname, age, gender, skin)
-    outputChatBox("[DEBUG] createCharacter recibido: name=" .. tostring(name) .. ", surname=" .. tostring(surname) .. ", age=" .. tostring(age) .. ", gender=" .. tostring(gender) .. ", skin=" .. tostring(skin), 255, 255, 0)
+    -- -- outputChatBox("[DEBUG] createCharacter recibido: name=" .. tostring(name) .. ", surname=" .. tostring(surname) .. ", age=" .. tostring(age) .. ", gender=" .. tostring(gender) .. ", skin=" .. tostring(skin), 255, 255, 0)
     
     -- Convertir age a número si es necesario
     if type(age) == "string" then
         age = tonumber(age)
     end
     
-    outputChatBox("[DEBUG] Validación 1: Verificando campos requeridos...", 255, 255, 0)
+    -- outputChatBox("[DEBUG] Validación 1: Verificando campos requeridos...", 255, 255, 0)
     if not name or not surname or not age then
-        outputChatBox("[DEBUG] Error: Faltan campos requeridos - name=" .. tostring(name) .. ", surname=" .. tostring(surname) .. ", age=" .. tostring(age), 255, 0, 0)
+        -- outputChatBox("[DEBUG] Error: Faltan campos requeridos - name=" .. tostring(name) .. ", surname=" .. tostring(surname) .. ", age=" .. tostring(age), 255, 0, 0)
         if browserContent and isElement(browserContent) then
             executeBrowserJavascript(browserContent, "showError('Por favor completa todos los campos');")
         end
         return
     end
     
-    outputChatBox("[DEBUG] Validación 2: Verificando longitud del nombre...", 255, 255, 0)
+    -- outputChatBox("[DEBUG] Validación 2: Verificando longitud del nombre...", 255, 255, 0)
     if string.len(name) < 2 or string.len(name) > 20 then
-        outputChatBox("[DEBUG] Error: Nombre inválido - longitud=" .. string.len(name), 255, 0, 0)
+        -- outputChatBox("[DEBUG] Error: Nombre inválido - longitud=" .. string.len(name), 255, 0, 0)
         if browserContent and isElement(browserContent) then
             executeBrowserJavascript(browserContent, "showError('El nombre debe tener entre 2 y 20 caracteres');")
         end
         return
     end
     
-    outputChatBox("[DEBUG] Validación 3: Verificando longitud del apellido...", 255, 255, 0)
+    -- outputChatBox("[DEBUG] Validación 3: Verificando longitud del apellido...", 255, 255, 0)
     if string.len(surname) < 2 or string.len(surname) > 20 then
-        outputChatBox("[DEBUG] Error: Apellido inválido - longitud=" .. string.len(surname), 255, 0, 0)
+        -- outputChatBox("[DEBUG] Error: Apellido inválido - longitud=" .. string.len(surname), 255, 0, 0)
         if browserContent and isElement(browserContent) then
             executeBrowserJavascript(browserContent, "showError('El apellido debe tener entre 2 y 20 caracteres');")
         end
         return
     end
     
-    outputChatBox("[DEBUG] Validación 4: Verificando edad... age=" .. tostring(age) .. ", tipo=" .. type(age), 255, 255, 0)
+    -- outputChatBox("[DEBUG] Validación 4: Verificando edad... age=" .. tostring(age) .. ", tipo=" .. type(age), 255, 255, 0)
     if not age or age < 18 or age > 100 then
-        outputChatBox("[DEBUG] Error: Edad inválida - age=" .. tostring(age) .. ", tipo=" .. type(age), 255, 0, 0)
+        -- outputChatBox("[DEBUG] Error: Edad inválida - age=" .. tostring(age) .. ", tipo=" .. type(age), 255, 0, 0)
         if browserContent and isElement(browserContent) then
             executeBrowserJavascript(browserContent, "showError('La edad debe estar entre 18 y 100 años');")
         end
         return
     end
     
-    outputChatBox("[DEBUG] Todas las validaciones pasaron. Enviando al servidor...", 0, 255, 0)
+    -- outputChatBox("[DEBUG] Todas las validaciones pasaron. Enviando al servidor...", 0, 255, 0)
     
     -- Enviar evento al servidor
-    outputChatBox("[DEBUG] Enviando createCharacter al servidor: name=" .. tostring(name) .. ", surname=" .. tostring(surname) .. ", age=" .. tostring(age) .. ", gender=" .. tostring(gender) .. ", skin=" .. tostring(skin or 0), 0, 255, 255)
+    -- outputChatBox("[DEBUG] Enviando createCharacter al servidor: name=" .. tostring(name) .. ", surname=" .. tostring(surname) .. ", age=" .. tostring(age) .. ", gender=" .. tostring(gender) .. ", skin=" .. tostring(skin or 0), 0, 255, 255)
     local success = triggerServerEvent("createCharacter", localPlayer, name, surname, age, gender, skin or 0)
     if not success then
-        outputChatBox("[DEBUG] ERROR: No se pudo enviar el evento al servidor", 255, 0, 0)
+        -- outputChatBox("[DEBUG] ERROR: No se pudo enviar el evento al servidor", 255, 0, 0)
         if browserContent and isElement(browserContent) then
             executeBrowserJavascript(browserContent, "showError('Error al enviar los datos al servidor');")
         end
     else
-        outputChatBox("[DEBUG] Evento enviado correctamente al servidor", 0, 255, 0)
+        -- outputChatBox("[DEBUG] Evento enviado correctamente al servidor", 0, 255, 0)
     end
 end)
 

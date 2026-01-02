@@ -46,41 +46,66 @@ function checkMoving()
         return
     end
     
-    if isElementMoving(localPlayer) and getElementSpeed(localPlayer) > 5.1 then
-        if not getPedOccupiedVehicle(localPlayer) then
-            local staminalevel = tonumber(getElementData(localPlayer, "stamina") or 100)
-            if staminalevel >= 0.2 then
-                setElementData(localPlayer, "stamina", staminalevel - 0.11)
-                if getElementData(localPlayer, "stamina->animRequested") then
-                    toggleAllControls(true, true, true)
-                    setElementData(localPlayer, "stamina->animRequested", false)
-                    setPedAnimation(localPlayer, "", "")
+    if not getPedOccupiedVehicle(localPlayer) then
+        local speed = getElementSpeed(localPlayer)
+        local staminalevel = tonumber(getElementData(localPlayer, "stamina") or 100)
+        
+        -- Diferencia entre trotar y correr basado en la velocidad
+        -- Caminar: < 5.1 (no consume stamina)
+        -- Trotar: 5.1 - 8.5 (consume poco)
+        -- Correr: > 8.5 (consume más)
+        
+        if isElementMoving(localPlayer) and speed > 5.1 then
+            if speed > 8.5 then
+                -- Corriendo (sprint) - consume más stamina
+                if staminalevel >= 0.2 then
+                    setElementData(localPlayer, "stamina", staminalevel - 0.06) -- Reducido de 0.11 a 0.06
+                    if getElementData(localPlayer, "stamina->animRequested") then
+                        toggleAllControls(true, true, true)
+                        setElementData(localPlayer, "stamina->animRequested", false)
+                        setPedAnimation(localPlayer, "", "")
+                    end
+                else
+                    if not getElementData(localPlayer, "stamina->animRequested") then
+                        toggleAllControls(false, true, false)
+                        setPedAnimation(localPlayer, "FAT", "idle_tired", 8000, true, false, true, false)
+                        setElementData(localPlayer, "stamina->animRequested", true)
+                    end
                 end
             else
+                -- Trotando - consume menos stamina
+                if staminalevel >= 0.2 then
+                    setElementData(localPlayer, "stamina", staminalevel - 0.025) -- Consumo mucho menor al trotar
+                    if getElementData(localPlayer, "stamina->animRequested") then
+                        toggleAllControls(true, true, true)
+                        setElementData(localPlayer, "stamina->animRequested", false)
+                        setPedAnimation(localPlayer, "", "")
+                    end
+                else
+                    if not getElementData(localPlayer, "stamina->animRequested") then
+                        toggleAllControls(false, true, false)
+                        setPedAnimation(localPlayer, "FAT", "idle_tired", 8000, true, false, true, false)
+                        setElementData(localPlayer, "stamina->animRequested", true)
+                    end
+                end
+            end
+        else
+            -- No se está moviendo o está caminando - recuperar stamina
+            if staminalevel < 25 then
                 if not getElementData(localPlayer, "stamina->animRequested") then
                     toggleAllControls(false, true, false)
                     setPedAnimation(localPlayer, "FAT", "idle_tired", 8000, true, false, true, false)
                     setElementData(localPlayer, "stamina->animRequested", true)
                 end
-            end
-        end
-    else
-        if tonumber(getElementData(localPlayer, "stamina") or 100) < 25 then
-            local staminalevel = tonumber(getElementData(localPlayer, "stamina") or 100)
-            if not getElementData(localPlayer, "stamina->animRequested") then
-                toggleAllControls(false, true, false)
-                setPedAnimation(localPlayer, "FAT", "idle_tired", 8000, true, false, true, false)
-                setElementData(localPlayer, "stamina->animRequested", true)
-            end
-            setElementData(localPlayer, "stamina", staminalevel + 0.11)
-        else
-            local staminalevel = tonumber(getElementData(localPlayer, "stamina") or 100)
-            if staminalevel < 100 then
-                setElementData(localPlayer, "stamina", staminalevel + 0.11)
-                if getElementData(localPlayer, "stamina->animRequested") then
-                    setElementData(localPlayer, "stamina->animRequested", false)
-                    toggleAllControls(true, true, true)
-                    setPedAnimation(localPlayer, "", "")
+                setElementData(localPlayer, "stamina", staminalevel + 0.08) -- Recuperación ligeramente más rápida
+            else
+                if staminalevel < 100 then
+                    setElementData(localPlayer, "stamina", staminalevel + 0.08) -- Recuperación ligeramente más rápida
+                    if getElementData(localPlayer, "stamina->animRequested") then
+                        setElementData(localPlayer, "stamina->animRequested", false)
+                        toggleAllControls(true, true, true)
+                        setPedAnimation(localPlayer, "", "")
+                    end
                 end
             end
         end
