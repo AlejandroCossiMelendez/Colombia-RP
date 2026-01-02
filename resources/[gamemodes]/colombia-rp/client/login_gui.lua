@@ -12,11 +12,18 @@ function whenBrowserReady()
 end
 
 function showLoginGUI()
-    -- Si ya existe, no crear otra vez
+    -- Si ya existe, solo mostrarlo
     if loginBrowser then
         if isElement(loginBrowser) then
             guiSetVisible(loginBrowser, true)
+            showCursor(true)
+            guiSetInputEnabled(true)
+            guiSetInputMode("no_binds_when_editing")
             return
+        else
+            -- Si el elemento fue destruido, limpiar la referencia
+            loginBrowser = nil
+            browserContent = nil
         end
     end
     
@@ -25,7 +32,7 @@ function showLoginGUI()
     browserContent = guiGetBrowser(loginBrowser)
     
     if not loginBrowser or not browserContent then
-        outputChatBox("Error: No se pudo crear el navegador", 255, 0, 0)
+        outputChatBox("Error: No se pudo crear el navegador de login", 255, 0, 0)
         return
     end
     

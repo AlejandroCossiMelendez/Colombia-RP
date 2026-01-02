@@ -12,15 +12,12 @@ function loadBrowser()
         -- Solo cargar el HTML si el jugador está logueado
         loadBrowserURL(source, "http://mta/local/html/characters.html")
     else
-        -- Si no está logueado, no cargar el HTML y destruir el navegador
-        outputChatBox("Error: Debes iniciar sesión primero", 255, 0, 0)
+        -- Si no está logueado, no cargar el HTML y destruir el navegador silenciosamente
+        -- NO mostrar mensaje de error aquí - el login se mostrará automáticamente
         if characterBrowser and isElement(characterBrowser) then
             destroyElement(characterBrowser)
             characterBrowser = nil
             browserContent = nil
-        end
-        if showLoginGUI then
-            showLoginGUI()
         end
     end
 end
@@ -41,13 +38,9 @@ function whenBrowserReady()
             triggerServerEvent("requestCharacters", localPlayer)
         end
     else
-        -- Si no está logueado, DESTRUIR el navegador y mostrar login
-        outputChatBox("Error: Debes iniciar sesión primero", 255, 0, 0)
+        -- Si no está logueado, DESTRUIR el navegador silenciosamente
+        -- NO mostrar mensaje de error - el login se mostrará automáticamente
         hideCharacterGUI()
-        -- Mostrar login si no está logueado
-        if showLoginGUI then
-            showLoginGUI()
-        end
     end
 end
 
@@ -59,13 +52,9 @@ function showCharacterGUI()
     
     -- TRIPLE verificación: debe estar logueado, tener userId, y no tener personaje seleccionado
     if not loggedIn or loggedIn ~= true or not userId then
-        outputChatBox("Error: Debes iniciar sesión primero", 255, 0, 0)
-        -- Destruir cualquier navegador de personajes que pueda existir
+        -- Destruir cualquier navegador de personajes que pueda existir silenciosamente
         hideCharacterGUI()
-        -- Mostrar login si no está logueado
-        if showLoginGUI then
-            showLoginGUI()
-        end
+        -- NO mostrar mensaje de error - el login se mostrará automáticamente
         return
     end
     
@@ -197,14 +186,9 @@ addEventHandler("showCharacterGUI", resourceRoot, function()
         -- Login confirmado, mostrar panel de personajes
         showCharacterGUI()
     else
-        -- Si no está logueado, BLOQUEAR completamente
-        outputChatBox("Error: Debes iniciar sesión primero", 255, 0, 0)
-        -- Destruir cualquier navegador de personajes
+        -- Si no está logueado, BLOQUEAR silenciosamente
+        -- NO mostrar mensaje de error - el login se mostrará automáticamente
         hideCharacterGUI()
-        -- Mostrar login
-        if showLoginGUI then
-            showLoginGUI()
-        end
     end
 end)
 
@@ -232,11 +216,8 @@ addEventHandler("receiveCharacters", resourceRoot, function(charList)
     local userId = getElementData(localPlayer, "account:userId")
     
     if not loggedIn or not userId then
-        -- Si no está logueado, ocultar navegador y mostrar login
+        -- Si no está logueado, ocultar navegador silenciosamente
         hideCharacterGUI()
-        if showLoginGUI then
-            showLoginGUI()
-        end
         return
     end
     
