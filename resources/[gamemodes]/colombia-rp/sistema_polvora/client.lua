@@ -309,3 +309,64 @@ function efectoDestello(x, y, z)
     
     playSoundFrontEnd(1)
 end
+
+-- Colocar C4 en el suelo
+addEvent("polvora:colocarC4", true)
+addEventHandler("polvora:colocarC4", root, function(itemId, itemName)
+    -- Obtener posición del jugador
+    local x, y, z = getElementPosition(localPlayer)
+    
+    -- Obtener rotación del jugador para colocar el C4 frente a él
+    local rotZ = getPedRotation(localPlayer)
+    local radians = math.rad(rotZ)
+    local forwardX = x + math.cos(radians) * 1.5
+    local forwardY = y + math.sin(radians) * 1.5
+    
+    -- Obtener altura del suelo usando processLineOfSight
+    local hit, hitX, hitY, hitZ = processLineOfSight(forwardX, forwardY, z + 2, forwardX, forwardY, z - 5, true, true, false, true, false, false, false, false, localPlayer)
+    if hit then
+        hitZ = hitZ + 0.1 -- Pequeño offset para que no esté dentro del suelo
+    else
+        hitZ = z - 0.5 -- Si no hay suelo, usar la posición del jugador menos 0.5
+    end
+    
+    -- Crear objeto C4 (usar modelo 1252 que es una caja/explosivo)
+    local c4Object = createObject(1252, forwardX, forwardY, hitZ, 0, 0, rotZ)
+    
+    if c4Object then
+        setElementData(c4Object, "c4:active", true)
+        setElementData(c4Object, "c4:owner", localPlayer)
+        setElementData(c4Object, "c4:type", itemId)
+        
+        -- Notificar al jugador
+        outputChatBox("✓ Has colocado un " .. itemName .. ". ¡Explotará en 5 segundos!", 255, 200, 0)
+        
+        -- Hacer que explote en 5 segundos
+        setTimer(function()
+            if isElement(c4Object) then
+                local objX, objY, objZ = getElementPosition(c4Object)
+                
+                -- Crear explosión (tipo 6 = explosión grande)
+                createExplosion(objX, objY, objZ, 6, true, 1.0, false)
+                
+                -- Notificar a jugadores cercanos (enviar al servidor para notificar a todos)
+                triggerServerEvent("polvora:c4Explotado", localPlayer, objX, objY, objZ)
+                
+                -- Destruir el objeto
+                destroyElement(c4Object)
+            end
+        end, 5000, 1)
+    else
+        outputChatBox("Error: No se pudo colocar el C4.", 255, 0, 0)
+    end
+end)
+
+-- Notificar explosión a todos los jugadores
+addEvent("polvora:notificarExplosion", true)
+addEventHandler("polvora:notificarExplosion", root, function(x, y, z)
+    local px, py, pz = getElementPosition(localPlayer)
+    local distance = getDistanceBetweenPoints3D(x, y, z, px, py, pz)
+    if distance < 50 then
+        outputChatBox("💥 ¡BOOM! Una explosión ha ocurrido cerca.", 255, 100, 0)
+    end
+end)

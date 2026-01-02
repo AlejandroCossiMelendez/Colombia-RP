@@ -469,6 +469,9 @@ item_list =
 	{ name = "Arepa", image = true },--100
 	{ name = "Jeringa Con Adrenalina", image = true },--101
 	{ name = "Tabletas Sanadoras", image = true },--102
+	{ name = "C4 Explosivo Tipo 1", image = true },--103
+	{ name = "C4 Explosivo Tipo 2", image = true },--104
+	{ name = "C4 Explosivo Tipo 3", image = true },--105
 }
   
 --
