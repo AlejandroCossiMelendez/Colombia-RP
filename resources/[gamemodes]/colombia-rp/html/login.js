@@ -145,19 +145,6 @@ function setLoading(btnId, loading) {
     }
 }
 
-function showSettings() {
-    alert('Configuración - Próximamente');
-}
-
-function showAbout() {
-    alert('Colombia RP\nVersión 1.0\nGamemode moderno con MySQL');
-}
-
-function quitGame() {
-    if (window.mta) {
-        window.mta.triggerEvent('quitGame');
-    }
-}
 
 // Funciones expuestas para MTA
 window.showError = showError;
