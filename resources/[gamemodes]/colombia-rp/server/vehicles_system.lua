@@ -187,3 +187,116 @@ function playerHasVehicleKey(player, vehicle)
     return false
 end
 
+-- Función para guardar un vehículo en la base de datos
+function saveVehicleToDatabase(vehicle)
+    if not vehicle or not isElement(vehicle) then
+        return false
+    end
+    
+    local vehicleDbId = getElementData(vehicle, "vehicle:db_id") or getElementData(vehicle, "vehicle:id")
+    local plate = getElementData(vehicle, "vehicle:plate")
+    local ownerId = getElementData(vehicle, "vehicle:owner_id")
+    local model = getElementModel(vehicle)
+    local x, y, z = getElementPosition(vehicle)
+    local rotX, rotY, rotZ = getElementRotation(vehicle)
+    local interior = getElementInterior(vehicle)
+    local dimension = getElementDimension(vehicle)
+    local fuel = getElementData(vehicle, "vehicle:fuel") or 100
+    local locked = getVehicleLocked(vehicle) and 1 or 0
+    local engine = getVehicleEngineState(vehicle) and 1 or 0
+    local lights = getVehicleOverrideLights(vehicle)
+    local lightsState = (lights == 2) and 1 or 0
+    
+    if vehicleDbId then
+        -- Actualizar vehículo existente
+        local success = executeDatabase([[
+            UPDATE vehicles 
+            SET x = ?, y = ?, z = ?, rot_x = ?, rot_y = ?, rot_z = ?, 
+                interior = ?, dimension = ?, fuel = ?, locked = ?, engine = ?, lights = ?
+            WHERE id = ?
+        ]], x, y, z, rotX, rotY, rotZ, interior, dimension, fuel, locked, engine, lightsState, vehicleDbId)
+        
+        return success
+    else
+        -- Crear nuevo registro si no existe
+        if not plate then
+            plate = generateUniquePlate()
+            setVehiclePlateText(vehicle, plate)
+            setElementData(vehicle, "vehicle:plate", plate)
+        end
+        
+        local vehicleDbIdTemp = getTickCount() .. math.random(1000, 9999)
+        local success = executeDatabase([[
+            INSERT INTO vehicles (vehicle_element_id, model, plate, owner_id, x, y, z, rot_x, rot_y, rot_z, 
+                                  interior, dimension, fuel, locked, engine, lights)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ]], vehicleDbIdTemp, model, plate, ownerId, x, y, z, rotX, rotY, rotZ, 
+            interior, dimension, fuel, locked, engine, lightsState)
+        
+        if success then
+            -- Obtener el ID real
+            local result = queryDatabase("SELECT id FROM vehicles WHERE vehicle_element_id = ?", vehicleDbIdTemp)
+            local realId = result and result[1] and result[1].id or vehicleDbIdTemp
+            
+            setElementData(vehicle, "vehicle:id", realId)
+            setElementData(vehicle, "vehicle:db_id", realId)
+            setElementData(vehicle, "vehicle:owner_id", ownerId)
+            setElementData(vehicle, "vehicle:locked", locked == 1)
+            setElementData(vehicle, "vehicle:fuel", fuel)
+        end
+        
+        return success
+    end
+end
+
+-- Función para guardar todos los vehículos y enviarlos al garaje
+function saveAllVehiclesToGarage()
+    outputServerLog("[VEHICLES] Guardando todos los vehículos en el garaje...")
+    
+    local savedCount = 0
+    local vehicles = getElementsByType("vehicle")
+    
+    for _, vehicle in ipairs(vehicles) do
+        -- Verificar si es un vehículo del sistema (tiene plate o owner_id)
+        local plate = getElementData(vehicle, "vehicle:plate")
+        local ownerId = getElementData(vehicle, "vehicle:owner_id")
+        
+        -- Solo guardar vehículos que tienen dueño o matrícula (vehículos del sistema)
+        if plate or ownerId then
+            if saveVehicleToDatabase(vehicle) then
+                savedCount = savedCount + 1
+                outputServerLog("[VEHICLES] Vehículo guardado: " .. (plate or "Sin matrícula") .. " (Owner: " .. (ownerId or "Ninguno") .. ")")
+            end
+        end
+    end
+    
+    outputServerLog("[VEHICLES] Total de vehículos guardados en garaje: " .. savedCount)
+    
+    -- Destruir todos los vehículos del mundo
+    for _, vehicle in ipairs(vehicles) do
+        local plate = getElementData(vehicle, "vehicle:plate")
+        local ownerId = getElementData(vehicle, "vehicle:owner_id")
+        
+        -- Solo destruir vehículos del sistema
+        if plate or ownerId then
+            destroyElement(vehicle)
+        end
+    end
+    
+    outputServerLog("[VEHICLES] Todos los vehículos han sido enviados al garaje.")
+end
+
+-- Evento cuando el recurso se detiene (restart/stop)
+addEventHandler("onResourceStop", resourceRoot, function()
+    saveAllVehiclesToGarage()
+end)
+
+-- Evento cuando el recurso se inicia
+addEventHandler("onResourceStart", resourceRoot, function()
+    -- Esperar un momento para que todo se cargue
+    setTimer(function()
+        saveAllVehiclesToGarage()
+        outputServerLog("[VEHICLES] Sistema de vehículos iniciado. Todos los vehículos están en el garaje.")
+    end, 2000, 1)
+end)
+
