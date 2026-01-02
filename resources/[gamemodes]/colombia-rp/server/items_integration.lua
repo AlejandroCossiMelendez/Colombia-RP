@@ -241,8 +241,15 @@ addEventHandler("admin:giveItems", root, function(characterId, itemsData)
     for _, itemData in ipairs(itemsData) do
         local itemId = tonumber(itemData.itemId)
         local quantity = tonumber(itemData.quantity) or 1
-        local value = itemData.value or 1
+        local value = itemData.value
         local name = itemData.name or nil
+        
+        -- Si es un chaleco (ID 46) y no se especificó un valor, usar 100 por defecto
+        if itemId == 46 and (not value or value == 1) then
+            value = 100
+        elseif not value then
+            value = 1
+        end
         
         if itemId then
             local success, errorMsg = giveItemToPlayer(target, itemId, value, name, quantity)

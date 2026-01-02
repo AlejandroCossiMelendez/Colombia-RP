@@ -234,12 +234,35 @@ addEventHandler("onPlayerDamage", root, function(attacker, weapon, bodypart, los
     if hasVest then
         local currentArmor = math.floor(getPedArmor(source))
         if currentArmor < 0 then currentArmor = 0 end
+        if currentArmor > 100 then currentArmor = 100 end
         setElementData(source, "vest:armor", currentArmor)
+        
+        -- Actualizar armor en la base de datos (con un pequeño delay para evitar muchas consultas)
+        local characterId = getElementData(source, "character:id")
+        if characterId then
+            -- Usar un timer para evitar actualizar en cada frame de daño
+            if not source.armorUpdateTimer or not isTimer(source.armorUpdateTimer) then
+                source.armorUpdateTimer = setTimer(function(player)
+                    if isElement(player) then
+                        local charId = getElementData(player, "character:id")
+                        local armor = math.floor(getPedArmor(player))
+                        if armor < 0 then armor = 0 end
+                        if charId then
+                            executeDatabase("UPDATE characters SET armor = ? WHERE id = ?", armor, charId)
+                        end
+                    end
+                end, 1000, 1, source) -- Actualizar después de 1 segundo
+            end
+        end
         
         -- Si el armor llega a 0, quitar el chaleco
         if currentArmor <= 0 then
             removeElementData(source, "has:vest")
             removeElementData(source, "vest:armor")
+            -- Limpiar armor en la base de datos
+            if characterId then
+                executeDatabase("UPDATE characters SET armor = 0 WHERE id = ?", characterId)
+            end
         end
     end
 end)
