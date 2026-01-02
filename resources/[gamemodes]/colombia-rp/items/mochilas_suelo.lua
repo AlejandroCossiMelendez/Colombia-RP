@@ -7,9 +7,18 @@ end
   
 addEventHandler( "onResourceStart", resourceRoot,
 	function( )
-		local result = exports.sql:query_assoc( "SELECT * FROM mochilas_suelo ORDER BY mochilaID ASC" )
-		for x, t in ipairs (result) do
-			createMochilaOnFloor (t.mochilaID, t.model, t.x, t.y, t.z, t.interior, t.dimension )
+		-- Verificar si el recurso sql está disponible
+		local sqlResource = getResourceFromName("sql")
+		if sqlResource and getResourceState(sqlResource) == "running" then
+			local result = exports.sql:query_assoc( "SELECT * FROM mochilas_suelo ORDER BY mochilaID ASC" )
+			if result then
+				for x, t in ipairs (result) do
+					createMochilaOnFloor (t.mochilaID, t.model, t.x, t.y, t.z, t.interior, t.dimension )
+				end
+			end
+		else
+			-- Si no hay recurso sql, simplemente no cargar mochilas del suelo
+			outputServerLog("[MOCHILAS] Recurso 'sql' no disponible. Las mochilas del suelo no se cargarán.")
 		end
 	end
 )

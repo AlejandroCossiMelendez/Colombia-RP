@@ -9,6 +9,7 @@
     <script src="server/events.lua" type="server" />
     <script src="server/config.lua" type="server" />
     <script src="server/database.lua" type="server" />
+    <script src="server/create_tables.lua" type="server" />
     <script src="server/login.lua" type="server" />
     <script src="server/characters.lua" type="server" />
     <script src="server/inventory.lua" type="server" />
@@ -48,6 +49,17 @@
     <script src="items/items_list.lua" type="client" />
     <script src="items/items_c.lua" type="client" />
     <script src="items/drogas_c.lua" type="client" />
+    
+    <!-- Sistema de mochilas (cliente) -->
+    <script src="mochilas/mochila.lua" type="client" />
+    <file src="mochilas/texturasMochilas/alice.txd" type="client" />
+    <file src="mochilas/texturasMochilas/alice.dff" type="client" />
+    <file src="mochilas/texturasMochilas/small.txd" type="client" />
+    <file src="mochilas/texturasMochilas/small.dff" type="client" />
+    <file src="mochilas/texturasMochilas/czech.txd" type="client" />
+    <file src="mochilas/texturasMochilas/czech.dff" type="client" />
+    <file src="mochilas/texturasMochilas/coyote.txd" type="client" />
+    <file src="mochilas/texturasMochilas/coyote.dff" type="client" />
     
     <!-- Radar HD -->
     <script src="client/radar.lua" type="client" />

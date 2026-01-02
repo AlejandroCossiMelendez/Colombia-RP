@@ -66,9 +66,9 @@ function createAdminPanel()
     panelVisible = true
     showCursor(true)
     
-    -- Crear ventana principal
-    local windowWidth = 400
-    local windowHeight = 500
+    -- Crear ventana principal (aumentada para más botones)
+    local windowWidth = 450
+    local windowHeight = 650
     local windowX = (screenW - windowWidth) / 2
     local windowY = (screenH - windowHeight) / 2
     
@@ -91,10 +91,10 @@ function createAdminPanel()
     guiLabelSetHorizontalAlign(titleLabel, "center", false)
     guiSetFont(titleLabel, "default-bold")
     
-    -- Crear botones según el tipo de usuario
+    -- Crear botones según el tipo de usuario (con mejor espaciado)
     local buttonY = 70
-    local buttonHeight = 35
-    local buttonSpacing = 45
+    local buttonHeight = 32
+    local buttonSpacing = 38
     
     if userType == "admin" then
         -- Botón: Revivir Usuario
@@ -278,8 +278,22 @@ function createAdminPanel()
         table.insert(adminButtons, ilegalBtn)
     end
     
-    -- Botón: Cerrar
-    local closeBtn = guiCreateButton(20, windowHeight - 50, windowWidth - 40, 35, "Cerrar", false, adminWindow)
+    -- Calcular altura necesaria antes de crear el botón cerrar
+    local neededHeight = buttonY + buttonSpacing + 80
+    if neededHeight > screenH - 100 then
+        neededHeight = screenH - 100
+    elseif neededHeight < windowHeight then
+        neededHeight = windowHeight
+    end
+    
+    -- Ajustar tamaño de la ventana si es necesario
+    if neededHeight ~= windowHeight then
+        guiSetSize(adminWindow, windowWidth, neededHeight, false)
+        guiSetPosition(adminWindow, (screenW - windowWidth) / 2, (screenH - neededHeight) / 2, false)
+    end
+    
+    -- Botón: Cerrar (siempre al final)
+    local closeBtn = guiCreateButton(20, neededHeight - 50, windowWidth - 40, 35, "Cerrar", false, adminWindow)
     addEventHandler("onClientGUIClick", closeBtn, function()
         closeAdminPanel()
     end, false)

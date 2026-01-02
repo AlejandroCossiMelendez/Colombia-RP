@@ -1,36 +1,59 @@
 -- Integración del sistema de items con el gamemode
 -- Funciones para obtener lista de items y dar items
 
+-- Función auxiliar para obtener getName
+local function getItemNameFunc()
+    -- Las funciones están incluidas directamente en el gamemode
+    -- Usar la función global getName directamente (de items_list.lua)
+    if type(getName) == "function" then
+        return getName
+    end
+    -- Si no está disponible, intentar exports como fallback
+    local success, result = pcall(function() return exports.items:getName(1) end)
+    if success then
+        return function(id) 
+            local s, r = pcall(function() return exports.items:getName(id) end)
+            return s and r or nil
+        end
+    end
+    return nil
+end
+
+-- Función auxiliar para obtener give
+local function getItemGiveFunc()
+    -- Las funciones están incluidas directamente en el gamemode
+    -- Usar la función global give directamente (de items.lua)
+    if type(give) == "function" then
+        return give
+    end
+    -- Si no está disponible, intentar exports como fallback
+    local success = pcall(function() return exports.items:give end)
+    if success then
+        return function(element, item, val, name) 
+            local s, r = pcall(function() return exports.items:give(element, item, val, name) end)
+            return s and r or false
+        end
+    end
+    return nil
+end
+
 -- Función para obtener la lista de todos los items disponibles
 function getAllItemsList()
     local itemsList = {}
     
     -- Las funciones de items están incluidas directamente en el gamemode
-    -- Intentar usar exports primero, si no funciona, usar las funciones directamente
-    local getNameFunc = nil
-    local success, result = pcall(function() return exports.items:getName(1) end)
-    if success then
-        getNameFunc = function(id) return exports.items:getName(id) end
-    else
-        -- Si exports no funciona, las funciones están disponibles globalmente
-        -- getName está definida en items_list.lua
-        getNameFunc = getName
-    end
+    -- Usar la función global getName directamente (de items_list.lua)
+    local getNameFunc = getItemNameFunc()
     
     if not getNameFunc then
         outputServerLog("[ITEMS] ERROR: No se pueden acceder a las funciones del sistema de items.")
+        outputServerLog("[ITEMS] INFO: Asegúrate de que items_list.lua esté incluido en meta.xml")
         return itemsList
     end
     
     -- Obtener la lista de items
     for i = 1, 102 do -- Basado en item_list que tiene 102 items
-        local itemName = nil
-        if getNameFunc then
-            local success, result = pcall(function() return getNameFunc(i) end)
-            if success then
-                itemName = result
-            end
-        end
+        local itemName = getNameFunc(i)
         
         if itemName and itemName ~= " " and itemName ~= "" then
             table.insert(itemsList, {

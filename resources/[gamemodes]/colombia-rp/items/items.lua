@@ -110,7 +110,19 @@ end
 
 local function getID( element )
 	if getElementType( element ) == "player" then
-		return exports.players:getCharacterID( element )
+		-- Usar nuestro sistema de characters en lugar de exports.players
+		if getElementData(element, "character:selected") then
+			return getElementData(element, "character:id")
+		end
+		-- Fallback: intentar exports.players si existe
+		local playersResource = getResourceFromName("players")
+		if playersResource and getResourceState(playersResource) == "running" then
+			local success, result = pcall(function() return exports.players:getCharacterID(element) end)
+			if success then
+				return result
+			end
+		end
+		return nil
 	end
 end
 
@@ -328,8 +340,18 @@ addEvent( "loadItems", true )
 addEventHandler( "loadItems", root,
 	function( )
 		if source == client then
-			if exports.players:isLoggedIn( source ) then
+			-- Verificar si el jugador tiene un personaje seleccionado
+			if getElementData(source, "character:selected") then
 				load( source, true )
+			else
+				-- Fallback: intentar exports.players si existe
+				local playersResource = getResourceFromName("players")
+				if playersResource and getResourceState(playersResource) == "running" then
+					local success, result = pcall(function() return exports.players:isLoggedIn(source) end)
+					if success and result then
+						load( source, true )
+					end
+				end
 			end
 		end
 	end
