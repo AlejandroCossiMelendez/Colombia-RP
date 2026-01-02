@@ -37,6 +37,7 @@
     <script src="client/admin_panel.lua" type="client" />
     <script src="client/freecam.lua" type="client" />
     <script src="client/inventory.lua" type="client" />
+    <script src="client/cursor_toggle.lua" type="client" />
     
     <!-- Radar HD -->
     <script src="client/radar.lua" type="client" />
