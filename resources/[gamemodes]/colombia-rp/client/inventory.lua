@@ -410,15 +410,22 @@ bindKey("i", "down", function()
     end
     
     -- Verificar si el teléfono está abierto primero
-    -- Verificar tanto el elementData como si hay un navegador del teléfono activo
     local phoneVisibleData = getElementData(localPlayer, "phone:visible") or false
-    -- También verificar si hay elementos del teléfono activos (navegador)
+    
+    -- Verificar si hay navegadores del teléfono activos (no del velocímetro)
     local phoneBrowserElements = getElementsByType("gui-browser", resourceRoot)
     local hasPhoneBrowser = false
-    for _, browser in ipairs(phoneBrowserElements) do
-        if isElement(browser) and guiGetVisible(browser) then
-            hasPhoneBrowser = true
-            break
+    for _, browserElement in ipairs(phoneBrowserElements) do
+        if isElement(browserElement) and guiGetVisible(browserElement) then
+            local browser = guiGetBrowser(browserElement)
+            if browser and isElement(browser) then
+                local browserURL = getBrowserURL(browser)
+                -- Solo considerar navegadores del teléfono, no del velocímetro
+                if browserURL and string.find(browserURL, "phone.html") then
+                    hasPhoneBrowser = true
+                    break
+                end
+            end
         end
     end
     

@@ -9,8 +9,8 @@ local fuelLevel = 100 -- Nivel de gasolina (0-100)
 -- Deshabilitar el velocímetro nativo del juego
 addEventHandler("onClientResourceStart", resourceRoot, function()
     -- Deshabilitar el componente de nombre de vehículo (velocímetro nativo)
-    showPlayerHudComponent("vehicle_name", false)
-    showPlayerHudComponent("area_name", false)
+    setPlayerHudComponentVisible("vehicle_name", false)
+    setPlayerHudComponentVisible("area_name", false)
     
     -- Crear el navegador para el velocímetro
     createSpeedometerBrowser()
@@ -27,12 +27,27 @@ function createSpeedometerBrowser()
     
     if speedometerBrowser then
         local browser = guiGetBrowser(speedometerBrowser)
+        
+        -- Esperar a que el navegador esté listo
         addEventHandler("onClientBrowserCreated", browser, function()
-            loadBrowserURL(browser, "http://mta/local/html/speedometer.html")
+            setTimer(function()
+                if isElement(browser) then
+                    loadBrowserURL(browser, "http://mta/local/html/speedometer.html")
+                end
+            end, 500, 1)
         end)
         
-        -- Ocultar el cursor del navegador
+        -- También intentar cargar después de un delay (fallback)
+        setTimer(function()
+            if isElement(browser) then
+                loadBrowserURL(browser, "http://mta/local/html/speedometer.html")
+            end
+        end, 1500, 1)
+        
+        -- Hacer visible el navegador
         guiSetVisible(speedometerBrowser, true)
+    else
+        outputChatBox("[ERROR] No se pudo crear el navegador del velocímetro", 255, 0, 0)
     end
 end
 
@@ -94,9 +109,36 @@ function updateSpeedometer()
         -- Mostrar el velocímetro
         if speedometerBrowser then
             local browser = guiGetBrowser(speedometerBrowser)
-            if browser then
-                executeBrowserJavascript(browser, "showSpeedometer();")
+            if browser and isElement(browser) then
+                -- Esperar un poco para asegurar que el HTML esté cargado
+                setTimer(function()
+                    if isElement(browser) then
+                        executeBrowserJavascript(browser, "if(typeof showSpeedometer === 'function') { showSpeedometer(); } else { console.log('showSpeedometer no disponible'); }")
+                    end
+                end, 300, 1)
+            else
+                -- Si el navegador no está listo, recrearlo
+                createSpeedometerBrowser()
+                setTimer(function()
+                    if speedometerBrowser then
+                        local newBrowser = guiGetBrowser(speedometerBrowser)
+                        if newBrowser and isElement(newBrowser) then
+                            executeBrowserJavascript(newBrowser, "if(typeof showSpeedometer === 'function') { showSpeedometer(); }")
+                        end
+                    end
+                end, 1000, 1)
             end
+        else
+            -- Si no existe el navegador, crearlo
+            createSpeedometerBrowser()
+            setTimer(function()
+                if speedometerBrowser then
+                    local newBrowser = guiGetBrowser(speedometerBrowser)
+                    if newBrowser and isElement(newBrowser) then
+                        executeBrowserJavascript(newBrowser, "if(typeof showSpeedometer === 'function') { showSpeedometer(); }")
+                    end
+                end
+            end, 1000, 1)
         end
     elseif not vehicle and isInVehicle then
         -- Jugador salió del vehículo
@@ -106,15 +148,15 @@ function updateSpeedometer()
         -- Ocultar el velocímetro
         if speedometerBrowser then
             local browser = guiGetBrowser(speedometerBrowser)
-            if browser then
-                executeBrowserJavascript(browser, "hideSpeedometer();")
+            if browser and isElement(browser) then
+                executeBrowserJavascript(browser, "if(typeof hideSpeedometer === 'function') { hideSpeedometer(); }")
             end
         end
     end
     
     if isInVehicle and vehicle and speedometerBrowser then
         local browser = guiGetBrowser(speedometerBrowser)
-        if browser then
+        if browser and isElement(browser) then
             local speed = getVehicleSpeedKMH(vehicle)
             local rpm = getVehicleRPM(vehicle)
             local vehicleName = getVehicleDisplayName(vehicle)
@@ -125,15 +167,16 @@ function updateSpeedometer()
             local vehicleFuel = getElementData(vehicle, "vehicle:fuel") or fuelLevel
             
             -- Enviar datos al navegador
-            executeBrowserJavascript(browser, string.format(
-                "updateSpeedometer(%d, %d, %d, %s, %s, '%s');",
+            local jsCode = string.format(
+                "if(typeof updateSpeedometer === 'function') { updateSpeedometer(%d, %d, %d, %s, %s, '%s'); }",
                 speed,
                 rpm,
                 vehicleFuel,
                 tostring(engineState),
                 tostring(lightsState == 2),
                 vehicleName
-            ))
+            )
+            executeBrowserJavascript(browser, jsCode)
         end
     end
 end
@@ -181,7 +224,7 @@ addEventHandler("onClientResourceStop", resourceRoot, function()
         destroyElement(speedometerBrowser)
     end
     -- Restaurar el velocímetro nativo
-    showPlayerHudComponent("vehicle_name", true)
-    showPlayerHudComponent("area_name", true)
+    setPlayerHudComponentVisible("vehicle_name", true)
+    setPlayerHudComponentVisible("area_name", true)
 end)
 
