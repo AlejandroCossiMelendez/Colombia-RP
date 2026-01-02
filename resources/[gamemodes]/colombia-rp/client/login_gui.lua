@@ -120,23 +120,37 @@ addEventHandler("loginResponse", resourceRoot, function(success, message)
     if browserContent and isElement(browserContent) then
         if success then
             executeBrowserJavascript(browserContent, "showSuccess('Login exitoso'); setLoading('loginBtn', false);")
-            -- Ocultar login y mostrar panel de personajes después de un delay
+            -- Ocultar login y mostrar panel de personajes SOLO después de confirmar login exitoso
             setTimer(function()
-                hideLoginGUI()
-                -- Verificar que el jugador esté logueado antes de mostrar personajes
-                setTimer(function()
-                    local loggedIn = getElementData(localPlayer, "account:loggedIn")
-                    if loggedIn == true then
-                        -- Solicitar personajes y mostrar panel
-                        triggerServerEvent("requestCharacters", localPlayer)
-                        -- Llamar directamente a la función, no usar evento
-                        if showCharacterGUI then
-                            showCharacterGUI()
+                -- Verificar que el login fue exitoso ANTES de ocultar login
+                local loggedIn = getElementData(localPlayer, "account:loggedIn")
+                local userId = getElementData(localPlayer, "account:userId")
+                
+                if loggedIn == true and userId then
+                    -- Login confirmado, ocultar login
+                    hideLoginGUI()
+                    -- Esperar un momento y luego mostrar panel de personajes
+                    setTimer(function()
+                        -- Verificar nuevamente antes de mostrar personajes
+                        local loggedIn2 = getElementData(localPlayer, "account:loggedIn")
+                        local userId2 = getElementData(localPlayer, "account:userId")
+                        
+                        if loggedIn2 == true and userId2 then
+                            -- Ahora sí, mostrar panel de personajes
+                            if showCharacterGUI then
+                                showCharacterGUI()
+                            end
+                        else
+                            outputChatBox("Error: No se pudo verificar el login", 255, 0, 0)
+                            -- Volver a mostrar login si falla la verificación
+                            if showLoginGUI then
+                                showLoginGUI()
+                            end
                         end
-                    else
-                        outputChatBox("Error: No se pudo verificar el login", 255, 0, 0)
-                    end
-                end, 500, 1)
+                    end, 300, 1)
+                else
+                    outputChatBox("Error: No se pudo verificar el login", 255, 0, 0)
+                end
             end, 1500, 1)
         else
             executeBrowserJavascript(browserContent, "showError('" .. tostring(message) .. "'); setLoading('loginBtn', false);")

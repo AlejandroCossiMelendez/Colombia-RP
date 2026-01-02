@@ -92,7 +92,19 @@ function showCreateModal() {
     document.getElementById('charSurname').value = '';
     document.getElementById('charAge').value = '25';
     document.getElementById('charGender').value = '0';
-    document.getElementById('charSkin').value = '0';
+    // Establecer skin por defecto según género (0 = masculino, 1 = femenino)
+    updateSkinByGender();
+}
+
+function updateSkinByGender() {
+    const gender = parseInt(document.getElementById('charGender').value);
+    const skinInput = document.getElementById('charSkin');
+    // 0 = masculino (skin 0), 1 = femenino (skin 216)
+    if (gender === 0) {
+        skinInput.value = '0';
+    } else if (gender === 1) {
+        skinInput.value = '216';
+    }
 }
 
 function hideCreateModal() {
@@ -106,7 +118,12 @@ function createCharacter(e) {
     const surname = document.getElementById('charSurname').value.trim();
     const age = parseInt(document.getElementById('charAge').value);
     const gender = parseInt(document.getElementById('charGender').value);
-    const skin = parseInt(document.getElementById('charSkin').value) || 0;
+    let skin = parseInt(document.getElementById('charSkin').value);
+    
+    // Si no se especifica una skin o es 0, usar la skin por defecto según el género
+    if (!skin || skin === 0) {
+        skin = (gender === 1) ? 216 : 0; // Femenino = 216, Masculino = 0
+    }
     
     if (!name || !surname) {
         showError('Por favor completa todos los campos');
@@ -161,6 +178,7 @@ function showSuccess(message) {
 window.loadCharacters = loadCharacters;
 window.showError = showError;
 window.showSuccess = showSuccess;
+window.updateSkinByGender = updateSkinByGender;
 
 // Cerrar modal al hacer clic fuera
 document.addEventListener('click', function(e) {
