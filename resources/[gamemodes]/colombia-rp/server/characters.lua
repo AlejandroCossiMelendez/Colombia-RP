@@ -113,14 +113,23 @@ addEventHandler("selectCharacter", root, function(characterId)
         setElementData(source, "character:thirst", character.thirst)
         setElementData(source, "character:health", character.health)
         
+        outputServerLog("[CHARACTERS] Spawneando personaje ID: " .. characterId .. " para " .. getPlayerName(source))
+        
         -- Spawnear personaje
         spawnPlayer(source, character.posX, character.posY, character.posZ, character.rotation, character.skin, character.interior, character.dimension)
         setElementHealth(source, character.health)
         setElementModel(source, character.skin)
         
+        outputServerLog("[CHARACTERS] Personaje spawneado en: " .. character.posX .. ", " .. character.posY .. ", " .. character.posZ)
+        
         -- Activar cámara del jugador
-        setCameraTarget(source, source)
-        fadeCamera(source, true, 1.0)
+        setTimer(function()
+            if isElement(source) then
+                setCameraTarget(source, source)
+                fadeCamera(source, true, 1.0)
+                outputServerLog("[CHARACTERS] Cámara activada para " .. getPlayerName(source))
+            end
+        end, 500, 1)
         
         -- Actualizar último login
         executeDatabase("UPDATE characters SET lastLogin = NOW() WHERE id = ?", characterId)
@@ -133,6 +142,7 @@ addEventHandler("selectCharacter", root, function(characterId)
         setPlayerMoney(source, character.money)
         
         outputChatBox("¡Bienvenido, " .. character.name .. " " .. character.surname .. "!", source, 0, 255, 0)
+        outputChatBox("Has aparecido en el mundo. ¡Disfruta tu aventura!", source, 0, 255, 255)
     else
         triggerClientEvent(source, "characterSelectResponse", resourceRoot, false, "Personaje no encontrado")
     end

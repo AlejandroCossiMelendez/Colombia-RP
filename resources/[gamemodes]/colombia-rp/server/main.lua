@@ -8,6 +8,9 @@ addEventHandler("onResourceStart", resourceRoot, function()
     if not getDatabase() then
         outputServerLog("ERROR: No se pudo conectar a la base de datos MySQL")
         outputServerLog("Verifica la configuración en server/config.lua")
+        -- No cancelar el recurso, solo advertir
+    else
+        outputServerLog("Base de datos conectada correctamente")
     end
 end)
 

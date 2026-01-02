@@ -82,14 +82,20 @@ addEventHandler("onPlayerLogin", root, function(username, password)
         -- Verificar contraseña
         if verifyPassword(password, user.password) then
             -- Login exitoso
+            outputServerLog("[LOGIN] Login exitoso para usuario: " .. username)
             setElementData(source, "account:loggedIn", true)
             setElementData(source, "account:username", user.username)
             setElementData(source, "account:userId", user.id)
             setElementData(source, "account:role", user.role)
             
             outputChatBox("¡Bienvenido, " .. user.username .. "!", source, 0, 255, 0)
+            outputServerLog("[LOGIN] Enviando respuesta de login exitoso y GUI de personajes")
             triggerClientEvent(source, "loginResponse", resourceRoot, true, "Login exitoso")
-            triggerClientEvent(source, "showCharacterGUI", resourceRoot)
+            setTimer(function()
+                if isElement(source) then
+                    triggerClientEvent(source, "showCharacterGUI", resourceRoot)
+                end
+            end, 500, 1)
         else
             triggerClientEvent(source, "loginResponse", resourceRoot, false, "Contraseña incorrecta")
         end
