@@ -17,6 +17,7 @@ addEventHandler("saveContacts", root, function(contactsJson)
     outputServerLog("[PHONE] Recibido evento saveContacts de " .. playerName)
     outputServerLog("[PHONE] character_id: " .. tostring(characterId))
     outputServerLog("[PHONE] contactsJson length: " .. tostring(contactsJson and string.len(contactsJson) or 0))
+    outputServerLog("[PHONE] contactsJson contenido: " .. tostring(contactsJson))
     
     if not characterId then
         outputServerLog("[PHONE] ERROR: No se pudo obtener character_id para guardar contactos")
@@ -48,10 +49,20 @@ addEventHandler("saveContacts", root, function(contactsJson)
     
     if not success or not result or type(result) ~= "table" then
         outputServerLog("[PHONE] ERROR: No se pudo parsear el JSON de contactos. JSON recibido: " .. tostring(contactsJson))
+        outputServerLog("[PHONE] success: " .. tostring(success) .. ", result type: " .. type(result))
+        if result then
+            outputServerLog("[PHONE] result: " .. tostring(result))
+        end
         return
     end
     
     contacts = result
+    outputServerLog("[PHONE] JSON parseado correctamente. Total contactos en array: " .. #contacts)
+    
+    -- Debug: mostrar cada contacto antes de validar
+    for i, contact in ipairs(contacts) do
+        outputServerLog("[PHONE] Contacto " .. i .. " antes de validar - name: " .. tostring(contact.name) .. " (" .. type(contact.name) .. "), number: " .. tostring(contact.number) .. " (" .. type(contact.number) .. ")")
+    end
     
     -- Eliminar contactos antiguos del personaje
     local deleteQuery = "DELETE FROM phone_contacts WHERE character_id = ?"
@@ -66,18 +77,43 @@ addEventHandler("saveContacts", root, function(contactsJson)
     local insertCount = 0
     local errorCount = 0
     for i, contact in ipairs(contacts) do
-        if contact.name and contact.number and type(contact.name) == "string" and type(contact.number) == "string" then
+        -- Validar que el contacto tenga los campos necesarios
+        local name = contact.name
+        local number = contact.number
+        
+        -- Debug detallado
+        outputServerLog("[PHONE] Procesando contacto " .. i .. ":")
+        outputServerLog("[PHONE]   - name existe: " .. tostring(name ~= nil))
+        outputServerLog("[PHONE]   - number existe: " .. tostring(number ~= nil))
+        outputServerLog("[PHONE]   - name type: " .. type(name))
+        outputServerLog("[PHONE]   - number type: " .. type(number))
+        if name then outputServerLog("[PHONE]   - name value: " .. tostring(name)) end
+        if number then outputServerLog("[PHONE]   - number value: " .. tostring(number)) end
+        
+        if name and number and type(name) == "string" and type(number) == "string" and name ~= "" and number ~= "" then
             local insertQuery = "INSERT INTO phone_contacts (character_id, contact_name, contact_number) VALUES (?, ?, ?)"
-            local insertSuccess = executeDatabase(insertQuery, characterId, contact.name, contact.number)
+            local insertSuccess = executeDatabase(insertQuery, characterId, name, number)
             if insertSuccess then
                 insertCount = insertCount + 1
-                outputServerLog("[PHONE] Contacto " .. i .. " guardado: " .. contact.name .. " - " .. contact.number)
+                outputServerLog("[PHONE] ✓ Contacto " .. i .. " guardado exitosamente: " .. name .. " - " .. number)
             else
                 errorCount = errorCount + 1
-                outputServerLog("[PHONE] ERROR al guardar contacto " .. i .. ": " .. contact.name .. " - " .. contact.number)
+                outputServerLog("[PHONE] ✗ ERROR al guardar contacto " .. i .. " en BD: " .. name .. " - " .. number)
             end
         else
-            outputServerLog("[PHONE] Contacto " .. i .. " inválido (name: " .. tostring(contact.name) .. ", number: " .. tostring(contact.number) .. ")")
+            outputServerLog("[PHONE] ✗ Contacto " .. i .. " NO pasó validación:")
+            if not name or name == "" then
+                outputServerLog("[PHONE]   - name está vacío o no existe")
+            end
+            if not number or number == "" then
+                outputServerLog("[PHONE]   - number está vacío o no existe")
+            end
+            if name and type(name) ~= "string" then
+                outputServerLog("[PHONE]   - name no es string, es: " .. type(name))
+            end
+            if number and type(number) ~= "string" then
+                outputServerLog("[PHONE]   - number no es string, es: " .. type(number))
+            end
             errorCount = errorCount + 1
         end
     end
