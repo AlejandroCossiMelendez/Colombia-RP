@@ -17,6 +17,7 @@
     <script src="server/spawn.lua" type="server" />
     <script src="server/commands.lua" type="server" />
     <script src="server/bank.lua" type="server" />
+    <script src="server/chat.lua" type="server" />
     <script src="server/main.lua" type="server" />
     
     <!-- Scripts del cliente -->
