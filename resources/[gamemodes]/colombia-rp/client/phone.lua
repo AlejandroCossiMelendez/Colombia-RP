@@ -48,7 +48,10 @@ function openPhone()
     triggerEvent("closeInventoryForPhone", localPlayer)
     
     phoneVisible = true
-    phoneBrowser = guiCreateBrowser((sw - w), (sh - h) / 2, w, h, true, true, false)
+    -- Posición: 30px más a la izquierda y un poco más abajo
+    local phoneX = (sw - w) - 30
+    local phoneY = (sh - h) / 2 + 30  -- Bajarlo 30px más
+    phoneBrowser = guiCreateBrowser(phoneX, phoneY, w, h, true, true, false)
     browserContent = guiGetBrowser(phoneBrowser)
     
     if not phoneBrowser or not browserContent then
@@ -98,6 +101,19 @@ end)
 addEvent("closePhone", true)
 addEventHandler("closePhone", resourceRoot, function()
     closePhone()
+end)
+
+-- Evento para cerrar el teléfono desde el navegador (botón home cuando ya está en home)
+addEvent("closePhoneFromBrowser", true)
+addEventHandler("closePhoneFromBrowser", localPlayer, function()
+    closePhone()
+end)
+
+-- Cerrar teléfono con tecla ESC
+bindKey("escape", "down", function()
+    if phoneVisible then
+        closePhone()
+    end
 end)
 
 -- Cerrar teléfono al detener el recurso

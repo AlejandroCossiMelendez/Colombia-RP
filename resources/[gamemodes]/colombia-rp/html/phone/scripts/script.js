@@ -30,7 +30,15 @@ function openApp(appId) {
 }
 
 function returnToHomePage() {
-    if (unlock.style.display !== 'none') return;
+    // Si ya está en el home (unlock visible), cerrar el teléfono
+    if (unlock.style.display !== 'none') {
+        // Cerrar el teléfono enviando evento a MTA
+        if (window.mta) {
+            window.mta.triggerEvent('closePhoneFromBrowser');
+        }
+        return;
+    }
+    // Si está en una app, volver al home
     lock.style.display = 'none';
     unlock.style.display = 'flex';
     interfaces.style.display = 'none';
