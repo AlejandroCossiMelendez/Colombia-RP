@@ -3,19 +3,30 @@ local loginBrowser = nil
 local screenWidth, screenHeight = guiGetScreenSize()
 
 function showLoginGUI()
+    outputChatBox("[DEBUG] showLoginGUI() llamado", 255, 255, 0)
+    
     if loginBrowser then
         destroyElement(loginBrowser)
+        loginBrowser = nil
     end
     
+    outputChatBox("[DEBUG] Creando navegador...", 255, 255, 0)
     loginBrowser = createBrowser(screenWidth, screenHeight, true, true)
     
+    if not loginBrowser then
+        outputChatBox("[ERROR] No se pudo crear el navegador. Verifica que el navegador esté habilitado en MTA.", 255, 0, 0)
+        return
+    end
+    
     addEventHandler("onClientBrowserCreated", loginBrowser, function()
+        outputChatBox("[DEBUG] Navegador creado, cargando URL...", 255, 255, 0)
         loadBrowserURL(loginBrowser, "http://mta/local/login.html")
         showCursor(true)
         guiSetInputEnabled(true)
     end)
     
     addEventHandler("onClientBrowserDocumentReady", loginBrowser, function(url)
+        outputChatBox("[DEBUG] Documento listo: " .. tostring(url), 255, 255, 0)
         if url == "http://mta/local/login.html" then
             -- Exponer funciones al navegador usando callRemote
             executeBrowserJavascript(loginBrowser, [[
@@ -26,6 +37,7 @@ function showLoginGUI()
                     callRemote('onPlayerRegister', username, password, email);
                 };
             ]])
+            outputChatBox("[DEBUG] Funciones JavaScript expuestas", 0, 255, 0)
         end
     end)
 end
@@ -51,17 +63,21 @@ end)
 -- También mostrar login cuando el recurso se inicia y el jugador ya está conectado
 addEventHandler("onClientResourceStart", resourceRoot, function()
     outputChatBox("Recurso iniciado, verificando login...", 255, 255, 0)
-    local loggedIn = getElementData(localPlayer, "account:loggedIn")
-    if loggedIn ~= true then
-        setTimer(function()
+    setTimer(function()
+        local loggedIn = getElementData(localPlayer, "account:loggedIn")
+        outputChatBox("[DEBUG] Estado de login: " .. tostring(loggedIn), 255, 255, 0)
+        
+        if loggedIn ~= true then
             if not loginBrowser then
                 outputChatBox("Mostrando login automáticamente...", 255, 255, 0)
                 showLoginGUI()
+            else
+                outputChatBox("Login ya está mostrado", 0, 255, 0)
             end
-        end, 2000, 1)
-    else
-        outputChatBox("Ya estás logueado", 0, 255, 0)
-    end
+        else
+            outputChatBox("Ya estás logueado", 0, 255, 0)
+        end
+    end, 3000, 1)
 end)
 
 addEvent("loginResponse", true)

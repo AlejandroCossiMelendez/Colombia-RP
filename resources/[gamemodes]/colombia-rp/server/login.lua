@@ -12,28 +12,50 @@ function verifyPassword(password, storedHash)
     return testHash == storedHash
 end
 
--- Evento cuando el jugador se une al juego (onPlayerJoin se dispara después de onPlayerConnect)
-addEventHandler("onPlayerJoin", root, function()
-    outputServerLog("[LOGIN] Jugador " .. getPlayerName(source) .. " se unió al juego")
+-- Función para inicializar jugador y mostrar login
+function initializePlayerLogin(player)
+    if not isElement(player) then
+        return
+    end
+    
+    outputServerLog("[LOGIN] Inicializando login para " .. getPlayerName(player))
     
     -- Inicializar datos del jugador
-    setElementData(source, "account:loggedIn", false)
-    setElementData(source, "account:username", nil)
-    setElementData(source, "account:userId", nil)
-    setElementData(source, "character:selected", false)
-    setElementData(source, "character:id", nil)
+    setElementData(player, "account:loggedIn", false)
+    setElementData(player, "account:username", nil)
+    setElementData(player, "account:userId", nil)
+    setElementData(player, "character:selected", false)
+    setElementData(player, "character:id", nil)
     
     -- Prevenir spawn automático
-    fadeCamera(source, false)
-    setCameraTarget(source, nil)
+    fadeCamera(player, false)
+    setCameraTarget(player, nil)
     
     -- Mostrar GUI de login al cliente después de un pequeño delay
     setTimer(function()
-        if isElement(source) then
-            outputServerLog("[LOGIN] Enviando GUI de login a " .. getPlayerName(source))
-            triggerClientEvent(source, "showLoginGUI", resourceRoot)
+        if isElement(player) then
+            outputServerLog("[LOGIN] Enviando GUI de login a " .. getPlayerName(player))
+            triggerClientEvent(player, "showLoginGUI", resourceRoot)
         end
-    end, 1000, 1)
+    end, 1500, 1)
+end
+
+-- Evento cuando el jugador se une al juego
+addEventHandler("onPlayerJoin", root, function()
+    initializePlayerLogin(source)
+end)
+
+-- Si el recurso se inicia después de que los jugadores ya están conectados
+addEventHandler("onResourceStart", resourceRoot, function()
+    setTimer(function()
+        for _, player in ipairs(getElementsByType("player")) do
+            local loggedIn = getElementData(player, "account:loggedIn")
+            if not loggedIn or loggedIn == false then
+                outputServerLog("[LOGIN] Jugador " .. getPlayerName(player) .. " ya estaba conectado, inicializando login...")
+                initializePlayerLogin(player)
+            end
+        end
+    end, 2000, 1)
 end)
 
 -- Evento de login desde el cliente
