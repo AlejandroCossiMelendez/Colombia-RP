@@ -228,16 +228,6 @@ addEventHandler("onClientPlayerVoiceStart", root, function()
             -- Actualizar estado de voz para el HUD
             isVoiceActive = true
             setElementData(localPlayer, "Hype>Voice", true)
-            
-            -- Verificar si tiene frecuencia activa
-            local frecuencia = getElementData(localPlayer, "frecuencia.voz")
-            if frecuencia and tonumber(frecuencia) >= 100 and tonumber(frecuencia) < 2000 then
-                -- Hablando en frecuencia
-                outputChatBox("* Hablando en frecuencia [" .. tostring(frecuencia) .. "]", 0, 255, 0)
-            else
-                -- Hablando por proximidad
-                outputChatBox("* Hablando por proximidad", 0, 255, 0)
-            end
         end
         voicePlayers[source] = true
     end

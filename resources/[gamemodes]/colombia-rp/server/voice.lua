@@ -4,6 +4,26 @@
 local venFrecAb = {}
 local tablasBroadcast = {}
 
+-- Función para obtener el nombre del personaje
+function getCharacterDisplayName(player)
+    if not isElement(player) or getElementType(player) ~= "player" then
+        return getPlayerName(player)
+    end
+    
+    if not getElementData(player, "character:selected") then
+        return getPlayerName(player)
+    end
+    
+    local charName = getElementData(player, "character:name")
+    local charSurname = getElementData(player, "character:surname")
+    
+    if charName and charSurname then
+        return charName .. " " .. charSurname
+    else
+        return getPlayerName(player)
+    end
+end
+
 -- Función para obtener las facciones del jugador (simplificado para Colombia RP)
 function getPlayerFactions(player)
     -- Por ahora retornar un array vacío, se puede expandir después
@@ -162,9 +182,8 @@ function conectarJugadorAFrecuencia(jugador, frecuencia, ignoreAviso)
             if tonumber(getElementData(v, "frecuencia.voz")) == tonumber(frecuencia) then
                 table.insert(tablaBroadcast, v)
                 if ignoreAviso ~= true and jugador ~= v then
-                    local charName = getElementData(jugador, "character:name") or getPlayerName(jugador)
-                    local charSurname = getElementData(jugador, "character:surname") or ""
-                    outputChatBox((charName .. " " .. charSurname) .. " se ha unido a tu frecuencia.", v, 0, 255, 0)
+                    local displayName = getCharacterDisplayName(jugador)
+                    outputChatBox(displayName .. " se ha unido a tu frecuencia.", v, 0, 255, 0)
                 end
             end
         end
