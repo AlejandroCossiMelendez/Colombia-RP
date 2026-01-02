@@ -6,6 +6,9 @@ local callFrequency = nil
 local callSpeakerEnabled = false
 local incomingCallPushNotification = nil
 local incomingCallSound = nil
+local currentCallId = nil
+local currentCallPartner = nil
+local currentCallNumber = nil
 
 -- Evento: Llamada entrante
 addEvent("phone:incomingCall", true)
@@ -184,6 +187,48 @@ addEventHandler("phone:callAnswered", root, function(callId)
     local browser = getElementData(localPlayer, "phone:browserContent")
     if browser and isElement(browser) then
         executeBrowserJavascript(browser, "if (typeof onCallAnswered === 'function') { onCallAnswered(); }")
+    end
+end)
+
+-- Evento: Llamada iniciada (cuando se conecta)
+addEvent("phone:callStarted", true)
+addEventHandler("phone:callStarted", root, function(callId, partnerName, partnerNumber)
+    isInCall = true
+    
+    -- Guardar información de la llamada
+    currentCallId = callId
+    currentCallPartner = partnerName
+    currentCallNumber = partnerNumber
+    
+    -- Obtener información del navegador del teléfono
+    local browser = getElementData(localPlayer, "phone:browserContent")
+    if browser and isElement(browser) then
+        executeBrowserJavascript(browser, "if (typeof onCallStarted === 'function') { onCallStarted('" .. tostring(partnerName) .. "', '" .. tostring(partnerNumber) .. "'); }")
+    end
+end)
+
+-- Evento: Estado de llamada activa
+addEvent("phone:callStatus", true)
+addEventHandler("phone:callStatus", root, function(callData)
+    if callData then
+        isInCall = true
+        currentCallId = callData.callId
+        currentCallPartner = callData.partnerName
+        currentCallNumber = callData.partnerNumber
+        
+        -- Obtener información del navegador del teléfono
+        local browser = getElementData(localPlayer, "phone:browserContent")
+        if browser and isElement(browser) then
+            -- Escapar comillas simples en los nombres
+            local partnerName = tostring(callData.partnerName):gsub("'", "\\'")
+            local partnerNumber = tostring(callData.partnerNumber):gsub("'", "\\'")
+            executeBrowserJavascript(browser, "if (typeof showActiveCall === 'function') { showActiveCall('" .. partnerName .. "', '" .. partnerNumber .. "', " .. tostring(callData.duration) .. ", " .. tostring(callData.speakerEnabled and "true" or "false") .. "); }")
+        end
+    else
+        isInCall = false
+        currentCallId = nil
+        currentCallPartner = nil
+        currentCallNumber = nil
     end
 end)
 

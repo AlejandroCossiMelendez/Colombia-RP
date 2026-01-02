@@ -3,7 +3,7 @@
 
 local PROXIMITY_DISTANCE = 5 -- Metros
 
--- Función para actualizar la voz de proximidad de un jugador
+-- Exportar función para que otros scripts puedan usarla
 function updatePlayerProximityVoice(player)
     if not isElement(player) or getElementType(player) ~= "player" then
         return

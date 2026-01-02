@@ -223,6 +223,10 @@ function openApp(appId) {
     // Si es la app de teléfono (appId 5), inicializar marcador
     if (appId === 5) {
         initPhoneApp();
+        // Solicitar estado de llamada activa
+        if (window.mta && window.mta.triggerEvent) {
+            window.mta.triggerEvent('phone:requestCallStatus');
+        }
     }
     
     // Si es la app de Spotify (appId 8), inicializar Spotify
@@ -775,6 +779,13 @@ function initPhoneApp() {
         });
     }
     
+    // Configurar botón de colgar
+    if (hangupButton) {
+        hangupButton.addEventListener('click', function() {
+            hangupCall();
+        });
+    }
+    
     if (hangupButton) {
         hangupButton.addEventListener('click', function() {
             hangupCall();
@@ -967,6 +978,9 @@ function hangupCall() {
     endCall();
 }
 
+// Exponer función globalmente para que MTA pueda llamarla
+window.hangupCall = hangupCall;
+
 // Terminar llamada
 function endCall() {
     currentCall = null;
@@ -981,24 +995,60 @@ function endCall() {
 }
 
 // Eventos desde MTA
-window.onCallStarted = function(callerNumber, receiverNumber, isIncoming) {
-    // Solo mostrar estado si realmente hay una llamada iniciada
-    if (!callerNumber && !receiverNumber) {
-        return; // No hay información de llamada, probablemente es un error
+window.onCallStarted = function(partnerName, partnerNumber) {
+    if (!partnerName || !partnerNumber) {
+        return;
     }
     
     currentCall = {
-        caller: callerNumber,
-        receiver: receiverNumber,
-        isIncoming: isIncoming
+        partner: partnerName,
+        number: partnerNumber
     };
     
-    if (isIncoming) {
-        showCallStatus('Llamada entrante', callerNumber);
-    } else if (receiverNumber) {
-        showCallStatus('Llamando...', receiverNumber);
+    showCallStatus('En llamada', partnerNumber);
+    startCallTimer();
+}
+
+// Mostrar llamada activa cuando se abre el teléfono
+window.showActiveCall = function(partnerName, partnerNumber, duration, speakerEnabled) {
+    if (!partnerName || !partnerNumber) {
+        return;
     }
-};
+    
+    currentCall = {
+        partner: partnerName,
+        number: partnerNumber
+    };
+    
+    // Mostrar estado de llamada
+    showCallStatus('En llamada', partnerNumber);
+    
+    // Actualizar timer si hay duración
+    if (duration && duration > 0) {
+        const minutes = Math.floor(duration / 60);
+        const seconds = duration % 60;
+        const timerElement = get('#callTimer');
+        if (timerElement) {
+            timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+        // Reiniciar timer desde la duración actual
+        callStartTime = Date.now() - (duration * 1000);
+        startCallTimer();
+    }
+    
+    // Actualizar estado del altavoz
+    if (speakerEnabled !== undefined) {
+        isSpeakerOn = speakerEnabled;
+        const speakerButton = get('#speakerButton');
+        if (speakerButton) {
+            if (isSpeakerOn) {
+                speakerButton.classList.add('active');
+            } else {
+                speakerButton.classList.remove('active');
+            }
+        }
+    }
+}
 
 window.onCallAnswered = function() {
     const callInfo = get('#callInfo');
