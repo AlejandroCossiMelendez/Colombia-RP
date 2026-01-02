@@ -14,15 +14,11 @@ addEventHandler("onClientPlayerSpawn", localPlayer, function()
     setPlayerHudComponentVisible("radar", false)
 end)
 
--- Ocultar el scoreboard por defecto cuando se presiona TAB
-addCommandHandler("scoreboard", function()
-    -- Este comando se ejecuta cuando se presiona TAB, pero lo manejamos manualmente
-end, false)
-
 -- Toggle del scoreboard (TAB)
 bindKey("tab", "both", function(key, keyState)
     if keyState == "down" then
         scoreboardVisible = true
+        outputChatBox("[DEBUG] Scoreboard visible: " .. tostring(scoreboardVisible), 255, 255, 0)
     else
         scoreboardVisible = false
     end
@@ -40,16 +36,25 @@ addEventHandler("onClientRender", root, function()
         return
     end
     
+    -- Debug: verificar que el scoreboard se está renderizando
+    -- outputChatBox("[DEBUG] Renderizando scoreboard", 0, 255, 0)
+    
     -- Obtener todos los jugadores
     local players = getElementsByType("player")
     local playerList = {}
     
-    -- Filtrar solo jugadores con personaje seleccionado
+    -- Filtrar solo jugadores con personaje seleccionado (incluyendo el jugador local)
     for _, player in ipairs(players) do
-        if getElementData(player, "character:selected") then
+        local characterSelected = getElementData(player, "character:selected")
+        if characterSelected then
             local charName = getElementData(player, "character:name")
             local charSurname = getElementData(player, "character:surname")
             local charId = getElementData(player, "character:id")
+            
+            -- Debug para el jugador local
+            if player == localPlayer then
+                outputChatBox("[DEBUG] Jugador local - Selected: " .. tostring(characterSelected) .. ", Name: " .. tostring(charName) .. ", ID: " .. tostring(charId), 255, 255, 0)
+            end
             
             if charName and charSurname and charId then
                 table.insert(playerList, {

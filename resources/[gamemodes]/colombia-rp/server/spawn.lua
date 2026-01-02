@@ -85,6 +85,8 @@ end, 300000, 0) -- Cada 5 minutos
 -- Sistema de Muerte y Respawn
 local deathTimers = {} -- Tabla para almacenar los timers de muerte
 local deathPositions = {} -- Tabla para almacenar las posiciones de muerte
+local deathStartTimes = {} -- Tabla para almacenar el tiempo de inicio de la muerte
+local deathUpdateTimers = {} -- Tabla para almacenar los timers de actualización del cliente
 
 -- Función para revivir al jugador en el hospital
 function respawnAtHospital(player)
@@ -136,6 +138,14 @@ function respawnAtHospital(player)
             killTimer(deathTimers[player])
         end
         deathTimers[player] = nil
+    end
+    
+    -- Limpiar timer de actualización
+    if deathUpdateTimers[player] then
+        if isTimer(deathUpdateTimers[player]) then
+            killTimer(deathUpdateTimers[player])
+        end
+        deathUpdateTimers[player] = nil
     end
     
     if deathPositions[player] then
@@ -203,6 +213,14 @@ function respawnAtDeathLocation(player)
         deathTimers[player] = nil
     end
     
+    -- Limpiar timer de actualización
+    if deathUpdateTimers[player] then
+        if isTimer(deathUpdateTimers[player]) then
+            killTimer(deathUpdateTimers[player])
+        end
+        deathUpdateTimers[player] = nil
+    end
+    
     deathPositions[player] = nil
     
     return true
@@ -261,6 +279,20 @@ addEventHandler("onPlayerWasted", root, function(ammo, attacker, weapon, bodypar
         if isTimer(deathTimers[source]) then
             killTimer(deathTimers[source])
         end
+        deathTimers[source] = nil
+    end
+    
+    -- Cancelar timer de actualización anterior si existe
+    if deathUpdateTimers[source] then
+        if isTimer(deathUpdateTimers[source]) then
+            killTimer(deathUpdateTimers[source])
+        end
+        deathUpdateTimers[source] = nil
+    end
+    
+    -- Limpiar tiempo de inicio anterior
+    if deathStartTimes[source] then
+        deathStartTimes[source] = nil
     end
     
     -- Crear timer para respawn después de 6 minutos
@@ -271,20 +303,51 @@ addEventHandler("onPlayerWasted", root, function(ammo, attacker, weapon, bodypar
         end
     end, Config.Death.respawnTime, 1)
     
-    -- Actualizar tiempo en el cliente cada segundo
+    -- Guardar tiempo de inicio de la muerte
     local totalSeconds = Config.Death.respawnTime / 1000
+    deathStartTimes[source] = getTickCount()
     
-    for i = 1, totalSeconds do
-        setTimer(function()
-            if isElement(source) and deathTimers[source] then
-                local remainingSeconds = totalSeconds - i
-                if remainingSeconds > 0 then
-                    -- Enviar actualización al cliente para mostrar en pantalla
-                    triggerClientEvent(source, "updateDeathTime", resourceRoot, remainingSeconds)
+    outputServerLog("[DEATH] Iniciando cuenta regresiva para " .. getPlayerName(source) .. " - Tiempo total: " .. totalSeconds .. " segundos")
+    
+    -- Enviar actualización inicial
+    triggerClientEvent(source, "updateDeathTime", resourceRoot, totalSeconds)
+    
+    -- Crear timer que se ejecuta cada segundo para actualizar el cliente
+    local updateTimer = setTimer(function()
+        if isElement(source) and deathTimers[source] and deathStartTimes[source] then
+            -- Calcular tiempo transcurrido
+            local elapsed = getTickCount() - deathStartTimes[source]
+            local remainingSeconds = math.max(0, math.ceil((Config.Death.respawnTime - elapsed) / 1000))
+            
+            if remainingSeconds > 0 then
+                -- Enviar actualización al cliente para mostrar en pantalla
+                triggerClientEvent(source, "updateDeathTime", resourceRoot, remainingSeconds)
+                -- Log cada 10 segundos para no saturar
+                if remainingSeconds % 10 == 0 then
+                    outputServerLog("[DEATH] Tiempo restante para " .. getPlayerName(source) .. ": " .. remainingSeconds .. " segundos")
+                end
+            else
+                -- Si el tiempo se acabó, detener este timer
+                if isTimer(updateTimer) then
+                    killTimer(updateTimer)
+                end
+                if deathUpdateTimers[source] then
+                    deathUpdateTimers[source] = nil
                 end
             end
-        end, i * 1000, 1)
-    end
+        else
+            -- Si el jugador ya no existe o el timer fue cancelado, detener este timer
+            if isTimer(updateTimer) then
+                killTimer(updateTimer)
+            end
+            if deathUpdateTimers[source] then
+                deathUpdateTimers[source] = nil
+            end
+        end
+    end, 1000, 0) -- Cada segundo, infinitamente hasta que se cancele
+    
+    -- Guardar el timer de actualización para poder cancelarlo después
+    deathUpdateTimers[source] = updateTimer
 end)
 
 -- Limpiar timers cuando el jugador se desconecta

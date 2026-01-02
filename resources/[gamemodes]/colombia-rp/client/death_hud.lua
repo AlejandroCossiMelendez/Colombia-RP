@@ -89,6 +89,12 @@ end)
 addEvent("updateDeathTime", true)
 addEventHandler("updateDeathTime", resourceRoot, function(seconds)
     updateDeathTime(seconds)
+    -- Debug: mostrar en chat cada 10 segundos
+    if seconds % 10 == 0 or seconds <= 10 then
+        local minutes = math.floor(seconds / 60)
+        local secs = seconds % 60
+        outputChatBox("[DEBUG] Tiempo restante: " .. string.format("%d:%02d", minutes, secs), 255, 255, 0)
+    end
 end)
 
 addEvent("onClientPlayerRevived", true)
