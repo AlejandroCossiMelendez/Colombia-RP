@@ -9,7 +9,9 @@ local incomingCallSound = nil
 
 -- Evento: Llamada entrante
 addEvent("phone:incomingCall", true)
-addEventHandler("phone:incomingCall", resourceRoot, function(callerNumber, callerName, callId)
+addEventHandler("phone:incomingCall", root, function(callerNumber, callerName, callId)
+    outputChatBox("DEBUG: Llamada entrante recibida - " .. tostring(callerNumber), 0, 255, 0)
+    
     -- Reproducir sonido de llamada entrante (usar sonido del juego)
     playSoundFrontEnd(40) -- Sonido de notificación del juego
     
@@ -115,7 +117,7 @@ function showIncomingCallNotification(callerNumber, callerName, callId)
     
     -- Guardar callId para las teclas
     setElementData(localPlayer, "phone:incomingCallId", callId)
-end)
+end
 
 -- Ocultar notificación
 function hideIncomingCallNotification()
@@ -145,10 +147,21 @@ function answerCall(callId)
         callId = getElementData(localPlayer, "phone:incomingCallId")
     end
     
-    if callId then
-        triggerServerEvent("phone:answerCall", localPlayer, callId)
-        hideIncomingCallNotification()
+    if not callId then
+        outputChatBox("Error: No se pudo obtener el ID de la llamada.", 255, 0, 0)
+        return
     end
+    
+    outputChatBox("Contestando llamada...", 0, 255, 0)
+    
+    -- Enviar evento al servidor
+    triggerServerEvent("phone:answerCall", localPlayer, callId)
+    
+    -- Ocultar notificación
+    hideIncomingCallNotification()
+    
+    -- Marcar como en llamada
+    isInCall = true
 end
 
 -- Rechazar llamada
@@ -159,25 +172,29 @@ end
 
 -- Evento: Llamada contestada
 addEvent("phone:callAnswered", true)
-addEventHandler("phone:callAnswered", resourceRoot, function(callId)
+addEventHandler("phone:callAnswered", root, function(callId)
     isInCall = true
-    callFrequency = getElementData(localPlayer, "phone:callFrequency")
+    
+    outputChatBox("Llamada contestada. Presiona C para colgar.", 0, 255, 0)
     
     -- Configurar chat de voz
     setupCallVoiceChat()
     
-    -- Notificar al navegador del teléfono
-    if browserContent and isElement(browserContent) then
-        executeBrowserJavascript(browserContent, "onCallAnswered();")
+    -- Obtener información del navegador del teléfono
+    local browser = getElementData(localPlayer, "phone:browserContent")
+    if browser and isElement(browser) then
+        executeBrowserJavascript(browser, "if (typeof onCallAnswered === 'function') { onCallAnswered(); }")
     end
 end)
 
 -- Evento: Llamada finalizada
 addEvent("phone:callEnded", true)
-addEventHandler("phone:callEnded", resourceRoot, function(reason)
+addEventHandler("phone:callEnded", root, function(reason)
     isInCall = false
     callFrequency = nil
     callSpeakerEnabled = false
+    
+    outputChatBox("Llamada finalizada. Voz de proximidad restaurada.", 255, 255, 0)
     
     -- Terminar chat de voz
     endCallVoiceChat()
@@ -185,9 +202,15 @@ addEventHandler("phone:callEnded", resourceRoot, function(reason)
     -- Ocultar notificación si existe
     hideIncomingCallNotification()
     
-    -- Notificar al navegador del teléfono
-    if browserContent and isElement(browserContent) then
-        executeBrowserJavascript(browserContent, "onCallEnded();")
+    -- Limpiar datos
+    setElementData(localPlayer, "phone:incomingCallId", nil)
+    setElementData(localPlayer, "phone:callPartner", nil)
+    setElementData(localPlayer, "phone:inCall", false)
+    
+    -- Obtener información del navegador del teléfono
+    local browser = getElementData(localPlayer, "phone:browserContent")
+    if browser and isElement(browser) then
+        executeBrowserJavascript(browser, "if (typeof onCallEnded === 'function') { onCallEnded(); }")
     end
     
     -- Mostrar mensaje
@@ -212,6 +235,11 @@ function endCallVoiceChat()
     -- Limpiar configuración de voz
     setElementData(localPlayer, "phone:callFrequency", nil)
     setElementData(localPlayer, "phone:inCall", false)
+    setElementData(localPlayer, "phone:callPartner", nil)
+    setElementData(localPlayer, "phone:speakerEnabled", false)
+    
+    -- La voz se restaura automáticamente en el servidor
+    -- Solo limpiamos los datos locales aquí
 end
 
 -- Manejar teclas R y C durante llamadas
@@ -242,9 +270,15 @@ end)
 
 -- Evento: Activar/desactivar altavoz
 addEvent("phone:toggleSpeaker", true)
-addEventHandler("phone:toggleSpeaker", resourceRoot, function(enabled)
+addEventHandler("phone:toggleSpeaker", root, function(enabled)
     callSpeakerEnabled = enabled
     setElementData(localPlayer, "phone:speakerEnabled", enabled)
+    
+    if enabled then
+        outputChatBox("Altavoz activado. Los jugadores cercanos pueden escuchar.", 0, 255, 0)
+    else
+        outputChatBox("Altavoz desactivado.", 255, 255, 0)
+    end
 end)
 
 -- Sistema de proximidad y altavoz para escuchar llamadas

@@ -178,8 +178,15 @@ addEventHandler("phone:makeCall", root, function(phoneNumber)
     
     -- Enviar notificación al receptor
     outputServerLog("[PHONE] Enviando notificación de llamada a " .. getPlayerName(receiver) .. " (ID: " .. tostring(callId) .. ")")
-    triggerClientEvent(receiver, "phone:incomingCall", resourceRoot, callerNumber, callerName, callId)
-    triggerClientEvent(caller, "phone:callRinging", resourceRoot, phoneNumber)
+    outputServerLog("[PHONE] CallerNumber: " .. tostring(callerNumber) .. ", CallerName: " .. tostring(callerName))
+    
+    -- Enviar evento al receptor (usar root en lugar de resourceRoot para asegurar que llegue)
+    triggerClientEvent(receiver, "phone:incomingCall", root, callerNumber, callerName, callId)
+    triggerClientEvent(caller, "phone:callRinging", root, phoneNumber)
+    
+    -- También enviar outputChatBox como backup
+    outputChatBox("📞 Llamada entrante de " .. callerName .. " (" .. callerNumber .. ")", receiver, 0, 255, 0)
+    outputChatBox("Presiona R para contestar o C para rechazar", receiver, 255, 255, 0)
     
     outputServerLog("[PHONE] Llamada iniciada: " .. getPlayerName(caller) .. " -> " .. getPlayerName(receiver))
 end)
@@ -210,8 +217,10 @@ addEventHandler("phone:answerCall", root, function(callId)
     setupCallVoice(call)
     
     -- Notificar a ambos
-    triggerClientEvent(call.caller, "phone:callAnswered", resourceRoot, callId)
-    triggerClientEvent(call.receiver, "phone:callAnswered", resourceRoot, callId)
+    triggerClientEvent(call.caller, "phone:callAnswered", root, callId)
+    triggerClientEvent(call.receiver, "phone:callAnswered", root, callId)
+    
+    outputServerLog("[PHONE] Llamada contestada por " .. getPlayerName(player))
     
     -- Limpiar llamada entrante
     incomingCalls[player] = nil
@@ -233,8 +242,17 @@ addEventHandler("phone:hangup", root, function()
         -- Puede ser una llamada entrante que se rechaza
         if incomingCalls[player] then
             local call = incomingCalls[player]
-            if call.caller then
-                triggerClientEvent(call.caller, "phone:callEnded", resourceRoot, "Llamada rechazada")
+            if call.caller and isElement(call.caller) then
+                triggerClientEvent(call.caller, "phone:callEnded", root, "Llamada rechazada")
+                -- Limpiar llamada del caller también
+                if playerCalls[call.caller] then
+                    local callerCallId = playerCalls[call.caller]
+                    if activeCalls[callerCallId] then
+                        endCallVoice(activeCalls[callerCallId])
+                        activeCalls[callerCallId] = nil
+                    end
+                    playerCalls[call.caller] = nil
+                end
             end
             incomingCalls[player] = nil
         end
@@ -252,10 +270,10 @@ addEventHandler("phone:hangup", root, function()
     -- Notificar al otro jugador
     local otherPlayer = (call.caller == player) and call.receiver or call.caller
     if isElement(otherPlayer) then
-        triggerClientEvent(otherPlayer, "phone:callEnded", resourceRoot, "Llamada finalizada")
+        triggerClientEvent(otherPlayer, "phone:callEnded", root, "Llamada finalizada")
     end
     
-    triggerClientEvent(player, "phone:callEnded", resourceRoot, "Llamada finalizada")
+    triggerClientEvent(player, "phone:callEnded", root, "Llamada finalizada")
     
     -- Calcular duración
     local duration = 0
@@ -284,6 +302,7 @@ addEventHandler("phone:toggleSpeaker", root, function(enabled)
     
     local callId = playerCalls[player]
     if not callId then
+        outputChatBox("No tienes una llamada activa.", player, 255, 0, 0)
         return
     end
     
@@ -301,6 +320,8 @@ addEventHandler("phone:toggleSpeaker", root, function(enabled)
     
     -- Actualizar chat de voz para incluir/excluir personas cercanas
     updateCallVoice(call)
+    
+    outputServerLog("[PHONE] Altavoz " .. (enabled and "activado" or "desactivado") .. " para " .. getPlayerName(player))
 end)
 
 -- Configurar chat de voz para la llamada
@@ -334,9 +355,39 @@ function updateCallVoice(call)
         return
     end
     
-    -- Asegurar que ambos se escuchen primero
-    setPlayerVoiceBroadcastTo(call.caller, {call.receiver})
-    setPlayerVoiceBroadcastTo(call.receiver, {call.caller})
+    -- Lista base de jugadores que siempre se escuchan (los dos de la llamada)
+    local callerBroadcast = {call.receiver}
+    local receiverBroadcast = {call.caller}
+    
+    -- Si el altavoz está activo, agregar jugadores cercanos
+    if call.speaker.caller or call.speaker.receiver then
+        -- Obtener posición del caller
+        local callerX, callerY, callerZ = getElementPosition(call.caller)
+        local receiverX, receiverY, receiverZ = getElementPosition(call.receiver)
+        
+        -- Buscar jugadores cercanos al caller (dentro de 20 metros)
+        for _, player in ipairs(getElementsByType("player")) do
+            if player ~= call.caller and player ~= call.receiver and isElement(player) then
+                local px, py, pz = getElementPosition(player)
+                local distanceToCaller = getDistanceBetweenPoints3D(callerX, callerY, callerZ, px, py, pz)
+                local distanceToReceiver = getDistanceBetweenPoints3D(receiverX, receiverY, receiverZ, px, py, pz)
+                
+                -- Si está cerca del caller y el altavoz del caller está activo
+                if distanceToCaller <= 20 and call.speaker.caller then
+                    table.insert(callerBroadcast, player)
+                end
+                
+                -- Si está cerca del receiver y el altavoz del receiver está activo
+                if distanceToReceiver <= 20 and call.speaker.receiver then
+                    table.insert(receiverBroadcast, player)
+                end
+            end
+        end
+    end
+    
+    -- Configurar broadcast
+    setPlayerVoiceBroadcastTo(call.caller, callerBroadcast)
+    setPlayerVoiceBroadcastTo(call.receiver, receiverBroadcast)
     
     -- Limpiar ignore lists para asegurar que se escuchen
     setPlayerVoiceIgnoreFrom(call.caller, {})
@@ -346,9 +397,7 @@ function updateCallVoice(call)
     setElementData(call.caller, "phone:speakerEnabled", call.speaker.caller)
     setElementData(call.receiver, "phone:speakerEnabled", call.speaker.receiver)
     
-    -- Si el altavoz está activo, los jugadores cercanos también escucharán
-    -- Esto se manejará dinámicamente en el cliente
-    -- El servidor solo actualiza el estado
+    outputServerLog("[PHONE] Chat de voz actualizado - Caller altavoz: " .. tostring(call.speaker.caller) .. ", Receiver altavoz: " .. tostring(call.speaker.receiver))
 end
 
 -- Terminar chat de voz
@@ -357,21 +406,47 @@ function endCallVoice(call)
         return
     end
     
+    outputServerLog("[PHONE] Terminando chat de voz para la llamada")
+    
     -- Restaurar voz por proximidad
     if isElement(call.caller) then
+        -- Limpiar configuración de voz de llamada
         setPlayerVoiceBroadcastTo(call.caller, {})
         setPlayerVoiceIgnoreFrom(call.caller, {}) -- Limpiar ignore list
+        
+        -- Limpiar datos
         setElementData(call.caller, "phone:inCall", false)
         setElementData(call.caller, "phone:callPartner", nil)
         setElementData(call.caller, "phone:speakerEnabled", false)
+        
+        -- Restaurar voz de proximidad (verificar si está en frecuencia)
+        local frecuencia = getElementData(call.caller, "frecuencia.voz")
+        if not frecuencia or tonumber(frecuencia) == -1 or tonumber(frecuencia) >= 2000 then
+            -- No está en frecuencia, restaurar voz de proximidad
+            setPlayerVoiceIgnoreFrom(call.caller, {})
+        end
+        
+        outputServerLog("[PHONE] Voz restaurada para " .. getPlayerName(call.caller))
     end
     
     if isElement(call.receiver) then
+        -- Limpiar configuración de voz de llamada
         setPlayerVoiceBroadcastTo(call.receiver, {})
         setPlayerVoiceIgnoreFrom(call.receiver, {}) -- Limpiar ignore list
+        
+        -- Limpiar datos
         setElementData(call.receiver, "phone:inCall", false)
         setElementData(call.receiver, "phone:callPartner", nil)
         setElementData(call.receiver, "phone:speakerEnabled", false)
+        
+        -- Restaurar voz de proximidad (verificar si está en frecuencia)
+        local frecuencia = getElementData(call.receiver, "frecuencia.voz")
+        if not frecuencia or tonumber(frecuencia) == -1 or tonumber(frecuencia) >= 2000 then
+            -- No está en frecuencia, restaurar voz de proximidad
+            setPlayerVoiceIgnoreFrom(call.receiver, {})
+        end
+        
+        outputServerLog("[PHONE] Voz restaurada para " .. getPlayerName(call.receiver))
     end
 end
 
