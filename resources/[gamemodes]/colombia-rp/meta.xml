@@ -30,6 +30,7 @@
     <script src="server/voice_proximity.lua" type="server" />
     <script src="server/phone_calls.lua" type="server" />
     <script src="server/jbl_system.lua" type="server" />
+    <script src="sistema_polvora/server.lua" type="server" />
     <script src="server/main.lua" type="server" />
     
     <!-- Scripts del cliente -->
@@ -53,6 +54,7 @@
     <script src="client/phone_calls.lua" type="client" />
     <script src="client/jbl_panel.lua" type="client" />
     <script src="client/jbl_model.lua" type="client" />
+    <script src="sistema_polvora/client.lua" type="client" />
     
     <!-- Scripts del sistema de items (cliente) -->
     <script src="items/items_list.lua" type="client" />
