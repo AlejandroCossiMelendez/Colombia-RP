@@ -455,11 +455,13 @@ addEventHandler("syncItems", root, function(...)
         -- Convertir items del sistema items al formato del inventario visual
         playerInventory = {}
         if items and type(items) == "table" then
+            outputChatBox("[DEBUG] Recibidos " .. #items .. " items del servidor", 0, 255, 0)
             for slot, item in ipairs(items) do
                 if item and item.item then
                     -- Obtener el nombre del item
                     local itemName = item.name or "Item " .. item.item
-                    if getName and type(getName) == "function" then
+                    -- Si name es NULL o vacío, usar getName
+                    if (not itemName or itemName == "NULL" or itemName == "") and getName and type(getName) == "function" then
                         local nameResult = getName(item.item)
                         if nameResult and nameResult ~= " " and nameResult ~= "" then
                             itemName = nameResult
@@ -476,6 +478,9 @@ addEventHandler("syncItems", root, function(...)
                     })
                 end
             end
+            outputChatBox("[DEBUG] Inventario actualizado: " .. #playerInventory .. " items", 0, 255, 0)
+        else
+            outputChatBox("[DEBUG] No se recibieron items o la tabla está vacía", 255, 0, 0)
         end
     end
 end)

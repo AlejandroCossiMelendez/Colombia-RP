@@ -138,6 +138,11 @@ addEventHandler("createCharacter", getRootElement(), function(name, surname, age
                             -- Inicializar sistema de voz (voz por proximidad)
                             triggerEvent("onCharacterSelected", source)
                             
+                            -- Cargar items del personaje
+                            if load then
+                                load(source, true)
+                            end
+                            
                             outputServerLog("[CHARACTERS] Spawneando personaje recién creado ID: " .. newCharacterId .. " para " .. getPlayerName(source))
                             
                             -- Spawnear personaje con altura segura
@@ -241,6 +246,11 @@ addEventHandler("selectCharacter", getRootElement(), function(characterId)
         setElementData(source, "character:health", character.health)
         -- Inicializar sistema de voz (voz por proximidad)
         triggerEvent("onCharacterSelected", source)
+        
+        -- Cargar items del personaje
+        if load then
+            load(source, true)
+        end
         
         outputServerLog("[CHARACTERS] Spawneando personaje ID: " .. characterId .. " para " .. getPlayerName(source))
         

@@ -139,9 +139,21 @@ function load( element, force )
 				-- Usar nuestras funciones de base de datos en lugar de exports.sql
 				local i = queryDatabase( "SELECT `index`, item, value, value2, name FROM items WHERE owner = " .. elementID .. " ORDER BY `index` ASC" )
 				if i then
+					outputServerLog("[ITEMS] Cargando " .. #i .. " items para el jugador " .. getPlayerName(element) .. " (ID: " .. elementID .. ")")
 					for key, value in ipairs( i ) do
+						-- Si name es NULL, obtenerlo usando getName
+						if not value.name or value.name == "NULL" or value.name == "" then
+							if getName and type(getName) == "function" then
+								local nameResult = getName(value.item)
+								if nameResult and nameResult ~= " " and nameResult ~= "" then
+									value.name = nameResult
+								end
+							end
+						end
 						table.insert( data[ element ].items, value )
 					end
+				else
+					outputServerLog("[ITEMS] No se encontraron items para el jugador " .. getPlayerName(element) .. " (ID: " .. elementID .. ")")
 				end
 				if getElementType( element ) == "player" then
 					data[ element ].subscribers[ element ] = true
