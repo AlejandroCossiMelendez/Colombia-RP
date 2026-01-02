@@ -329,30 +329,31 @@ addEventHandler("useItem", root, function(slot, itemId, itemIndex)
     
     -- C4 Explosivos (IDs: 103, 104, 105) - Colocar C4 en el suelo
     if itemId == 103 or itemId == 104 or itemId == 105 then
-        -- Remover el item del inventario primero
-        local inventory = getPlayerInventory(source)
-        local itemToRemove = nil
-        for _, invItem in ipairs(inventory) do
-            if invItem.item_id == itemId then
-                itemToRemove = invItem
-                break
+        -- Remover el item del inventario usando take() del sistema de items
+        -- El slot es la posición en la tabla items, no el slot de inventory
+        local slotNum = tonumber(slot)
+        if not slotNum then
+            -- Si no tenemos el slot, buscar el item en la tabla items
+            for i, it in ipairs(items) do
+                if tonumber(it.item) == itemId then
+                    slotNum = i
+                    break
+                end
             end
         end
         
-        if not itemToRemove then
+        if slotNum and items[slotNum] then
+            -- Remover el item usando take() del sistema de items
+            local success = take(source, slotNum)
+            if success then
+                -- Pedir al cliente que coloque el C4 (el cliente tiene acceso a processLineOfSight)
+                triggerClientEvent(source, "polvora:colocarC4", source, itemId, itemName, slotNum)
+            else
+                outputChatBox("Error: No se pudo remover el item del inventario.", source, 255, 0, 0)
+            end
+        else
             outputChatBox("Error: No se encontró el item en el inventario.", source, 255, 0, 0)
-            return
         end
-        
-        -- Remover el item
-        local success = removeItemFromInventory(source, itemToRemove.slot, 1)
-        if not success then
-            outputChatBox("Error: No se pudo remover el item del inventario.", source, 255, 0, 0)
-            return
-        end
-        
-        -- Pedir al cliente que coloque el C4 (el cliente tiene acceso a processLineOfSight)
-        triggerClientEvent(source, "polvora:colocarC4", source, itemId, itemName)
         
         return
     end

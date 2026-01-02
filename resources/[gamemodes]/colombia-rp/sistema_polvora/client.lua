@@ -312,7 +312,10 @@ end
 
 -- Colocar C4 en el suelo
 addEvent("polvora:colocarC4", true)
-addEventHandler("polvora:colocarC4", root, function(itemId, itemName)
+addEventHandler("polvora:colocarC4", root, function(itemId, itemName, slotNum)
+    -- Cerrar el inventario
+    triggerEvent("closeInventoryForPhone", localPlayer)
+    
     -- Obtener posición del jugador
     local x, y, z = getElementPosition(localPlayer)
     
@@ -341,16 +344,30 @@ addEventHandler("polvora:colocarC4", root, function(itemId, itemName)
         -- Notificar al jugador
         outputChatBox("✓ Has colocado un " .. itemName .. ". ¡Explotará en 5 segundos!", 255, 200, 0)
         
+        -- Determinar daño según el tipo de C4
+        local damage = 0
+        local explosionType = 6 -- Tipo de explosión grande
+        if itemId == 103 then
+            damage = 20 -- Tipo 1: daño bajo
+            explosionType = 5
+        elseif itemId == 104 then
+            damage = 50 -- Tipo 2: daño medio
+            explosionType = 6
+        elseif itemId == 105 then
+            damage = 100 -- Tipo 3: daño alto
+            explosionType = 7
+        end
+        
         -- Hacer que explote en 5 segundos
         setTimer(function()
             if isElement(c4Object) then
                 local objX, objY, objZ = getElementPosition(c4Object)
                 
-                -- Crear explosión (tipo 6 = explosión grande)
-                createExplosion(objX, objY, objZ, 6, true, 1.0, false)
+                -- Crear explosión con el tipo correspondiente
+                createExplosion(objX, objY, objZ, explosionType, true, 1.0, false)
                 
-                -- Notificar a jugadores cercanos (enviar al servidor para notificar a todos)
-                triggerServerEvent("polvora:c4Explotado", localPlayer, objX, objY, objZ)
+                -- Enviar al servidor para aplicar daño a jugadores cercanos
+                triggerServerEvent("polvora:c4Explotado", localPlayer, objX, objY, objZ, damage, itemId)
                 
                 -- Destruir el objeto
                 destroyElement(c4Object)

@@ -142,12 +142,45 @@ addEventHandler("polvora:usarItem", root, function(itemNombre, efecto)
     end
 end)
 
--- Notificar explosión a todos los jugadores
+-- Notificar explosión y aplicar daño
 addEvent("polvora:c4Explotado", true)
-addEventHandler("polvora:c4Explotado", root, function(x, y, z)
-    -- Notificar a todos los jugadores cercanos
+addEventHandler("polvora:c4Explotado", root, function(x, y, z, damage, itemId)
+    damage = damage or 50 -- Daño por defecto
+    local explosionRadius = 10 -- Radio de la explosión en metros
+    
+    -- Aplicar daño a todos los jugadores cercanos
     for _, player in ipairs(getElementsByType("player")) do
-        triggerClientEvent(player, "polvora:notificarExplosion", player, x, y, z)
+        if isElement(player) and getElementType(player) == "player" then
+            local px, py, pz = getElementPosition(player)
+            local distance = getDistanceBetweenPoints3D(x, y, z, px, py, pz)
+            
+            if distance <= explosionRadius then
+                -- Calcular daño según la distancia (más cerca = más daño)
+                local distanceFactor = 1 - (distance / explosionRadius) -- 1.0 en el centro, 0.0 en el borde
+                local finalDamage = damage * distanceFactor
+                
+                -- Aplicar daño
+                local currentHealth = getElementHealth(player)
+                local newHealth = math.max(0, currentHealth - finalDamage)
+                setElementHealth(player, newHealth)
+                
+                -- Notificar al jugador
+                if distance < 50 then
+                    triggerClientEvent(player, "polvora:notificarExplosion", player, x, y, z)
+                    if finalDamage > 0 then
+                        outputChatBox("💥 Has recibido " .. math.floor(finalDamage) .. " de daño por la explosión.", player, 255, 100, 0)
+                    end
+                end
+                
+                -- Si el jugador muere por la explosión
+                if newHealth <= 0 then
+                    killPed(player)
+                end
+            elseif distance < 50 then
+                -- Solo notificar si está cerca pero fuera del radio de daño
+                triggerClientEvent(player, "polvora:notificarExplosion", player, x, y, z)
+            end
+        end
     end
 end)
 
