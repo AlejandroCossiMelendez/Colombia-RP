@@ -9,11 +9,32 @@ end
 
 function whenBrowserReady()
     -- El navegador está listo
-    -- Solicitar lista de personajes
-    triggerServerEvent("requestCharacters", localPlayer)
+    -- Verificar que el jugador esté logueado antes de solicitar personajes
+    local loggedIn = getElementData(localPlayer, "account:loggedIn")
+    if loggedIn == true then
+        triggerServerEvent("requestCharacters", localPlayer)
+    else
+        outputChatBox("Error: Debes iniciar sesión primero", 255, 0, 0)
+        hideCharacterGUI()
+        -- Mostrar login si no está logueado
+        if showLoginGUI then
+            showLoginGUI()
+        end
+    end
 end
 
 function showCharacterGUI()
+    -- VERIFICACIÓN CRÍTICA: Solo mostrar personajes si el jugador está logueado
+    local loggedIn = getElementData(localPlayer, "account:loggedIn")
+    if not loggedIn or loggedIn ~= true then
+        outputChatBox("Error: Debes iniciar sesión primero", 255, 0, 0)
+        -- Mostrar login si no está logueado
+        if showLoginGUI then
+            showLoginGUI()
+        end
+        return
+    end
+    
     -- Si ya existe, no crear otra vez
     if characterBrowser then
         if isElement(characterBrowser) then

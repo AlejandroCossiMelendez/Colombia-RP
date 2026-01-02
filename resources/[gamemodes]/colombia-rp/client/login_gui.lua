@@ -123,10 +123,19 @@ addEventHandler("loginResponse", resourceRoot, function(success, message)
             -- Ocultar login y mostrar panel de personajes después de un delay
             setTimer(function()
                 hideLoginGUI()
-                -- Mostrar panel de personajes después de ocultar login
+                -- Verificar que el jugador esté logueado antes de mostrar personajes
                 setTimer(function()
-                    triggerServerEvent("requestCharacters", localPlayer)
-                    triggerClientEvent("showCharacterGUI", resourceRoot)
+                    local loggedIn = getElementData(localPlayer, "account:loggedIn")
+                    if loggedIn == true then
+                        -- Solicitar personajes y mostrar panel
+                        triggerServerEvent("requestCharacters", localPlayer)
+                        -- Llamar directamente a la función, no usar evento
+                        if showCharacterGUI then
+                            showCharacterGUI()
+                        end
+                    else
+                        outputChatBox("Error: No se pudo verificar el login", 255, 0, 0)
+                    end
                 end, 500, 1)
             end, 1500, 1)
         else

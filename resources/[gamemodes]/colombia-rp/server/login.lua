@@ -51,9 +51,13 @@ end)
 addEventHandler("onResourceStart", resourceRoot, function()
     setTimer(function()
         for _, player in ipairs(getElementsByType("player")) do
+            -- FORZAR verificación: si no tiene account:userId, no está logueado
+            local userId = getElementData(player, "account:userId")
             local loggedIn = getElementData(player, "account:loggedIn")
-            if not loggedIn or loggedIn == false then
-                outputServerLog("[LOGIN] Jugador " .. getPlayerName(player) .. " ya estaba conectado, inicializando login...")
+            
+            -- Si no tiene userId o loggedIn es false/nil, inicializar login
+            if not userId or not loggedIn or loggedIn == false then
+                outputServerLog("[LOGIN] Jugador " .. getPlayerName(player) .. " no está logueado, inicializando login...")
                 initializePlayerLogin(player)
             end
         end
