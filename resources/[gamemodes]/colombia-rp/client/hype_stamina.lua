@@ -34,9 +34,8 @@ end)
 addEvent("initializeStamina", true)
 addEventHandler("initializeStamina", resourceRoot, function()
     if getElementData(localPlayer, "character:selected") then
-        if not getElementData(localPlayer, "stamina") then
-            setElementData(localPlayer, "stamina", 100)
-        end
+        -- Siempre inicializar/resetear stamina a 100 cuando se selecciona un personaje
+        setElementData(localPlayer, "stamina", 100)
     end
 end)
 
@@ -46,9 +45,17 @@ function checkMoving()
         return
     end
     
+    -- Obtener stamina actual
+    local staminalevel = tonumber(getElementData(localPlayer, "stamina") or 100)
+    
+    -- Si no hay stamina, inicializarla
+    if not staminalevel or staminalevel < 0 then
+        setElementData(localPlayer, "stamina", 100)
+        staminalevel = 100
+    end
+    
     if not getPedOccupiedVehicle(localPlayer) then
         local speed = getElementSpeed(localPlayer)
-        local staminalevel = tonumber(getElementData(localPlayer, "stamina") or 100)
         
         -- Diferencia entre trotar y correr basado en la velocidad
         -- Caminar: < 5.1 (no consume stamina)
@@ -92,7 +99,7 @@ function checkMoving()
                 end
             end
         else
-            -- No se está moviendo o está caminando - recuperar stamina
+            -- No se está moviendo o está caminando - recuperar stamina SIEMPRE
             if staminalevel < 100 then
                 local newStamina = math.min(100, math.floor((staminalevel + 0.08) * 10) / 10) -- Redondear a 1 decimal
                 setElementData(localPlayer, "stamina", newStamina)
@@ -104,8 +111,7 @@ function checkMoving()
             end
         end
     else
-        -- Está en un vehículo - recuperar stamina
-        local staminalevel = tonumber(getElementData(localPlayer, "stamina") or 100)
+        -- Está en un vehículo - recuperar stamina SIEMPRE
         if staminalevel < 100 then
             local newStamina = math.min(100, math.floor((staminalevel + 0.08) * 10) / 10) -- Redondear a 1 decimal
             setElementData(localPlayer, "stamina", newStamina)

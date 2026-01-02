@@ -246,10 +246,12 @@ local vestClickArea = {
 }
 
 addEventHandler("onClientClick", root, function(button, state, absX, absY)
-    if button == "left" and state == "down" then
+    if button == "left" and state == "down" and hudEnabled and getElementData(localPlayer, "character:selected") then
         -- Verificar si el jugador tiene chaleco equipado
         local hasVest = getElementData(localPlayer, "has:vest")
-        if not hasVest then
+        local currentArmor = math.floor(getPedArmor(localPlayer))
+        
+        if not hasVest or currentArmor <= 0 then
             return
         end
         
@@ -257,15 +259,25 @@ addEventHandler("onClientClick", root, function(button, state, absX, absY)
         local screenW, screenH = guiGetScreenSize()
         local x, y = (screenW/1366), (screenH/768)
         
-        -- Área del icono de defensa (armor.png)
+        -- Área del icono de defensa (armor.png) - Área más grande para facilitar el click
         local iconX = x * 1303
         local iconY = y * 191
         local iconW = x * 24
         local iconH = y * 19
         
-        -- Verificar si el click está dentro del área del icono
-        if absX >= iconX and absX <= iconX + iconW and absY >= iconY and absY <= iconY + iconH then
+        -- También incluir el área de la barra de defensa para facilitar el click
+        local barX = x * 1225
+        local barY = y * 187
+        local barW = x * 101
+        local barH = y * 28
+        
+        -- Verificar si el click está dentro del área del icono o de la barra
+        local clickedOnIcon = (absX >= iconX and absX <= iconX + iconW and absY >= iconY and absY <= iconY + iconH)
+        local clickedOnBar = (absX >= barX and absX <= barX + barW and absY >= barY and absY <= barY + barH)
+        
+        if clickedOnIcon or clickedOnBar then
             -- Enviar evento al servidor para quitarse el chaleco
+            outputChatBox("Quitando chaleco...", 0, 150, 255)
             triggerServerEvent("unequipVest", localPlayer)
         end
     end
