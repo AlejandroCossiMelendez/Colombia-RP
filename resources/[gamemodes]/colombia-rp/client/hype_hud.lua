@@ -88,14 +88,16 @@ function HudHype()
     dxDrawImage(x*1225, y*154, x*101, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 80), false) -- VIDA
     dxDrawImage(x*1225, y*187, x*101, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 80), false) -- COLETE
     dxDrawImage(x*1225, y*221, x*101, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 80), false) -- STAMINA
+    dxDrawImage(x*1225, y*255, x*101, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 80), false) -- HAMBRE
+    dxDrawImage(x*1225, y*289, x*101, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 80), false) -- SED
     dxDrawImage(x*1002, y*703, x*285, y*41, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, tocolor(0, 0, 0, 108), false) -- VOICE
     
     --<!-- BARRINHA (ajustada para respetar la curva del círculo y mantener forma) --!>--
     -- Calcular el ancho máximo disponible (antes del círculo)
     local maxBarWidth = x*101 - x*10 -- Ancho total menos espacio para el círculo
-    local minBarWidth = x*10 -- Ancho mínimo para mantener la forma de la barra
+    local minBarWidth = x*12 -- Ancho mínimo para mantener la forma de la barra (aumentado)
     
-    -- Función auxiliar para dibujar barra con forma mantenida usando la imagen original
+    -- Función auxiliar para dibujar barra con forma mantenida usando sección de imagen
     local function drawBar(barX, barY, value, color, minWidth)
         if value <= 0 then
             return
@@ -104,34 +106,49 @@ function HudHype()
         local percent = math.max(0, math.min(100, value)) / 100
         local calculatedWidth = maxBarWidth * percent
         
-        -- Si el valor es muy bajo (menos del 20%), usar ancho mínimo fijo para mantener la forma
+        -- Si el valor es muy bajo (menos del 25%), usar ancho mínimo fijo para mantener la forma
         local finalWidth
-        if value < 20 then
+        if value < 25 then
             finalWidth = minWidth
         else
             finalWidth = math.max(minWidth, calculatedWidth)
         end
         
-        -- Usar la imagen original para mantener la forma, pero con el ancho calculado
-        -- Si el ancho es menor que el mínimo, usar el mínimo pero mantener la proporción visual
-        dxDrawImage(barX, barY, finalWidth, y*28, "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, color, false)
+        -- Usar dxDrawImageSection para mantener la forma original de la imagen
+        -- Esto evita que la imagen se estire y pierda su forma
+        local imageSourceWidth = 101 -- Ancho original de la imagen fuente
+        local imageSourceHeight = 28 -- Alto original de la imagen fuente
+        
+        -- Calcular qué sección de la imagen usar (desde el inicio hasta el porcentaje)
+        local sectionWidth = (finalWidth / maxBarWidth) * imageSourceWidth
+        sectionWidth = math.min(sectionWidth, imageSourceWidth) -- No exceder el ancho original
+        
+        -- Dibujar solo la sección necesaria de la imagen para mantener la forma
+        dxDrawImageSection(barX, barY, finalWidth, y*28, 0, 0, sectionWidth, imageSourceHeight, 
+            "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, color, false)
     end
     
     -- Dibujar barras
     drawBar(x*1225, y*154, Vida, tocolor(237, 0, 5, 200), minBarWidth) -- VIDA
     drawBar(x*1225, y*187, Colete, tocolor(7, 239, 247, 150), minBarWidth) -- COLETE
     drawBar(x*1225, y*221, Stamina, tocolor(253, 221, 0, 150), minBarWidth) -- STAMINA
+    drawBar(x*1225, y*255, Hambre, tocolor(255, 165, 0, 200), minBarWidth) -- HAMBRE
+    drawBar(x*1225, y*289, Sed, tocolor(0, 100, 255, 200), minBarWidth) -- SED
     
     --<!-- CIRCULO (dibujado después de las barras para que esté encima) --!>--
     dxDrawImage(x*1295, y*153, x*38, y*29, "hud-rp/Hype_Hud/imgs/circulo.png", 0, 0, 0, tocolor(255, 0, 0, 255), false) -- VIDA
     dxDrawImage(x*1295, y*186, x*38, y*29, "hud-rp/Hype_Hud/imgs/circulo.png", 0, 0, 0, tocolor(7, 239, 247, 255), false) -- COLETE
     dxDrawImage(x*1295, y*220, x*38, y*29, "hud-rp/Hype_Hud/imgs/circulo.png", 0, 0, 0, tocolor(237, 218, 16, 255), false) -- STAMINA
+    dxDrawImage(x*1295, y*254, x*38, y*29, "hud-rp/Hype_Hud/imgs/circulo.png", 0, 0, 0, tocolor(255, 165, 0, 255), false) -- HAMBRE
+    dxDrawImage(x*1295, y*288, x*38, y*29, "hud-rp/Hype_Hud/imgs/circulo.png", 0, 0, 0, tocolor(0, 100, 255, 255), false) -- SED
     dxDrawImage(x*1284, y*703, x*52, y*42, "hud-rp/Hype_Hud/imgs/circulo.png", 0, 0, 0, tocolor(33, 141, 8, 254), false) -- VOICE
     
     --<!-- ICONES --!>--
     dxDrawImage(x*1303, y*160, x*22, y*16, "hud-rp/Hype_Hud/imgs/health.png", 0, 0, 0, tocolor(255, 255, 255, 255), false) -- VIDA
     dxDrawImage(x*1303, y*191, x*24, y*19, "hud-rp/Hype_Hud/imgs/armor.png", 0, 0, 0, tocolor(255, 255, 255, 255), false) -- COLETE
     dxDrawImage(x*1303, y*225, x*22, y*19, "hud-rp/Hype_Hud/imgs/stamina.png", 0, 0, 0, tocolor(255, 255, 255, 255), false) -- STAMINA
+    dxDrawImage(x*1303, y*259, x*22, y*19, "hud-rp/Hype_Hud/imgs/comida.png", 0, 0, 0, tocolor(255, 255, 255, 255), false) -- HAMBRE
+    dxDrawImage(x*1303, y*293, x*22, y*19, "hud-rp/Hype_Hud/imgs/agua.png", 0, 0, 0, tocolor(255, 255, 255, 255), false) -- SED
     
     --<!-- DX --!>--
     dxDrawText(Emprego, x*1120, y*87, x*1328, y*119, tocolor(255, 255, 255, 255), 1.00, FontHypeBrivie, "center", "center", false, false, false, false, false)
@@ -140,18 +157,21 @@ function HudHype()
     dxDrawText(Vida, x*1245, y*161, x*1279, y*174, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
     dxDrawText(Colete, x*1245, y*194, x*1279, y*207, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
     dxDrawText(Stamina, x*1245, y*228, x*1279, y*241, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
+    dxDrawText(math.floor(Hambre), x*1245, y*262, x*1279, y*275, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
+    dxDrawText(math.floor(Sed), x*1245, y*296, x*1279, y*309, tocolor(255, 255, 255, 255), 1.00, FontHype, "center", "center", false, false, false, false, false)
     
-    --<!-- DINERO Y BANCO (mejorado y reposicionado) --!>--
-    -- Fondo semi-transparente para el dinero
-    dxDrawRectangle(x*20, y*20, x*200, y*50, tocolor(0, 0, 0, 150), false)
+    --<!-- DINERO Y BANCO (reposicionado a la derecha) --!>--
+    -- Fondo semi-transparente para el dinero (a la derecha)
+    local moneyBoxX = screenW - x*220 -- Posición desde la derecha
+    dxDrawRectangle(moneyBoxX, y*20, x*200, y*50, tocolor(0, 0, 0, 150), false)
     
-    -- Icono y texto de dinero en billetera
-    dxDrawImage(x*25, y*25, x*20, y*20, "hud-rp/Hype_Hud/imgs/wallet.png", 0, 0, 0, tocolor(255, 255, 255, 255), false)
-    dxDrawText("$" .. Dinheiro, x*50, y*25, x*200, y*45, tocolor(255, 255, 0, 255), 1.00, FontHype, "left", "center", false, false, false, false, false)
+    -- Icono y texto de dinero en billetera (alineado a la derecha)
+    dxDrawImage(moneyBoxX + x*5, y*25, x*20, y*20, "hud-rp/Hype_Hud/imgs/wallet.png", 0, 0, 0, tocolor(255, 255, 255, 255), false)
+    dxDrawText("$" .. Dinheiro, moneyBoxX + x*30, y*25, moneyBoxX + x*195, y*45, tocolor(255, 255, 0, 255), 1.00, FontHype, "left", "center", false, false, false, false, false)
     
-    -- Icono y texto de dinero en banco
-    dxDrawImage(x*25, y*45, x*20, y*20, "hud-rp/Hype_Hud/imgs/bank.png", 0, 0, 0, tocolor(255, 255, 255, 255), false)
-    dxDrawText("$" .. Banco, x*50, y*45, x*200, y*65, tocolor(0, 255, 0, 255), 1.00, FontHype, "left", "center", false, false, false, false, false)
+    -- Icono y texto de dinero en banco (alineado a la derecha)
+    dxDrawImage(moneyBoxX + x*5, y*45, x*20, y*20, "hud-rp/Hype_Hud/imgs/bank.png", 0, 0, 0, tocolor(255, 255, 255, 255), false)
+    dxDrawText("$" .. Banco, moneyBoxX + x*30, y*45, moneyBoxX + x*195, y*65, tocolor(0, 255, 0, 255), 1.00, FontHype, "left", "center", false, false, false, false, false)
     
     --<!-- HAMBRE Y SED (opcional, puedes agregar barras si quieres) --!>--
     --<!-- VOICE LADO --!>--

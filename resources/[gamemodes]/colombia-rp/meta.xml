@@ -261,6 +261,8 @@
     <file src="hud-rp/Hype_Hud/imgs/voiceOff.png" />
     <file src="hud-rp/Hype_Hud/imgs/voiceOn.png" />
     <file src="hud-rp/Hype_Hud/imgs/logo.png" />
+    <file src="hud-rp/Hype_Hud/imgs/comida.png" />
+    <file src="hud-rp/Hype_Hud/imgs/agua.png" />
     
     <!-- Archivos (ya no necesarios para login, pero se mantienen para character GUI) -->
     <file src="client/character.html" />
