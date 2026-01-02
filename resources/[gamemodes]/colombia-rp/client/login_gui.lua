@@ -130,13 +130,15 @@ addEventHandler("loginResponse", resourceRoot, function(success, message)
                     -- Login confirmado, ocultar login
                     hideLoginGUI()
                     -- Esperar un momento y luego mostrar panel de personajes
+                    -- IMPORTANTE: Solo mostrar personajes DESPUÉS del login exitoso
                     setTimer(function()
                         -- Verificar nuevamente antes de mostrar personajes
                         local loggedIn2 = getElementData(localPlayer, "account:loggedIn")
                         local userId2 = getElementData(localPlayer, "account:userId")
                         
                         if loggedIn2 == true and userId2 then
-                            -- Ahora sí, mostrar panel de personajes
+                            -- Ahora sí, mostrar panel de personajes SOLO si está logueado
+                            -- El panel de personajes NO se carga hasta este momento
                             if showCharacterGUI then
                                 showCharacterGUI()
                             end
@@ -147,7 +149,7 @@ addEventHandler("loginResponse", resourceRoot, function(success, message)
                                 showLoginGUI()
                             end
                         end
-                    end, 300, 1)
+                    end, 500, 1)
                 else
                     outputChatBox("Error: No se pudo verificar el login", 255, 0, 0)
                 end

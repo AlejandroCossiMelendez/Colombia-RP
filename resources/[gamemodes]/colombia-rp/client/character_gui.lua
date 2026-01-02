@@ -4,7 +4,25 @@ local browserContent = nil
 local screenWidth, screenHeight = guiGetScreenSize()
 
 function loadBrowser() 
-    loadBrowserURL(source, "http://mta/local/html/characters.html")
+    -- VERIFICACIÓN: Solo cargar el HTML si el jugador está logueado
+    local loggedIn = getElementData(localPlayer, "account:loggedIn")
+    local userId = getElementData(localPlayer, "account:userId")
+    
+    if loggedIn == true and userId then
+        -- Solo cargar el HTML si el jugador está logueado
+        loadBrowserURL(source, "http://mta/local/html/characters.html")
+    else
+        -- Si no está logueado, no cargar el HTML y destruir el navegador
+        outputChatBox("Error: Debes iniciar sesión primero", 255, 0, 0)
+        if characterBrowser and isElement(characterBrowser) then
+            destroyElement(characterBrowser)
+            characterBrowser = nil
+            browserContent = nil
+        end
+        if showLoginGUI then
+            showLoginGUI()
+        end
+    end
 end
 
 function whenBrowserReady()
@@ -34,14 +52,15 @@ function whenBrowserReady()
 end
 
 function showCharacterGUI()
-    -- VERIFICACIÓN CRÍTICA: Solo mostrar personajes si el jugador está logueado
+    -- VERIFICACIÓN ESTRICTA: Solo mostrar personajes si el jugador está logueado
+    -- Esta función SOLO debe llamarse después de un login exitoso
     local loggedIn = getElementData(localPlayer, "account:loggedIn")
     local userId = getElementData(localPlayer, "account:userId")
     
-    -- Doble verificación: debe estar logueado Y tener userId
+    -- TRIPLE verificación: debe estar logueado, tener userId, y no tener personaje seleccionado
     if not loggedIn or loggedIn ~= true or not userId then
         outputChatBox("Error: Debes iniciar sesión primero", 255, 0, 0)
-        -- Asegurarse de que el navegador de personajes esté oculto/destruido
+        -- Destruir cualquier navegador de personajes que pueda existir
         hideCharacterGUI()
         -- Mostrar login si no está logueado
         if showLoginGUI then
@@ -50,15 +69,33 @@ function showCharacterGUI()
         return
     end
     
+    -- Solo proceder si el jugador está logueado
+    
     -- Si ya existe, no crear otra vez
     if characterBrowser then
         if isElement(characterBrowser) then
-            guiSetVisible(characterBrowser, true)
-            triggerServerEvent("requestCharacters", localPlayer)
+            -- Verificar nuevamente que esté logueado antes de mostrar
+            local loggedInCheck = getElementData(localPlayer, "account:loggedIn")
+            local userIdCheck = getElementData(localPlayer, "account:userId")
+            if loggedInCheck == true and userIdCheck then
+                guiSetVisible(characterBrowser, true)
+                triggerServerEvent("requestCharacters", localPlayer)
+            else
+                -- Si no está logueado, destruir el navegador
+                hideCharacterGUI()
+                if showLoginGUI then
+                    showLoginGUI()
+                end
+            end
             return
+        else
+            -- Si el elemento fue destruido, limpiar la referencia
+            characterBrowser = nil
+            browserContent = nil
         end
     end
     
+    -- IMPORTANTE: El navegador SOLO se crea después de un login exitoso confirmado
     -- Crear navegador usando el mismo método que phone-example
     characterBrowser = guiCreateBrowser(0, 0, screenWidth, screenHeight, true, true, false)
     browserContent = guiGetBrowser(characterBrowser)
@@ -68,7 +105,8 @@ function showCharacterGUI()
         return
     end
     
-    -- IMPORTANTE: Ocultar el navegador hasta que se verifique el login
+    -- IMPORTANTE: Ocultar el navegador hasta que se carguen los personajes
+    -- El navegador NO se mostrará hasta que receiveCharacters lo muestre
     guiSetVisible(characterBrowser, false)
     
     -- Configurar input mode
@@ -147,20 +185,21 @@ addEventHandler("deleteCharacter", resourceRoot, function(characterId)
 end)
 
 -- Eventos del servidor
+-- IMPORTANTE: Este evento SOLO debe ser llamado después de un login exitoso
 addEvent("showCharacterGUI", true)
 addEventHandler("showCharacterGUI", resourceRoot, function()
     -- VERIFICACIÓN ESTRICTA: Solo mostrar personajes si el jugador está logueado
     local loggedIn = getElementData(localPlayer, "account:loggedIn")
     local userId = getElementData(localPlayer, "account:userId")
     
-    -- Doble verificación: debe estar logueado Y tener userId
+    -- Verificación triple: debe estar logueado Y tener userId
     if loggedIn == true and userId then
         -- Login confirmado, mostrar panel de personajes
         showCharacterGUI()
     else
-        -- Si no está logueado, BLOQUEAR y mostrar login
+        -- Si no está logueado, BLOQUEAR completamente
         outputChatBox("Error: Debes iniciar sesión primero", 255, 0, 0)
-        -- Asegurarse de ocultar/destruir el navegador de personajes
+        -- Destruir cualquier navegador de personajes
         hideCharacterGUI()
         -- Mostrar login
         if showLoginGUI then
@@ -278,8 +317,8 @@ addEventHandler("onClientResourceStop", resourceRoot, function()
     hideCharacterGUI()
 end)
 
--- IMPORTANTE: Asegurarse de que el navegador de personajes NO se cree automáticamente
--- Solo se creará cuando se llame explícitamente a showCharacterGUI() después de un login exitoso
+-- IMPORTANTE: El panel de personajes NO debe cargarse ni mostrarse hasta después del login
+-- Este script se carga pero NO hace nada hasta que se llame explícitamente showCharacterGUI() después de un login exitoso
 addEventHandler("onClientResourceStart", resourceRoot, function()
     -- FORZAR: Destruir cualquier navegador de personajes que pueda existir
     if characterBrowser and isElement(characterBrowser) then
@@ -287,11 +326,8 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
         characterBrowser = nil
         browserContent = nil
     end
-    -- FORZAR: Asegurarse de que el jugador NO esté logueado al iniciar el recurso
-    -- Esto previene que se muestre el panel de personajes antes del login
-    setElementData(localPlayer, "account:loggedIn", false)
-    setElementData(localPlayer, "account:userId", nil)
-    -- Ocultar cursor por si acaso
+    -- Asegurarse de que el cursor esté oculto
     showCursor(false)
     guiSetInputEnabled(false)
+    -- NO hacer nada más - el panel de personajes solo se mostrará después del login
 end)
