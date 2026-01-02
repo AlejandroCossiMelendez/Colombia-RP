@@ -87,6 +87,32 @@ end
 
 -- Variable para rastrear si necesitamos forzar el cursor oculto
 local forceCursorHidden = false
+local phoneClosedTimer = nil
+
+-- Función auxiliar para restaurar controles completamente
+local function restoreGameControls()
+    showCursor(false)
+    guiSetInputEnabled(false)
+    guiSetInputMode("allow_binds")
+    
+    local controlsToEnable = {
+        "fire", "next_weapon", "previous_weapon", "forwards", "backwards", 
+        "left", "right", "jump", "sprint", "crouch", "walk", "enter_exit",
+        "vehicle_fire", "vehicle_secondary_fire", "steer_forward", "steer_back",
+        "accelerate", "brake_reverse", "handbrake", "horn", "sub_mission",
+        "radio_next", "radio_previous", "radio_user_track_skip",
+        "vehicle_look_left", "vehicle_look_right", "vehicle_look_behind",
+        "vehicle_mouse_look", "special_control_left", "special_control_right",
+        "special_control_up", "special_control_down", "aim_weapon",
+        "conversation_yes", "conversation_no", "group_control_forwards",
+        "group_control_back", "enter_passenger", "cycle_weapon_left",
+        "cycle_weapon_right", "change_camera", "vehicle_next_radio", "vehicle_prev_radio"
+    }
+    
+    for _, control in ipairs(controlsToEnable) do
+        toggleControl(control, true)
+    end
+end
 
 function closePhone()
     if not phoneVisible then
@@ -95,6 +121,11 @@ function closePhone()
     
     phoneVisible = false
     forceCursorHidden = true  -- Activar flag para forzar cursor oculto
+    
+    -- Cancelar timer anterior si existe
+    if phoneClosedTimer and isTimer(phoneClosedTimer) then
+        killTimer(phoneClosedTimer)
+    end
     
     -- PRIMERO: Remover event handlers ANTES de hacer cualquier cosa
     if phoneBrowser and isElement(phoneBrowser) then
@@ -116,119 +147,44 @@ function closePhone()
     
     renderTime(false)
     
-    -- CUARTO: Restaurar controles del juego INMEDIATAMENTE - FORZAR MÚLTIPLES VECES
-    showCursor(false)
-    guiSetInputEnabled(false)
-    guiSetInputMode("allow_binds")
+    -- CUARTO: Restaurar controles INMEDIATAMENTE
+    restoreGameControls()
     
-    -- Repetir inmediatamente varias veces
-    showCursor(false)
-    guiSetInputEnabled(false)
-    guiSetInputMode("allow_binds")
-    showCursor(false)
-    guiSetInputEnabled(false)
-    guiSetInputMode("allow_binds")
-    
-    -- QUINTO: Forzar restauración de TODOS los controles inmediatamente
-    local controlsToEnable = {
-        "fire", "next_weapon", "previous_weapon", "forwards", "backwards", 
-        "left", "right", "jump", "sprint", "crouch", "walk", "enter_exit",
-        "vehicle_fire", "vehicle_secondary_fire", "steer_forward", "steer_back",
-        "accelerate", "brake_reverse", "handbrake", "horn", "sub_mission",
-        "radio_next", "radio_previous", "radio_user_track_skip",
-        "vehicle_look_left", "vehicle_look_right", "vehicle_look_behind",
-        "vehicle_mouse_look", "special_control_left", "special_control_right",
-        "special_control_up", "special_control_down", "aim_weapon",
-        "conversation_yes", "conversation_no", "group_control_forwards",
-        "group_control_back", "enter_passenger", "cycle_weapon_left",
-        "cycle_weapon_right", "change_camera", "vehicle_next_radio", "vehicle_prev_radio"
-    }
-    
-    for _, control in ipairs(controlsToEnable) do
-        toggleControl(control, true)
-    end
-    
-    -- SEXTO: Forzar restauración múltiple veces de forma MUY AGRESIVA
-    -- Ejecutar inmediatamente (delay 0)
+    -- QUINTO: Forzar restauración múltiple veces
     setTimer(function()
-        showCursor(false)
-        guiSetInputEnabled(false)
-        guiSetInputMode("allow_binds")
-        for _, control in ipairs(controlsToEnable) do
-            toggleControl(control, true)
-        end
+        restoreGameControls()
     end, 0, 1)
     
-    -- Ejecutar después de 5ms
     setTimer(function()
-        showCursor(false)
-        guiSetInputEnabled(false)
-        guiSetInputMode("allow_binds")
-        for _, control in ipairs(controlsToEnable) do
-            toggleControl(control, true)
-        end
-    end, 5, 1)
-    
-    -- Ejecutar después de 10ms
-    setTimer(function()
-        showCursor(false)
-        guiSetInputEnabled(false)
-        guiSetInputMode("allow_binds")
-        for _, control in ipairs(controlsToEnable) do
-            toggleControl(control, true)
-        end
+        restoreGameControls()
     end, 10, 1)
     
-    -- Ejecutar después de 25ms
     setTimer(function()
-        showCursor(false)
-        guiSetInputEnabled(false)
-        guiSetInputMode("allow_binds")
-        for _, control in ipairs(controlsToEnable) do
-            toggleControl(control, true)
-        end
-    end, 25, 1)
-    
-    -- Ejecutar después de 50ms
-    setTimer(function()
-        showCursor(false)
-        guiSetInputEnabled(false)
-        guiSetInputMode("allow_binds")
-        for _, control in ipairs(controlsToEnable) do
-            toggleControl(control, true)
-        end
+        restoreGameControls()
     end, 50, 1)
     
-    -- Ejecutar después de 100ms
     setTimer(function()
-        showCursor(false)
-        guiSetInputEnabled(false)
-        guiSetInputMode("allow_binds")
-        for _, control in ipairs(controlsToEnable) do
-            toggleControl(control, true)
-        end
+        restoreGameControls()
         triggerEvent("phoneClosed", localPlayer)
     end, 100, 1)
     
-    -- Ejecutar después de 200ms (verificación final)
-    setTimer(function()
-        showCursor(false)
-        guiSetInputEnabled(false)
-        guiSetInputMode("allow_binds")
-        for _, control in ipairs(controlsToEnable) do
-            toggleControl(control, true)
-        end
-        forceCursorHidden = false  -- Desactivar flag después de 200ms
-    end, 200, 1)
+    -- SEXTO: Mantener el flag activo por 1 segundo para asegurar que el cursor se mantenga oculto
+    phoneClosedTimer = setTimer(function()
+        forceCursorHidden = false
+        phoneClosedTimer = nil
+    end, 1000, 1)
     
     -- Notificar inmediatamente que el teléfono se cerró
     triggerEvent("phoneClosed", localPlayer)
 end
 
 -- Handler para forzar cursor oculto después de cerrar el teléfono
+-- Este handler se ejecuta cada frame mientras forceCursorHidden sea true
 addEventHandler("onClientRender", root, function()
-    if forceCursorHidden and isCursorShowing() then
-        showCursor(false)
+    if forceCursorHidden then
+        if isCursorShowing() then
+            showCursor(false)
+        end
         guiSetInputEnabled(false)
         guiSetInputMode("allow_binds")
     end
