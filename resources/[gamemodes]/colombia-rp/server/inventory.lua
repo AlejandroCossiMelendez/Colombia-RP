@@ -290,6 +290,42 @@ addEventHandler("useItem", root, function(slot, itemId, itemIndex)
     local itemId = tonumber(item.item)
     local itemName = item.name or "Item"
     
+    -- Chaleco Antibalas (ID: 46) - Equipar y poner defensa al máximo
+    if itemId == 46 then
+        setPedArmor(source, 100)
+        outputChatBox("Has equipado un Chaleco Antibalas. Tu defensa está al máximo.", source, 0, 150, 255)
+        
+        -- Crear objeto visual del chaleco y adjuntarlo al jugador
+        -- Modelo 3026 es un chaleco antibalas en MTA
+        local vestObject = getElementData(source, "equipped:vest")
+        if isElement(vestObject) then
+            destroyElement(vestObject)
+        end
+        
+        local x, y, z = getElementPosition(source)
+        local vest = createObject(3026, x, y, z)
+        if vest then
+            -- Adjuntar el chaleco al jugador en el torso
+            attachElements(vest, source, 0, 0, 0.1, 0, 0, 0)
+            setElementCollisionsEnabled(vest, false)
+            setElementAlpha(vest, 255)
+            setElementData(source, "equipped:vest", vest)
+            setElementData(source, "has:vest", true)
+        end
+        
+        -- Remover el item del inventario usando el sistema de items
+        if take then
+            local result = take(source, tonumber(slot))
+            if result then
+                -- Recargar items para actualizar el inventario
+                if load then
+                    load(source, true)
+                end
+            end
+        end
+        return
+    end
+    
     -- Verificar si las funciones de necesidades están disponibles
     if not feedPlayer or not hydratePlayer then
         outputChatBox("El sistema de necesidades no está disponible", source, 255, 0, 0)

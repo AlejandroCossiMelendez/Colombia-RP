@@ -214,6 +214,14 @@ addEventHandler("onPlayerWasted", root, function(ammo, attacker, weapon, bodypar
         return
     end
     
+    -- Remover chaleco al morir
+    local vestObject = getElementData(source, "equipped:vest")
+    if isElement(vestObject) then
+        destroyElement(vestObject)
+    end
+    removeElementData(source, "equipped:vest")
+    removeElementData(source, "has:vest")
+    
     outputServerLog("[DEATH] " .. getPlayerName(source) .. " ha muerto")
     
     -- Notificar al cliente que el jugador ha muerto
@@ -299,5 +307,13 @@ addEventHandler("onPlayerQuit", root, function()
     if deathPositions[source] then
         deathPositions[source] = nil
     end
+    
+    -- Limpiar objeto del chaleco si existe
+    local vestObject = getElementData(source, "equipped:vest")
+    if isElement(vestObject) then
+        destroyElement(vestObject)
+    end
+    removeElementData(source, "equipped:vest")
+    removeElementData(source, "has:vest")
 end)
 
