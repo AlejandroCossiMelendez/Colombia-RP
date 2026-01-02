@@ -27,7 +27,6 @@ function loadCharacters(characters) {
                 <div class="character-info">Último login: ${char.lastLogin || 'Nunca'}</div>
                 <div class="card-actions">
                     <button class="btn btn-primary" onclick="selectCharacter(${char.id}, event)">Seleccionar</button>
-                    <button class="btn btn-danger" onclick="deleteCharacter(${char.id}, event)">Eliminar</button>
                 </div>
             `;
             container.appendChild(card);
@@ -54,21 +53,6 @@ function selectCharacter(id, event) {
     }
 }
 
-// Función para eliminar personaje
-function deleteCharacter(id, event) {
-    if (event) {
-        event.stopPropagation();
-    }
-    
-    if (confirm('¿Estás seguro de eliminar este personaje? Esta acción no se puede deshacer.')) {
-        if (window.mta) {
-            window.mta.triggerEvent('deleteCharacter', id);
-        } else {
-            console.error('MTA no está disponible');
-            showError('Error de conexión con el juego');
-        }
-    }
-}
 
 // Función para mostrar modal de crear personaje
 function showCreateModal() {
@@ -168,7 +152,6 @@ window.showError = showError;
 window.showSuccess = showSuccess;
 window.hideMessage = hideMessage;
 window.selectCharacter = selectCharacter;
-window.deleteCharacter = deleteCharacter;
 window.createCharacter = createCharacter;
 window.showCreateModal = showCreateModal;
 window.hideCreateModal = hideCreateModal;

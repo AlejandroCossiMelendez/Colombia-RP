@@ -126,6 +126,10 @@ body {
     margin-top: 20px;
 }
 
+.card-actions .btn {
+    width: 100%;
+}
+
 .btn {
     flex: 1;
     padding: 12px 20px;
