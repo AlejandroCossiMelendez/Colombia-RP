@@ -32,20 +32,33 @@ function whenPhoneBrowserReady()
             executeBrowserJavascript(browserContent, "setMyPhoneNumber('" .. tostring(phoneNumber) .. "');")
         end
         
-        -- Cargar contactos desde el servidor (con un pequeño delay para asegurar que character:id esté disponible)
+        -- Cargar contactos desde el servidor (con verificación de que el personaje esté completamente seleccionado)
         setTimer(function()
+            local characterSelected = getElementData(localPlayer, "character:selected")
             local characterId = getElementData(localPlayer, "character:id")
-            if characterId then
+            
+            if characterSelected and characterId then
                 triggerServerEvent("loadContacts", resourceRoot)
             else
                 -- Reintentar después de 1 segundo si character:id aún no está disponible
                 setTimer(function()
-                    if getElementData(localPlayer, "character:id") then
+                    local retrySelected = getElementData(localPlayer, "character:selected")
+                    local retryCharacterId = getElementData(localPlayer, "character:id")
+                    if retrySelected and retryCharacterId then
                         triggerServerEvent("loadContacts", resourceRoot)
+                    else
+                        -- Último intento después de 2 segundos más
+                        setTimer(function()
+                            local finalSelected = getElementData(localPlayer, "character:selected")
+                            local finalCharacterId = getElementData(localPlayer, "character:id")
+                            if finalSelected and finalCharacterId then
+                                triggerServerEvent("loadContacts", resourceRoot)
+                            end
+                        end, 2000, 1)
                     end
                 end, 1000, 1)
             end
-        end, 500, 1)
+        end, 1000, 1)
     end
 end
 

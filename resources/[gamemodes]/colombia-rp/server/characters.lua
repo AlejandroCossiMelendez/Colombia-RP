@@ -120,10 +120,11 @@ addEventHandler("createCharacter", getRootElement(), function(name, surname, age
                         if result and #result > 0 then
                             local character = result[1]
                             
-                            -- Guardar datos del personaje en el elemento
-                            setElementData(source, "character:selected", true)
-                            setElementData(source, "character:id", character.id)
-                            setElementData(source, "character:name", character.name)
+        -- Guardar datos del personaje en el elemento
+        setElementData(source, "character:selected", true)
+        setElementData(source, "character:id", character.id)
+        outputServerLog("[CHARACTERS] character:id establecido: " .. tostring(character.id) .. " para " .. getPlayerName(source))
+        setElementData(source, "character:name", character.name)
                             setElementData(source, "character:surname", character.surname)
                             setElementData(source, "character:age", character.age)
                             setElementData(source, "character:gender", character.gender)
@@ -238,6 +239,7 @@ addEventHandler("selectCharacter", getRootElement(), function(characterId)
         -- Guardar datos del personaje en el elemento
         setElementData(source, "character:selected", true)
         setElementData(source, "character:id", character.id)
+        outputServerLog("[CHARACTERS] character:id establecido: " .. tostring(character.id) .. " para " .. getPlayerName(source))
         setElementData(source, "character:name", character.name)
         setElementData(source, "character:surname", character.surname)
         setElementData(source, "character:age", character.age)
