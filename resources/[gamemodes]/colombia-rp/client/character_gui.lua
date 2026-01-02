@@ -9,8 +9,6 @@ local selectedCharacterId = nil
 local screenWidth, screenHeight = guiGetScreenSize()
 
 function showCharacterGUI()
-    outputChatBox("Mostrando GUI de personajes...", 255, 255, 0)
-    
     -- Si ya existe, no crear otra vez
     if characterWindow then
         return
@@ -52,7 +50,7 @@ function showCharacterGUI()
         if selectedRow ~= -1 then
             local characterId = guiGridListGetItemData(characterList, selectedRow, 1)
             if characterId then
-                triggerServerEvent("selectCharacter", root, characterId)
+                triggerServerEvent("selectCharacter", resourceRoot, characterId)
             else
                 outputChatBox("Selecciona un personaje de la lista", 255, 0, 0)
             end
@@ -71,7 +69,7 @@ function showCharacterGUI()
             local characterId = guiGridListGetItemData(characterList, selectedRow, 1)
             if characterId then
                 if confirm("¿Estás seguro de eliminar este personaje?") then
-                    triggerServerEvent("deleteCharacter", root, characterId)
+                    triggerServerEvent("deleteCharacter", resourceRoot, characterId)
                 end
             end
         else
@@ -80,7 +78,7 @@ function showCharacterGUI()
     end, false)
     
     -- Solicitar lista de personajes
-    triggerServerEvent("requestCharacters", root)
+    triggerServerEvent("requestCharacters", resourceRoot)
 end
 
 function hideCharacterGUI()
@@ -154,7 +152,7 @@ function showCreateCharacterGUI()
             return
         end
         
-        triggerServerEvent("createCharacter", root, name, surname, age, gender, 0)
+        triggerServerEvent("createCharacter", resourceRoot, name, surname, age, gender, 0)
         hideCreateCharacterGUI()
     end, false)
     
@@ -184,7 +182,6 @@ end
 -- Eventos del servidor
 addEvent("showCharacterGUI", true)
 addEventHandler("showCharacterGUI", resourceRoot, function()
-    outputChatBox("Recibido evento showCharacterGUI", 255, 255, 0)
     showCharacterGUI()
 end)
 
@@ -216,7 +213,7 @@ addEvent("characterCreateResponse", true)
 addEventHandler("characterCreateResponse", resourceRoot, function(success, message)
     if success then
         outputChatBox(message, 0, 255, 0)
-        triggerServerEvent("requestCharacters", root)
+        triggerServerEvent("requestCharacters", resourceRoot)
     else
         outputChatBox("Error: " .. message, 255, 0, 0)
     end
@@ -233,7 +230,7 @@ addEvent("characterDeleteResponse", true)
 addEventHandler("characterDeleteResponse", resourceRoot, function(success, message)
     if success then
         outputChatBox(message, 0, 255, 0)
-        triggerServerEvent("requestCharacters", root)
+        triggerServerEvent("requestCharacters", resourceRoot)
     else
         outputChatBox("Error: " .. message, 255, 0, 0)
     end

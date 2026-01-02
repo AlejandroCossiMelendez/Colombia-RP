@@ -132,7 +132,6 @@ function performLogin()
     end
     
     -- Activar evento del servidor (usando getLocalPlayer() como en el ejemplo que funciona)
-    outputChatBox("[DEBUG] Enviando evento colombiaRP:playerLogin con usuario: " .. username, 255, 255, 0)
     triggerServerEvent("colombiaRP:playerLogin", getLocalPlayer(), username, password)
 end
 
@@ -162,7 +161,6 @@ function performRegister()
     end
     
     -- Activar evento del servidor (usando getLocalPlayer() como en el ejemplo que funciona)
-    outputChatBox("[DEBUG] Enviando evento colombiaRP:playerRegister", 255, 255, 0)
     triggerServerEvent("colombiaRP:playerRegister", getLocalPlayer(), username, password, email)
 end
 
@@ -191,8 +189,8 @@ end)
 addEvent("loginResponse", true)
 addEventHandler("loginResponse", resourceRoot, function(success, message)
     if success then
-        outputChatBox(message, 0, 255, 0)
         hideLoginGUI()
+        -- El panel de personajes se mostrará automáticamente desde el servidor
     else
         outputChatBox("Error: " .. message, 255, 0, 0)
     end

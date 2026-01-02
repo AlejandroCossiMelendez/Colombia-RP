@@ -86,13 +86,13 @@ addEventHandler("colombiaRP:playerLogin", getRootElement(), function(username, p
             setElementData(source, "account:role", user.role)
             
             outputChatBox("¡Bienvenido, " .. user.username .. "!", source, 0, 255, 0)
-            outputServerLog("[LOGIN] Enviando respuesta de login exitoso y GUI de personajes")
             triggerClientEvent(source, "loginResponse", resourceRoot, true, "Login exitoso")
+            -- Mostrar panel de personajes inmediatamente después del login
             setTimer(function()
                 if isElement(source) then
                     triggerClientEvent(source, "showCharacterGUI", resourceRoot)
                 end
-            end, 500, 1)
+            end, 300, 1)
         else
             outputServerLog("[LOGIN] Contraseña incorrecta para usuario: " .. username)
             triggerClientEvent(source, "loginResponse", resourceRoot, false, "Contraseña incorrecta")
