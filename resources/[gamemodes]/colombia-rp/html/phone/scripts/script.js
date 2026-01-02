@@ -40,21 +40,37 @@ function setupDragToClose() {
     const iphone = get('.iphone');
     if (!iphone) return;
     
-    // Área superior del teléfono donde se puede arrastrar (notch y área superior)
+    // Área superior del teléfono donde se puede arrastrar (solo notch y área pequeña)
+    // No cubrir toda la parte superior para no interferir con botones
     const dragArea = document.createElement('div');
     dragArea.style.position = 'absolute';
     dragArea.style.top = '0';
-    dragArea.style.left = '0';
-    dragArea.style.right = '0';
-    dragArea.style.height = '80px';
-    dragArea.style.zIndex = '1000';
+    dragArea.style.left = '50%';
+    dragArea.style.transform = 'translateX(-50%)';
+    dragArea.style.width = '120px'; // Solo el área del notch
+    dragArea.style.height = '60px';
+    dragArea.style.zIndex = '50'; // Menor que botones y elementos interactivos
     dragArea.style.cursor = 'grab';
     dragArea.style.userSelect = 'none';
+    dragArea.style.pointerEvents = 'auto';
     iphone.appendChild(dragArea);
     
-    // Evento cuando se presiona el mouse/touch
-    dragArea.addEventListener('mousedown', handleDragStart);
-    dragArea.addEventListener('touchstart', handleDragStart, { passive: false });
+    // Evento cuando se presiona el mouse/touch - solo si no es un botón
+    dragArea.addEventListener('mousedown', function(e) {
+        // Si el clic es en un botón o elemento interactivo, no iniciar arrastre
+        const target = e.target;
+        if (target && (target.tagName === 'BUTTON' || target.closest('button') || target.closest('.add-contact-btn'))) {
+            return;
+        }
+        handleDragStart(e);
+    });
+    dragArea.addEventListener('touchstart', function(e) {
+        const target = e.target;
+        if (target && (target.tagName === 'BUTTON' || target.closest('button') || target.closest('.add-contact-btn'))) {
+            return;
+        }
+        handleDragStart(e);
+    }, { passive: false });
     
     // Evento cuando se mueve el mouse/touch
     document.addEventListener('mousemove', handleDragMove);
@@ -136,16 +152,19 @@ function handleDragEnd(e) {
         
         // Cerrar el teléfono después de la animación
         setTimeout(function() {
+            // Guardar contactos una vez más antes de cerrar
+            saveContactsToMTA();
+            
+            // Cerrar el teléfono
             if (window.mta && window.mta.triggerEvent) {
                 window.mta.triggerEvent('closePhoneFromBrowser');
             }
-            // Resetear estilos
-            if (iphone) {
-                iphone.style.transform = 'translateY(0)';
-                iphone.style.opacity = '1';
-                iphone.style.filter = 'brightness(1)';
-            }
-            isClosing = false;
+            
+            // NO resetear estilos aquí - el navegador se destruirá completamente
+            // No resetear isClosing aquí para evitar que vuelva a aparecer
+            isDragging = false;
+            startY = 0;
+            currentY = 0;
         }, 400);
     } else if (iphone) {
         // Volver a la posición original con animación
@@ -162,13 +181,16 @@ function handleDragEnd(e) {
 
 // Función para guardar contactos en MTA
 function saveContactsToMTA() {
-    if (window.mta && window.mta.triggerEvent && contacts.length > 0) {
+    // Guardar siempre, incluso si no hay contactos (para limpiar)
+    if (window.mta && window.mta.triggerEvent) {
         try {
-            window.mta.triggerEvent('saveContacts', JSON.stringify(contacts));
-            console.log('Contactos guardados al cerrar el teléfono');
+            window.mta.triggerEvent('saveContacts', JSON.stringify(contacts || []));
+            console.log('Contactos guardados:', (contacts || []).length, 'contactos');
         } catch (e) {
             console.error('Error al guardar contactos:', e);
         }
+    } else {
+        console.warn('MTA no está disponible para guardar contactos');
     }
 }
 
@@ -321,14 +343,23 @@ function loadContacts() {
 }
 
 // Función para mostrar formulario de agregar contacto
-function showAddContactForm() {
+function showAddContactForm(e) {
+    if (e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
     const form = get('#addContactForm');
     if (form) {
         form.style.display = 'block';
-        get('#contactName').value = '';
-        get('#contactNumber').value = '';
+        const nameInput = get('#contactName');
+        const numberInput = get('#contactNumber');
+        if (nameInput) nameInput.value = '';
+        if (numberInput) numberInput.value = '';
     }
 }
+
+// Exponer función globalmente
+window.showAddContactForm = showAddContactForm;
 
 // Función para ocultar formulario
 function hideAddContactForm() {
@@ -435,6 +466,9 @@ function deleteContact(index) {
 // Exponer funciones para MTA
 window.setMyPhoneNumber = setMyPhoneNumber;
 window.loadContacts = loadContacts;
+window.showAddContactForm = showAddContactForm;
+window.hideAddContactForm = hideAddContactForm;
+window.addContact = addContact;
 
 /* Calculator App */
 

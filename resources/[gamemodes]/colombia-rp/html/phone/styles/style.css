@@ -350,10 +350,19 @@ input {
     justify-content: center;
     cursor: pointer;
     transition: background-color 0.2s;
+    border: none;
+    padding: 0;
+    margin: 0;
+    z-index: 200;
+    position: relative;
+}
+
+.add-contact-btn:hover {
+    background-color: #0051D5;
 }
 
 .add-contact-btn:active {
-    background-color: #0051D5;
+    background-color: #003d99;
 }
 
 .contacts-list {
