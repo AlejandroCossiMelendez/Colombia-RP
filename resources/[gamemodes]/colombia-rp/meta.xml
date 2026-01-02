@@ -61,10 +61,10 @@
     <script src="items/items_c.lua" type="client" />
     <script src="items/drogas_c.lua" type="client" />
     
-    <!-- Skin Colombiana (cliente) - Modelo 0 -->
+    <!-- Skin ByelzinSUG2 (cliente) - Modelo 0 -->
     <script src="skins/skin-0/script.lua" type="client" />
-    <file src="skins/skin-0/skin-0.txd" type="client" />
-    <file src="skins/skin-0/skin-0.dff" type="client" />
+    <file src="skins/ByelzinSUG2/skin58.txd" type="client" />
+    <file src="skins/ByelzinSUG2/skin58.dff" type="client" />
     
     <!-- Sistema de mochilas (cliente) -->
     <script src="mochilas/mochila.lua" type="client" />

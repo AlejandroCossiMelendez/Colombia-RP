@@ -1,4 +1,4 @@
--- Skin colombiana para modelo 0 (CJ - personaje masculino por defecto)
+-- Skin ByelzinSUG2 para modelo 0 (CJ - personaje masculino por defecto)
 
 addEventHandler('onClientResourceStart', root, function(resource)
     -- Solo ejecutar si es el gamemode colombia-rp
@@ -6,14 +6,14 @@ addEventHandler('onClientResourceStart', root, function(resource)
         return
     end
     
-    -- Usar ruta completa relativa al gamemode
-    local txdPath = "skins/skin-0/skin-0.txd"
-    local dffPath = "skins/skin-0/skin-0.dff"
+    -- Usar ruta completa relativa al gamemode (archivos de ByelzinSUG2)
+    local txdPath = "skins/ByelzinSUG2/skin58.txd"
+    local dffPath = "skins/ByelzinSUG2/skin58.dff"
     
     local txd = engineLoadTXD(txdPath) 
     if txd then
         engineImportTXD(txd, 0) 
-        outputChatBox("✓ Skin colombiana cargada (TXD) para modelo 0", 0, 255, 0)
+        outputChatBox("✓ Skin ByelzinSUG2 cargada (TXD) para modelo 0", 0, 255, 0)
     else
         outputChatBox("Error al cargar TXD: " .. txdPath, 255, 0, 0)
     end
@@ -21,7 +21,7 @@ addEventHandler('onClientResourceStart', root, function(resource)
     local dff = engineLoadDFF(dffPath, 0) 
     if dff then
         engineReplaceModel(dff, 0)
-        outputChatBox("✓ Skin colombiana cargada (DFF) para modelo 0", 0, 255, 0)
+        outputChatBox("✓ Skin ByelzinSUG2 cargada (DFF) para modelo 0", 0, 255, 0)
     else
         outputChatBox("Error al cargar DFF: " .. dffPath, 255, 0, 0)
     end
