@@ -92,19 +92,41 @@ function closePhone()
     
     phoneVisible = false
     
-    -- PRIMERO: Ocultar y deshabilitar el navegador para que deje de capturar eventos
+    -- PRIMERO: Remover event handlers ANTES de hacer cualquier cosa
     if phoneBrowser and isElement(phoneBrowser) then
-        guiSetVisible(phoneBrowser, false)
         removeEventHandler("onClientBrowserCreated", phoneBrowser, loadPhoneBrowser)
         removeEventHandler("onClientBrowserDocumentReady", phoneBrowser, whenPhoneBrowserReady)
     end
     
-    -- SEGUNDO: Restaurar controles del juego INMEDIATAMENTE
+    -- SEGUNDO: Ocultar el navegador inmediatamente
+    if phoneBrowser and isElement(phoneBrowser) then
+        guiSetVisible(phoneBrowser, false)
+    end
+    
+    -- TERCERO: DESTRUIR el navegador INMEDIATAMENTE para que deje de capturar eventos
+    if phoneBrowser and isElement(phoneBrowser) then
+        destroyElement(phoneBrowser)
+        phoneBrowser = nil
+        browserContent = nil
+    end
+    
+    renderTime(false)
+    
+    -- CUARTO: Restaurar controles del juego INMEDIATAMENTE después de destruir el navegador
+    -- Forzar múltiples veces para asegurar que funcione
+    -- IMPORTANTE: Ejecutar en el siguiente frame para asegurar que el navegador esté completamente destruido
+    setTimer(function()
+        showCursor(false)
+        guiSetInputEnabled(false)
+        guiSetInputMode("allow_binds")
+    end, 0, 1)
+    
+    -- También ejecutar inmediatamente por si acaso
     showCursor(false)
     guiSetInputEnabled(false)
     guiSetInputMode("allow_binds")
     
-    -- TERCERO: Forzar restauración de TODOS los controles inmediatamente
+    -- QUINTO: Forzar restauración de TODOS los controles inmediatamente
     local controlsToEnable = {
         "fire", "next_weapon", "previous_weapon", "forwards", "backwards", 
         "left", "right", "jump", "sprint", "crouch", "walk", "enter_exit",
@@ -123,16 +145,20 @@ function closePhone()
         toggleControl(control, true)
     end
     
-    -- CUARTO: Destruir el navegador
-    if phoneBrowser and isElement(phoneBrowser) then
-        destroyElement(phoneBrowser)
-        phoneBrowser = nil
-        browserContent = nil
-    end
+    -- SEXTO: Forzar restauración múltiple veces de forma agresiva
+    setTimer(function()
+        -- Forzar ocultar cursor y restaurar modo de entrada
+        if isCursorShowing() then
+            showCursor(false)
+        end
+        guiSetInputEnabled(false)
+        guiSetInputMode("allow_binds")
+        -- Habilitar todos los controles nuevamente
+        for _, control in ipairs(controlsToEnable) do
+            toggleControl(control, true)
+        end
+    end, 0, 1)  -- Ejecutar inmediatamente
     
-    renderTime(false)
-    
-    -- QUINTO: Asegurar que los controles se mantengan habilitados múltiples veces
     setTimer(function()
         showCursor(false)
         guiSetInputEnabled(false)
@@ -140,9 +166,8 @@ function closePhone()
         for _, control in ipairs(controlsToEnable) do
             toggleControl(control, true)
         end
-    end, 10, 3)  -- Ejecutar 3 veces con 10ms de intervalo
+    end, 10, 1)
     
-    -- SEXTO: Verificación final después de un delay más largo
     setTimer(function()
         showCursor(false)
         guiSetInputEnabled(false)
@@ -150,7 +175,26 @@ function closePhone()
         for _, control in ipairs(controlsToEnable) do
             toggleControl(control, true)
         end
+    end, 50, 1)
+    
+    -- SÉPTIMO: Verificación final después de un delay más largo
+    setTimer(function()
+        showCursor(false)
+        guiSetInputEnabled(false)
+        guiSetInputMode("allow_binds")
+        for _, control in ipairs(controlsToEnable) do
+            toggleControl(control, true)
+        end
+        -- Forzar que el cursor esté oculto
+        if isCursorShowing() then
+            showCursor(false)
+        end
+        -- Notificar a otros sistemas que el teléfono se cerró
+        triggerEvent("phoneClosed", localPlayer)
     end, 100, 1)
+    
+    -- OCTAVO: Notificar inmediatamente que el teléfono se cerró
+    triggerEvent("phoneClosed", localPlayer)
 end
 
 -- Evento del servidor para abrir el teléfono
