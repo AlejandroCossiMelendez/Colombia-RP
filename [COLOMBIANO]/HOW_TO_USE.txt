@@ -1,0 +1,16 @@
+-- Files are encrypted on https://mtaclub.eu/pcrypt
+-- Discord: https://mtasa.com/discord
+-- Author: !Patrick
+
+
+You have to decompress the .zip file into your /resources directory, as a resource.
+When it's done, open 'loader.lua' file and set modelIDs of models.
+
+
+FOR EXAMPLE: if you want to load the model to an infernus
+- Just replace default zeros to 411, which is the modelID of infernus.
+
+local files = {
+	{ "infernus.txd", 0 },
+	{ "infernus.dff", 0 },
+}
