@@ -11,9 +11,17 @@ function whenBrowserReady()
     -- El navegador está listo
     -- Verificar que el jugador esté logueado antes de solicitar personajes
     local loggedIn = getElementData(localPlayer, "account:loggedIn")
-    if loggedIn == true then
+    local userId = getElementData(localPlayer, "account:userId")
+    
+    -- Doble verificación: debe estar logueado Y tener userId
+    if loggedIn == true and userId then
+        -- Mostrar el navegador solo si está logueado
+        if characterBrowser and isElement(characterBrowser) then
+            guiSetVisible(characterBrowser, true)
+        end
         triggerServerEvent("requestCharacters", localPlayer)
     else
+        -- Si no está logueado, ocultar y mostrar login
         outputChatBox("Error: Debes iniciar sesión primero", 255, 0, 0)
         hideCharacterGUI()
         -- Mostrar login si no está logueado
@@ -26,8 +34,13 @@ end
 function showCharacterGUI()
     -- VERIFICACIÓN CRÍTICA: Solo mostrar personajes si el jugador está logueado
     local loggedIn = getElementData(localPlayer, "account:loggedIn")
-    if not loggedIn or loggedIn ~= true then
+    local userId = getElementData(localPlayer, "account:userId")
+    
+    -- Doble verificación: debe estar logueado Y tener userId
+    if not loggedIn or loggedIn ~= true or not userId then
         outputChatBox("Error: Debes iniciar sesión primero", 255, 0, 0)
+        -- Asegurarse de que el navegador de personajes esté oculto/destruido
+        hideCharacterGUI()
         -- Mostrar login si no está logueado
         if showLoginGUI then
             showLoginGUI()
@@ -52,6 +65,9 @@ function showCharacterGUI()
         outputChatBox("Error: No se pudo crear el navegador", 255, 0, 0)
         return
     end
+    
+    -- IMPORTANTE: Ocultar el navegador hasta que se verifique el login
+    guiSetVisible(characterBrowser, false)
     
     -- Configurar input mode
     guiSetInputMode("no_binds_when_editing")
@@ -133,12 +149,20 @@ addEvent("showCharacterGUI", true)
 addEventHandler("showCharacterGUI", resourceRoot, function()
     -- Verificar que el jugador esté logueado antes de mostrar personajes
     local loggedIn = getElementData(localPlayer, "account:loggedIn")
-    if loggedIn == true then
+    local userId = getElementData(localPlayer, "account:userId")
+    
+    -- Doble verificación: debe estar logueado Y tener userId
+    if loggedIn == true and userId then
         showCharacterGUI()
     else
         -- Si no está logueado, mostrar login primero
         outputChatBox("Debes iniciar sesión primero", 255, 0, 0)
-        triggerClientEvent("showLoginGUI", resourceRoot)
+        -- Asegurarse de ocultar el navegador de personajes
+        hideCharacterGUI()
+        -- Mostrar login
+        if showLoginGUI then
+            showLoginGUI()
+        end
     end
 end)
 
@@ -231,4 +255,20 @@ end)
 -- Limpiar al cerrar el recurso
 addEventHandler("onClientResourceStop", resourceRoot, function()
     hideCharacterGUI()
+end)
+
+-- IMPORTANTE: Asegurarse de que el navegador de personajes NO se cree automáticamente
+-- Solo se creará cuando se llame explícitamente a showCharacterGUI() después de un login exitoso
+addEventHandler("onClientResourceStart", resourceRoot, function()
+    -- Asegurarse de que no haya navegadores de personajes creados al iniciar
+    if characterBrowser and isElement(characterBrowser) then
+        hideCharacterGUI()
+    end
+    -- Verificar que el jugador NO esté logueado al iniciar el recurso
+    -- Si por alguna razón está logueado pero no debería, limpiar
+    local loggedIn = getElementData(localPlayer, "account:loggedIn")
+    if not loggedIn or loggedIn == false then
+        -- Asegurarse de que el navegador de personajes esté oculto
+        hideCharacterGUI()
+    end
 end)
