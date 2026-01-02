@@ -41,27 +41,76 @@ addEventHandler("saveContacts", root, function(contactsJson)
     local contacts = nil
     local success, result = pcall(function()
         if type(fromJSON) == "function" then
-            return fromJSON(contactsJson)
+            local parsed = fromJSON(contactsJson)
+            outputServerLog("[PHONE] fromJSON devolvió tipo: " .. type(parsed))
+            if type(parsed) == "table" then
+                outputServerLog("[PHONE] fromJSON #result: " .. #parsed)
+                local pairCount = 0
+                for k, v in pairs(parsed) do
+                    pairCount = pairCount + 1
+                    outputServerLog("[PHONE] fromJSON pair[" .. tostring(k) .. "] = " .. type(v))
+                end
+                outputServerLog("[PHONE] fromJSON total pairs: " .. pairCount)
+            end
+            return parsed
         else
-            return loadstring("return " .. contactsJson)()
+            -- Fallback: usar loadstring
+            local func = loadstring("return " .. contactsJson)
+            if func then
+                return func()
+            end
+            return nil
         end
     end)
     
     if not success or not result or type(result) ~= "table" then
         outputServerLog("[PHONE] ERROR: No se pudo parsear el JSON de contactos. JSON recibido: " .. tostring(contactsJson))
         outputServerLog("[PHONE] success: " .. tostring(success) .. ", result type: " .. type(result))
-        if result then
-            outputServerLog("[PHONE] result: " .. tostring(result))
-        end
         return
     end
     
     contacts = result
-    outputServerLog("[PHONE] JSON parseado correctamente. Total contactos en array: " .. #contacts)
+    
+    -- Verificar estructura y convertir si es necesario
+    local arrayLength = #contacts
+    local pairCount = 0
+    for k, v in pairs(contacts) do
+        pairCount = pairCount + 1
+    end
+    
+    outputServerLog("[PHONE] Array length (#): " .. arrayLength)
+    outputServerLog("[PHONE] Pairs count: " .. pairCount)
+    
+    -- Si el array está vacío pero hay pairs, podría ser un objeto en lugar de array
+    if arrayLength == 0 and pairCount > 0 then
+        outputServerLog("[PHONE] WARNING: Array vacío pero hay " .. pairCount .. " pares. Intentando convertir...")
+        -- Intentar convertir objeto a array
+        local tempArray = {}
+        for k, v in pairs(contacts) do
+            if type(k) == "number" and type(v) == "table" then
+                table.insert(tempArray, v)
+            elseif type(v) == "table" then
+                -- Podría ser un objeto con propiedades name y number
+                if v.name and v.number then
+                    table.insert(tempArray, v)
+                end
+            end
+        end
+        if #tempArray > 0 then
+            contacts = tempArray
+            outputServerLog("[PHONE] Convertido a array con " .. #contacts .. " elementos")
+        end
+    end
+    
+    outputServerLog("[PHONE] Total contactos finales: " .. #contacts)
     
     -- Debug: mostrar cada contacto antes de validar
-    for i, contact in ipairs(contacts) do
-        outputServerLog("[PHONE] Contacto " .. i .. " antes de validar - name: " .. tostring(contact.name) .. " (" .. type(contact.name) .. "), number: " .. tostring(contact.number) .. " (" .. type(contact.number) .. ")")
+    if #contacts > 0 then
+        for i, contact in ipairs(contacts) do
+            outputServerLog("[PHONE] Contacto " .. i .. " - name: " .. tostring(contact.name) .. " (" .. type(contact.name) .. "), number: " .. tostring(contact.number) .. " (" .. type(contact.number) .. ")")
+        end
+    else
+        outputServerLog("[PHONE] WARNING: Array de contactos está vacío después del parseo")
     end
     
     -- Eliminar contactos antiguos del personaje
