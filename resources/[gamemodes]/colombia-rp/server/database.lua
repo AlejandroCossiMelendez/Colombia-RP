@@ -57,7 +57,9 @@ end)
 -- Desconectar al detener el recurso
 addEventHandler("onResourceStop", resourceRoot, function()
     if dbConnection then
-        dbDestroy(dbConnection)
+        -- En MTA, las conexiones se cierran automáticamente al detener el recurso
+        -- No hay necesidad de dbDestroy, la conexión se libera automáticamente
+        dbConnection = nil
         outputServerLog("[DATABASE] Desconectado de MySQL")
     end
 end)

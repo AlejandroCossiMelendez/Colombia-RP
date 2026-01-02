@@ -1,5 +1,4 @@
 -- Sistema de Login y Registro
-
 -- Hash de contraseña usando md5 (más seguro que hash() que requiere permisos)
 function hashPassword(password)
     -- Usar md5 que no requiere permisos especiales

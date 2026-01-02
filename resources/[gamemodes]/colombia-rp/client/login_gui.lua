@@ -50,12 +50,17 @@ end)
 
 -- También mostrar login cuando el recurso se inicia y el jugador ya está conectado
 addEventHandler("onClientResourceStart", resourceRoot, function()
-    if getElementData(localPlayer, "account:loggedIn") ~= true then
+    outputChatBox("Recurso iniciado, verificando login...", 255, 255, 0)
+    local loggedIn = getElementData(localPlayer, "account:loggedIn")
+    if loggedIn ~= true then
         setTimer(function()
             if not loginBrowser then
+                outputChatBox("Mostrando login automáticamente...", 255, 255, 0)
                 showLoginGUI()
             end
-        end, 1000, 1)
+        end, 2000, 1)
+    else
+        outputChatBox("Ya estás logueado", 0, 255, 0)
     end
 end)
 
