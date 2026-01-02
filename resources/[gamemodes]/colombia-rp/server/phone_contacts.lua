@@ -12,12 +12,6 @@ addEventHandler("saveContacts", root, function(contactsJson)
     end
     
     local characterId = getElementData(player, "character:id")
-    local playerName = getPlayerName(player) or "Unknown"
-    
-    outputServerLog("[PHONE] Recibido evento saveContacts de " .. playerName)
-    outputServerLog("[PHONE] character_id: " .. tostring(characterId))
-    outputServerLog("[PHONE] contactsJson length: " .. tostring(contactsJson and string.len(contactsJson) or 0))
-    outputServerLog("[PHONE] contactsJson contenido: " .. tostring(contactsJson))
     
     if not characterId then
         outputServerLog("[PHONE] ERROR: No se pudo obtener character_id para guardar contactos")
@@ -28,12 +22,7 @@ addEventHandler("saveContacts", root, function(contactsJson)
     if not contactsJson or contactsJson == "" then
         -- Si no hay contactos, simplemente eliminar todos los existentes
         local deleteQuery = "DELETE FROM phone_contacts WHERE character_id = ?"
-        local deleteSuccess = executeDatabase(deleteQuery, characterId)
-        if deleteSuccess then
-            outputServerLog("[PHONE] Todos los contactos eliminados para personaje ID " .. characterId)
-        else
-            outputServerLog("[PHONE] ERROR: No se pudieron eliminar los contactos")
-        end
+        executeDatabase(deleteQuery, characterId)
         return
     end
     
@@ -41,18 +30,7 @@ addEventHandler("saveContacts", root, function(contactsJson)
     local contacts = nil
     local success, result = pcall(function()
         if type(fromJSON) == "function" then
-            local parsed = fromJSON(contactsJson)
-            outputServerLog("[PHONE] fromJSON devolvió tipo: " .. type(parsed))
-            if type(parsed) == "table" then
-                outputServerLog("[PHONE] fromJSON #result: " .. #parsed)
-                local pairCount = 0
-                for k, v in pairs(parsed) do
-                    pairCount = pairCount + 1
-                    outputServerLog("[PHONE] fromJSON pair[" .. tostring(k) .. "] = " .. type(v))
-                end
-                outputServerLog("[PHONE] fromJSON total pairs: " .. pairCount)
-            end
-            return parsed
+            return fromJSON(contactsJson)
         else
             -- Fallback: usar loadstring
             local func = loadstring("return " .. contactsJson)
@@ -64,8 +42,8 @@ addEventHandler("saveContacts", root, function(contactsJson)
     end)
     
     if not success or not result or type(result) ~= "table" then
-        outputServerLog("[PHONE] ERROR: No se pudo parsear el JSON de contactos. JSON recibido: " .. tostring(contactsJson))
-        outputServerLog("[PHONE] success: " .. tostring(success) .. ", result type: " .. type(result))
+        outputServerLog("[PHONE] ERROR: No se pudo parsear el JSON de contactos")
+        outputChatBox("Error: Formato de contactos inválido. Intenta de nuevo.", player, 255, 0, 0)
         return
     end
     
@@ -82,19 +60,12 @@ addEventHandler("saveContacts", root, function(contactsJson)
         if k == "number" then hasNumber = true end
     end
     
-    outputServerLog("[PHONE] Array length (#): " .. arrayLength)
-    outputServerLog("[PHONE] Pairs count: " .. pairCount)
-    outputServerLog("[PHONE] Tiene 'name': " .. tostring(hasName) .. ", Tiene 'number': " .. tostring(hasNumber))
-    
     -- Si el array está vacío pero tiene las propiedades name y number directamente, 
     -- significa que fromJSON devolvió el objeto del array en lugar del array
     if arrayLength == 0 and hasName and hasNumber then
-        outputServerLog("[PHONE] fromJSON devolvió objeto directo en lugar de array. Convirtiendo...")
         -- Convertir el objeto único a un array con un elemento
         contacts = {contacts}
-        outputServerLog("[PHONE] Convertido a array con " .. #contacts .. " elemento(s)")
     elseif arrayLength == 0 and pairCount > 0 then
-        outputServerLog("[PHONE] WARNING: Array vacío pero hay " .. pairCount .. " pares. Intentando convertir...")
         -- Intentar convertir objeto a array
         local tempArray = {}
         for k, v in pairs(contacts) do
@@ -109,19 +80,7 @@ addEventHandler("saveContacts", root, function(contactsJson)
         end
         if #tempArray > 0 then
             contacts = tempArray
-            outputServerLog("[PHONE] Convertido a array con " .. #contacts .. " elementos")
         end
-    end
-    
-    outputServerLog("[PHONE] Total contactos finales: " .. #contacts)
-    
-    -- Debug: mostrar cada contacto antes de validar
-    if #contacts > 0 then
-        for i, contact in ipairs(contacts) do
-            outputServerLog("[PHONE] Contacto " .. i .. " - name: " .. tostring(contact.name) .. " (" .. type(contact.name) .. "), number: " .. tostring(contact.number) .. " (" .. type(contact.number) .. ")")
-        end
-    else
-        outputServerLog("[PHONE] WARNING: Array de contactos está vacío después del parseo")
     end
     
     -- Eliminar contactos antiguos del personaje
@@ -141,44 +100,19 @@ addEventHandler("saveContacts", root, function(contactsJson)
         local name = contact.name
         local number = contact.number
         
-        -- Debug detallado
-        outputServerLog("[PHONE] Procesando contacto " .. i .. ":")
-        outputServerLog("[PHONE]   - name existe: " .. tostring(name ~= nil))
-        outputServerLog("[PHONE]   - number existe: " .. tostring(number ~= nil))
-        outputServerLog("[PHONE]   - name type: " .. type(name))
-        outputServerLog("[PHONE]   - number type: " .. type(number))
-        if name then outputServerLog("[PHONE]   - name value: " .. tostring(name)) end
-        if number then outputServerLog("[PHONE]   - number value: " .. tostring(number)) end
-        
         if name and number and type(name) == "string" and type(number) == "string" and name ~= "" and number ~= "" then
             local insertQuery = "INSERT INTO phone_contacts (character_id, contact_name, contact_number) VALUES (?, ?, ?)"
             local insertSuccess = executeDatabase(insertQuery, characterId, name, number)
             if insertSuccess then
                 insertCount = insertCount + 1
-                outputServerLog("[PHONE] ✓ Contacto " .. i .. " guardado exitosamente: " .. name .. " - " .. number)
             else
                 errorCount = errorCount + 1
-                outputServerLog("[PHONE] ✗ ERROR al guardar contacto " .. i .. " en BD: " .. name .. " - " .. number)
             end
         else
-            outputServerLog("[PHONE] ✗ Contacto " .. i .. " NO pasó validación:")
-            if not name or name == "" then
-                outputServerLog("[PHONE]   - name está vacío o no existe")
-            end
-            if not number or number == "" then
-                outputServerLog("[PHONE]   - number está vacío o no existe")
-            end
-            if name and type(name) ~= "string" then
-                outputServerLog("[PHONE]   - name no es string, es: " .. type(name))
-            end
-            if number and type(number) ~= "string" then
-                outputServerLog("[PHONE]   - number no es string, es: " .. type(number))
-            end
             errorCount = errorCount + 1
         end
     end
     
-    outputServerLog("[PHONE] Contactos guardados para personaje ID " .. characterId .. ": " .. insertCount .. " exitosos, " .. errorCount .. " errores")
     if isElement(player) and getElementType(player) == "player" then
         if insertCount > 0 then
             outputChatBox("✓ " .. insertCount .. " contacto(s) guardado(s) correctamente.", player, 0, 255, 0)
@@ -224,5 +158,4 @@ addEventHandler("loadContacts", root, function()
     
     -- Enviar contactos al cliente
     triggerClientEvent(player, "receiveContacts", resourceRoot, contactsList)
-    outputServerLog("[PHONE] Contactos cargados para personaje ID: " .. characterId .. " (" .. #contactsList .. " contactos)")
 end)
