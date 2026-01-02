@@ -564,6 +564,7 @@
     <file src="html/phone/styles/svgs/contacts.svg"/>
     <file src="html/phone/styles/svgs/phone-flip.svg"/>
     <file src="html/phone/styles/svgs/delete.svg"/>
+    <file src="html/phone/styles/svgs/gallery.svg"/>
     
     <!-- Archivos -->
     <file src="colombia-rp-login.png" type="client" />
