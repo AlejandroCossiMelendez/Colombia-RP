@@ -130,23 +130,37 @@ function hideSpeedometer() {
     }
 }
 
-// Inicializar: ocultar por defecto
-hideSpeedometer();
-
 // Log cuando el script se carga
 console.log('Speedometer script cargado');
+
+// Función de inicialización
+function initSpeedometer() {
+    console.log('Inicializando velocímetro...');
+    // Ocultar por defecto
+    hideSpeedometer();
+    console.log('Velocímetro inicializado y oculto por defecto');
+}
 
 // Verificar que el DOM esté listo
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Speedometer DOM listo');
+        initSpeedometer();
     });
 } else {
     console.log('Speedometer DOM ya estaba listo');
+    initSpeedometer();
 }
 
 // Función global para ser llamada desde Lua
 window.updateSpeedometer = updateSpeedometer;
 window.showSpeedometer = showSpeedometer;
 window.hideSpeedometer = hideSpeedometer;
+
+// Asegurar que las funciones estén disponibles inmediatamente
+console.log('Funciones globales registradas:', {
+    updateSpeedometer: typeof window.updateSpeedometer,
+    showSpeedometer: typeof window.showSpeedometer,
+    hideSpeedometer: typeof window.hideSpeedometer
+});
 

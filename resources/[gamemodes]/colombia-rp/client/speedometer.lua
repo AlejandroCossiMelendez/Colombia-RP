@@ -42,6 +42,41 @@ function createSpeedometerBrowser()
             end, 500, 1)
         end)
         
+        -- También escuchar cuando el documento esté listo
+        addEventHandler("onClientBrowserDocumentReady", browser, function()
+            outputChatBox("[DEBUG] Velocímetro: Documento listo", 0, 255, 0)
+            -- Verificar que las funciones estén disponibles
+            setTimer(function()
+                if isElement(browser) then
+                    executeBrowserJavascript(browser, 
+                        "console.log('Verificando funciones...'); " ..
+                        "console.log('window.showSpeedometer:', typeof window.showSpeedometer); " ..
+                        "console.log('window.updateSpeedometer:', typeof window.updateSpeedometer); " ..
+                        "console.log('showSpeedometer (global):', typeof showSpeedometer); " ..
+                        "console.log('updateSpeedometer (global):', typeof updateSpeedometer);"
+                    )
+                    -- Si estamos en un vehículo, intentar mostrar el velocímetro
+                    if isInVehicle and currentVehicle then
+                        setTimer(function()
+                            if isElement(browser) then
+                                executeBrowserJavascript(browser, 
+                                    "try { " ..
+                                    "if(typeof window.showSpeedometer === 'function') { " ..
+                                    "window.showSpeedometer(); " ..
+                                    "console.log('Velocímetro mostrado desde documentReady'); " ..
+                                    "} else if(typeof showSpeedometer === 'function') { " ..
+                                    "showSpeedometer(); " ..
+                                    "console.log('Velocímetro mostrado desde documentReady (sin window)'); " ..
+                                    "} " ..
+                                    "} catch(e) { console.log('Error mostrando velocímetro: ' + e); }"
+                                )
+                            end
+                        end, 500, 1)
+                    end
+                end
+            end, 500, 1)
+        end)
+        
         -- También intentar cargar después de un delay (fallback)
         setTimer(function()
             if isElement(browser) then
@@ -132,9 +167,12 @@ function updateSpeedometer()
                             -- El HTML está cargado, intentar mostrar
                             executeBrowserJavascript(browser, 
                                 "try { " ..
-                                "if(typeof showSpeedometer === 'function') { " ..
-                                "showSpeedometer(); " ..
+                                "if(typeof window.showSpeedometer === 'function') { " ..
+                                "window.showSpeedometer(); " ..
                                 "console.log('Velocímetro mostrado'); " ..
+                                "} else if(typeof showSpeedometer === 'function') { " ..
+                                "showSpeedometer(); " ..
+                                "console.log('Velocímetro mostrado (sin window)'); " ..
                                 "} else { " ..
                                 "console.log('showSpeedometer no disponible'); " ..
                                 "} " ..
