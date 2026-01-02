@@ -4,6 +4,11 @@ local screenWidth, screenHeight = guiGetScreenSize()
 addEventHandler("onClientResourceStart", resourceRoot, function()
     outputChatBox("Colombia RP cargado correctamente", 0, 255, 0)
     
+    -- Deshabilitar scoreboard por defecto de MTA
+    setPlayerHudComponentVisible("radar", false)
+    setPlayerHudComponentVisible("area_name", false)
+    setPlayerHudComponentVisible("vehicle_name", false)
+    
     -- Configurar nametags para que aparezcan arriba del jugador
     for _, player in ipairs(getElementsByType("player")) do
         setPlayerNametagShowing(player, true)

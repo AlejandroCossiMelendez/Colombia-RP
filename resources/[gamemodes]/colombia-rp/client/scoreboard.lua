@@ -2,18 +2,20 @@
 local scoreboardVisible = false
 local screenWidth, screenHeight = guiGetScreenSize()
 
--- Ocultar componentes del HUD por defecto de MTA
-addEventHandler("onClientResourceStart", resourceRoot, function()
-    -- Ocultar el scoreboard por defecto
+-- Deshabilitar completamente el scoreboard por defecto de MTA
+addEventHandler("onClientResourceStart", root, function()
+    -- Ocultar todos los componentes del HUD por defecto relacionados con el scoreboard
     setPlayerHudComponentVisible("radar", false)
     setPlayerHudComponentVisible("area_name", false)
     setPlayerHudComponentVisible("vehicle_name", false)
 end)
 
--- Asegurar que el scoreboard por defecto esté oculto
-addEventHandler("onClientPlayerSpawn", localPlayer, function()
+-- Asegurar que el scoreboard por defecto esté oculto siempre
+setTimer(function()
     setPlayerHudComponentVisible("radar", false)
-end)
+    setPlayerHudComponentVisible("area_name", false)
+    setPlayerHudComponentVisible("vehicle_name", false)
+end, 100, 0) -- Verificar cada 100ms para asegurar que esté oculto
 
 -- Toggle del scoreboard con TAB
 bindKey("tab", "down", function()
@@ -24,12 +26,13 @@ bindKey("tab", "up", function()
     scoreboardVisible = false
 end)
 
--- Interceptar el comando scoreboard para evitar el por defecto
+-- Interceptar y bloquear el comando scoreboard por defecto
 addCommandHandler("scoreboard", function()
-    -- No hacer nada, nuestro scoreboard se maneja con TAB
+    -- Bloquear completamente el scoreboard por defecto
+    return false
 end, true)
 
--- Función para obtener lista de jugadores
+-- Función para obtener lista de jugadores ordenada
 function getPlayerList()
     local players = getElementsByType("player")
     local playerList = {}
@@ -63,7 +66,7 @@ function getPlayerList()
     return playerList
 end
 
--- Renderizar scoreboard
+-- Renderizar scoreboard limpio y organizado
 addEventHandler("onClientRender", root, function()
     if not scoreboardVisible then
         return
@@ -73,105 +76,107 @@ addEventHandler("onClientRender", root, function()
     local playerList = getPlayerList()
     local totalPlayers = #playerList
     
-    -- Dimensiones del scoreboard
-    local boardWidth = 700
-    local boardHeight = math.min(500, 100 + (totalPlayers * 35) + 50)
+    if totalPlayers == 0 then
+        return
+    end
+    
+    -- Dimensiones fijas del scoreboard
+    local boardWidth = 650
+    local maxRows = 12
+    local rowHeight = 32
+    local headerHeight = 50
+    local footerHeight = 35
+    local boardHeight = headerHeight + (math.min(totalPlayers, maxRows) * rowHeight) + footerHeight
+    
     local boardX = (screenWidth - boardWidth) / 2
     local boardY = (screenHeight - boardHeight) / 2
     
-    -- Fondo principal con transparencia
-    dxDrawRectangle(boardX, boardY, boardWidth, boardHeight, tocolor(0, 0, 0, 220), false)
+    -- Fondo principal
+    dxDrawRectangle(boardX, boardY, boardWidth, boardHeight, tocolor(20, 20, 20, 240), false)
     
-    -- Bordes
-    local borderColor = tocolor(0, 150, 255, 255)
-    dxDrawRectangle(boardX, boardY, boardWidth, 3, borderColor, false) -- Superior
-    dxDrawRectangle(boardX, boardY + boardHeight - 3, boardWidth, 3, borderColor, false) -- Inferior
-    dxDrawRectangle(boardX, boardY, 3, boardHeight, borderColor, false) -- Izquierdo
-    dxDrawRectangle(boardX + boardWidth - 3, boardY, 3, boardHeight, borderColor, false) -- Derecho
+    -- Borde azul
+    local borderSize = 2
+    dxDrawRectangle(boardX, boardY, boardWidth, borderSize, tocolor(0, 150, 255, 255), false) -- Superior
+    dxDrawRectangle(boardX, boardY + boardHeight - borderSize, boardWidth, borderSize, tocolor(0, 150, 255, 255), false) -- Inferior
+    dxDrawRectangle(boardX, boardY, borderSize, boardHeight, tocolor(0, 150, 255, 255), false) -- Izquierdo
+    dxDrawRectangle(boardX + boardWidth - borderSize, boardY, borderSize, boardHeight, tocolor(0, 150, 255, 255), false) -- Derecho
     
     -- Título
-    dxDrawText("COLOMBIA RP - JUGADORES ONLINE", 
-               boardX, boardY + 10, boardX + boardWidth, boardY + 45,
-               tocolor(255, 255, 255, 255), 1.8, "default-bold", "center", "center",
+    dxDrawText("COLOMBIA RP", 
+               boardX, boardY + 5, boardX + boardWidth, boardY + headerHeight - 5,
+               tocolor(255, 255, 255, 255), 1.5, "default-bold", "center", "center",
                false, false, false, false, false)
     
-    -- Encabezados
-    local headerY = boardY + 55
+    -- Encabezados de columnas
+    local headerY = boardY + headerHeight - 5
     local headerColor = tocolor(0, 200, 255, 255)
     
-    dxDrawText("ID", boardX + 25, headerY, boardX + 100, headerY + 30,
-               headerColor, 1.3, "default-bold", "left", "center",
+    dxDrawText("ID", boardX + 20, headerY, boardX + 80, headerY + 20,
+               headerColor, 1.1, "default-bold", "left", "center",
                false, false, false, false, false)
     
-    dxDrawText("NOMBRE", boardX + 120, headerY, boardX + 450, headerY + 30,
-               headerColor, 1.3, "default-bold", "left", "center",
+    dxDrawText("NOMBRE", boardX + 100, headerY, boardX + 500, headerY + 20,
+               headerColor, 1.1, "default-bold", "left", "center",
                false, false, false, false, false)
     
-    dxDrawText("PING", boardX + 480, headerY, boardX + 675, headerY + 30,
-               headerColor, 1.3, "default-bold", "center", "center",
+    dxDrawText("PING", boardX + 520, headerY, boardX + 630, headerY + 20,
+               headerColor, 1.1, "default-bold", "center", "center",
                false, false, false, false, false)
     
     -- Línea separadora
-    dxDrawRectangle(boardX + 15, headerY + 30, boardWidth - 30, 2, tocolor(0, 150, 255, 180), false)
+    dxDrawRectangle(boardX + 15, headerY + 20, boardWidth - 30, 1, tocolor(0, 150, 255, 200), false)
     
     -- Lista de jugadores
-    local startY = headerY + 40
-    local rowHeight = 35
-    local maxVisible = math.floor((boardHeight - startY - 50) / rowHeight)
+    local startY = headerY + 25
+    local rowsToShow = math.min(totalPlayers, maxRows)
     
-    for i = 1, math.min(maxVisible, totalPlayers) do
+    for i = 1, rowsToShow do
         local playerData = playerList[i]
         if not playerData then break end
         
         local rowY = startY + (i - 1) * rowHeight
         
-        -- Fondo alternado
+        -- Fondo alternado para mejor legibilidad
         if i % 2 == 0 then
-            dxDrawRectangle(boardX + 15, rowY, boardWidth - 30, rowHeight - 3, tocolor(255, 255, 255, 15), false)
+            dxDrawRectangle(boardX + 15, rowY, boardWidth - 30, rowHeight - 2, tocolor(255, 255, 255, 8), false)
         end
         
         -- ID
         dxDrawText(tostring(playerData.id), 
-                   boardX + 25, rowY, boardX + 100, rowY + rowHeight,
-                   tocolor(255, 255, 255, 255), 1.1, "default", "left", "center",
+                   boardX + 20, rowY, boardX + 80, rowY + rowHeight - 2,
+                   tocolor(200, 200, 200, 255), 1.0, "default", "left", "center",
                    false, false, false, false, false)
         
         -- Nombre (verde si es el jugador local)
         local nameColor = tocolor(255, 255, 255, 255)
         if playerData.player == localPlayer then
-            nameColor = tocolor(0, 255, 0, 255)
+            nameColor = tocolor(0, 255, 100, 255)
         end
         
         dxDrawText(playerData.name, 
-                   boardX + 120, rowY, boardX + 450, rowY + rowHeight,
-                   nameColor, 1.1, "default", "left", "center",
+                   boardX + 100, rowY, boardX + 500, rowY + rowHeight - 2,
+                   nameColor, 1.0, "default", "left", "center",
                    false, false, false, false, false)
         
         -- Ping con colores
-        local pingColor = tocolor(0, 255, 0, 255) -- Verde por defecto
+        local pingColor = tocolor(0, 255, 0, 255) -- Verde
         if playerData.ping > 200 then
             pingColor = tocolor(255, 0, 0, 255) -- Rojo
         elseif playerData.ping > 100 then
-            pingColor = tocolor(255, 165, 0, 255) -- Naranja
+            pingColor = tocolor(255, 200, 0, 255) -- Amarillo/Naranja
         end
         
-        dxDrawText(tostring(playerData.ping) .. " ms", 
-                   boardX + 480, rowY, boardX + 675, rowY + rowHeight,
-                   pingColor, 1.1, "default", "center", "center",
+        dxDrawText(tostring(playerData.ping), 
+                   boardX + 520, rowY, boardX + 630, rowY + rowHeight - 2,
+                   pingColor, 1.0, "default", "center", "center",
                    false, false, false, false, false)
     end
     
-    -- Footer con contador
-    local footerY = boardY + boardHeight - 35
-    dxDrawText("Total: " .. totalPlayers .. " jugador(es) conectado(s)", 
-               boardX + 25, footerY, boardX + boardWidth - 25, footerY + 25,
-               tocolor(200, 200, 200, 255), 1.0, "default", "left", "center",
-               false, false, false, false, false)
-    
-    -- Instrucción
-    dxDrawText("Presiona TAB para ocultar", 
-               boardX + 25, footerY, boardX + boardWidth - 25, footerY + 25,
-               tocolor(150, 150, 150, 255), 0.9, "default", "right", "center",
+    -- Footer
+    local footerY = boardY + boardHeight - footerHeight + 5
+    dxDrawText("Total: " .. totalPlayers .. " jugador(es)", 
+               boardX + 20, footerY, boardX + boardWidth - 20, footerY + 25,
+               tocolor(180, 180, 180, 255), 1.0, "default", "left", "center",
                false, false, false, false, false)
 end)
 
