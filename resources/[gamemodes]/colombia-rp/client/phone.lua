@@ -49,8 +49,8 @@ function openPhone()
     
     phoneVisible = true
     -- Posición: 30px más a la izquierda y un poco más abajo
-    local phoneX = (sw - w) - 100
-    local phoneY = (sh - h) / 2 + 200  -- Bajarlo 30px más
+    local phoneX = (sw - w) - 130
+    local phoneY = (sh - h) / 2 + 180  -- Bajarlo 190px más
     phoneBrowser = guiCreateBrowser(phoneX, phoneY, w, h, true, true, false)
     browserContent = guiGetBrowser(phoneBrowser)
     
