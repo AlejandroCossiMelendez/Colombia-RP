@@ -92,59 +92,39 @@ function closePhone()
     
     phoneVisible = false
     
-    -- Restaurar controles del juego INMEDIATAMENTE antes de destruir el navegador
+    -- PRIMERO: Ocultar y deshabilitar el navegador para que deje de capturar eventos
+    if phoneBrowser and isElement(phoneBrowser) then
+        guiSetVisible(phoneBrowser, false)
+        removeEventHandler("onClientBrowserCreated", phoneBrowser, loadPhoneBrowser)
+        removeEventHandler("onClientBrowserDocumentReady", phoneBrowser, whenPhoneBrowserReady)
+    end
+    
+    -- SEGUNDO: Restaurar controles del juego INMEDIATAMENTE
     showCursor(false)
     guiSetInputEnabled(false)
     guiSetInputMode("allow_binds")
     
-    -- Forzar restauración de controles inmediatamente
-    toggleControl("fire", true)
-    toggleControl("next_weapon", true)
-    toggleControl("previous_weapon", true)
-    toggleControl("forwards", true)
-    toggleControl("backwards", true)
-    toggleControl("left", true)
-    toggleControl("right", true)
-    toggleControl("jump", true)
-    toggleControl("sprint", true)
-    toggleControl("crouch", true)
-    toggleControl("walk", true)
-    toggleControl("enter_exit", true)
-    toggleControl("vehicle_fire", true)
-    toggleControl("vehicle_secondary_fire", true)
-    toggleControl("steer_forward", true)
-    toggleControl("steer_back", true)
-    toggleControl("accelerate", true)
-    toggleControl("brake_reverse", true)
-    toggleControl("handbrake", true)
-    toggleControl("horn", true)
-    toggleControl("sub_mission", true)
-    toggleControl("radio_next", true)
-    toggleControl("radio_previous", true)
-    toggleControl("radio_user_track_skip", true)
-    toggleControl("vehicle_look_left", true)
-    toggleControl("vehicle_look_right", true)
-    toggleControl("vehicle_look_behind", true)
-    toggleControl("vehicle_mouse_look", true)
-    toggleControl("special_control_left", true)
-    toggleControl("special_control_right", true)
-    toggleControl("special_control_up", true)
-    toggleControl("special_control_down", true)
-    toggleControl("aim_weapon", true)
-    toggleControl("conversation_yes", true)
-    toggleControl("conversation_no", true)
-    toggleControl("group_control_forwards", true)
-    toggleControl("group_control_back", true)
-    toggleControl("enter_passenger", true)
-    toggleControl("cycle_weapon_left", true)
-    toggleControl("cycle_weapon_right", true)
-    toggleControl("change_camera", true)
-    toggleControl("vehicle_next_radio", true)
-    toggleControl("vehicle_prev_radio", true)
+    -- TERCERO: Forzar restauración de TODOS los controles inmediatamente
+    local controlsToEnable = {
+        "fire", "next_weapon", "previous_weapon", "forwards", "backwards", 
+        "left", "right", "jump", "sprint", "crouch", "walk", "enter_exit",
+        "vehicle_fire", "vehicle_secondary_fire", "steer_forward", "steer_back",
+        "accelerate", "brake_reverse", "handbrake", "horn", "sub_mission",
+        "radio_next", "radio_previous", "radio_user_track_skip",
+        "vehicle_look_left", "vehicle_look_right", "vehicle_look_behind",
+        "vehicle_mouse_look", "special_control_left", "special_control_right",
+        "special_control_up", "special_control_down", "aim_weapon",
+        "conversation_yes", "conversation_no", "group_control_forwards",
+        "group_control_back", "enter_passenger", "cycle_weapon_left",
+        "cycle_weapon_right", "change_camera", "vehicle_next_radio", "vehicle_prev_radio"
+    }
     
+    for _, control in ipairs(controlsToEnable) do
+        toggleControl(control, true)
+    end
+    
+    -- CUARTO: Destruir el navegador
     if phoneBrowser and isElement(phoneBrowser) then
-        removeEventHandler("onClientBrowserCreated", phoneBrowser, loadPhoneBrowser)
-        removeEventHandler("onClientBrowserDocumentReady", phoneBrowser, whenPhoneBrowserReady)
         destroyElement(phoneBrowser)
         phoneBrowser = nil
         browserContent = nil
@@ -152,20 +132,25 @@ function closePhone()
     
     renderTime(false)
     
-    -- Asegurar que los controles se mantengan habilitados después de un pequeño delay
+    -- QUINTO: Asegurar que los controles se mantengan habilitados múltiples veces
     setTimer(function()
-        -- Forzar restauración de controles nuevamente por si acaso
-        toggleControl("fire", true)
-        toggleControl("forwards", true)
-        toggleControl("backwards", true)
-        toggleControl("left", true)
-        toggleControl("right", true)
-        toggleControl("jump", true)
-        toggleControl("sprint", true)
-        toggleControl("crouch", true)
-        toggleControl("walk", true)
+        showCursor(false)
+        guiSetInputEnabled(false)
         guiSetInputMode("allow_binds")
-    end, 50, 1)
+        for _, control in ipairs(controlsToEnable) do
+            toggleControl(control, true)
+        end
+    end, 10, 3)  -- Ejecutar 3 veces con 10ms de intervalo
+    
+    -- SEXTO: Verificación final después de un delay más largo
+    setTimer(function()
+        showCursor(false)
+        guiSetInputEnabled(false)
+        guiSetInputMode("allow_binds")
+        for _, control in ipairs(controlsToEnable) do
+            toggleControl(control, true)
+        end
+    end, 100, 1)
 end
 
 -- Evento del servidor para abrir el teléfono
@@ -229,17 +214,12 @@ end)
 -- Evento para cerrar el teléfono desde el navegador (botón home cuando ya está en home)
 addEvent("closePhoneFromBrowser", true)
 addEventHandler("closePhoneFromBrowser", localPlayer, function()
-    -- Guardar contactos antes de cerrar (si el navegador aún existe)
-    if browserContent and isElement(browserContent) then
+    -- Guardar contactos ANTES de cerrar (si el navegador aún existe)
+    if browserContent and isElement(browserContent) and phoneVisible then
         executeBrowserJavascript(browserContent, "saveContactsToMTA();")
-        -- Pequeño delay para asegurar que se guarden los contactos, luego cerrar
-        setTimer(function()
-            closePhone()
-        end, 50, 1)
-    else
-        -- Si el navegador ya no existe, cerrar inmediatamente
-        closePhone()
     end
+    -- Cerrar inmediatamente sin esperar (los contactos se guardan en el servidor de todas formas)
+    closePhone()
 end)
 
 -- Cerrar teléfono con tecla ESC
