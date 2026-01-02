@@ -23,6 +23,8 @@ function showLoginGUI()
         loadBrowserURL(loginBrowser, "http://mta/local/login.html")
         showCursor(true)
         guiSetInputEnabled(true)
+        -- Asegurar que el navegador esté visible y renderizando
+        setBrowserRenderingPaused(loginBrowser, false)
     end)
     
     addEventHandler("onClientBrowserDocumentReady", loginBrowser, function(url)
@@ -38,6 +40,7 @@ function showLoginGUI()
                 };
             ]])
             outputChatBox("[DEBUG] Funciones JavaScript expuestas", 0, 255, 0)
+            outputChatBox("[DEBUG] Login GUI debería estar visible ahora. Si no la ves, presiona F8 para ver la consola.", 0, 255, 255)
         end
     end)
 end
@@ -125,6 +128,7 @@ end)
 -- Renderizar el navegador
 addEventHandler("onClientRender", root, function()
     if loginBrowser then
+        -- Renderizar el navegador en pantalla completa
         dxDrawImage(0, 0, screenWidth, screenHeight, loginBrowser, 0, 0, 0, tocolor(255, 255, 255, 255), false)
     end
 end)
