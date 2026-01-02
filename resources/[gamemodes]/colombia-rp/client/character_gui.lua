@@ -201,7 +201,7 @@ addEventHandler("createCharacter", root, function(name, surname, age, gender, sk
     
     -- Enviar evento al servidor
     -- outputChatBox("[DEBUG] Enviando createCharacter al servidor: name=" .. tostring(name) .. ", surname=" .. tostring(surname) .. ", age=" .. tostring(age) .. ", gender=" .. tostring(gender) .. ", skin=" .. tostring(skin or 0), 0, 255, 255)
-    local success = triggerServerEvent("createCharacter", localPlayer, name, surname, age, gender, skin or 0)
+    local success = triggerServerEvent("createCharacter", localPlayer, name, surname, age, gender, skin or 30)
     if not success then
         -- outputChatBox("[DEBUG] ERROR: No se pudo enviar el evento al servidor", 255, 0, 0)
         if browserContent and isElement(browserContent) then

@@ -151,8 +151,8 @@ function createCharacter(e) {
         return;
     }
     
-    // Asignar skin según el género: 0 = masculino (skin 0), 1 = femenino (skin 216)
-    const skin = (gender === 0) ? 0 : 216;
+    // Asignar skin según el género: 0 = masculino (skin 30), 1 = femenino (skin 216)
+    const skin = (gender === 0) ? 30 : 216;
     
     // Validar que gender sea un número válido
     if (isNaN(gender) || (gender !== 0 && gender !== 1)) {
