@@ -71,6 +71,82 @@ addEventHandler("admin:revivePlayer", root, function(characterId)
     end
 end)
 
+-- Evento para teleportar a un jugador (desde el panel)
+addEvent("admin:teleportToPlayer", true)
+addEventHandler("admin:teleportToPlayer", root, function(characterId)
+    if not isElement(source) or getElementType(source) ~= "player" then
+        return
+    end
+    
+    if not isPlayerAdmin(source) then
+        triggerClientEvent(source, "admin:teleportResponse", source, false, "No tienes permiso para usar esta función.")
+        return
+    end
+    
+    if not characterId or not tonumber(characterId) then
+        triggerClientEvent(source, "admin:teleportResponse", source, false, "ID de personaje inválido.")
+        return
+    end
+    
+    characterId = tonumber(characterId)
+    
+    -- Buscar jugador con ese ID de personaje
+    local target = nil
+    for _, p in ipairs(getElementsByType("player")) do
+        if getElementData(p, "character:selected") then
+            local pCharId = getElementData(p, "character:id")
+            if pCharId and tonumber(pCharId) == characterId then
+                target = p
+                break
+            end
+        end
+    end
+    
+    if not target then
+        triggerClientEvent(source, "admin:teleportResponse", source, false, "No se encontró ningún jugador con el ID de personaje " .. characterId .. ".")
+        return
+    end
+    
+    if target == source then
+        triggerClientEvent(source, "admin:teleportResponse", source, false, "No puedes teleportarte a ti mismo.")
+        return
+    end
+    
+    -- Obtener posición del jugador objetivo
+    local targetX, targetY, targetZ = getElementPosition(target)
+    local targetRotation = getPedRotation(target)
+    local targetInterior = getElementInterior(target)
+    local targetDimension = getElementDimension(target)
+    
+    -- Teleportar al admin a la ubicación del jugador objetivo
+    setElementPosition(source, targetX, targetY, targetZ)
+    setPedRotation(source, targetRotation)
+    setElementInterior(source, targetInterior)
+    setElementDimension(source, targetDimension)
+    
+    -- Ajustar altura para evitar caídas
+    setTimer(function()
+        if isElement(source) then
+            local px, py, pz = getElementPosition(source)
+            local hit, hitX, hitY, hitZ = processLineOfSight(px, py, pz + 50, px, py, pz - 50, true, true, false, true, false, false, false, false, source)
+            if hit then
+                if pz - hitZ < 2.0 or pz < hitZ then
+                    setElementPosition(source, px, py, hitZ + 2.0)
+                end
+            elseif pz < 5.0 then
+                setElementPosition(source, px, py, 15.0)
+            end
+        end
+    end, 100, 1)
+    
+    local charName = getElementData(target, "character:name")
+    local charSurname = getElementData(target, "character:surname")
+    local displayName = (charName and charSurname) and (charName .. " " .. charSurname) or getPlayerName(target)
+    
+    triggerClientEvent(source, "admin:teleportResponse", source, true, "Te has teleportado a " .. displayName .. " (ID: " .. characterId .. ").")
+    outputServerLog("[ADMIN] " .. getPlayerName(source) .. " se teleportó a " .. displayName .. " (ID: " .. characterId .. ")")
+end)
+
 -- Evento para obtener coordenadas (desde el panel)
 addEvent("admin:getCoords", true)
 addEventHandler("admin:getCoords", root, function()

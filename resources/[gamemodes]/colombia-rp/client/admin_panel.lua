@@ -108,7 +108,7 @@ function createAdminPanel()
         -- Botón: Teleportar a Usuario
         local teleportBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Teleportar a Usuario", false, adminWindow)
         addEventHandler("onClientGUIClick", teleportBtn, function()
-            outputChatBox("Función en desarrollo...", 255, 255, 0)
+            showTeleportInput()
         end, false)
         table.insert(adminButtons, teleportBtn)
         buttonY = buttonY + buttonSpacing
@@ -201,6 +201,49 @@ function showReviveInput()
     end, false)
 end
 
+-- Función para mostrar el input de teleportar
+function showTeleportInput()
+    if inputWindow and isElement(inputWindow) then
+        destroyElement(inputWindow)
+    end
+    
+    currentAction = "teleportar"
+    
+    local windowWidth = 350
+    local windowHeight = 150
+    local windowX = (screenW - windowWidth) / 2
+    local windowY = (screenH - windowHeight) / 2
+    
+    inputWindow = guiCreateWindow(windowX, windowY, windowWidth, windowHeight, "Teleportar a Usuario", false)
+    guiWindowSetSizable(inputWindow, false)
+    
+    local label = guiCreateLabel(10, 30, windowWidth - 20, 20, "Ingresa el ID del personaje al que te quieres teleportar:", false, inputWindow)
+    
+    inputEdit = guiCreateEdit(10, 55, windowWidth - 20, 30, "", false, inputWindow)
+    guiEditSetMaxLength(inputEdit, 10)
+    
+    local acceptBtn = guiCreateButton(10, 95, (windowWidth - 30) / 2, 30, "Teleportar", false, inputWindow)
+    addEventHandler("onClientGUIClick", acceptBtn, function()
+        local characterId = guiGetText(inputEdit)
+        if characterId and characterId ~= "" then
+            local id = tonumber(characterId)
+            if id then
+                triggerServerEvent("admin:teleportToPlayer", localPlayer, id)
+                closeInputWindow()
+            else
+                outputChatBox("El ID debe ser un número válido.", 255, 0, 0)
+            end
+        else
+            outputChatBox("Debes ingresar un ID de personaje.", 255, 0, 0)
+        end
+    end, false)
+    
+    local cancelBtn = guiCreateButton((windowWidth - 10) / 2 + 5, 95, (windowWidth - 30) / 2, 30, "Cancelar", false, inputWindow)
+    addEventHandler("onClientGUIClick", cancelBtn, function()
+        closeInputWindow()
+    end, false)
+end
+
 -- Función para cerrar el input window
 function closeInputWindow()
     if inputWindow and isElement(inputWindow) then
@@ -249,9 +292,19 @@ addEventHandler("onClientGUIClick", root, function()
     end
 end)
 
--- Evento para recibir respuesta del servidor
+-- Evento para recibir respuesta del servidor (revivir)
 addEvent("admin:reviveResponse", true)
 addEventHandler("admin:reviveResponse", root, function(success, message)
+    if success then
+        outputChatBox(message, 0, 255, 0)
+    else
+        outputChatBox(message, 255, 0, 0)
+    end
+end)
+
+-- Evento para recibir respuesta del servidor (teleportar)
+addEvent("admin:teleportResponse", true)
+addEventHandler("admin:teleportResponse", root, function(success, message)
     if success then
         outputChatBox(message, 0, 255, 0)
     else

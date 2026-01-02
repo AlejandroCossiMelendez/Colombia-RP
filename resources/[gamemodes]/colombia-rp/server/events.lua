@@ -49,8 +49,10 @@ outputServerLog("[EVENTS] Eventos de voz registrados: onConectarAFrecuencia, onA
 
 -- Eventos del panel de administración
 addEvent("admin:revivePlayer", true)
+addEvent("admin:teleportToPlayer", true)
 addEvent("admin:getCoords", true)
 addEvent("admin:reviveResponse", true)
-outputServerLog("[EVENTS] Eventos del panel de administración registrados: admin:revivePlayer, admin:getCoords, admin:reviveResponse")
+addEvent("admin:teleportResponse", true)
+outputServerLog("[EVENTS] Eventos del panel de administración registrados: admin:revivePlayer, admin:teleportToPlayer, admin:getCoords, admin:reviveResponse, admin:teleportResponse")
 
 outputServerLog("[EVENTS] Todos los eventos registrados correctamente")
