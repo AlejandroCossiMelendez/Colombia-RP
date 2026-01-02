@@ -1,0 +1,7 @@
+<meta>
+    <info author="JDfidel-#^StriKeR~>^" name="Ocultar Todo" version="1.0" type="script"/>
+    <script src="client.lua" />
+    <!-- <script src="c_hide.lua" type="client" /> -->
+    <!-- c_hide.lua necesita ser compilado a .luac - comentado temporalmente -->
+    <!-- Para compilar: https://luac.multitheftauto.com/ -->
+</meta>
