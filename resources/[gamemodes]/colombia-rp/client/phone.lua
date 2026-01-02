@@ -85,12 +85,16 @@ function openPhone()
     renderTime(true)
 end
 
+-- Variable para rastrear si necesitamos forzar el cursor oculto
+local forceCursorHidden = false
+
 function closePhone()
     if not phoneVisible then
         return
     end
     
     phoneVisible = false
+    forceCursorHidden = true  -- Activar flag para forzar cursor oculto
     
     -- PRIMERO: Remover event handlers ANTES de hacer cualquier cosa
     if phoneBrowser and isElement(phoneBrowser) then
@@ -112,16 +116,15 @@ function closePhone()
     
     renderTime(false)
     
-    -- CUARTO: Restaurar controles del juego INMEDIATAMENTE después de destruir el navegador
-    -- Forzar múltiples veces para asegurar que funcione
-    -- IMPORTANTE: Ejecutar en el siguiente frame para asegurar que el navegador esté completamente destruido
-    setTimer(function()
-        showCursor(false)
-        guiSetInputEnabled(false)
-        guiSetInputMode("allow_binds")
-    end, 0, 1)
+    -- CUARTO: Restaurar controles del juego INMEDIATAMENTE - FORZAR MÚLTIPLES VECES
+    showCursor(false)
+    guiSetInputEnabled(false)
+    guiSetInputMode("allow_binds")
     
-    -- También ejecutar inmediatamente por si acaso
+    -- Repetir inmediatamente varias veces
+    showCursor(false)
+    guiSetInputEnabled(false)
+    guiSetInputMode("allow_binds")
     showCursor(false)
     guiSetInputEnabled(false)
     guiSetInputMode("allow_binds")
@@ -145,20 +148,28 @@ function closePhone()
         toggleControl(control, true)
     end
     
-    -- SEXTO: Forzar restauración múltiple veces de forma agresiva
+    -- SEXTO: Forzar restauración múltiple veces de forma MUY AGRESIVA
+    -- Ejecutar inmediatamente (delay 0)
     setTimer(function()
-        -- Forzar ocultar cursor y restaurar modo de entrada
-        if isCursorShowing() then
-            showCursor(false)
-        end
+        showCursor(false)
         guiSetInputEnabled(false)
         guiSetInputMode("allow_binds")
-        -- Habilitar todos los controles nuevamente
         for _, control in ipairs(controlsToEnable) do
             toggleControl(control, true)
         end
-    end, 0, 1)  -- Ejecutar inmediatamente
+    end, 0, 1)
     
+    -- Ejecutar después de 5ms
+    setTimer(function()
+        showCursor(false)
+        guiSetInputEnabled(false)
+        guiSetInputMode("allow_binds")
+        for _, control in ipairs(controlsToEnable) do
+            toggleControl(control, true)
+        end
+    end, 5, 1)
+    
+    -- Ejecutar después de 10ms
     setTimer(function()
         showCursor(false)
         guiSetInputEnabled(false)
@@ -168,6 +179,17 @@ function closePhone()
         end
     end, 10, 1)
     
+    -- Ejecutar después de 25ms
+    setTimer(function()
+        showCursor(false)
+        guiSetInputEnabled(false)
+        guiSetInputMode("allow_binds")
+        for _, control in ipairs(controlsToEnable) do
+            toggleControl(control, true)
+        end
+    end, 25, 1)
+    
+    -- Ejecutar después de 50ms
     setTimer(function()
         showCursor(false)
         guiSetInputEnabled(false)
@@ -177,7 +199,7 @@ function closePhone()
         end
     end, 50, 1)
     
-    -- SÉPTIMO: Verificación final después de un delay más largo
+    -- Ejecutar después de 100ms
     setTimer(function()
         showCursor(false)
         guiSetInputEnabled(false)
@@ -185,17 +207,32 @@ function closePhone()
         for _, control in ipairs(controlsToEnable) do
             toggleControl(control, true)
         end
-        -- Forzar que el cursor esté oculto
-        if isCursorShowing() then
-            showCursor(false)
-        end
-        -- Notificar a otros sistemas que el teléfono se cerró
         triggerEvent("phoneClosed", localPlayer)
     end, 100, 1)
     
-    -- OCTAVO: Notificar inmediatamente que el teléfono se cerró
+    -- Ejecutar después de 200ms (verificación final)
+    setTimer(function()
+        showCursor(false)
+        guiSetInputEnabled(false)
+        guiSetInputMode("allow_binds")
+        for _, control in ipairs(controlsToEnable) do
+            toggleControl(control, true)
+        end
+        forceCursorHidden = false  -- Desactivar flag después de 200ms
+    end, 200, 1)
+    
+    -- Notificar inmediatamente que el teléfono se cerró
     triggerEvent("phoneClosed", localPlayer)
 end
+
+-- Handler para forzar cursor oculto después de cerrar el teléfono
+addEventHandler("onClientRender", root, function()
+    if forceCursorHidden and isCursorShowing() then
+        showCursor(false)
+        guiSetInputEnabled(false)
+        guiSetInputMode("allow_binds")
+    end
+end)
 
 -- Evento del servidor para abrir el teléfono
 addEvent("openPhone", true)
