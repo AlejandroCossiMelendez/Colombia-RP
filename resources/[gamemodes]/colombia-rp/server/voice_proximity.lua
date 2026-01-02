@@ -28,13 +28,16 @@ function updatePlayerProximityVoice(player)
     
     -- Revisar todos los jugadores
     for _, otherPlayer in ipairs(getElementsByType("player")) do
-        if otherPlayer ~= player and isElementStreamedIn(otherPlayer) then
-            local ox, oy, oz = getElementPosition(otherPlayer)
-            local distance = getDistanceBetweenPoints3D(x, y, z, ox, oy, oz)
-            
-            -- Si está a más de 5 metros, agregarlo a la lista de ignorados
-            if distance > PROXIMITY_DISTANCE then
-                table.insert(playersToIgnore, otherPlayer)
+        if otherPlayer ~= player and isElement(otherPlayer) then
+            -- Verificar que el otro jugador tenga personaje seleccionado
+            if getElementData(otherPlayer, "character:selected") then
+                local ox, oy, oz = getElementPosition(otherPlayer)
+                local distance = getDistanceBetweenPoints3D(x, y, z, ox, oy, oz)
+                
+                -- Si está a más de 5 metros, agregarlo a la lista de ignorados
+                if distance > PROXIMITY_DISTANCE then
+                    table.insert(playersToIgnore, otherPlayer)
+                end
             end
         end
     end
@@ -46,7 +49,7 @@ end
 -- Actualizar voz de proximidad periódicamente
 setTimer(function()
     for _, player in ipairs(getElementsByType("player")) do
-        if isElementStreamedIn(player) and getElementData(player, "character:selected") then
+        if isElement(player) and getElementData(player, "character:selected") then
             updatePlayerProximityVoice(player)
         end
     end
