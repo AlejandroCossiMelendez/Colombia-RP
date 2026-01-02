@@ -1,22 +1,33 @@
-function switchTab(tab) {
-    const loginTab = document.getElementById('tabLogin');
-    const registerTab = document.getElementById('tabRegister');
-    const loginPanel = document.getElementById('loginPanel');
-    const registerPanel = document.getElementById('registerPanel');
+function focusLogin() {
+    const loginTab = document.querySelector('.tab:first-child');
+    const registerTab = document.querySelector('.tab:last-child');
     
-    if (tab === 'login') {
+    if (loginTab && registerTab) {
         loginTab.classList.add('active');
         registerTab.classList.remove('active');
-        loginPanel.classList.add('active');
-        registerPanel.classList.remove('active');
-    } else {
-        loginTab.classList.remove('active');
-        registerTab.classList.add('active');
-        loginPanel.classList.remove('active');
-        registerPanel.classList.add('active');
     }
     
-    hideMessage();
+    // Scroll suave al panel de login (opcional)
+    const loginPanel = document.querySelector('.login-panel');
+    if (loginPanel) {
+        loginPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+function focusRegister() {
+    const loginTab = document.querySelector('.tab:first-child');
+    const registerTab = document.querySelector('.tab:last-child');
+    
+    if (loginTab && registerTab) {
+        loginTab.classList.remove('active');
+        registerTab.classList.add('active');
+    }
+    
+    // Scroll suave al panel de register (opcional)
+    const registerPanel = document.querySelector('.register-panel');
+    if (registerPanel) {
+        registerPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 }
 
 function doLogin(e) {
@@ -153,4 +164,5 @@ window.showError = showError;
 window.showSuccess = showSuccess;
 window.setLoading = setLoading;
 window.hideMessage = hideMessage;
-window.switchTab = switchTab;
+window.focusLogin = focusLogin;
+window.focusRegister = focusRegister;
