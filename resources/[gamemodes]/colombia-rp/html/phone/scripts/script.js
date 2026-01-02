@@ -33,6 +33,10 @@ onload = () => {
     
     // Habilitar gesto de deslizar hacia abajo para cerrar el teléfono
     setupDragToClose();
+    
+    // Cargar fondo guardado
+    const savedBackground = localStorage.getItem('phoneBackground') || '2.jpg';
+    changeBackground(savedBackground);
 }
 
 // Función para configurar el gesto de arrastre hacia abajo para cerrar
@@ -215,6 +219,11 @@ function openApp(appId) {
     if (appId === 6) {
         loadContacts();
     }
+    
+    // Si es la app de galería (appId 7), cargar imágenes
+    if (appId === 7) {
+        loadGallery();
+    }
 }
 
 let isInHomeScreen = true; // Variable para rastrear si estamos en el home
@@ -275,6 +284,74 @@ function updateTime() {
 
 apps.forEach((app, key) => app.onclick = (e) => openApp(key));
 homeButtom.onclick = (e) => returnToHomePage();
+
+/* Gallery App */
+let currentBackground = localStorage.getItem('phoneBackground') || '2.jpg'; // Fondo por defecto
+
+// Función para cargar la galería
+function loadGallery() {
+    const galleryGrid = get('#galleryGrid');
+    if (!galleryGrid) return;
+    
+    galleryGrid.innerHTML = '';
+    
+    // Cargar las 6 imágenes de fondo disponibles
+    for (let i = 1; i <= 6; i++) {
+        const galleryItem = document.createElement('div');
+        galleryItem.className = 'gallery-item';
+        if (currentBackground === `${i}.jpg`) {
+            galleryItem.classList.add('selected');
+        }
+        
+        const img = document.createElement('img');
+        img.src = `./phone/styles/backgrounds/${i}.jpg`;
+        img.alt = `Fondo ${i}`;
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'gallery-item-overlay';
+        
+        const check = document.createElement('div');
+        check.className = 'gallery-item-check';
+        check.textContent = '✓';
+        overlay.appendChild(check);
+        
+        galleryItem.appendChild(img);
+        galleryItem.appendChild(overlay);
+        
+        // Agregar evento click para cambiar el fondo
+        galleryItem.addEventListener('click', function() {
+            changeBackground(`${i}.jpg`);
+            // Remover selección de todos los items
+            document.querySelectorAll('.gallery-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            // Agregar selección al item clickeado
+            galleryItem.classList.add('selected');
+        });
+        
+        galleryGrid.appendChild(galleryItem);
+    }
+}
+
+// Función para cambiar el fondo de pantalla
+function changeBackground(filename) {
+    currentBackground = filename;
+    localStorage.setItem('phoneBackground', filename);
+    
+    // Cambiar el fondo del unlock-screen
+    const unlockScreen = get('.unlock-screen');
+    if (unlockScreen) {
+        unlockScreen.style.backgroundImage = `url('./phone/styles/backgrounds/${filename}')`;
+        unlockScreen.style.backgroundPosition = 'center';
+        unlockScreen.style.backgroundSize = 'cover';
+    }
+    
+    // Notificar a MTA que el fondo cambió (opcional, para guardar en servidor)
+    if (window.mta && window.mta.triggerEvent) {
+        window.mta.triggerEvent('changePhoneBackground', filename);
+    }
+}
+
 
 /* Contacts App */
 let contacts = [];
