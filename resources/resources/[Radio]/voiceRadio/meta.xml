@@ -1,0 +1,9 @@
+<meta>
+	<min_mta_version server="1.5.4-0.00000" client="1.5.4-0.00000" />
+    <oop>true</oop>
+	<script src="global.lua" type="shared" cache="false"/>
+	<script src="cGlobals.lua" type="client" cache="false" />
+	<script src="sGlobals.lua" type="server"/>
+	<file src="radio.mp3" cache="false"/>
+	<download_priority_group>99</download_priority_group>
+</meta>

@@ -1,0 +1,6 @@
+[2024-06-06 23:38:26] Cantidad $200000 pagado a Juan Arendo.
+[2024-06-08 17:58:44] Cantidad $300000 pagado a Sofia Ayala.
+[2024-06-08 17:59:16] Cantidad $71000 pagado a Sofia Ayala.
+[2024-06-10 21:45:23] Cantidad $15000000 pagado a Popeye Gaviria.
+[2024-06-10 22:21:54] Cantidad $2000000 pagado a Abuelito Kozlov.
+[2024-06-10 22:25:38] Cantidad $15000000 pagado a Abuelito Kozlov.

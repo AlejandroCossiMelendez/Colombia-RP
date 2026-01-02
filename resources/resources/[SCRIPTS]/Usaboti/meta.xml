@@ -1,0 +1,4 @@
+<meta>
+    <info author="agogo" version="1" name="botiquin" description="kit medico" type="script" />
+    <script src="boti.lua" type='server' />
+</meta>

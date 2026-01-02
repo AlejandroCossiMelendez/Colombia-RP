@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="Srdetp" type="misc" name="srdetp" description="srdetp" />
+     <script src="script.lua" type="client" />
+     <file src="Prisionero2.txd" />
+     <file src="Prisionero2.dff" />
+</meta>

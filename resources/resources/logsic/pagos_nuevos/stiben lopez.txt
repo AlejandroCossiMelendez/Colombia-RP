@@ -1,0 +1,23 @@
+[2024-06-03 18:08:24] Cantidad $4000000 pagado a Kevin Castro.
+[2024-06-03 18:38:16] Cantidad $4000000 pagado a Kevin Castro.
+[2024-06-03 19:05:39] Cantidad $1500000 pagado a Devin Escobar.
+[2024-06-04 20:26:47] Cantidad $9000000 pagado a Sneider Rodriguez.
+[2024-06-04 22:52:54] Cantidad $20000000 pagado a Lil Wave.
+[2024-06-04 23:17:08] Cantidad $5000000 pagado a Pablo Perez.
+[2024-06-05 01:25:21] Cantidad $12000000 pagado a Rolman Bambino.
+[2024-06-05 03:04:07] Cantidad $1000000 pagado a Sebastian Sins.
+[2024-06-05 18:12:41] Cantidad $500000 pagado a Martin Ledesma.
+[2024-06-06 02:05:33] Cantidad $500000 pagado a Rolman Bambino.
+[2024-06-06 22:06:10] Cantidad $600000 pagado a Eris Rodriguez.
+[2024-06-06 22:46:15] Cantidad $3000000 pagado a Angel Vasiliev.
+[2024-06-07 18:31:22] Cantidad $6000000 pagado a Andres Sanchez.
+[2024-06-07 18:32:26] Cantidad $3000000 pagado a Andres Sanchez.
+[2024-06-07 18:34:38] Cantidad $2600000 pagado a Andres Sanchez.
+[2024-06-07 18:35:07] Cantidad $26000000 pagado a Andres Sanchez.
+[2024-06-07 21:16:53] Cantidad $12000000 pagado a Mikel Torres.
+[2024-06-07 21:24:37] Cantidad $1000000 pagado a Daniel Acosta.
+[2024-06-07 21:44:23] Cantidad $6000000 pagado a Stiven Ramirez.
+[2024-06-07 21:46:00] Cantidad $6000000 pagado a Stiven Ramirez.
+[2024-06-07 22:12:33] Cantidad $500000 pagado a Lionel Andres Messi.
+[2024-06-07 22:23:41] Cantidad $4000000 pagado a Stiven Ramirez.
+[2024-06-07 22:27:12] Cantidad $5000000 pagado a Bastian Ramirez Vip.

@@ -1,0 +1,4 @@
+[2024-06-13 17:46:25] Cantidad $10000000 pagado a Jhony Dacota.
+[2024-06-13 18:40:12] Cantidad $4000000 pagado a Jhony Dacota.
+[2024-06-13 18:51:50] Cantidad $1000000 pagado a Nicolas Rojas.
+[2024-06-13 18:53:12] Cantidad $400000 pagado a Nicolas Rojas.

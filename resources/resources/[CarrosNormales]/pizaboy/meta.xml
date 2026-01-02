@@ -1,0 +1,6 @@
+﻿<meta>
+     <info author="ByCaiqueS" type="misc" name="[ByCaiqueS]" description="ByCaiqueS" />
+     <script src="script.lua" type="client" />
+     <file src="pizzaboy.txd" />
+     <file src="pizzaboy.dff" />
+</meta>

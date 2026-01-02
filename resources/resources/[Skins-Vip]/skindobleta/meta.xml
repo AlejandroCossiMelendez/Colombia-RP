@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="Chichi" type="misc" name="Chichi" description="Chichi" />
+     <script src="script.lua" type="client" />
+     <file src="fLOWd.txd" />
+     <file src="FlowD.dff" />
+</meta>

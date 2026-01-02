@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="dylan" type="misc" name="skincacique" description="skincacique" />
+     <script src="script.lua" type="client" />
+     <file src="skincacique.txd" />
+     <file src="skincacique.dff" />
+</meta>

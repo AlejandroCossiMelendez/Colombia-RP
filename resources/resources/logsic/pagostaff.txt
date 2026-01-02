@@ -1,0 +1,64 @@
+[2024-01-09 20:57:06] Nombre del afectado: Tabares Ohsi. $100. Staff: Tabares_Ohsi. Razón: no. 
+
+[2024-01-09 20:57:24] Nombre del afectado: Tabares Ohsi. $10. Staff: Tabares_Ohsi. Razón: no. 
+
+[2024-01-10 00:39:17] Nombre del afectado: [AYP] Jhon. $100000. Staff: Fermin_Jesus. Razón: A. 
+
+[2024-01-10 00:39:20] Nombre del afectado: [AYP] Jhon. $100000. Staff: Fermin_Jesus. Razón: A. 
+
+[2024-01-10 00:39:21] Nombre del afectado: [AYP] Jhon. $100000. Staff: Fermin_Jesus. Razón: A. 
+
+[2024-01-10 00:39:21] Nombre del afectado: [AYP] Jhon. $100000. Staff: Fermin_Jesus. Razón: A. 
+
+[2024-01-10 00:39:21] Nombre del afectado: [AYP] Jhon. $100000. Staff: Fermin_Jesus. Razón: A. 
+
+[2024-01-10 00:39:22] Nombre del afectado: [AYP] Jhon. $100000. Staff: Fermin_Jesus. Razón: A. 
+
+[2024-01-10 00:39:22] Nombre del afectado: [AYP] Jhon. $100000. Staff: Fermin_Jesus. Razón: A. 
+
+[2024-01-10 00:39:22] Nombre del afectado: [AYP] Jhon. $100000. Staff: Fermin_Jesus. Razón: A. 
+
+[2024-01-10 00:39:23] Nombre del afectado: [AYP] Jhon. $100000. Staff: Fermin_Jesus. Razón: A. 
+
+[2024-01-10 00:39:23] Nombre del afectado: [AYP] Jhon. $100000. Staff: Fermin_Jesus. Razón: A. 
+
+[2024-01-10 00:39:33] Nombre del afectado: [AYP] Jhon. $100000. Staff: Fermin_Jesus. Razón: a. 
+
+[2024-01-10 00:39:42] Nombre del afectado: [AYP] Jhon. $100000. Staff: Fermin_Jesus. Razón: a. 
+
+[2024-01-10 00:39:44] Nombre del afectado: [AYP] Jhon. $100000. Staff: Fermin_Jesus. Razón: a. 
+
+[2024-01-10 00:39:49] Nombre del afectado: [AYP] Jhon. $10000. Staff: Fermin_Jesus. Razón: a. 
+
+[2024-01-10 00:39:51] Nombre del afectado: [AYP] Jhon. $10000. Staff: Fermin_Jesus. Razón: a. 
+
+[2024-01-10 00:39:51] Nombre del afectado: [AYP] Jhon. $10000. Staff: Fermin_Jesus. Razón: a. 
+
+[2024-01-10 00:39:52] Nombre del afectado: [AYP] Jhon. $10000. Staff: Fermin_Jesus. Razón: a. 
+
+[2024-01-10 00:39:52] Nombre del afectado: [AYP] Jhon. $10000. Staff: Fermin_Jesus. Razón: a. 
+
+[2024-01-10 00:39:52] Nombre del afectado: [AYP] Jhon. $10000. Staff: Fermin_Jesus. Razón: a. 
+
+[2024-01-10 00:39:53] Nombre del afectado: [AYP] Jhon. $10000. Staff: Fermin_Jesus. Razón: a. 
+
+[2024-01-10 00:39:53] Nombre del afectado: [AYP] Jhon. $10000. Staff: Fermin_Jesus. Razón: a. 
+
+[2024-01-10 00:40:04] Nombre del afectado: [AYP] Jhon. $1000. Staff: Fermin_Jesus. Razón: a. 
+
+[2024-01-10 00:40:04] Nombre del afectado: [AYP] Jhon. $1000. Staff: Fermin_Jesus. Razón: a. 
+
+[2024-01-18 20:42:29] Nombre del afectado: Santiago Quintero. $500000. Staff: Tabares_<3. Razón: NO PAGAR MECA. 
+
+[2024-01-24 01:41:52] Nombre del afectado: Pope Ramos. $90000000. Staff: [ENC_A]_Guerrero. Razón: Error. 
+
+[2024-01-24 01:42:19] Nombre del afectado: Parchita Fontecha. $90000000. Staff: [ENC_A]_Guerrero. Razón: Error. 
+
+[2024-01-25 22:23:47] Nombre del afectado: Manuel Arteaga. $90000000. Staff: [_ENCA_]_Guerrero. Razón: Bug. 
+
+[2024-04-01 21:23:26] Nombre del afectado: CEO CACHETES Px3. $1000. Staff: MamboKings. Razón: a. 
+
+[2024-04-01 23:37:49] Nombre del afectado: Agogo $. $100. Staff: CEO_CACHETES_Px3. Razón: cuota inicial hp. 
+
+[2024-04-20 01:04:06] Nombre del afectado: CEO CACHETES Px3. $1. Staff: CEO_CACHETES_Px3. Razón: .. 
+

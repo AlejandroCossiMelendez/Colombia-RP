@@ -1,0 +1,5 @@
+<meta>
+	<info author="Andrixx" version="1.0.0" type="script" name="" description="" showInResourceBrowser="true" />
+	<script src="texturem.lua" type="client" />
+	<file src="sunset02_law2.txd" />
+</meta>

@@ -1,0 +1,30 @@
+[2024-05-26 02:39:45] Cantidad $100000 pagado a Santi Carranza.
+[2024-05-26 02:41:31] Cantidad $9900000 pagado a Santi Carranza.
+[2024-05-26 03:07:16] Cantidad $9000000 pagado a Santi Carranza.
+[2024-05-26 05:30:43] Cantidad $25000000 pagado a Benjamin Arellano VIP.
+[2024-05-26 20:20:14] Cantidad $6000000 pagado a Sebas Carranza.
+[2024-05-26 20:20:32] Cantidad $6000000 pagado a Sebas Carranza.
+[2024-05-26 20:20:57] Cantidad $45000000 pagado a Sebas Carranza.
+[2024-05-26 21:23:15] Cantidad $3000000 pagado a Sebas Carranza.
+[2024-05-26 21:34:30] Cantidad $10000000 pagado a Sebastian Sins.
+[2024-05-26 23:08:15] Cantidad $30000000 pagado a Sebas Carranza.
+[2024-05-26 23:12:14] Cantidad $4000 pagado a Sebas Carranza.
+[2024-05-26 23:36:23] Cantidad $370000 pagado a Jose Carranza.
+[2024-05-27 00:55:04] Cantidad $2000000 pagado a Juan David Navarro VIP.
+[2024-05-27 01:02:11] Cantidad $100000 pagado a Santi Carranza.
+[2024-05-27 01:28:45] Cantidad $69000 pagado a Brayan Martinez.
+[2024-05-27 03:21:59] Cantidad $2000 pagado a Santi Carranza.
+[2024-05-27 20:18:58] Cantidad $500000 pagado a Devin Escobar.
+[2024-05-27 22:11:00] Cantidad $50000000 pagado a Benjamin Arellano VIP.
+[2024-05-28 03:31:11] Cantidad $100000 pagado a Sebas Carranza.
+[2024-05-28 19:20:54] Cantidad $1500000 pagado a Davinsito Towers VIP.
+[2024-05-28 20:32:09] Cantidad $25000000 pagado a Benjamin Arellano VIP.
+[2024-05-28 20:58:16] Cantidad $12000000 pagado a Sebas Carranza.
+[2024-05-28 20:58:31] Cantidad $400000 pagado a Sebas Carranza.
+[2024-05-28 21:26:31] Cantidad $2000000 pagado a Santi Carranza.
+[2024-05-28 21:26:43] Cantidad $200000 pagado a Santi Carranza.
+[2024-05-28 21:47:40] Cantidad $10000000 pagado a Sebas Carranza.
+[2024-05-28 22:01:52] Cantidad $4000000 pagado a Andres Grienko.
+[2024-05-28 23:30:27] Cantidad $12000000 pagado a Juanjo Franco.
+[2024-05-30 19:11:03] Cantidad $40000000 pagado a Duvan Martinez VIP.
+[2024-05-30 19:11:26] Cantidad $360000000 pagado a Duvan Martinez VIP.

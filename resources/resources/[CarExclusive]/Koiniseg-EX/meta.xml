@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="Xatuios" type="misc" name="Gtr_Skyline" description="Gtr_Skyline" />
+     <script src="client.lua" type="client" />
+     <file src="car.txd" />
+     <file src="car.dff" />
+</meta>

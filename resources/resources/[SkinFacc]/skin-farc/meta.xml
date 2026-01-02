@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="Nathaan23" type="misc" name="[BOPE[Skin" description="[BOPE[Skin" />
+     <script src="script.lua" type="client" />
+     <file src="BopeNathaan.txd" />
+     <file src="BopeNathaan.dff" />
+</meta>

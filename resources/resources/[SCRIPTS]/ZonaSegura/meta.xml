@@ -1,0 +1,7 @@
+<meta>
+	<script src="client.lua" type="client" cache="false"/>
+	<script src="responsive.lua" type="client" cache="false"/>
+
+	<file src="fondo.png" type="client"/>
+	<file src="font.ttf" type="client"/>
+</meta>

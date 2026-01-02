@@ -1,0 +1,6 @@
+addEventHandler('onClientResourceStart',resourceRoot,function () 
+txd = engineLoadTXD( 'Sking.txd' ) 
+engineImportTXD( txd, 31) 
+dff = engineLoadDFF('SkinG.dff', 31) 
+engineReplaceModel( dff, 31)
+end)

@@ -1,0 +1,3 @@
+[2024-05-31 00:02:15] Cantidad $50000 pagado a Jhon Jairo Rodriguez.
+[2024-05-31 00:02:59] Cantidad $100000 pagado a Jhon Jairo Rodriguez.
+[2024-05-31 00:03:15] Cantidad $10000000 pagado a Jhon Jairo Rodriguez.

@@ -1,0 +1,5 @@
+function AndrixxClient ()
+txd = engineLoadTXD("hospital_lawn.txd") 
+engineImportTXD(txd,5708)
+end
+addEventHandler( "onClientResourceStart", resourceRoot, AndrixxClient )

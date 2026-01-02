@@ -1,0 +1,6 @@
+<meta>
+    <info author="Puma: pumamta" name="VenderDroga" version="1.0"/>
+	<oop>true</oop>
+	<script src="server.lua" type="server" cache="false" />
+
+</meta>

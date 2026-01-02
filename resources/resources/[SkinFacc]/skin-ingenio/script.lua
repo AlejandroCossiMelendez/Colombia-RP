@@ -1,0 +1,6 @@
+addEventHandler('onClientResourceStart',resourceRoot,function () 
+txd = engineLoadTXD('skin.txd') 
+engineImportTXD( txd, 277 ) 
+dff = engineLoadDFF('skin.dff', 277) 
+engineReplaceModel( dff, 277 )
+end)

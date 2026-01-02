@@ -1,0 +1,4 @@
+[2024-05-26 23:28:03] Cantidad $1200000 pagado a Deiby Garcia.
+[2024-05-27 00:08:56] Cantidad $1000000 pagado a Luiz Escobar Gaithan.
+[2024-05-28 19:31:44] Cantidad $1000000 pagado a Santiago Alfonso.
+[2024-05-29 01:42:09] Cantidad $1000000 pagado a Juan Deeps.

@@ -1,0 +1,6 @@
+addEventHandler('onClientResourceStart',resourceRoot,function () 
+txd = engineLoadTXD( 'pcj600.txd' ) 
+engineImportTXD( txd, 581 ) 
+dff = engineLoadDFF('pcj600.dff', 581) 
+engineReplaceModel( dff, 581 )
+end)

@@ -1,0 +1,8 @@
+[2024-06-03 22:37:05] Cantidad $600000 pagado a Alexander Castano VIP.
+[2024-06-05 20:38:05] Cantidad $100000 pagado a Daniel Acosta.
+[2024-06-06 18:53:44] Cantidad $11000000 pagado a Daniel Acosta.
+[2024-06-06 21:06:23] Cantidad $100000 pagado a Mikel Torres.
+[2024-06-06 23:27:13] Cantidad $600000 pagado a Juan Arendo.
+[2024-06-07 01:45:22] Cantidad $4000000 pagado a Mikel Torres.
+[2024-06-07 01:56:42] Cantidad $600000 pagado a Mikel Torres.
+[2024-06-07 02:30:32] Cantidad $700000 pagado a Samuel Marin.

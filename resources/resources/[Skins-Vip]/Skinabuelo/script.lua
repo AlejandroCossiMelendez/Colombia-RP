@@ -1,0 +1,6 @@
+addEventHandler('onClientResourceStart',resourceRoot,function () 
+txd = engineLoadTXD( 'ByGuii.txd' ) 
+engineImportTXD( txd, 35  ) 
+dff = engineLoadDFF('ByGuii.dff', 35) 
+engineReplaceModel( dff, 35 )
+end)

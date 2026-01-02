@@ -1,0 +1,22 @@
+<strilgui>
+    <info author="AgogoMTA" version="3" name="LoginV3-Verso" />
+    <min_mta_version server='1.5.4-9.11413' client='1.5.4-9.11413' />
+
+    <script src='gStrilgui.lua' type='shared' cache = 'false'/>
+    <script src='sStrilgui.lua' type='server' cache = 'false'/>
+    <script src='cStrilgui.lua' type='client' cache='false'/>
+    <script src='assets/utils/utils.lua' type='client' cache='false'/>
+
+    <file src='assets/fonts/font.ttf'/>
+    <file src='assets/fonts/medium.otf'/>
+    <file src='assets/fonts/bold.otf'/>
+
+    <file src='assets/sounds/click.wav'/>
+    <file src='assets/sounds/music.mp3'/>
+
+    <file src='assets/imgs/rectangle.png'/>
+    <file src='assets/imgs/rectangle_2.png'/>
+    <file src='assets/imgs/rectangle_3.png'/>
+    <file src='assets/imgs/effect.png'/>
+
+</strilgui>

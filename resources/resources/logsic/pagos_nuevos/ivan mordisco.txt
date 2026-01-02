@@ -1,0 +1,14 @@
+[2024-06-06 23:15:02] Cantidad $2000000 pagado a Alejandro Villa.
+[2024-06-06 23:50:41] Cantidad $500000 pagado a Alejandro Morello.
+[2024-06-07 21:02:13] Cantidad $4000000 pagado a Alex Gutierrez.
+[2024-06-07 21:07:18] Cantidad $1000000 pagado a Alex Gutierrez.
+[2024-06-07 21:08:05] Cantidad $5000000 pagado a Alex Gutierrez.
+[2024-06-07 21:32:15] Cantidad $500000 pagado a Rigoberto Matinez.
+[2024-06-07 21:56:46] Cantidad $600000 pagado a Mohamed Ali.
+[2024-06-07 22:30:13] Cantidad $1000000 pagado a Jeison Vega.
+[2024-06-08 04:26:21] Cantidad $8000000 pagado a Valentin Farias.
+[2024-06-08 22:52:07] Cantidad $8500000 pagado a Valentin Farias.
+[2024-06-09 18:07:29] Cantidad $40000 pagado a Fermin Ocoro.
+[2024-06-09 18:50:01] Cantidad $5000000 pagado a Kevin Rubio.
+[2024-06-09 20:10:51] Cantidad $1000000 pagado a Bracava Vanin.
+[2024-06-10 23:05:41] Cantidad $500000 pagado a Bastian Ramirez Vip.

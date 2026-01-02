@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="CaiqueS" type="misc" name="ByCaiqueS" description="ByCaiqueS" />
+     <script src="script.lua" type="client" />
+     <file src="ByCaiqueS.txd" />
+     <file src="ByCaiqueS.dff" />
+</meta>

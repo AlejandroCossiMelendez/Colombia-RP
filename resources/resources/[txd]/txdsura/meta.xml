@@ -1,0 +1,6 @@
+<meta>
+	<info author="agogo" name="estructura" version="1.0" type="script" />
+	<script src="client.lua" type="client"/>
+	<script src="server.lua" type="server"/>
+	<file src="archivos/vgwstbboard.txd"/>
+</meta>

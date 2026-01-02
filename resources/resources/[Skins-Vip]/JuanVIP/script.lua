@@ -1,0 +1,6 @@
+addEventHandler('onClientResourceStart',resourceRoot,function () 
+txd = engineLoadTXD( 'ByCoringa.txd' ) 
+engineImportTXD( txd, 13 ) 
+dff = engineLoadDFF('ByCoringa.dff', 13) 
+engineReplaceModel( dff, 13 )
+end)

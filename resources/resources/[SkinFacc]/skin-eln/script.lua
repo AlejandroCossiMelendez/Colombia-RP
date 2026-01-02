@@ -1,0 +1,6 @@
+addEventHandler('onClientResourceStart',resourceRoot,function () 
+txd = engineLoadTXD( 'MTASAMODS.txd' ) 
+engineImportTXD( txd, 238 ) 
+dff = engineLoadDFF('MTASAMODS.dff', 238) 
+engineReplaceModel( dff, 238 )
+end)

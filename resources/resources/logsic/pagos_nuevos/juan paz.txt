@@ -1,0 +1,13 @@
+[2024-06-14 19:25:37] Cantidad $1500000 pagado a Alejandro Aranzazu.
+[2024-06-14 20:13:50] Cantidad $875000 pagado a Alejandro Aranzazu.
+[2024-06-14 20:16:49] Cantidad $450000 pagado a Alejandro Aranzazu.
+[2024-06-14 20:25:41] Cantidad $8000000 pagado a Jhon Perez.
+[2024-06-15 03:12:57] Cantidad $600000 pagado a Valentin Perez.
+[2024-06-16 05:38:53] Cantidad $300000 pagado a Juan Jaramillo..
+[2024-06-16 16:38:15] Cantidad $500000 pagado a Josex Darl.
+[2024-06-16 16:57:38] Cantidad $1996000 pagado a Cristiano Messi VIP.
+[2024-06-16 17:23:09] Cantidad $1000000 pagado a Juan Olarte.
+[2024-06-16 17:24:47] Cantidad $1000000 pagado a Javier Morales.
+[2024-06-16 17:27:15] Cantidad $600000 pagado a Neide Sol.
+[2024-06-16 17:33:05] Cantidad $500000 pagado a Alberto Darkan.
+[2024-06-17 06:48:47] Cantidad $126000 pagado a Felipe Cano VIP.

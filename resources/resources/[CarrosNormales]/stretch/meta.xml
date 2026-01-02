@@ -1,0 +1,6 @@
+﻿<meta>
+     <info author="SerjaoModder" type="misc" name="SerjaoModder" description="SerjaoModder" />
+     <script src="script.lua" type="client" />
+     <file src="stretch.txd" />
+     <file src="stretch.dff" />
+</meta>

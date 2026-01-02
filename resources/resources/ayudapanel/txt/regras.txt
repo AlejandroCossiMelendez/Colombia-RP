@@ -1,0 +1,33 @@
+==================== INICIO ====================
+(( ATENCION )) En primer lugar, recuerda que esto es un servidor de ROL
+en donde tendras que aprender CONCEPTOS y ROL en general SI o SI, para evitar sanciones
+Todo lo encuentras en este panel o en nuestro discord.
+==========================================================================
+Si Eres un usuario que recien comienza,
+- Recuerda pedir tu kit inicial ( con /duda soy nuevo, quiero mi kit )
+|Que debo hacer?
+- Debes darle un ROL o un PAPEL a tu personaje, conoce gente, inicia aventuras en nuestra gran zona de ROL.
+Probando los distintos sistemas que tenemos, explora nuestros mapas, etc...
+- Recuerda que debes actuar como lo harias en la vida real, hacer cosas IMPOSIBLES puede ser SANCIONABLE.
+|Como trabajo?
+- Hay muchos trabajos en nuestro servidor; temporales, facciones, publicos, privados, mafias, etc...
+- Si eres nuevo normalmente te recomendamos iniciar con un trabajo TEMPORAL, los cuales se ubican
+en las ( T ) del mapa / radar, alli cada uno tiene distintas tareas para darte dinero.
+|Donde compro autos?
+- En el icono del auto del mapa ( F11 ) es el concesionario, es un sistema en donde podras probar y comprar coches.
+================================================================================
+|Como Interactuo con los vehiculos?
+- Funcionan mediante teclas, ( para prender, poner freno, cerrar, etc ) a continuacion te dejaremos una lista.
+- Con J ( Prendes tu vehiculo )
+- Con N ( Pones freno de mano o pata )
+- COn K ( Trancas o cierras tu vehiculo con llave )
+- Con L ( Enciendes/apagas las luces )
+=================================================================================
+|Donde me uno a la comunidad o como puedo resolver mis dudas?
+Tenemos un grupo de discord muy activo en donde los STAFF responden a los usuarios, les ayudan
+algunas funciones que pueden hacer. Este grupo lo encuentras en nuestro tik tok @benditoo10 ( un link de invitacion )
+- Tambien tenemos el comando /duda , en donde podras preguntar o llamar a un staff para que te ayude a solucionar tus dudas.
+=======================================================================
+|Como cambiar/hacer animaciones con mi personaje?
+- Tenemos un bonito panel de animaciones y objetos, se abre con la tecla *F2* ( si tienes laptop usa fn + f2 o alt + f2 )
+Esto podra complementar a tus roles, formas de expresarte, etc...

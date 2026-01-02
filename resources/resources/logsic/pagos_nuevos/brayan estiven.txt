@@ -1,0 +1,11 @@
+[2024-06-16 00:08:54] Cantidad $280000 pagado a Rolman Bambino.
+[2024-06-16 00:30:54] Cantidad $2000000 pagado a Hank Ganishka.
+[2024-06-16 17:35:39] Cantidad $500000 pagado a Alberto Darkan.
+[2024-06-16 18:57:52] Cantidad $30000 pagado a Adrian Barbosa.
+[2024-06-16 19:02:52] Cantidad $200000 pagado a Adrian Barbosa.
+[2024-06-16 22:20:09] Cantidad $5000000 pagado a Angel Rios.
+[2024-06-17 16:04:05] Cantidad $30000000 pagado a Julian Alvarado.
+[2024-06-17 17:09:09] Cantidad $9000000 pagado a Mateo Restrepo.
+[2024-06-17 17:11:16] Cantidad $5000000 pagado a Alejandro Cuellar.
+[2024-06-17 17:21:23] Cantidad $600000 pagado a Mateo Restrepo.
+[2024-06-17 17:46:19] Cantidad $9000000 pagado a Mateo Restrepo.

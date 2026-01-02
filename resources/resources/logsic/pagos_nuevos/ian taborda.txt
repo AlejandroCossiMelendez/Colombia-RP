@@ -1,0 +1,14 @@
+[2024-06-10 00:41:33] Cantidad $2000000 pagado a Emanuel Ramirez.
+[2024-06-10 01:38:01] Cantidad $2000000 pagado a Lionel Andres Messi.
+[2024-06-11 02:15:59] Cantidad $30000000 pagado a Santi Carranza.
+[2024-06-11 23:42:10] Cantidad $20000 pagado a Alex Corzo.
+[2024-06-11 23:42:23] Cantidad $20000 pagado a Alex Corzo.
+[2024-06-11 23:42:26] Cantidad $20000 pagado a Alex Corzo.
+[2024-06-11 23:42:26] Cantidad $20000 pagado a Alex Corzo.
+[2024-06-11 23:42:27] Cantidad $20000 pagado a Alex Corzo.
+[2024-06-13 14:07:03] Cantidad $8000000 pagado a Santiago Hurtado.
+[2024-06-13 17:51:19] Cantidad $2000000 pagado a Trueno Yankees.
+[2024-06-13 18:02:45] Cantidad $2000000 pagado a Trueno Yankees.
+[2024-06-13 18:20:37] Cantidad $50000000 pagado a Trueno Yankees.
+[2024-06-13 18:20:49] Cantidad $50000000 pagado a Trueno Yankees.
+[2024-06-13 18:20:54] Cantidad $5000000 pagado a Trueno Yankees.

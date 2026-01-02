@@ -1,0 +1,20 @@
+[2024-06-16 21:17:31] Cantidad $8000000 pagado a Mateo Restrepo.
+[2024-06-16 22:19:13] Cantidad $500000 pagado a Mateo Restrepo.
+[2024-06-17 01:57:35] Cantidad $500000 pagado a Juan Santa.
+[2024-06-17 02:39:51] Cantidad $700000 pagado a Daniel Acosta.
+[2024-06-17 03:21:55] Cantidad $10300000 pagado a Valentin Perez.
+[2024-06-17 03:48:02] Cantidad $1000000 pagado a Valentin Perez.
+[2024-06-17 04:31:57] Cantidad $47500000 pagado a Juan Santa.
+[2024-06-17 04:38:31] Cantidad $10000000 pagado a Nauhel Oconer.
+[2024-06-17 04:40:24] Cantidad $1000000 pagado a Nauhel Oconer.
+[2024-06-17 05:07:26] Cantidad $800000 pagado a Daniel Acosta.
+[2024-06-17 05:11:25] Cantidad $3000000 pagado a Daniel Acosta.
+[2024-06-17 05:19:10] Cantidad $600000 pagado a Daniel Acosta.
+[2024-06-17 16:33:56] Cantidad $980000 pagado a Felipe Carrera VIP.
+[2024-06-17 17:13:53] Cantidad $9000000 pagado a Mateo Restrepo.
+[2024-06-17 17:19:46] Cantidad $200000 pagado a Mateo Restrepo.
+[2024-06-17 17:23:10] Cantidad $900000 pagado a Mateo Restrepo.
+[2024-06-17 17:27:53] Cantidad $1000000 pagado a Mateo Restrepo.
+[2024-06-17 17:45:56] Cantidad $7000000 pagado a Crotolamo Perez.
+[2024-06-17 17:48:19] Cantidad $500000 pagado a Mateo Restrepo.
+[2024-06-17 18:14:37] Cantidad $300000 pagado a Mateo Restrepo.

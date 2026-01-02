@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="Bychicih" type="misc" name="Chichi" description="Chichi" />
+     <script src="script.lua" type="client" />
+     <script src="comando.lua" type="server" />
+     <file src="SkinEnc.txd" />
+     <file src="SkinEnc.dff" />
+</meta>

@@ -1,0 +1,24 @@
+[2024-06-05 20:40:19] Cantidad $1000000 pagado a Danco Alex.
+[2024-06-05 21:58:34] Cantidad $25000000 pagado a Juan Cruz.
+[2024-06-06 18:07:07] Cantidad $15000000 pagado a Mohamed Ali.
+[2024-06-07 19:45:49] Cantidad $4500000 pagado a Daniel Acosta.
+[2024-06-07 19:49:36] Cantidad $30000000 pagado a Doble Cero.
+[2024-06-07 20:35:23] Cantidad $25000000 pagado a Juan Cruz.
+[2024-06-07 21:36:51] Cantidad $800000 pagado a Bastian Ramirez Vip.
+[2024-06-07 21:42:44] Cantidad $1500000 pagado a Daniel Acosta.
+[2024-06-07 21:53:40] Cantidad $1000000 pagado a Daniel Acosta.
+[2024-06-07 22:02:11] Cantidad $1000000 pagado a Cristofer Ozuna..
+[2024-06-09 16:17:54] Cantidad $2000000 pagado a Daniel Acosta.
+[2024-06-09 16:36:13] Cantidad $500000 pagado a Harri Tussi.
+[2024-06-09 16:53:04] Cantidad $25000000 pagado a Martin Ledesma.
+[2024-06-09 19:41:47] Cantidad $2000000 pagado a Twoolds Podolsky.
+[2024-06-09 19:43:01] Cantidad $2000000 pagado a Luis Angel.
+[2024-06-09 20:15:08] Cantidad $250000000 pagado a Manuel Rp VIP.
+[2024-06-09 20:15:18] Cantidad $250000000 pagado a Manuel Rp VIP.
+[2024-06-09 20:15:36] Cantidad $220000000 pagado a Manuel Rp VIP.
+[2024-06-09 20:44:58] Cantidad $800000 pagado a Abuelito Kozlov.
+[2024-06-09 21:02:35] Cantidad $1000000 pagado a Alejandro Perez.
+[2024-06-09 21:24:27] Cantidad $10000000 pagado a Daniel Acosta.
+[2024-06-09 21:49:54] Cantidad $1000000 pagado a Joan Sanchez.
+[2024-06-09 22:10:05] Cantidad $100000 pagado a Daniel Gonzalezz.
+[2024-06-09 22:38:08] Cantidad $8000000 pagado a Joan Sanchez.

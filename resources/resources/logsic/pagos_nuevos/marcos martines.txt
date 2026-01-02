@@ -1,0 +1,8 @@
+[2024-06-17 02:20:47] Cantidad $800 pagado a Enmanuel Hernanez.
+[2024-06-17 03:10:22] Cantidad $20000000 pagado a Tomas Gomez.
+[2024-06-17 04:28:23] Cantidad $9000000 pagado a Mattew Hanibal.
+[2024-06-17 04:42:35] Cantidad $700 pagado a Adolfo Hitler.
+[2024-06-17 04:43:32] Cantidad $700000 pagado a Adolfo Hitler.
+[2024-06-17 07:13:20] Cantidad $12000000 pagado a Fernando Vidal.
+[2024-06-17 20:13:50] Cantidad $500 pagado a Daniel Acosta.
+[2024-06-17 20:14:14] Cantidad $500000 pagado a Daniel Acosta.

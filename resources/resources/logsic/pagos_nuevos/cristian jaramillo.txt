@@ -1,0 +1,14 @@
+[2024-06-01 21:29:10] Cantidad $1000000 pagado a Jose Castro.
+[2024-06-01 21:34:58] Cantidad $20000000 pagado a Pablo Villas.
+[2024-06-01 21:35:35] Cantidad $20000000 pagado a Pablo Villas.
+[2024-06-01 21:36:31] Cantidad $20000000 pagado a Pablo Villas.
+[2024-06-01 21:38:37] Cantidad $17000000 pagado a Pablo Villas.
+[2024-06-01 21:41:05] Cantidad $60000000 pagado a Alex Escorcia.
+[2024-06-01 22:54:29] Cantidad $20000000 pagado a Devin Escobar.
+[2024-06-01 22:54:36] Cantidad $200000 pagado a Devin Escobar.
+[2024-06-01 22:54:45] Cantidad $2000000 pagado a Devin Escobar.
+[2024-06-03 00:29:56] Cantidad $1000000 pagado a Pablo Escobaar.
+[2024-06-03 00:30:15] Cantidad $2000000 pagado a Pablo Escobaar.
+[2024-06-03 00:33:44] Cantidad $5000000 pagado a David Tabares.
+[2024-06-03 02:48:27] Cantidad $270000 pagado a Alberto Darkan.
+[2024-06-05 01:49:47] Cantidad $30000000 pagado a James Rodriguezz.

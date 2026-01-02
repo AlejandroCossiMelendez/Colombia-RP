@@ -1,0 +1,5 @@
+<meta>
+	<info author="Puma" version="1.0.0" type="script" name="Dominos" description="Domninos en los Pueblos" showInResourceBrowser="true" />
+	<script src="texturem.lua" type="client" />
+	<file src="CE_pizza.txd" />
+</meta>

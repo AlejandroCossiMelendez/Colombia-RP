@@ -1,0 +1,15 @@
+[2024-06-03 00:20:46] Cantidad $10000000 pagado a Daniel Acosta.
+[2024-06-03 00:21:25] Cantidad $300000 pagado a Daniel Acosta.
+[2024-06-03 00:31:26] Cantidad $10000000 pagado a Jao Sanchez.
+[2024-06-03 00:31:38] Cantidad $500000 pagado a Jao Sanchez.
+[2024-06-03 22:54:30] Cantidad $25000000 pagado a Juan Cruz.
+[2024-06-04 00:37:03] Cantidad $12000000 pagado a Daniel Acosta.
+[2024-06-04 02:29:55] Cantidad $10000 pagado a Alex Goncalvez.
+[2024-06-04 02:30:05] Cantidad $100000 pagado a Alex Goncalvez.
+[2024-06-04 02:38:30] Cantidad $11000000 pagado a Rolman Bambino.
+[2024-06-04 02:56:03] Cantidad $500000 pagado a Felipe Laiton.
+[2024-06-05 00:37:42] Cantidad $900000 pagado a Daniel Acosta.
+[2024-06-06 22:50:22] Cantidad $740000000 pagado a Alex Goncalvez.
+[2024-06-06 22:54:31] Cantidad $30000 pagado a Pablo Bin Laden.
+[2024-06-06 22:54:35] Cantidad $300000 pagado a Pablo Bin Laden.
+[2024-06-06 23:08:40] Cantidad $11000000 pagado a Daniel Acosta.

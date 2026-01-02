@@ -1,3 +1,0 @@
-<gamemode name="MyGamemode" type="server" version="1.0">
-    <script src="main.lua" type="server" />
-</gamemode>

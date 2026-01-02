@@ -1,0 +1,19 @@
+[2024-05-29 03:16:13] Cantidad $25000000 pagado a Jorge Carrasquilla.
+[2024-05-29 19:10:37] Cantidad $300000 pagado a Pablo Bin Laden.
+[2024-05-29 20:29:55] Cantidad $9200000 pagado a Joan Sanchez.
+[2024-05-30 03:33:05] Cantidad $9000000 pagado a Nauhel Oconer.
+[2024-05-30 03:34:50] Cantidad $3000000 pagado a Felip Aruiz.
+[2024-05-30 03:46:38] Cantidad $300000 pagado a Nauhel Oconer.
+[2024-05-30 18:17:03] Cantidad $600000 pagado a Joan Sanchez.
+[2024-05-30 18:56:42] Cantidad $10000000 pagado a Monk Esquivel.
+[2024-05-30 19:09:19] Cantidad $15000000 pagado a Omar Hurtado.
+[2024-05-30 22:42:16] Cantidad $10000000 pagado a Elkin Gonzales.
+[2024-05-31 01:37:32] Cantidad $8000000 pagado a Mohamed Ali.
+[2024-05-31 01:37:58] Cantidad $72000000 pagado a Mohamed Ali.
+[2024-05-31 01:38:26] Cantidad $7000000 pagado a Mohamed Ali.
+[2024-05-31 04:19:07] Cantidad $7000000 pagado a Alexander Castano VIP.
+[2024-05-31 20:10:33] Cantidad $2000000 pagado a Jesus Chirinos.
+[2024-05-31 20:22:22] Cantidad $20000000 pagado a Daniel Riquett.
+[2024-05-31 20:22:35] Cantidad $19000000 pagado a Daniel Riquett.
+[2024-05-31 23:48:36] Cantidad $4500000 pagado a Javier Morales.
+[2024-06-01 15:27:07] Cantidad $4500000 pagado a Kevin Castro.

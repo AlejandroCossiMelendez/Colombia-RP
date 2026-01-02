@@ -1,0 +1,36 @@
+--[[
+Copyright (c) 2010 MTA: Paradise
+Copyright (c) 2020 DownTown RolePlay
+Copyright (c) 2016 DownTown County Roleplay
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+]]
+
+routes =
+{
+	{
+		{ x = 2228.5244140625, y=-2221.337890625, z=13.82808303833, stop = true },
+		{ x = 2211.369140625, y=-2173.5986328125, z=13.643500328064, stop = true },
+		{ x = 2053.75390625, y=-2106.888671875, z=13.60148525238, stop = true },
+		{ x = 1966.416015625, y=-2089.8125, z=-2089.8125, stop = true },
+		{ x = 1964.9375, y=-1985.0146484375, z=13.668083190918, stop = true },
+		{ x = 2011.3916015625, y=-2011.3916015625, z=13.746932029724, stop = true },
+		{ x = 2079.568359375, y=-1784.3037109375, z=13.711052894592, stop = true },
+		{ x = 2152.8994140625, y=-1898.5908203125, z=13.741281509399, stop = true },
+		{ x = 2267.458984375, y-2093.8095703125, z=13.891450881958, stop = true },
+		{ x = 2210.0751953125, y-2149.634765625, z=13.664887428284, stop = true },
+		{ x = 2225.416015625, y=-2224.1630859375, z=13.828272819519,  stop = true, last = true },
+	},
+	
+}

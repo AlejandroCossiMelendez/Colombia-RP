@@ -1,0 +1,10 @@
+[2024-06-02 00:18:32] Cantidad $3000000 pagado a Alejandro Villa.
+[2024-06-02 01:22:40] Cantidad $600000 pagado a Chapo Guzman..
+[2024-06-02 01:42:47] Cantidad $1000000 pagado a Alexander Perez.
+[2024-06-02 18:27:55] Cantidad $4200000 pagado a Kevin Castro.
+[2024-06-02 18:59:22] Cantidad $700000 pagado a Santiago Meza VIP.
+[2024-06-02 18:59:38] Cantidad $6500000 pagado a Santiago Meza VIP.
+[2024-06-02 19:01:28] Cantidad $2700000 pagado a Santiago Meza VIP.
+[2024-06-03 18:37:24] Cantidad $1600000 pagado a Devin Escobar.
+[2024-06-04 00:22:37] Cantidad $8000000 pagado a Chapo Guzmann.
+[2024-06-04 00:23:07] Cantidad $7800000 pagado a Chapo Guzmann.

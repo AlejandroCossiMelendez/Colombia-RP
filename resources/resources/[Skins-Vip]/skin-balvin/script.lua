@@ -1,0 +1,6 @@
+addEventHandler('onClientResourceStart',resourceRoot,function () 
+    txd = engineLoadTXD( 'ByCruz.txd' ) 
+    engineImportTXD( txd, 159 ) 
+    dff = engineLoadDFF('ByCruz.dff', 159) 
+    engineReplaceModel( dff, 159 )
+end)

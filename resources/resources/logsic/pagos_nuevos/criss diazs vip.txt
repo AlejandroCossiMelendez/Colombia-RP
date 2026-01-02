@@ -1,0 +1,23 @@
+[2024-06-14 19:18:18] Cantidad $700000 pagado a Alexander Castano VIP.
+[2024-06-14 19:36:53] Cantidad $19000000 pagado a Jordan Paredes.
+[2024-06-14 19:37:40] Cantidad $19000000 pagado a Jordan Paredes.
+[2024-06-14 22:24:31] Cantidad $1000000 pagado a Marlon Garcia.
+[2024-06-14 22:35:13] Cantidad $1000000 pagado a Ferney Cano.
+[2024-06-14 22:42:58] Cantidad $1000000 pagado a Ferney Cano.
+[2024-06-14 23:07:08] Cantidad $1000000 pagado a Fermin Alberto.
+[2024-06-14 23:08:44] Cantidad $1000000 pagado a Rolman Bambino.
+[2024-06-14 23:25:49] Cantidad $30000000 pagado a Tomas Gomez.
+[2024-06-14 23:34:05] Cantidad $1000000 pagado a Rolman Bambino.
+[2024-06-14 23:35:34] Cantidad $1000000 pagado a Rolman Bambino.
+[2024-06-15 16:53:08] Cantidad $46000000 pagado a Joelito Vin.
+[2024-06-15 17:12:54] Cantidad $45000000 pagado a Ferney Cano.
+[2024-06-15 22:38:01] Cantidad $12000000 pagado a Felipe Carrera VIP.
+[2024-06-15 22:42:28] Cantidad $8000000 pagado a Felipe Carrera VIP.
+[2024-06-15 22:50:24] Cantidad $15000000 pagado a Gonzalo Rodriguez VIP.
+[2024-06-15 22:53:18] Cantidad $600000 pagado a Gonzalo Rodriguez VIP.
+[2024-06-15 22:53:27] Cantidad $5000000 pagado a Gonzalo Rodriguez VIP.
+[2024-06-16 03:14:54] Cantidad $1000000 pagado a Mattew Hanibal.
+[2024-06-16 18:54:11] Cantidad $2000000 pagado a Nicolas Cortes.
+[2024-06-16 19:27:09] Cantidad $35000000 pagado a Samuel Marin.
+[2024-06-16 20:02:47] Cantidad $26000000 pagado a Samuel Marin.
+[2024-06-16 20:09:56] Cantidad $7000000 pagado a Mateo Restrepo.

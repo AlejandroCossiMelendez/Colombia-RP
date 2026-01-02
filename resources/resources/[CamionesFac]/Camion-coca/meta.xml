@@ -1,0 +1,6 @@
+<meta>
+	<info author="Xeyz77" version="1.0.0" type="script" name="" description="" showInResourceBrowser="true" />
+	<script src="client.lua" type="client" />
+	<file src="byxeyz77.txd" />
+	<file src="byxeyz77.dff" />
+</meta>

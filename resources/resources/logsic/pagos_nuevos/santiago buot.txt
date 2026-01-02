@@ -1,0 +1,4 @@
+[2024-06-05 23:50:51] Cantidad $2000000 pagado a Daniel Acosta.
+[2024-06-05 23:51:05] Cantidad $18000000 pagado a Daniel Acosta.
+[2024-06-06 01:51:01] Cantidad $100000 pagado a Joan Sanchez.
+[2024-06-06 02:09:15] Cantidad $15000000 pagado a Daniel Acosta.

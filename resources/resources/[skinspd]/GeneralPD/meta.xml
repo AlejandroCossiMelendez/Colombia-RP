@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="TiioCharuto |FUM1N|#2673" type="misc" name="31" description="31" />
+     <script src="script.lua" type="client" />
+     <file src="fbi.txd" />
+     <file src="fbi.dff" />
+</meta>

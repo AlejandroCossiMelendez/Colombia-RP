@@ -1,0 +1,5 @@
+<meta>
+	<info author="Daveli7094" version="1.0.0" type="script" name="JuanValdez" description="Textura" showInResourceBrowser="true" />
+	<script src="texturem.lua" type="client" cache="false" />
+	<file src="tempo22_law.txd" />
+</meta>

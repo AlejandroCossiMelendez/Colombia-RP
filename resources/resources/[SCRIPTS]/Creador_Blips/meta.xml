@@ -1,0 +1,73 @@
+<meta>
+    <info author="ClawSuit" collaborator='Bruno PU' name="Blips" type="script" version="1.0" />
+    <oop>true</oop>
+    
+    <script src="cliente.lua" type="client" cache="false" />
+    <script src="servidor.lua" type="server" />
+
+    <file src='radarset/0.png' cache='false' />
+	<file src='radarset/1.png' cache='false' />
+	<file src='radarset/2.png' cache='false' />
+	<file src='radarset/3.png' cache='false' />
+	<file src='radarset/4.png' cache='false' />
+	<file src='radarset/5.png' cache='false' />
+	<file src='radarset/6.png' cache='false' />
+	<file src='radarset/7.png' cache='false' />
+	<file src='radarset/8.png' cache='false' />
+	<file src='radarset/9.png' cache='false' />
+	<file src='radarset/10.png' cache='false' />
+	<file src='radarset/11.png' cache='false' />
+	<file src='radarset/12.png' cache='false' />
+	<file src='radarset/13.png' cache='false' />
+	<file src='radarset/14.png' cache='false' />
+	<file src='radarset/15.png' cache='false' />
+	<file src='radarset/16.png' cache='false' />
+	<file src='radarset/17.png' cache='false' />
+	<file src='radarset/18.png' cache='false' />
+	<file src='radarset/19.png' cache='false' />
+	<file src='radarset/20.png' cache='false' />
+	<file src='radarset/21.png' cache='false' />
+	<file src='radarset/22.png' cache='false' />
+	<file src='radarset/23.png' cache='false' />
+	<file src='radarset/24.png' cache='false' />
+	<file src='radarset/25.png' cache='false' />
+	<file src='radarset/26.png' cache='false' />
+	<file src='radarset/27.png' cache='false' />
+	<file src='radarset/28.png' cache='false' />
+	<file src='radarset/29.png' cache='false' />
+	<file src='radarset/30.png' cache='false' />
+	<file src='radarset/31.png' cache='false' />
+	<file src='radarset/32.png' cache='false' />
+	<file src='radarset/33.png' cache='false' />
+	<file src='radarset/34.png' cache='false' />
+	<file src='radarset/35.png' cache='false' />
+	<file src='radarset/36.png' cache='false' />
+	<file src='radarset/37.png' cache='false' />
+	<file src='radarset/38.png' cache='false' />
+	<file src='radarset/39.png' cache='false' />
+	<file src='radarset/40.png' cache='false' />
+	<file src='radarset/41.png' cache='false' />
+	<file src='radarset/42.png' cache='false' />
+	<file src='radarset/43.png' cache='false' />
+	<file src='radarset/44.png' cache='false' />
+	<file src='radarset/45.png' cache='false' />
+	<file src='radarset/46.png' cache='false' />
+	<file src='radarset/47.png' cache='false' />
+	<file src='radarset/48.png' cache='false' />
+	<file src='radarset/49.png' cache='false' />
+	<file src='radarset/50.png' cache='false' />
+	<file src='radarset/51.png' cache='false' />
+	<file src='radarset/52.png' cache='false' />
+	<file src='radarset/53.png' cache='false' />
+	<file src='radarset/54.png' cache='false' />
+	<file src='radarset/55.png' cache='false' />
+	<file src='radarset/56.png' cache='false' />
+	<file src='radarset/57.png' cache='false' />
+	<file src='radarset/58.png' cache='false' />
+	<file src='radarset/59.png' cache='false' />
+	<file src='radarset/60.png' cache='false' />
+	<file src='radarset/61.png' cache='false' />
+	<file src='radarset/62.png' cache='false' />
+	<file src='radarset/63.png' cache='false' />
+    
+</meta>

@@ -1,0 +1,6 @@
+[2023-11-09 14:22:52] Ingreso - $282000000 - Nombre PJ: Leandro Escobar.
+[2023-11-09 14:24:39] Retiro - $1 - Nombre PJ: Oscar Gomez.
+[2023-11-09 14:24:46] Ingreso - $1 - Nombre PJ: Oscar Gomez.
+[2023-11-09 14:25:17] Retiro - $20000000 - Nombre PJ: Leandro Escobar.
+[2023-11-09 23:34:25] Retiro - $10000000 - Nombre PJ: Leandro Escobar.
+[2023-11-09 23:35:31] Retiro - $10000000 - Nombre PJ: Leandro Escobar.

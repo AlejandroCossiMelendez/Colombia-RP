@@ -1,0 +1,38 @@
+[2024-06-07 03:31:00] Cantidad $10000 pagado a Sneider Rodriguez.
+[2024-06-07 03:31:17] Cantidad $90000 pagado a Sneider Rodriguez.
+[2024-06-08 02:11:34] Cantidad $800000 pagado a Daniel Acosta.
+[2024-06-08 19:21:19] Cantidad $1000000 pagado a Marlon Lopez Sanchez.
+[2024-06-08 19:32:11] Cantidad $13000000 pagado a Jorge Perla.
+[2024-06-08 19:47:34] Cantidad $8000000 pagado a Samuel Marin.
+[2024-06-08 20:14:08] Cantidad $10000000 pagado a Lionel Andres Messi.
+[2024-06-09 04:17:19] Cantidad $100000 pagado a Royner Martinezxxx.
+[2024-06-09 17:58:34] Cantidad $500000 pagado a Joan Sanchez.
+[2024-06-09 19:22:37] Cantidad $100000 pagado a Valentin Farias.
+[2024-06-09 19:22:43] Cantidad $1000000 pagado a Valentin Farias.
+[2024-06-09 21:51:30] Cantidad $100000 pagado a SF Savier Foster.
+[2024-06-09 22:43:16] Cantidad $1000000 pagado a Cristiano Messi VIP.
+[2024-06-09 23:48:10] Cantidad $500000 pagado a Estiven Taborda.
+[2024-06-10 00:04:12] Cantidad $600000 pagado a Emanuel Sosa.
+[2024-06-10 00:11:19] Cantidad $2000000 pagado a Nathan Ford.
+[2024-06-10 00:17:41] Cantidad $600000 pagado a Emanuel Sosa.
+[2024-06-10 00:41:39] Cantidad $600000 pagado a Nicolas Portilla.
+[2024-06-10 02:55:31] Cantidad $500000 pagado a Felipe Carrera VIP.
+[2024-06-10 03:02:09] Cantidad $500000 pagado a Daniel Acosta.
+[2024-06-10 03:08:16] Cantidad $800000 pagado a Sebastian Sins.
+[2024-06-10 17:47:25] Cantidad $11000000 pagado a Elkin Gonzales.
+[2024-06-10 18:03:25] Cantidad $20000000 pagado a Pablo Villas.
+[2024-06-10 18:54:22] Cantidad $5000000 pagado a Matias Garcia.
+[2024-06-10 20:40:01] Cantidad $40000000 pagado a Hank Ganishka.
+[2024-06-10 21:34:01] Cantidad $900000 pagado a Elkin Gonzales.
+[2024-06-10 21:52:35] Cantidad $900000 pagado a El Wama.
+[2024-06-10 22:17:25] Cantidad $900000 pagado a Elkin Gonzales.
+[2024-06-10 22:43:29] Cantidad $750000 pagado a Nicolas Portilla.
+[2024-06-10 22:48:38] Cantidad $900000 pagado a Nicolas Portilla.
+[2024-06-10 23:14:50] Cantidad $600000 pagado a Elkin Gonzales.
+[2024-06-10 23:18:36] Cantidad $1000000 pagado a Monk Esquivel.
+[2024-06-11 00:15:47] Cantidad $800000 pagado a Daniel Acosta.
+[2024-06-11 01:22:33] Cantidad $900000 pagado a Daniel Acosta.
+[2024-06-11 03:10:07] Cantidad $800000 pagado a Sebastian Sins.
+[2024-06-11 05:55:37] Cantidad $10000000 pagado a Brandon Alexander.
+[2024-06-11 06:43:07] Cantidad $5000000 pagado a Valentin Perez.
+[2024-06-11 22:25:00] Cantidad $60000000 pagado a Sebas Garcia VIP.

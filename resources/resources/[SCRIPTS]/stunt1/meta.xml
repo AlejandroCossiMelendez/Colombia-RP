@@ -1,0 +1,7 @@
+<meta>
+	<info author="Canal-opa24hrs"description="https://www.youtube.com/channel/UCB0NU45S96_d48CX892MhMQ"/>
+	<script src="server.lua" type="server" />
+	<script src="client.lua" type="client" />
+	<file src="yat.ifp"/>
+	<min_mta_version server="1.3.0-9.04570" client="1.3.0-9.04570" />
+</meta>

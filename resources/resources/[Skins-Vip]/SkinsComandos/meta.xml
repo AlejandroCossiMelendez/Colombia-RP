@@ -1,0 +1,4 @@
+<meta>
+	<info author="MonsalveGod" name="SkinCmds" description="Poner Skins Por Cmds" type="script"/>
+	<script scr="skinscmd.lua" type="server"/>
+</meta>

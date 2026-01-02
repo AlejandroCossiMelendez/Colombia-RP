@@ -1,0 +1,6 @@
+<meta>
+<info name='n-sei' type='misc' />
+<script src='client.lua' type='client' />
+<file src='benson.txd' />
+<file src='benson.dff' />
+</meta>

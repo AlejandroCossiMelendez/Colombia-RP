@@ -1,0 +1,7 @@
+[2024-06-17 06:14:18] Cantidad $1000000 pagado a Nauhel Oconer.
+[2024-06-17 06:33:37] Cantidad $1000000 pagado a Jose Maria.
+[2024-06-17 15:57:37] Cantidad $8000000 pagado a Daniel Acosta.
+[2024-06-17 16:01:09] Cantidad $1200000 pagado a Daniel Acosta.
+[2024-06-17 17:09:42] Cantidad $30000 pagado a Luis Perez.
+[2024-06-17 17:26:06] Cantidad $200000 pagado a Gustavo Petro.
+[2024-06-17 17:52:54] Cantidad $1000000 pagado a Luis Perez.

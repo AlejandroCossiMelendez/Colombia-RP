@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="Kratos444" type="misc" name="Skindura" description="Skindura" />
+     <script src="script.lua" type="client" />
+     <file src="Skindura.txd" />
+     <file src="skin_duradura.dff" />
+</meta>

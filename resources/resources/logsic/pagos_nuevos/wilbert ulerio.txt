@@ -1,0 +1,4 @@
+[2024-05-30 21:31:10] Cantidad $3000000 pagado a Juan David Navarro VIP.
+[2024-05-30 21:32:04] Cantidad $3000000 pagado a Juan David Navarro VIP.
+[2024-05-30 22:21:10] Cantidad $2300000 pagado a Andres Grienko.
+[2024-06-01 03:42:27] Cantidad $10000000 pagado a Davinsito Towers VIP.

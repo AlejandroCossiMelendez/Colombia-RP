@@ -1,0 +1,12 @@
+[2024-06-06 20:35:18] Cantidad $700000 pagado a Daniel Acosta.
+[2024-06-06 21:00:57] Cantidad $7000000 pagado a Daniel Acosta.
+[2024-06-06 21:48:03] Cantidad $2000000 pagado a Carlos Montana.
+[2024-06-06 22:45:55] Cantidad $365000 pagado a Juan Arendo.
+[2024-06-06 23:20:52] Cantidad $20000000 pagado a Sebastian Hernandez.
+[2024-06-07 16:28:19] Cantidad $12000000 pagado a Daniel Acosta.
+[2024-06-07 16:58:03] Cantidad $23500000 pagado a Daniel Acosta.
+[2024-06-07 17:30:38] Cantidad $89000000 pagado a Sofia Ayala.
+[2024-06-07 17:30:40] Cantidad $8900000 pagado a Sofia Ayala.
+[2024-06-07 17:40:16] Cantidad $2000000 pagado a Sofia Ayala.
+[2024-06-07 17:40:21] Cantidad $2000000 pagado a Sofia Ayala.
+[2024-06-07 17:45:45] Cantidad $2000000 pagado a Doble Cero.

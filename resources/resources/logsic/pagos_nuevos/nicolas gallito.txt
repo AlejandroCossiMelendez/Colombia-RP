@@ -1,0 +1,4 @@
+[2024-06-02 22:51:10] Cantidad $5000000 pagado a Santiago Meza VIP.
+[2024-06-03 13:39:48] Cantidad $400000 pagado a Daniel Acosta.
+[2024-06-03 14:21:53] Cantidad $2000000 pagado a Kevin Castro.
+[2024-06-03 21:56:47] Cantidad $500000 pagado a Alexander Castano VIP.

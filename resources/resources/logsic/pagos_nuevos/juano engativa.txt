@@ -1,0 +1,3 @@
+[2024-05-29 18:26:49] Cantidad $2000000 pagado a Pablo Bin Laden.
+[2024-05-29 18:26:53] Cantidad $20000000 pagado a Pablo Bin Laden.
+[2024-06-02 00:05:42] Cantidad $60000000 pagado a Gonzalo Rodriguez VIP.

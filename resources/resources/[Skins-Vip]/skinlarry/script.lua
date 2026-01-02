@@ -1,0 +1,6 @@
+addEventHandler('onClientResourceStart',resourceRoot,function () 
+txd = engineLoadTXD( 'FlowNose.txd' ) 
+engineImportTXD( txd, 259 ) 
+dff = engineLoadDFF('FlowNose.dff', 259) 
+engineReplaceModel( dff, 259 )
+end)

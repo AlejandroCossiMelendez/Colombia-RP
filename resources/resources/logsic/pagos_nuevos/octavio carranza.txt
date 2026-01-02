@@ -1,0 +1,3 @@
+[2024-05-27 00:36:24] Cantidad $2000000 pagado a Santi Carranza.
+[2024-05-27 01:29:54] Cantidad $700 pagado a Brayan Martinez.
+[2024-05-27 03:24:10] Cantidad $21000 pagado a Camilo Carranza.

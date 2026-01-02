@@ -1,0 +1,20 @@
+﻿----------------------------------------- Conceptos de rol basicos -----------------------------------------
+Con la siguiente lista de conceptos vas a poder jugar tranquilamente
+sin la preocupacion de que seas sancionado:
+[Listado] 
+- DM = Matar a un jugador sin razon alguna o sin rol previo
+- PG = Hacer cosas imposibles o que tu en la vida real no harias
+- PG2 = Forzar un rol, ya sea desconectandote o negandote a cooperar
+- MG = Usar informacion OOC ( Vida real ) para beneficiarte en el juego ( IC )
+- MG2 = Confundir los canales o mal usarlos, por ejemplo: usar el /fb para llamar un staff o decir cosas OOC
+- ICN = Incumplir las reglas del servidor ( Normativa )
+- CJ = Robarte un vehiculo sin rol previo o simplemente para molestar a los demas
+- NRC = Chocarte a una alta velocidad y no hacer el rol previo
+- NRA = No hacer rol de que sacas tu arma para usarla
+- NRE = No rolear el entorno de tu rol, ya sea de un robo o un acto que requiera /entorno
+- TTO = Hacerle daño a un civil que ya esta muerto, por diversion o de manera de TROLL
+- ER = Evadir un rol ( no cooperando o haciendote pasar por alguien que no sabe )
+- TK = Matar un jugador de tu misma faccion o equipo
+- NVVPJ = no valorar tu vida ya sea escapandote mientras te apuntan
+- RK = Matar a un civil que te habia matado anteriormente simplemente por venganza
+- SPAM = Mostrar otro servidor o promocionar otras cosas que no tienen nada que ver con VERSO

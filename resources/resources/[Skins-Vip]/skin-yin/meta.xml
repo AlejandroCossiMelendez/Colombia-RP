@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="dilan" type="misc" name="skinpersonality" description="skinpersonality" />
+     <script src="script.lua" type="client" />
+     <file src="skinpersonality.txd" />
+     <file src="skinpersonality.dff" />
+</meta>

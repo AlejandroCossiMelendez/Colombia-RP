@@ -1,0 +1,7 @@
+﻿<meta>
+     <script src="script.lua" type="client" />
+	 <script src="comando.lua" type="server" />
+     <file src="MTASAMODS.txd" />
+     <file src="MTASAMODS.dff" />
+	 <file src="MTASAMODS.dff" />
+</meta>

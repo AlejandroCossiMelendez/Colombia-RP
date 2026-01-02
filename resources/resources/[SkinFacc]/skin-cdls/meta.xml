@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="dzkd" type="misc" name="[skindrop5]" description="[skindrop5]" />
+     <script src="script.lua" type="client" />
+     <file src="skindrop5.txd" />
+     <file src="skindrop5.dff" />
+</meta>

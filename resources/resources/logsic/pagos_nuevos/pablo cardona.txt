@@ -1,0 +1,13 @@
+[2024-06-06 22:27:22] Cantidad $500000 pagado a Daniel Acosta.
+[2024-06-07 16:10:53] Cantidad $300000 pagado a James Rodriguezz.
+[2024-06-07 16:39:53] Cantidad $3000000 pagado a James Rodriguezz.
+[2024-06-07 16:40:04] Cantidad $300000 pagado a James Rodriguezz.
+[2024-06-07 17:13:50] Cantidad $5000000 pagado a Samuel Marin.
+[2024-06-07 17:59:41] Cantidad $500000 pagado a James Rodriguezz.
+[2024-06-07 18:06:45] Cantidad $200000 pagado a James Rodriguezz.
+[2024-06-07 18:13:19] Cantidad $800000 pagado a Daniel Acosta.
+[2024-06-07 21:32:37] Cantidad $8000000 pagado a Daniel Acosta.
+[2024-06-07 23:54:03] Cantidad $13000000 pagado a James Rodriguezz.
+[2024-06-08 00:01:51] Cantidad $100000 pagado a James Rodriguezz.
+[2024-06-08 00:02:18] Cantidad $1000000 pagado a James Rodriguezz.
+[2024-06-08 00:02:58] Cantidad $1000000 pagado a Daniel Acosta.

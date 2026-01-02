@@ -1,0 +1,6 @@
+[2024-06-17 04:46:16] Cantidad $1000000 pagado a Sebas Ramirez.
+[2024-06-17 14:04:10] Cantidad $969300 pagado a Daniel Acosta.
+[2024-06-17 14:04:42] Cantidad $500000 pagado a Daniel Acosta.
+[2024-06-17 14:05:26] Cantidad $8724183 pagado a Daniel Acosta.
+[2024-06-17 15:03:41] Cantidad $5000000 pagado a Neide Sol.
+[2024-06-17 15:05:28] Cantidad $800000 pagado a Neide Sol.

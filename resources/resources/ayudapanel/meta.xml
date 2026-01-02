@@ -1,0 +1,12 @@
+<meta>
+    <info author="Morrice!(!Mr.JoTa)" version="1.0" type="script" description="Painel de Ajuda"/>
+    <script src="client.lua" type="client"/>
+
+    <file src="font/font.ttf" />
+
+    <file src="txt/ajuda.txt"/>
+    <file src="txt/comandos.txt"/>
+    <file src="txt/radio.txt"/>
+    <file src="txt/regras.txt"/>
+    <file src="txt/vendas.txt"/>
+</meta>

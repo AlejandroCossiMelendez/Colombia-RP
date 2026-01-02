@@ -1,0 +1,8 @@
+<meta>
+	<info name="Barra de Progresso" author="ber#8813" />
+	<min_mta_version server="1.5.9" client="1.5.9" />
+    <script src="client.lua" type="client" cache="false" />
+    <script src="server.lua" type="server" />
+    <file src="fontes/RobotoBold.ttf" />
+    <file src="gfx/loading.png" />
+</meta>

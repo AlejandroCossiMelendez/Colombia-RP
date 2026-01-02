@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="BY_SEPILLIN" type="misc" name="BY_SEPILLIN" description="BY_SEPILLIN" />
+     <script src="script.lua" type="client" />
+     <file src="BY_SEPILLIN.txd" />
+     <file src="BY_SEPILLIN.dff" />
+</meta>

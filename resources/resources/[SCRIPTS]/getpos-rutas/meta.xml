@@ -1,0 +1,6 @@
+<meta>
+	<info author="JakeAG" type="script" name="Sistema de get pos para rutas de la dt" />
+	<script src="mainS.lua" type="server" />
+	<script src="mainC.lua" type="client" />
+
+</meta>

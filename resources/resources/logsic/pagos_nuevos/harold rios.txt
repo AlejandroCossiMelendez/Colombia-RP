@@ -1,0 +1,5 @@
+[2024-06-12 23:35:28] Cantidad $20000000 pagado a Felipe Carrera VIP.
+[2024-06-13 01:28:58] Cantidad $600000 pagado a Bastian Ramirez Vip.
+[2024-06-13 13:24:01] Cantidad $70000 pagado a Alex Corzo.
+[2024-06-13 18:03:56] Cantidad $500000 pagado a Daniel Acosta.
+[2024-06-13 18:39:33] Cantidad $850000 pagado a Kevin Rueda.

@@ -1,0 +1,7 @@
+<meta>
+	<info author="Nombre" name="Estructura Basica" version="1.0" type="script" />
+	<script src="client.lua" type="client"/>
+	<script src="server.lua" type="server"/>
+	<file src="archivos/203.txd"/>
+	<file src="archivos/203.dff"/>
+</meta>

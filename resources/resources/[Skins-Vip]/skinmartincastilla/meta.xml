@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="DAVID" type="misc" name="SKIN168" description="SKIN168" />
+     <script src="script.lua" type="client" />
+     <file src="1.txd" />
+     <file src="1.dff" />
+</meta>

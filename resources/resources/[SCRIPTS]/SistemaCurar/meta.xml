@@ -1,0 +1,4 @@
+<meta>
+<script src="curarS.lua" type="server"/>
+<script src="curarC.lua" type="client"/>
+</meta>

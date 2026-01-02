@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="ByGuuh" type="misc" name="ByGuuh_MEC" description="ByGuuh_MEC" />
+     <script src="script.lua" type="client" />
+     <file src="ByGuuh_MEC.txd" />
+     <file src="ByGuuh_MEC.dff" />
+</meta>

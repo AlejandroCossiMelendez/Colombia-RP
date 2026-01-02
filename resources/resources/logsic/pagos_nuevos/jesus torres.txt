@@ -1,0 +1,17 @@
+[2024-06-05 18:42:54] Cantidad $300000 pagado a Daniel Acosta.
+[2024-06-05 19:26:31] Cantidad $500000 pagado a Martin Ledesma.
+[2024-06-05 22:09:42] Cantidad $25000000 pagado a Juan Cruz.
+[2024-06-05 22:31:54] Cantidad $2000000 pagado a Juan David.
+[2024-06-05 23:28:24] Cantidad $1000000 pagado a Juan David.
+[2024-06-05 23:41:30] Cantidad $2500000 pagado a Elkin Gonzales.
+[2024-06-05 23:41:59] Cantidad $2500000 pagado a Elkin Gonzales.
+[2024-06-06 01:25:10] Cantidad $500000 pagado a Stiven Rodriguez.
+[2024-06-06 01:34:47] Cantidad $30000 pagado a Stiven Rodriguez.
+[2024-06-06 02:22:48] Cantidad $500000 pagado a Sebastian Hernandez.
+[2024-06-06 02:36:15] Cantidad $500000 pagado a Sebastian Hernandez.
+[2024-06-06 03:46:51] Cantidad $500000 pagado a Sofia Ayala.
+[2024-06-06 05:39:55] Cantidad $500000 pagado a Sofia Ayala.
+[2024-06-06 16:33:40] Cantidad $500000 pagado a Sofia Ayala.
+[2024-06-06 16:39:54] Cantidad $600000 pagado a Sofia Ayala.
+[2024-06-07 15:20:01] Cantidad $12000000 pagado a Daniel Acosta.
+[2024-06-07 16:28:38] Cantidad $800000 pagado a Daniel Acosta.
