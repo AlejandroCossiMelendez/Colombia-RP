@@ -1,8 +1,6 @@
 -- CLIENT.LUA - Sistema de Pólvora y Pirotecnia con Efectos
 local screenW, screenH = guiGetScreenSize()
 local panelAbierto = false
-local inventarioJugador = {}
-local modoInventario = false
 local animacionPanel = 0
 local efectosActivos = {}
 
@@ -30,21 +28,12 @@ addEventHandler("polvora:abrirPanel", root, function(items)
     
     itemsPolvora = items
     panelAbierto = true
-    modoInventario = false
     animacionPanel = 0
     showCursor(true)
-    
-    triggerServerEvent("polvora:obtenerInventario", localPlayer)
     
     addEventHandler("onClientRender", root, renderPanelPolvora)
     addEventHandler("onClientClick", root, clickPanelPolvora)
     addEventHandler("onClientKey", root, teclasPanelPolvora)
-end)
-
--- Recibir inventario
-addEvent("polvora:recibirInventario", true)
-addEventHandler("polvora:recibirInventario", root, function(inventario)
-    inventarioJugador = inventario
 end)
 
 -- Cerrar panel
@@ -92,25 +81,13 @@ function renderPanelPolvora()
     local btnCerrarX = x + ancho - 60
     dibujarBotonRedondeado(btnCerrarX, y + 15, 50, 50, tocolor(255, 50, 0, alpha), "✕", alpha, 2)
     
-    -- Botones de modo
-    local btnModoY = y + 100
-    local colorTienda = not modoInventario and tocolor(255, 100, 0, alpha) or tocolor(50, 50, 50, alpha * 0.7)
-    dibujarBotonRedondeado(x + 30, btnModoY, 200, 50, colorTienda, "🛒 TIENDA", alpha)
+    -- Contenido (solo tienda)
+    renderTienda(x, y, ancho, alto, alpha)
     
-    local colorInv = modoInventario and tocolor(255, 100, 0, alpha) or tocolor(50, 50, 50, alpha * 0.7)
-    dibujarBotonRedondeado(x + 250, btnModoY, 200, 50, colorInv, "🎆 MI INVENTARIO", alpha)
-    
-    -- Contenido
-    if modoInventario then
-        renderInventario(x, y, ancho, alto, alpha)
-    else
-        renderTienda(x, y, ancho, alto, alpha)
-    end
-    
-    -- Saldo
-    local saldo = getPlayerMoney()
+    -- Saldo (usar el sistema de dinero del gamemode)
+    local saldo = getElementData(localPlayer, "character:money") or 0
     dxDrawRectangle(x + 30, y + alto - 60, 250, 40, tocolor(20, 20, 20, alpha * 0.9), false)
-    dxDrawText("💰 Saldo: $" .. saldo, x + 30, y + alto - 60, x + 280, y + alto - 20, tocolor(100, 255, 100, alpha), 1.2, "default-bold", "center", "center")
+    dxDrawText("💰 Saldo: $" .. tostring(saldo), x + 30, y + alto - 60, x + 280, y + alto - 20, tocolor(100, 255, 100, alpha), 1.2, "default-bold", "center", "center")
 end
 
 -- Render tienda
@@ -142,45 +119,6 @@ function renderTienda(x, y, ancho, alto, alpha)
     end
 end
 
--- Render inventario
-function renderInventario(x, y, ancho, alto, alpha)
-    local listaY = y + 170
-    local itemAlto = 80
-    
-    if #inventarioJugador == 0 then
-        dxDrawText("No tienes pólvora\n\n¡Compra en la tienda!", x + 50, y + 300, x + ancho - 50, y + 400, tocolor(150, 150, 150, alpha), 1.2, "default-bold", "center", "center", false, true)
-        return
-    end
-    
-    for i, item in ipairs(inventarioJugador) do
-        local itemY = listaY + ((i - 1) * (itemAlto + 10))
-        
-        if itemY > y + 160 and itemY < y + alto - 80 then
-            -- Fondo
-            dxDrawRectangle(x + 30, itemY, ancho - 60, itemAlto, tocolor(30, 30, 30, alpha * 0.9), false)
-            dxDrawRectangle(x + 30, itemY, 5, itemAlto, tocolor(255, 100, 0, alpha), false)
-            
-            -- Buscar efecto del item
-            local efectoItem = ""
-            for _, itemData in ipairs(itemsPolvora) do
-                if itemData.nombre == item.item then
-                    efectoItem = itemData.efecto
-                    break
-                end
-            end
-            
-            -- Nombre
-            dxDrawText(item.item, x + 50, itemY + 10, x + 400, itemY + 35, tocolor(255, 255, 255, alpha), 1.2, "default-bold")
-            
-            -- Cantidad
-            dxDrawText("x" .. item.cantidad, x + 50, itemY + 40, x + 150, itemY + 65, tocolor(255, 200, 50, alpha), 1.3, "pricedown")
-            
-            -- Botón USAR
-            local brilloBtn = math.abs(math.sin(getTickCount() / 300 + i)) * 50 + 200
-            dibujarBotonRedondeado(x + ancho - 210, itemY + 15, 160, 50, tocolor(0, brilloBtn, 0, alpha), "🔥 USAR", alpha, 1.1)
-        end
-    end
-end
 
 -- Botón redondeado
 function dibujarBotonRedondeado(x, y, ancho, alto, color, texto, alpha, escalaTexto)
@@ -207,24 +145,8 @@ function clickPanelPolvora(button, state)
         return
     end
     
-    -- Botones de modo
-    local btnModoY = y + 100
-    if my >= btnModoY and my <= btnModoY + 50 then
-        if mx >= x + 30 and mx <= x + 230 then
-            modoInventario = false
-            return
-        elseif mx >= x + 250 and mx <= x + 450 then
-            modoInventario = true
-            triggerServerEvent("polvora:obtenerInventario", localPlayer)
-            return
-        end
-    end
-    
-    if modoInventario then
-        clickInventario(x, y, ancho, alto, mx, my)
-    else
-        clickTienda(x, y, ancho, alto, mx, my)
-    end
+    -- Solo manejar clicks en la tienda
+    clickTienda(x, y, ancho, alto, mx, my)
 end
 
 -- Clicks tienda
@@ -244,32 +166,6 @@ function clickTienda(x, y, ancho, alto, mx, my)
     end
 end
 
--- Clicks inventario
-function clickInventario(x, y, ancho, alto, mx, my)
-    local listaY = y + 170
-    local itemAlto = 80
-    
-    for i, item in ipairs(inventarioJugador) do
-        local itemY = listaY + ((i - 1) * (itemAlto + 10))
-        
-        if my >= itemY and my <= itemY + itemAlto then
-            if mx >= x + ancho - 210 and mx <= x + ancho - 50 then
-                -- Buscar efecto
-                local efectoItem = ""
-                for _, itemData in ipairs(itemsPolvora) do
-                    if itemData.nombre == item.item then
-                        efectoItem = itemData.efecto
-                        break
-                    end
-                end
-                
-                triggerServerEvent("polvora:usarItem", localPlayer, item.item, efectoItem)
-                cerrarPanelPolvora()
-                return
-            end
-        end
-    end
-end
 
 -- Teclas
 function teclasPanelPolvora(key, press)
