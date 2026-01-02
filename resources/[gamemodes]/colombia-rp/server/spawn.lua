@@ -75,8 +75,23 @@ setTimer(function()
                 local interior = getElementInterior(player)
                 local dimension = getElementDimension(player)
                 
-                executeDatabase("UPDATE characters SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ? WHERE id = ?",
-                    x, y, z, rotation, interior, dimension, characterId)
+                -- Guardar armor del chaleco si tiene uno equipado
+                local hasVest = getElementData(player, "has:vest")
+                local vestArmor = 0
+                if hasVest then
+                    vestArmor = math.floor(getPedArmor(player))
+                    if vestArmor < 0 then vestArmor = 0 end
+                end
+                
+                -- Intentar actualizar con armor, si falla (columna no existe), actualizar sin ella
+                local success = executeDatabase("UPDATE characters SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, armor = ? WHERE id = ?",
+                    x, y, z, rotation, interior, dimension, vestArmor, characterId)
+                
+                if not success then
+                    -- Si falla, actualizar sin la columna armor
+                    executeDatabase("UPDATE characters SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ? WHERE id = ?",
+                        x, y, z, rotation, interior, dimension, characterId)
+                end
             end
         end
     end
@@ -209,14 +224,48 @@ function respawnAtDeathLocation(player)
 end
 
 -- Evento cuando el jugador muere
+-- Actualizar armor del chaleco cuando el jugador recibe daño
+addEventHandler("onPlayerDamage", root, function(attacker, weapon, bodypart, loss)
+    if not getElementData(source, "character:selected") then
+        return
+    end
+    
+    local hasVest = getElementData(source, "has:vest")
+    if hasVest then
+        local currentArmor = math.floor(getPedArmor(source))
+        if currentArmor < 0 then currentArmor = 0 end
+        setElementData(source, "vest:armor", currentArmor)
+        
+        -- Si el armor llega a 0, quitar el chaleco
+        if currentArmor <= 0 then
+            removeElementData(source, "has:vest")
+            removeElementData(source, "vest:armor")
+        end
+    end
+end)
+
 addEventHandler("onPlayerWasted", root, function(ammo, attacker, weapon, bodypart)
     if not getElementData(source, "character:selected") then
         return
     end
     
+    -- Guardar armor del chaleco antes de removerlo (para que se guarde en la BD)
+    local hasVest = getElementData(source, "has:vest")
+    local vestArmor = 0
+    if hasVest then
+        vestArmor = math.floor(getPedArmor(source))
+        if vestArmor < 0 then vestArmor = 0 end
+    end
+    
     -- Remover chaleco al morir
     removeElementData(source, "has:vest")
     removeElementData(source, "vest:armor")
+    
+    -- Guardar el armor en la base de datos antes de que se pierda
+    local characterId = getElementData(source, "character:id")
+    if characterId and vestArmor > 0 then
+        executeDatabase("UPDATE characters SET armor = ? WHERE id = ?", vestArmor, characterId)
+    end
     
     outputServerLog("[DEATH] " .. getPlayerName(source) .. " ha muerto")
     

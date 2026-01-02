@@ -169,7 +169,28 @@ addEventHandler("onPlayerQuit", root, function()
         local hunger = getElementData(source, "character:hunger") or Config.Server.defaultHunger
         local thirst = getElementData(source, "character:thirst") or Config.Server.defaultThirst
         
-        local updateQuery = "UPDATE characters SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, health = ?, hunger = ?, thirst = ?, lastLogin = NOW() WHERE id = ?"
-        executeDatabase(updateQuery, x, y, z, rotation, interior, dimension, health, hunger, thirst, characterId)
+        -- Guardar armor del chaleco si tiene uno equipado
+        local hasVest = getElementData(source, "has:vest")
+        local vestArmor = 0
+        if hasVest then
+            vestArmor = math.floor(getPedArmor(source))
+            if vestArmor < 0 then vestArmor = 0 end
+        end
+        
+        -- Intentar actualizar con la columna armor, si no existe, solo actualizar sin ella
+        local updateQuery = "UPDATE characters SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, health = ?, hunger = ?, thirst = ?, armor = ?, lastLogin = NOW() WHERE id = ?"
+        local success = executeDatabase(updateQuery, x, y, z, rotation, interior, dimension, health, hunger, thirst, vestArmor, characterId)
+        
+        -- Si falla (probablemente porque la columna no existe), intentar sin la columna armor
+        if not success then
+            updateQuery = "UPDATE characters SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, health = ?, hunger = ?, thirst = ?, lastLogin = NOW() WHERE id = ?"
+            executeDatabase(updateQuery, x, y, z, rotation, interior, dimension, health, hunger, thirst, characterId)
+            -- Intentar agregar la columna si no existe
+            executeDatabase("ALTER TABLE characters ADD COLUMN armor INT NOT NULL DEFAULT 0")
+            -- Intentar guardar de nuevo
+            if vestArmor > 0 then
+                executeDatabase("UPDATE characters SET armor = ? WHERE id = ?", vestArmor, characterId)
+            end
+        end
     end
 end)

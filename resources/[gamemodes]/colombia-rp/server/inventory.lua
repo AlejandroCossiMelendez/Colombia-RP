@@ -290,14 +290,19 @@ addEventHandler("useItem", root, function(slot, itemId, itemIndex)
     local itemId = tonumber(item.item)
     local itemName = item.name or "Item"
     
-    -- Chaleco Antibalas (ID: 46) - Equipar y poner defensa al máximo
+    -- Chaleco Antibalas (ID: 46) - Equipar y poner defensa según el valor del item
     if itemId == 46 then
-        setPedArmor(source, 100)
-        outputChatBox("Has equipado un Chaleco Antibalas. Tu defensa está al máximo.", source, 0, 150, 255)
+        -- El valor del item es el porcentaje de defensa del chaleco
+        local armorValue = tonumber(item.value) or 100
+        if armorValue < 0 then armorValue = 0 end
+        if armorValue > 100 then armorValue = 100 end
+        
+        setPedArmor(source, armorValue)
+        outputChatBox("Has equipado un Chaleco Antibalas. Tu defensa está al " .. armorValue .. "%.", source, 0, 150, 255)
         
         -- Marcar que el jugador tiene chaleco equipado (para mostrar icono)
         setElementData(source, "has:vest", true)
-        setElementData(source, "vest:armor", 100) -- Guardar el porcentaje de defensa del chaleco
+        setElementData(source, "vest:armor", armorValue) -- Guardar el porcentaje de defensa del chaleco
         
         -- Remover el item del inventario usando el sistema de items
         if take then

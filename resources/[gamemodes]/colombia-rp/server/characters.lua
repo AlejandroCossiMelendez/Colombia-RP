@@ -157,6 +157,15 @@ addEventHandler("createCharacter", getRootElement(), function(name, surname, age
                             setElementHealth(source, character.health)
                             setElementModel(source, character.skin)
                             
+                            -- Cargar y equipar chaleco si tiene armor guardado
+                            local savedArmor = character.armor or 0
+                            if savedArmor and savedArmor > 0 then
+                                setPedArmor(source, savedArmor)
+                                setElementData(source, "has:vest", true)
+                                setElementData(source, "vest:armor", savedArmor)
+                                outputChatBox("Chaleco Antibalas restaurado. Defensa: " .. savedArmor .. "%", source, 0, 150, 255)
+                            end
+                            
                             -- Asegurar que el jugador esté en una posición segura después del spawn
                             setTimer(function()
                                 if isElement(source) then
@@ -265,6 +274,15 @@ addEventHandler("selectCharacter", getRootElement(), function(characterId)
         spawnPlayer(source, character.posX, character.posY, spawnZ, character.rotation, character.skin, character.interior, character.dimension)
         setElementHealth(source, character.health)
         setElementModel(source, character.skin)
+        
+        -- Cargar y equipar chaleco si tiene armor guardado
+        local savedArmor = character.armor or 0
+        if savedArmor and savedArmor > 0 then
+            setPedArmor(source, savedArmor)
+            setElementData(source, "has:vest", true)
+            setElementData(source, "vest:armor", savedArmor)
+            outputChatBox("Chaleco Antibalas restaurado. Defensa: " .. savedArmor .. "%", source, 0, 150, 255)
+        end
         
         outputServerLog("[CHARACTERS] Personaje spawneado en: " .. character.posX .. ", " .. character.posY .. ", " .. spawnZ)
         
