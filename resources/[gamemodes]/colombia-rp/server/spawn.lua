@@ -84,6 +84,7 @@ end, 300000, 0) -- Cada 5 minutos
 
 -- Sistema de Muerte y Respawn
 local deathTimers = {} -- Tabla para almacenar los timers de muerte
+local deathPositions = {} -- Tabla para almacenar las posiciones de muerte
 
 -- Función para revivir al jugador en el hospital
 function respawnAtHospital(player)
@@ -115,16 +116,78 @@ function respawnAtHospital(player)
         Config.Death.hospitalX, Config.Death.hospitalY, Config.Death.hospitalZ, 
         Config.Death.hospitalRotation, Config.Death.hospitalInterior, Config.Death.hospitalDimension, 100, characterId)
     
+    -- Notificar al cliente que fue revivido
+    triggerClientEvent(player, "onClientPlayerRevived", resourceRoot)
+    
     outputChatBox("Has sido trasladado al hospital.", player, 0, 255, 255)
     outputChatBox("Estás vivo nuevamente. ¡Ten más cuidado!", player, 0, 255, 0)
     
-    -- Limpiar el timer
+    -- Limpiar el timer y la posición de muerte
     if deathTimers[player] then
         if isTimer(deathTimers[player]) then
             killTimer(deathTimers[player])
         end
         deathTimers[player] = nil
     end
+    
+    if deathPositions[player] then
+        deathPositions[player] = nil
+    end
+    
+    return true
+end
+
+-- Función para revivir al jugador en el lugar donde murió
+function respawnAtDeathLocation(player)
+    if not isElement(player) then
+        return false
+    end
+    
+    local characterId = getElementData(player, "character:id")
+    if not characterId then
+        return false
+    end
+    
+    -- Verificar si hay posición de muerte guardada
+    if not deathPositions[player] then
+        return false
+    end
+    
+    local deathPos = deathPositions[player]
+    
+    -- Revivir al jugador en el lugar donde murió
+    spawnPlayer(player, deathPos.x, deathPos.y, deathPos.z, 
+                deathPos.rotation, 0, deathPos.interior, deathPos.dimension)
+    
+    -- Restaurar salud y modelo
+    local skin = getElementModel(player)
+    setElementModel(player, skin)
+    setElementHealth(player, 100)
+    setElementData(player, "character:health", 100)
+    
+    -- Activar cámara
+    setCameraTarget(player, player)
+    fadeCamera(player, true, 1.0)
+    
+    -- Actualizar posición en la base de datos
+    executeDatabase("UPDATE characters SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, health = ? WHERE id = ?",
+        deathPos.x, deathPos.y, deathPos.z, 
+        deathPos.rotation, deathPos.interior, deathPos.dimension, 100, characterId)
+    
+    -- Notificar al cliente que fue revivido
+    triggerClientEvent(player, "onClientPlayerRevived", resourceRoot)
+    
+    outputChatBox("Has sido revivido en el lugar donde moriste.", player, 0, 255, 0)
+    
+    -- Limpiar el timer y la posición de muerte
+    if deathTimers[player] then
+        if isTimer(deathTimers[player]) then
+            killTimer(deathTimers[player])
+        end
+        deathTimers[player] = nil
+    end
+    
+    deathPositions[player] = nil
     
     return true
 end
@@ -137,28 +200,42 @@ addEventHandler("onPlayerWasted", root, function(ammo, attacker, weapon, bodypar
     
     outputServerLog("[DEATH] " .. getPlayerName(source) .. " ha muerto")
     
+    -- Notificar al cliente que el jugador ha muerto
+    triggerClientEvent(source, "onClientPlayerDeath", resourceRoot, Config.Death.respawnTime / 1000)
+    
     -- Deshabilitar el efecto de "alma volando" - mantener la cámara fija en el lugar de la muerte
     setTimer(function()
         if isElement(source) then
-            local x, y, z = getElementPosition(source)
-            -- Configurar cámara fija en el lugar de la muerte
+            -- Desactivar la cámara del jugador para evitar el efecto de "alma volando"
             setCameraTarget(source, nil)
             fadeCamera(source, true, 1.0)
-            -- La cámara se mantendrá en el lugar de la muerte
         end
     end, 100, 1)
     
+    -- Guardar posición de muerte
+    local x, y, z = getElementPosition(source)
+    local rotation = getPedRotation(source)
+    local interior = getElementInterior(source)
+    local dimension = getElementDimension(source)
+    
+    -- Guardar posición de muerte para poder revivir ahí
+    deathPositions[source] = {
+        x = x,
+        y = y,
+        z = z,
+        rotation = rotation,
+        interior = interior,
+        dimension = dimension
+    }
+    
     -- Mostrar mensaje de muerte
+    outputChatBox("═══════════════════════════════════", source, 255, 0, 0)
     outputChatBox("Has muerto. Serás trasladado al hospital en 6 minutos...", source, 255, 0, 0)
+    outputChatBox("═══════════════════════════════════", source, 255, 0, 0)
     
     -- Guardar posición de muerte en la base de datos
     local characterId = getElementData(source, "character:id")
     if characterId then
-        local x, y, z = getElementPosition(source)
-        local rotation = getPedRotation(source)
-        local interior = getElementInterior(source)
-        local dimension = getElementDimension(source)
-        
         executeDatabase("UPDATE characters SET posX = ?, posY = ?, posZ = ?, rotation = ?, interior = ?, dimension = ?, health = 0 WHERE id = ?",
             x, y, z, rotation, interior, dimension, characterId)
     end
@@ -178,17 +255,19 @@ addEventHandler("onPlayerWasted", root, function(ammo, attacker, weapon, bodypar
         end
     end, Config.Death.respawnTime, 1)
     
-    -- Mostrar cuenta regresiva cada minuto
-    local minutesLeft = Config.Death.respawnTime / 60000
-    for i = 1, minutesLeft - 1 do
+    -- Actualizar tiempo en el cliente cada segundo
+    local totalSeconds = Config.Death.respawnTime / 1000
+    
+    for i = 1, totalSeconds do
         setTimer(function()
             if isElement(source) and deathTimers[source] then
-                local remaining = minutesLeft - i
-                if remaining > 0 then
-                    outputChatBox("Serás trasladado al hospital en " .. remaining .. " minuto(s)...", source, 255, 255, 0)
+                local remainingSeconds = totalSeconds - i
+                if remainingSeconds > 0 then
+                    -- Enviar actualización al cliente para mostrar en pantalla
+                    triggerClientEvent(source, "updateDeathTime", resourceRoot, remainingSeconds)
                 end
             end
-        end, i * 60000, 1)
+        end, i * 1000, 1)
     end
 end)
 
@@ -199,6 +278,10 @@ addEventHandler("onPlayerQuit", root, function()
             killTimer(deathTimers[source])
         end
         deathTimers[source] = nil
+    end
+    
+    if deathPositions[source] then
+        deathPositions[source] = nil
     end
 end)
 

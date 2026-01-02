@@ -57,3 +57,37 @@ addCommandHandler("pos", function(player, cmd)
     outputServerLog("[COORDS] " .. getPlayerName(player) .. " - " .. coordsString)
 end)
 
+-- Comando para revivir jugador en el lugar donde murió (solo admin)
+addCommandHandler("revivir", function(player, cmd, targetName)
+    if not isPlayerAdmin(player) then
+        outputChatBox("No tienes permiso para usar este comando.", player, 255, 0, 0)
+        return
+    end
+    
+    if not targetName then
+        outputChatBox("Uso: /revivir [nombre del jugador]", player, 255, 255, 0)
+        return
+    end
+    
+    local target = getPlayerFromName(targetName)
+    if not target then
+        outputChatBox("Jugador '" .. targetName .. "' no encontrado.", player, 255, 0, 0)
+        return
+    end
+    
+    -- Verificar que el jugador tenga un personaje seleccionado
+    if not getElementData(target, "character:selected") then
+        outputChatBox("El jugador " .. getPlayerName(target) .. " no tiene un personaje seleccionado.", player, 255, 0, 0)
+        return
+    end
+    
+    -- Intentar revivir en el lugar donde murió
+    if respawnAtDeathLocation(target) then
+        outputChatBox("Has revivido a " .. getPlayerName(target) .. " en el lugar donde murió.", player, 0, 255, 0)
+        outputChatBox("Un administrador te ha revivido en el lugar donde moriste.", target, 0, 255, 0)
+        outputServerLog("[ADMIN] " .. getPlayerName(player) .. " revivió a " .. getPlayerName(target) .. " en el lugar donde murió")
+    else
+        outputChatBox("No se pudo revivir a " .. getPlayerName(target) .. ". El jugador no está muerto o no hay posición de muerte guardada.", player, 255, 0, 0)
+    end
+end)
+
