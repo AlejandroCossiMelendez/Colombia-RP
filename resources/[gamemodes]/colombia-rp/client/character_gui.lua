@@ -110,7 +110,15 @@ end)
 -- Eventos del servidor
 addEvent("showCharacterGUI", true)
 addEventHandler("showCharacterGUI", resourceRoot, function()
-    showCharacterGUI()
+    -- Verificar que el jugador esté logueado antes de mostrar personajes
+    local loggedIn = getElementData(localPlayer, "account:loggedIn")
+    if loggedIn == true then
+        showCharacterGUI()
+    else
+        -- Si no está logueado, mostrar login primero
+        outputChatBox("Debes iniciar sesión primero", 255, 0, 0)
+        triggerClientEvent("showLoginGUI", resourceRoot)
+    end
 end)
 
 addEvent("hideCharacterGUI", true)

@@ -120,9 +120,15 @@ addEventHandler("loginResponse", resourceRoot, function(success, message)
     if browserContent and isElement(browserContent) then
         if success then
             executeBrowserJavascript(browserContent, "showSuccess('Login exitoso'); setLoading('loginBtn', false);")
+            -- Ocultar login y mostrar panel de personajes después de un delay
             setTimer(function()
                 hideLoginGUI()
-            end, 1000, 1)
+                -- Mostrar panel de personajes después de ocultar login
+                setTimer(function()
+                    triggerServerEvent("requestCharacters", localPlayer)
+                    triggerClientEvent("showCharacterGUI", resourceRoot)
+                end, 500, 1)
+            end, 1500, 1)
         else
             executeBrowserJavascript(browserContent, "showError('" .. tostring(message) .. "'); setLoading('loginBtn', false);")
         end
@@ -154,15 +160,9 @@ addEventHandler("registerResponse", resourceRoot, function(success, message)
     end
 end)
 
--- Mostrar login cuando el recurso se inicia
-addEventHandler("onClientResourceStart", resourceRoot, function()
-    setTimer(function()
-        local loggedIn = getElementData(localPlayer, "account:loggedIn")
-        if loggedIn ~= true then
-            showLoginGUI()
-        end
-    end, 2000, 1)
-end)
+-- NO mostrar login automáticamente al iniciar el recurso
+-- El servidor se encarga de mostrar el login cuando el jugador se conecta
+-- Esto evita conflictos cuando el recurso se recarga
 
 -- Limpiar al cerrar el recurso
 addEventHandler("onClientResourceStop", resourceRoot, function()
