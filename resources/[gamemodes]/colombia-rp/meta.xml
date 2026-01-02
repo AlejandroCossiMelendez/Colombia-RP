@@ -295,12 +295,14 @@
     <file src="hud-rp/Hype_Hud/imgs/agua.png" />
     
     <!-- Imágenes de items -->
+    <file src="items/images/1.png" type="client" />
     <file src="items/images/3.png" type="client" />
     <file src="items/images/5.png" type="client" />
     <file src="items/images/6.png" type="client" />
     <file src="items/images/7.png" type="client" />
     <file src="items/images/8.png" type="client" />
     <file src="items/images/9.png" type="client" />
+    <file src="items/images/32.png" type="client" />
     <file src="items/images/33.png" type="client" />
     <file src="items/images/36.png" type="client" />
     <file src="items/images/37.png" type="client" />
@@ -317,6 +319,7 @@
     <file src="items/images/51.png" type="client" />
     <file src="items/images/52.png" type="client" />
     <file src="items/images/53.png" type="client" />
+    <file src="items/images/54.png" type="client" />
     <file src="items/images/55.png" type="client" />
     <file src="items/images/56.png" type="client" />
     <file src="items/images/57.png" type="client" />
