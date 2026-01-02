@@ -199,7 +199,6 @@ end)
 addEvent("receiveCharacters", true)
 addEventHandler("receiveCharacters", resourceRoot, function(charList)
     characters = charList or {}
-    outputChatBox("Recibidos " .. #characters .. " personajes", 255, 255, 0)
     
     if characterList then
         guiGridListClear(characterList)
@@ -218,8 +217,8 @@ end)
 addEvent("characterCreateResponse", true)
 addEventHandler("characterCreateResponse", resourceRoot, function(success, message)
     if success then
-        outputChatBox(message, 0, 255, 0)
-        triggerServerEvent("requestCharacters", resourceRoot)
+        -- El personaje se spawnea automáticamente desde el servidor
+        -- No necesitamos recargar la lista porque el GUI se ocultará
     else
         outputChatBox("Error: " .. message, 255, 0, 0)
     end

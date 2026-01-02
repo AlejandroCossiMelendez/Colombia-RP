@@ -1,6 +1,6 @@
 -- Sistema de Personajes
 -- Nota: Los eventos están registrados en server/events.lua
-addEventHandler("requestCharacters", root, function()
+addEventHandler("requestCharacters", resourceRoot, function()
     local userId = getElementData(source, "account:userId")
     if not userId then
         triggerClientEvent(source, "receiveCharacters", resourceRoot, {})
@@ -18,7 +18,7 @@ addEventHandler("requestCharacters", root, function()
 end)
 
 -- Crear nuevo personaje
-addEventHandler("createCharacter", root, function(name, surname, age, gender, skin)
+addEventHandler("createCharacter", resourceRoot, function(name, surname, age, gender, skin)
     local userId = getElementData(source, "account:userId")
     local username = getElementData(source, "account:username")
     
@@ -80,16 +80,81 @@ addEventHandler("createCharacter", root, function(name, surname, age, gender, sk
     )
     
     if success then
-        triggerClientEvent(source, "characterCreateResponse", resourceRoot, true, "Personaje creado exitosamente")
-        -- Recargar lista de personajes
-        triggerEvent("requestCharacters", source)
+        -- Obtener el ID del personaje recién creado
+        local getCharQuery = "SELECT id FROM characters WHERE username = ? AND name = ? AND surname = ? ORDER BY created DESC LIMIT 1"
+        local charResult = queryDatabase(getCharQuery, username, name, surname)
+        
+        if charResult and #charResult > 0 then
+            local newCharacterId = charResult[1].id
+            outputServerLog("[CHARACTERS] Personaje creado con ID: " .. newCharacterId .. " para " .. username)
+            
+            -- Spawnear automáticamente el personaje recién creado
+            setTimer(function()
+                if isElement(source) then
+                    -- Llamar directamente a la función de selección para spawnearlo
+                    local userId = getElementData(source, "account:userId")
+                    if userId then
+                        local query = "SELECT * FROM characters WHERE id = ? AND username = (SELECT username FROM users WHERE id = ?) LIMIT 1"
+                        local result = queryDatabase(query, newCharacterId, userId)
+                        
+                        if result and #result > 0 then
+                            local character = result[1]
+                            
+                            -- Guardar datos del personaje en el elemento
+                            setElementData(source, "character:selected", true)
+                            setElementData(source, "character:id", character.id)
+                            setElementData(source, "character:name", character.name)
+                            setElementData(source, "character:surname", character.surname)
+                            setElementData(source, "character:age", character.age)
+                            setElementData(source, "character:gender", character.gender)
+                            setElementData(source, "character:money", character.money)
+                            setElementData(source, "character:hunger", character.hunger)
+                            setElementData(source, "character:thirst", character.thirst)
+                            setElementData(source, "character:health", character.health)
+                            
+                            outputServerLog("[CHARACTERS] Spawneando personaje recién creado ID: " .. newCharacterId .. " para " .. getPlayerName(source))
+                            
+                            -- Spawnear personaje
+                            spawnPlayer(source, character.posX, character.posY, character.posZ, character.rotation, character.skin, character.interior, character.dimension)
+                            setElementHealth(source, character.health)
+                            setElementModel(source, character.skin)
+                            
+                            -- Activar cámara del jugador
+                            setTimer(function()
+                                if isElement(source) then
+                                    setCameraTarget(source, source)
+                                    fadeCamera(source, true, 1.0)
+                                end
+                            end, 500, 1)
+                            
+                            -- Actualizar último login
+                            executeDatabase("UPDATE characters SET lastLogin = NOW() WHERE id = ?", newCharacterId)
+                            
+                            -- Ocultar GUI y mostrar HUD
+                            triggerClientEvent(source, "hideCharacterGUI", resourceRoot)
+                            triggerClientEvent(source, "showHUD", resourceRoot)
+                            
+                            -- Actualizar dinero
+                            setPlayerMoney(source, character.money)
+                            
+                            outputChatBox("¡Bienvenido, " .. character.name .. " " .. character.surname .. "!", source, 0, 255, 0)
+                            outputChatBox("Has aparecido en el mundo. ¡Disfruta tu aventura!", source, 0, 255, 255)
+                        end
+                    end
+                end
+            end, 500, 1)
+            
+            triggerClientEvent(source, "characterCreateResponse", resourceRoot, true, "Personaje creado exitosamente")
+        else
+            triggerClientEvent(source, "characterCreateResponse", resourceRoot, false, "Error al obtener el personaje creado")
+        end
     else
         triggerClientEvent(source, "characterCreateResponse", resourceRoot, false, "Error al crear el personaje")
     end
 end)
 
 -- Seleccionar personaje
-addEventHandler("selectCharacter", root, function(characterId)
+addEventHandler("selectCharacter", resourceRoot, function(characterId)
     local userId = getElementData(source, "account:userId")
     if not userId then
         return
@@ -149,7 +214,7 @@ addEventHandler("selectCharacter", root, function(characterId)
 end)
 
 -- Eliminar personaje
-addEventHandler("deleteCharacter", root, function(characterId)
+addEventHandler("deleteCharacter", resourceRoot, function(characterId)
     local userId = getElementData(source, "account:userId")
     if not userId then
         return
@@ -168,7 +233,12 @@ addEventHandler("deleteCharacter", root, function(characterId)
         
         if success then
             triggerClientEvent(source, "characterDeleteResponse", resourceRoot, true, "Personaje eliminado")
-            triggerEvent("requestCharacters", source)
+            -- Recargar lista de personajes
+            setTimer(function()
+                if isElement(source) then
+                    triggerClientEvent(source, "requestCharacters", resourceRoot)
+                end
+            end, 100, 1)
         else
             triggerClientEvent(source, "characterDeleteResponse", resourceRoot, false, "Error al eliminar el personaje")
         end
