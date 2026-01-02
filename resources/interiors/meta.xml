@@ -54,6 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 			(bool) true if toggling the lock was successful, false otherwise.
 	-->
     <export function="toggleLock" />
+    <script src="blips.lua" />
     
     <include resource="sql" />
     <export function="getPos" />

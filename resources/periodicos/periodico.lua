@@ -87,7 +87,7 @@ function createperiodico( player )
 	end
 end
 
-addCommandHandler("crearperiodico", createperiodico)
+addCommandHandler("createperiodico", createperiodico)
 
 
 
@@ -161,7 +161,7 @@ addEventHandler( "onElementClicked", resourceRoot,
 					if getDistanceBetweenPoints3D( x, y, z, getElementPosition( source ) ) < 5 and getElementDimension( player ) == getElementDimension( source ) then
 						if getElementType( periodico.periodico ) == "object" then
 							if getElementData(periodico.periodico, "operativa") == 1 then
-								if not getElementData(player, "newspaper") == false then outputChatBox("Ya tienes un periodico! Usa: /leerpdc para leerlo o /tirarpdc para tirarlo.", player, 0, 255, 0) return end
+								if not getElementData(player, "newspaper") == false then outputChatBox("Ya tienes un periodico! Usa: /leerperiodico para leerlo o /tirarperiodico para tirarlo.", player, 0, 255, 0) return end
 								if not exports.players:takeMoney(player, 4) then outputChatBox("(( No te puedes permitir un periodico. Cuesta 4$. ))", player, 255, 0, 0) return end
 								local textFile = fileOpen("text.txt", true)
 								local text = fileRead(textFile, 500)

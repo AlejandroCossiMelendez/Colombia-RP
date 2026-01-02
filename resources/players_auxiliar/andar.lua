@@ -1,6 +1,6 @@
 local andarHombre =
     {
-		[ 65 ] = false,
+		[ 65 ] = true,
 		[ 118 ] = true,
 		[ 121 ] = true,
 		[ 122 ] = true,

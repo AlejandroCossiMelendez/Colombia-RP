@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="camera" type="misc" name="[camera]" description="[camera]" />
-     <script src="script.lua" type="client" />
-     <file src="camera.txd" />
-     <file src="camera.dff" />
-</meta>

@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="TheOscar17" type="misc" name="FlowNose" description="FlowNose" />
-     <script src="script.lua" type="client" />
-     <file src="FlowNose.txd" />
-     <file src="FlowNose.dff" />
-</meta>

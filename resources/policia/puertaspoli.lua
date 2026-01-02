@@ -9,7 +9,7 @@ end
 -- 
 
 pd1gate = createObject ( 3089, 253.1767578125, 107.607421875, 1003.5477294922, 0, 0, 90 )
-setElementDimension ( pd1gate, 61 )
+setElementDimension ( pd1gate, 104 )
 setElementInterior ( pd1gate, 10 )
 
 function gatepd1c() 
@@ -27,7 +27,7 @@ end
 addCommandHandler("pd1", gatepd1o)
 
 pd2gate = createObject ( 3089, 253.1865234375, 110.580078125, 1003.5477294922, 0, 0, 270 )
-setElementDimension ( pd2gate, 61 )
+setElementDimension ( pd2gate, 104 )
 setElementInterior ( pd2gate, 10 )
 
 function gatepd2c() 
@@ -46,7 +46,7 @@ addCommandHandler("pd1", gatepd2o)
 -- 
 
 pd3gate = createObject ( 3089, 239.625, 116.099609375, 1003.5477294922, 0, 0, 90 )
-setElementDimension ( pd3gate, 61 )
+setElementDimension ( pd3gate, 104 )
 setElementInterior ( pd3gate, 10 )
 
 function gatepd3c() 
@@ -64,7 +64,7 @@ end
 addCommandHandler("pd2", gatepd3o)
 
 pd4gate = createObject ( 3089, 239.63491821289, 119.07646179199, 1003.5477294922, 0, 0, 270 )
-setElementDimension ( pd4gate, 61 )
+setElementDimension ( pd4gate, 104 )
 setElementInterior ( pd4gate, 10 )
 
 function gatepd4c() 
@@ -82,92 +82,92 @@ addCommandHandler("pd2", gatepd4o)
 
 -- 
 
-pd5gate = createObject ( 3089, 245, 72.400001525879, 1004)
-setElementDimension ( pd5gate, 2578 )
-setElementInterior ( pd5gate, 6 )
+pd5gate = createObject ( 3089, 253.1669921875, 123.767578125, 1003.5477294922, 0, 0, 90 )
+setElementDimension ( pd5gate, 104 )
+setElementInterior ( pd5gate, 10 )
 
 function gatepd5c() 
-moveObject ( pd5gate, 2000, 245, 72.400001525879, 1004 )
+moveObject ( pd5gate, 2000, 253.1669921875, 123.767578125, 1003.5477294922 )
 end
                                              
 function gatepd5o(thePlayer, command)
-if exports.factions:isPlayerInFaction( thePlayer, 1 ) or exports.factions:isPlayerInFaction( thePlayer, 22 ) then
-outputChatBox("Puerta Celda 1 Abierta.",thePlayer)   
-moveObject ( pd5gate, 2000, 244, 72.400001525879, 1004) 
+if exports.factions:isPlayerInFaction( thePlayer, 1 ) then
+outputChatBox("Puerta 3 abierta.",thePlayer)   
+moveObject ( pd5gate, 2000, 253.1682434082, 122.74251556396, 1003.5477294922) 
 setTimer (gatepd5c, 3000, 1)
 end
 end
 
-addCommandHandler("pdc1", gatepd5o)
+addCommandHandler("pd3", gatepd5o)
 
-pd6gate = createObject ( 3089, 247.89999389648, 72.400001525879, 1004, 0, 0, 181.00006103516 )
-setElementDimension ( pd6gate, 2578 )
-setElementInterior ( pd6gate, 6 )
+pd6gate = createObject ( 3089, 253.17578125, 126.75, 1003.5477294922, 0, 0, 270 )
+setElementDimension ( pd6gate, 104 )
+setElementInterior ( pd6gate, 10 )
 
 function gatepd6c() 
-moveObject ( pd6gate, 2000, 247.89999389648, 72.400001525879, 1004 )
+moveObject ( pd6gate, 2000, 253.17578125, 126.75, 1003.5477294922 )
 end
                                              
 function gatepd6o(thePlayer, command)
-if exports.factions:isPlayerInFaction( thePlayer, 1 ) or exports.factions:isPlayerInFaction( thePlayer, 22 ) then  
-moveObject ( pd6gate, 2000, 248.8, 72.400001525879, 1004) 
+if exports.factions:isPlayerInFaction( thePlayer, 1 ) then  
+moveObject ( pd6gate, 2000, 253.18453979492, 127.77506256104, 1003.5477294922) 
 setTimer (gatepd6c, 3000, 1)
 end
 end
 
-addCommandHandler("pdc1", gatepd6o)
+addCommandHandler("pd3", gatepd6o)
 
 --
 
-pd7gate = createObject ( 2930, 3152.2001953125, -2004.099609375, 12.699999809265, 0, 0, 304.74975585938 )
-setElementDimension ( pd7gate, 0 )
-setElementInterior ( pd7gate, 0 )
+pd7gate = createObject ( 3089, 239.6025390625, 123.599609375, 1003.5477294922, 0, 0, 90 )
+setElementDimension ( pd7gate, 104 )
+setElementInterior ( pd7gate, 10 )
 
 function gatepd7c() 
-moveObject ( pd7gate, 2000, 3152.2001953125, -2004.099609375, 12.699999809265 )
+moveObject ( pd7gate, 2000, 239.6025390625, 123.599609375, 1003.5477294922 )
 end
                                              
 function gatepd7o(thePlayer, command)
-	if exports.factions:isPlayerInFaction( thePlayer, 1 ) or exports.factions:isPlayerInFaction( thePlayer, 22 ) then
-	outputChatBox("Puerta Patios Abierta.",thePlayer)   
-	moveObject ( pd7gate, 2000, 3152.2001953125, -2004.099609375, 10) 
+	if exports.factions:isPlayerInFaction( thePlayer, 1 ) then
+	outputChatBox("Puerta 4 abierta.",thePlayer)   
+	moveObject ( pd7gate, 2000, 239.59878540039, 122.57454681396, 1003.5477294922) 
 	setTimer (gatepd7c, 3000, 1)
 	end
 end
 
-addCommandHandler("pdt", gatepd7o)
+addCommandHandler("pd4", gatepd7o)
 
-pd8gate = createObject ( 3089, -327.39999389648, 1551.6999511719, 77.599998474121, 0, 0, 179.99450683594 )
-setElementDimension ( pd8gate, 1000 )
-setElementInterior ( pd8gate, 1000 )
+pd8gate = createObject ( 3089, 239.6123046875, 126.57421875, 1003.5477294922, 0, 0, 270 )
+setElementDimension ( pd8gate, 104 )
+setElementInterior ( pd8gate, 10 )
 
 function gatepd8c() 
-moveObject ( pd8gate, 2000, -327.39999389648, 1551.6999511719, 77.599998474121 )
+moveObject ( pd8gate, 2000, 239.6123046875, 126.57421875, 1003.5477294922 )
 end
                                              
 function gatepd8o(thePlayer, command)
-	if exports.factions:isPlayerInFaction( thePlayer, 1 ) or exports.factions:isPlayerInFaction( thePlayer, 22 ) then  
-		moveObject ( pd8gate, 2000, -325.9, 1551.6999511719, 77.599998474121) 
+	if exports.factions:isPlayerInFaction( thePlayer, 1 ) then  
+		moveObject ( pd8gate, 2000, 239.62919616699, 127.59896850586, 1003.5477294922) 
 		setTimer (gatepd8c, 3000, 1)
 	end
 end
 
-addCommandHandler("pdc2", gatepd8o)
+addCommandHandler("pd4", gatepd8o)
 
 --
 
-pd10gate = createObject ( 976, 259.39999389648, 86.800003051758, 1000.5999755859, 0, 0, 90.5 )
-setElementDimension ( pd10gate, 2578 )
-setElementInterior ( pd10gate, 6 )
+pd10gate = createObject ( 969, 211.8448638916, 116.53050994873, 997.36499023438 )
+setElementDimension ( pd10gate, 104 )
+setElementInterior ( pd10gate, 10 )
 
 function gatepd10c() 
-moveObject ( pd10gate, 2000, 259.39999389648, 86.800003051758, 1000.5999755859 )
+moveObject ( pd10gate, 2000, 211.8448638916, 116.53050994873, 997.36499023438 )
 end
                                              
 function gatepd10o(thePlayer, command)
-	if exports.factions:isPlayerInFaction( thePlayer, 1 ) or exports.factions:isPlayerInFaction( thePlayer, 22 ) then
+	if exports.factions:isPlayerInFaction( thePlayer, 1 ) then
 		outputChatBox("Puerta de las celdas abierta.",thePlayer)   
-		moveObject ( pd10gate, 2000, 259.39999389648, 86.800003051758, 998 ) 
+		moveObject ( pd10gate, 2000, 211.8448638916, 116.53050994873, 993.0107421875 ) 
 		setTimer (gatepd10c, 3000, 1)
 	end
 end
@@ -175,21 +175,20 @@ end
 addCommandHandler("pdc", gatepd10o)
 
 
-pdjailgate1 = createObject ( 976, 2873.8000488281, -1954.4000244141, 10.10000038147, 0, 0, 270 )
-setElementDimension ( pdjailgate1, 0 )
-setElementInterior ( pdjailgate1, 0, 2873.8000488281, -1954.4000244141, 10.10000038147 )
+pdjailgate1 = createObject ( 976, 227.71434020996, 133.72973632813, 1002.0435791016, 0, 0, 270 )
+setElementDimension ( pdjailgate1, 104 )
+setElementInterior ( pdjailgate1, 10, 227.71434020996, 133.72973632813, 1002.0435791016 )
 
 	
 function pdgatejailc() 
-	moveObject ( pdjailgate1, 3000, 2873.8000488281, -1954.4000244141, 10.10000038147 )
+	moveObject ( pdjailgate1, 3000, 227.71434020996, 133.72973632813, 1002.0435791016 )
 end
                                              
 function pdgatejailo(thePlayer, command)
-	if exports.factions:isPlayerInFaction( thePlayer, 1 ) or exports.factions:isPlayerInFaction( thePlayer, 22 ) then
-		outputChatBox("Puerta de Principal De Carcel Abierta.",thePlayer)  
-		moveObject ( pdjailgate1, 3000, 2873.8000488281, -1954.4000244141, 6) 
+	if exports.factions:isPlayerInFaction( thePlayer, 1 ) then  
+		moveObject ( pdjailgate1, 3000, 227.71434020996, 135.63565063477, 1002.0435791016) 
 		setTimer (pdgatejailc, 5000, 1)
 	end
 end
 
-addCommandHandler("pdp", pdgatejailo)
+addCommandHandler("pdj", pdgatejailo)

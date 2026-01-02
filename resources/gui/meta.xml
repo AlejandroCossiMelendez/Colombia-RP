@@ -21,6 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     
     <script src="windows/login_s.lua" type="server" />
     <script src="windows/windows.lua" type="client" size="687" />
+    <script src="windows/scoreboard.lua" type="client" size="2685" />
     
     <script src="windows/daritem.lua" type="client" size="1437" />
     <export function="updateGive" type="client" />

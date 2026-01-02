@@ -1,8 +1,0 @@
- <meta>
-    <info author="ColomoStyle" name="logo_server" version="1.0.0" type="script"/>
-    <script src="client.lua" type="client" />
-
-    <!--  Puedes hacer tu logo en https://cooltext.com  -->
-    <file src="logo1.png" />
-
-</meta>

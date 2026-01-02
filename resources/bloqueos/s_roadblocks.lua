@@ -27,7 +27,7 @@ addEvent( "roadblockCreateWorldObject", true )
 addEventHandler( "roadblockCreateWorldObject", getRootElement(), roadblockCreateWorldObject )
 
 function getNearbyRoadblocks(thePlayer, commandName)
-	if exports.factions:isPlayerInFaction ( thePlayer, 1 ) or exports.factions:isPlayerInFaction ( thePlayer, 22 ) or exports.factions:isPlayerInFaction ( thePlayer, 33 ) then
+	if exports.factions:isPlayerInFaction ( thePlayer, 1 ) or exports.factions:isPlayerInFaction ( thePlayer, 2 ) or exports.factions:isPlayerInFaction ( thePlayer, 10 ) then
 		local posX, posY, posZ = getElementPosition(thePlayer)
 		outputChatBox("Bloqueos cercanos:", thePlayer, 255, 126, 0)
 		local found = false	
@@ -51,7 +51,7 @@ end
 addCommandHandler("nearbybloqueos", getNearbyRoadblocks, false, false)
 
 function removeRoadblock(thePlayer, commandName, id)
-	if exports.factions:isPlayerInFaction ( thePlayer, 1 ) or  exports.factions:isPlayerInFaction ( thePlayer, 22 ) or exports.factions:isPlayerInFaction ( thePlayer, 33 ) then
+	if exports.factions:isPlayerInFaction ( thePlayer, 1 ) or  exports.factions:isPlayerInFaction ( thePlayer, 2 ) or exports.factions:isPlayerInFaction ( thePlayer, 10 ) then
 		if not (id) then
 			outputChatBox("SYNTAX: /" .. commandName .. " [Bloqueo ID]", thePlayer, 255, 194, 15)
 		else
@@ -72,7 +72,7 @@ end
 addCommandHandler("quitarbloqueo", removeRoadblock, false, false)
 
 function removeAllRoadblocks(thePlayer, commandName)
-	if exports.factions:isPlayerInFaction ( thePlayer, 1 ) or exports.factions:isPlayerInFaction ( thePlayer, 22 ) or exports.factions:isPlayerInFaction ( thePlayer, 33 ) then
+	if exports.factions:isPlayerInFaction ( thePlayer, 1 ) or exports.factions:isPlayerInFaction ( thePlayer, 2 ) or exports.factions:isPlayerInFaction ( thePlayer, 10 ) then
 		for i = 1, maxroadblocks do
 			if not (roadblocksarr[i]==nil) then
 				local object = roadblocksarr[i]
@@ -90,7 +90,7 @@ end
 addCommandHandler("quitarbloqueos", removeAllRoadblocks, false, false)
 
 function onRoadblockStart(thePlayer, commandName)
-    if exports.factions:isPlayerInFaction ( thePlayer, 1 ) or exports.factions:isPlayerInFaction ( thePlayer, 22 ) or exports.factions:isPlayerInFaction ( thePlayer, 33 ) then
+    if exports.factions:isPlayerInFaction ( thePlayer, 1 ) or exports.factions:isPlayerInFaction ( thePlayer, 2 ) or exports.factions:isPlayerInFaction ( thePlayer, 10 ) then
 		triggerClientEvent(thePlayer, "enableRoadblockGUI", getRootElement(), true)
 	else
 	outputChatBox("(( Autorizado: SFPD - SFMD - Constructora ))", thePlayer, 255, 0, 0)

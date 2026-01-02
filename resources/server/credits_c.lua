@@ -20,14 +20,14 @@ addEventHandler( "onClientResourceStart", resourceRoot,
 	function()
 		local screenX, screenY = guiGetScreenSize( )
 		-------- Texto en ventana N*1
-		local label = guiCreateLabel( 0, 0, screenX, 15, "", false )
+		local label = guiCreateLabel( 0, 0, screenX, 15, "DTRP - v1.0", false )
 		guiSetSize( label, guiLabelGetTextExtent( label ) + 5, 15, false )
-		guiSetPosition( label, screenX - guiLabelGetTextExtent( label ) - 15, screenY - 29.5, false )
-		guiSetAlpha( label, 0.45 )
+		guiSetPosition( label, screenX - guiLabelGetTextExtent( label ) - 215, screenY - 15.5, false )
+		guiSetAlpha( label, 0.55 )
 		-------- Texto en ventana N*2
-		local label2 = guiCreateLabel( 0, 0, screenX, 15, "", false )
+		local label2 = guiCreateLabel( 0, 0, screenX, 15, "foro.dt-mta.com", false )
 		guiSetSize( label2, guiLabelGetTextExtent( label2 ) + 5, 15, false )
 		guiSetPosition( label2, screenX - guiLabelGetTextExtent( label2 ) - 95, screenY - 15.5, false )
-		guiSetAlpha( label2, 0.45 )
+		guiSetAlpha( label2, 0.55 )
 	end
 )

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="Underground47" type="misc" name="Underground47" description="Special-Force" />
-     <script src="script.lua" type="client" />
-     <file src="skin1.txd" />
-     <file src="skin1.dff" />
-</meta>

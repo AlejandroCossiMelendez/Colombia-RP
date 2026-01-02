@@ -368,7 +368,6 @@ addCommandHandler( { "createvehicle", "makevehicle" },
 					exports.vehicles_auxiliar:saveColors(vehicle)
 					-- success message
 					outputChatBox( "Has creado un " .. getVehicleName( vehicle ) .. " con el ID " .. vehicleID .. ".", player, 0, 255, 0 )
-					exports.logs:addLogMessage("makeveh", getPlayerName(player):gsub("_", " ").." ha creado vehiculo con ID " .. vehicleID .. ".")
 				else
 					destroyElement( vehicle )
 					outputChatBox( "MySQL-Query failed.", player, 255, 0, 0 )
@@ -387,7 +386,7 @@ function createVehicleFromConce( player, model2 )
 	if isElement( player ) then
 		local characterID = exports.players:getCharacterID( player )
 		if characterID then
-		    local vehicle = createVehicle(tonumber(model2), 147.8017578125, -167.1845703125, 1.578125, 0, 0, 89.174621582031) 
+		    local vehicle = createVehicle(tonumber(model2), 1779.1943359375, 112.126953125, 34.458763122559, 359.8681640625, 359.99450683594, 159.97192382812)
 			local model = getElementModel( vehicle )
 			local x, y, z = getElementPosition( vehicle )
 			local rx, ry, rz = getVehicleRotation( vehicle )
@@ -592,72 +591,6 @@ addCommandHandler( { "respawnvehicle", "regenerarvehicle", "rv" },
 	end,
 	true
 )
-
-function createVehicleFromGaraje(vehicleID)
-	if vehicleID then
-		if getVehicle(tonumber(vehicleID)) then destroyElement(getVehicle(tonumber(vehicleID))) end
-		local data = exports.sql:query_assoc_single("SELECT * FROM vehicles WHERE vehicleID = "..vehicleID)
-		if not data then return false end
-		if data.inactivo == 0 then
-			local vehicle = createVehicle( data.model, data.posX, data.posY, data.posZ, data.rotX, data.rotY, data.rotZ )
-			setElementFrozen(vehicle, true)
-			setElementAlpha(vehicle, 127)
-			setElementCollisionsEnabled(vehicle, false)
-			setTimer(setElementCollisionsEnabled, 2000, 1, vehicle, true)
-			setTimer(setElementAlpha, 2000, 1, vehicle, 255)
-			-- tables for ID -> vehicle and vehicle -> data
-			vehicleIDs[ data.vehicleID ] = vehicle
-			vehicles[ vehicle ] = { vehicleID = data.vehicleID, respawnInterior = data.respawnInterior, respawnDimension = data.respawnDimension, characterID = data.characterID, engineState = not doesVehicleHaveEngine( vehicle ) or data.engineState == 1, tintedWindows = data.tintedWindows == 1, fuel = data.fuel, km = data.km, pinturas = data.pinturas, motor = data.motor, mejoramotor = data.mejoramotor, frenos = data.frenos, mejorafrenos = data.mejorafrenos, model = data.model }
-
-			setElementHealth( vehicle, data.health )
-			if data.health <= 300 then
-				vehicles[ vehicle ].engineState = false
-			end
-			if data.color1 and data.color2 then
-				r, g, b = HEX2RGB(data.color1)
-				r2, g2, b2 = HEX2RGB(data.color2)
-				setVehicleColor( vehicle, r, g, b, r2, g2, b2 )
-			end
-			if data.color3 then
-				r, g, b = HEX2RGB(data.color3)
-				setVehicleHeadLightColor ( vehicle, r, g, b )
-			end
-			setVehiclePlateText(vehicle, tostring(addZero( data.vehicleID, 4 )))
-			setVehicleRespawnPosition( vehicle, data.respawnPosX, data.respawnPosY, data.respawnPosZ, data.respawnRotX, data.respawnRotY, data.respawnRotZ )
-			setElementInterior( vehicle, data.interior )
-			setElementDimension( vehicle, data.dimension )
-			if data.alarma == 1 then
-				setElementData(vehicle, "havealarm", true)
-			end
-			-- setVehicleLocked( vehicle, true )
-			setVehicleEngineState( vehicle, false )
-			setVehicleOverrideLights( vehicle, data.lightsState + 1 )
-			setElementData( vehicle, "fuel", data.fuel )
-			if data.cepo == 1 then setVehicleEngineState( vehicle, false ) setElementData( vehicle, "cepo", 1 ) end
-			setVehiclePaintjob ( vehicle, data.pinturas )
-			setElementData(vehicle, "km", data.km)
-			setElementData(vehicle, "idowner", data.characterID)
-			setElementData(vehicle, "idveh", data.vehicleID)
-			exports.vehicles_auxiliar:applyTunning(vehicle)
-			setElementData(vehicle, "model", data.model)
-			setElementData(vehicle, "fasemotor", data.fasemotor)
-			setElementData(vehicle, "fasefrenos", data.fasefrenos)
-			if data.marchas == 1 then
-				setElementData(vehicle, "marchas", 1)
-			end
-			if data.marchas == 0 then
-				setElementData(vehicle, "marchas", 0)
-			end
-			if data.fasemotor > 0 then
-				exports.vehicles_auxiliar:solicitarMejora(vehicle, 1, data.fasemotor)
-			end
-			if data.fasefrenos > 0 then
-				exports.vehicles_auxiliar:solicitarMejora(vehicle, 2, data.fasefrenos)
-			end
-			return true
-		end
-	end
-end
 
 addCommandHandler( { "respawnvehicles", "regenerarvehicles", "rvs" },
 	function( player, commandName )
@@ -1191,12 +1124,12 @@ function toggleFreezeStatus ( thePlayer )
 			local newFreezeStatus = not currentFreezeStatus
 			if getVehicleType(playerVehicle) == "Automobile" then
 				if getPedOccupiedVehicleSeat(thePlayer) == 0 or getPedOccupiedVehicleSeat(thePlayer) == 1 then
-					--if isVehicleOnGround(playerVehicle) then
+					if isVehicleOnGround(playerVehicle) then
 						exports.chat:me( thePlayer, ( isElementFrozen( playerVehicle ) and "quita" or "pone" ) .. " el freno de mano." )
 						setElementFrozen ( playerVehicle, newFreezeStatus )
-					--else
-						--outputChatBox("¡No puedes poner el freno de mano si no estás en el suelo!", thePlayer, 255, 0, 0)
-					--end
+					else
+						outputChatBox("¡No puedes poner el freno de mano si no estás en el suelo!", thePlayer, 255, 0, 0)
+					end
 				end
 			elseif getVehicleType(playerVehicle) == "BMX" or getVehicleType(playerVehicle) == "Bike" then
 				exports.chat:me( thePlayer, ( isElementFrozen( playerVehicle ) and "quita" or "pone" ) .. " la pata de cabra." )
@@ -1629,7 +1562,7 @@ addEventHandler( "onElementClicked", resourceRoot,
 			local x, y, z = getElementPosition( player )
 			local ox, oy, oz = getElementPosition( source )
 			if getDistanceBetweenPoints3D( x, y, z, ox, oy, oz ) <= 8 and getElementDimension( player ) == getElementDimension( source ) then				
-			if getElementData(player, "mid") then outputChatBox("Abriendo maletero, llama staff si no te funciona correctamente.", player, 255, 0, 0) return end
+			if getElementData(player, "mid") then outputChatBox("Hemos detectado que has estado abriendo el maletero de un coche. Usa /dmal.", player, 255, 0, 0) return end
 				if getElementType( source ) == "vehicle" and not getElementData(player, "mid") and not isPedInVehicle(player) then
 					local vehicleID = getElementData(source, "idveh")
 					local vehicleID = tonumber(vehicleID)
@@ -1687,6 +1620,14 @@ addEventHandler( "onElementClicked", resourceRoot,
         end 
     end
 )
+
+function desbugMaletero(player)
+	if getElementData(player, "mid") then
+		outputChatBox("Has sido desbugeado, lo sentimos. Ya puedes abrir de nuevo cualquier maletero.", player, 255, 0, 0)
+		removeElementData(player, "mid")
+	end
+end
+addCommandHandler("dmal", desbugMaletero)
 
 function rolAbrirMaletero()
 	if source then
@@ -1756,8 +1697,8 @@ function getVehicleOwner(vehicleID, type)
 end
 
 function toggleCepo(player, commandName, id, ...)
-	if exports.factions:isPlayerInFaction(player, 1) or exports.factions:isPlayerInFaction(player, 33) then
-		if getElementData(player, "duty") == false then
+	if exports.factions:isPlayerInFaction(player, 1) then
+		if getElementData(player, "duty") == true then
 			local razon = table.concat({...}, " ")
 			if (...) and razon and tonumber(id) then
 				local id = tonumber(id)
@@ -1815,25 +1756,3 @@ function capo (player)
 end
 addEvent("onCapo", true)
 addEventHandler("onCapo", getRootElement(), capo )
-
--------------Vehicle_Destroy-----------------
-
-addEvent( "onVehicles > deleteOwnerVehicles", true )
-addEventHandler( "onVehicles > deleteOwnerVehicles", root,
-    function ( veh )
-        if veh then
-            saveVehicle( veh )
-            destroyElement( veh )
-        end
-    end
-)
-
-addEvent( "onVehicles > deleteVehicles", true )
-addEventHandler( "onVehicles > deleteVehicles", root,
-    function ( veh )
-        if veh then
-            saveVehicle( veh )
-            destroyElement( veh )
-        end
-    end
-)

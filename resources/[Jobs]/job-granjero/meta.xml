@@ -1,6 +1,0 @@
-<meta>
-	<script src="sourceC.lua" type="client" cache="false" />
-	<script src="sourceS.lua" type="server" />
-
-	<file src="Roboto.ttf" />
-</meta>

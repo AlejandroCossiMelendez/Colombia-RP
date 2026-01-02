@@ -21,8 +21,14 @@
     
     <file src="imagenesA/28.png" />
     <file src="imagenesA/22.png" />
+    <file src="imagenesA/23.png" />
+    <file src="imagenesA/34.png" />
+    <file src="imagenesA/33.png" />
+    <file src="imagenesA/8.png" />
+    <file src="imagenesA/18.png" />
     <file src="imagenesA/30.png" />
     <file src="imagenesA/26.png" />
+    <file src="imagenesA/32.png" />
     <file src="imagenesA/logoarmas.png" />
     
     <min_mta_version server="1.3.4-0.00000" client="1.5.2-9.07903"></min_mta_version>

@@ -71,7 +71,7 @@ function hint( ti, te, ic, dur )
 		color = { 197, 31, 31, 193 }
 	else
 		icon = "info"
-		color = { 0, 0, 0, 190 }   
+		color = { 38, 159, 235, 193 }   
 	end
 	
 	start = getTickCount( )

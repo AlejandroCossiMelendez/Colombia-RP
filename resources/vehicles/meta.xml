@@ -56,7 +56,8 @@
     <export function="toggleLock" />
     <export function="saveVehicle" />
     
-    <export function="createVehicleFromGaraje" />
+    
+    <script src="speedo_c.lua" type="client" size="4566" />
     
     <script src="fuel.lua" />
     <script src="fuel_c.lua" type="client" size="3946" />

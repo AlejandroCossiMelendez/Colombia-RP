@@ -81,7 +81,7 @@ function iniciarfuegoaleatorioAdmin()
 				destroyElement(col)
 			end, 420000, 1)
 		
-            triggerClientEvent("iniciarFuegosAntiHackers", getRootElement(),fX,fY,fZ)
+            triggerClientEvent("startTheFire", getRootElement(),fX,fY,fZ)
             local blip = exports.factions:createFactionBlip2(fX,fY,fZ, 2)
             setTimer ( function ()
                 destroyElement(blip)

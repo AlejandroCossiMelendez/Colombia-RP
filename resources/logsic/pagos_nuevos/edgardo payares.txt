@@ -1,4 +1,0 @@
-[2024-06-16 23:09:59] Cantidad $1000000 pagado a Mathias Gomez.
-[2024-06-17 17:07:00] Cantidad $1200000 pagado a Daniel Acosta.
-[2024-06-17 17:47:51] Cantidad $160000 pagado a Mathias Gomez.
-[2024-06-17 17:48:06] Cantidad $1500000 pagado a Mathias Gomez.

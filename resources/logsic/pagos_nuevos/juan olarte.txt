@@ -1,5 +1,0 @@
-[2024-06-14 22:44:53] Cantidad $2000000 pagado a Fermin Alberto.
-[2024-06-15 17:51:29] Cantidad $4000000 pagado a Juan Rodas.
-[2024-06-15 17:51:30] Cantidad $400000 pagado a Juan Rodas.
-[2024-06-15 22:42:30] Cantidad $1000000 pagado a Tom Holand.
-[2024-06-15 22:42:31] Cantidad $100000 pagado a Tom Holand.

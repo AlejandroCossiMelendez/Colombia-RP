@@ -1,6 +1,0 @@
-<meta>
-<info author="RodriX" description="creadordeautosymotos" version="1.5" type="script" />
-<script src="client.lua" type="client"/>
-<file src="ambulancia.txd" type="client"/>
-<file src="ambulancia.dff" type="client"/>
-</meta> 

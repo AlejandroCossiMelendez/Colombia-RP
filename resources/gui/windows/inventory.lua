@@ -49,7 +49,7 @@ function updateInventory( )
 		for k, v in ipairs( t ) do
 			local nItem = nil
 			if v and v.item and v.item == 27 then 
-				nItem = nil--exports.muebles:getNombreMueble(v.value)
+				nItem = exports.muebles:getNombreMueble(v.value)
 			else
 				if v.name and tostring(v.name) and tostring(v.name) ~= "" then 
 					nItem = v.name
@@ -64,7 +64,7 @@ function updateInventory( )
 				{
 						onHover = function( cursor, pos )
 						local width2 = dxGetTextWidth( nItem, 1, "default-bold" ) + 50
-						dxDrawRectangle( pos[1], pos[2], pos[3] - pos[1], pos[4] - pos[2], tocolor( unpack( getKeyState( 'c' ) and { 0, 255, 97, 63 } or { 0, 162, 255, 63 } ) ) )
+						dxDrawRectangle( pos[1], pos[2], pos[3] - pos[1], pos[4] - pos[2], tocolor( unpack( getKeyState( 'c' ) and { 255, 0, 0, 63 } or { 255, 255, 0, 63 } ) ) )
 						dxDrawRectangle( pos[1] + 64, pos[2] - 52, width2, height, tocolor( 0, 0, 0, 255 ), true )
 						dxDrawText( "ID: "..(string.len(tostring(v.value)) < 15 and tostring(v.value) or "Pulsa para más info."), pos[1] + 180, pos[2]+20 , pos[1] + width, pos[2] - height, tocolor( 160, 94, 0, 255 ), 1, "default-bold", "center", "center", false, false, true )
 						dxDrawText( nItem, pos[1] + 180, pos[2]-25 , pos[1] + width, pos[2] - height, tocolor( 255, 255, 255, 255 ), 1, "default-bold", "center", "center", false, false, true )
@@ -133,7 +133,7 @@ function updateInventory2(t, otherP)
 				{
 					onHover = function( cursor, pos )
 					local width2 = dxGetTextWidth( nItem, 1, "default-bold" ) + 50
-					dxDrawRectangle( pos[1], pos[2], pos[3] - pos[1], pos[4] - pos[2], tocolor( unpack( getKeyState( 'c' ) and { 255, 0, 0, 63 } or { 0, 162, 255, 63 } ) ) )
+					dxDrawRectangle( pos[1], pos[2], pos[3] - pos[1], pos[4] - pos[2], tocolor( unpack( getKeyState( 'c' ) and { 255, 0, 0, 63 } or { 255, 255, 0, 63 } ) ) )
 					dxDrawRectangle( pos[1] + 64, pos[2] - 52, width2, height, tocolor( 0, 0, 0, 255 ), true )
 					dxDrawText( "ID: "..tostring(v.value), pos[1] + 180, pos[2]+20 , pos[1] + width, pos[2] - height, tocolor( 160, 94, 0, 255 ), 1, "default-bold", "center", "center", false, false, true )
 					dxDrawText( nItem, pos[1] + 180, pos[2]-25 , pos[1] + width, pos[2] - height, tocolor( 255, 255, 255, 255 ), 1, "default-bold", "center", "center", false, false, true )

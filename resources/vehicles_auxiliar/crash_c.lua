@@ -52,7 +52,7 @@ function updateDamage()
 		c_lasthealth = getElementHealth(c_player) - 15*(c_lastspeed)
 		if 20*(c_lastspeed) > 5 and (getVehicleType(c_veh) == "Bike" or getVehicleType(c_veh) == "BMX") then
 			if getElementData(getLocalPlayer(), "antiSPAMCaida") == true then return end
-		    exports.infobox:addNotification("¡Recibiste daño por el choque, cuidado!", "warning")
+			outputChatBox("Has sufrido daños por la colisión. ¡Ten cuidado!", 255, 0, 0)
 			setElementData(getLocalPlayer(), "antiSPAMCaida", true)
 			setTimer(setElementData, 750, 1, getLocalPlayer(), "antiSPAMCaida", false)
 			local hp = getElementHealth(c_player)
@@ -69,7 +69,7 @@ function updateDamage()
 			end
 		else
 			if 10*(c_lastspeed) > 5 and not getElementData(c_player, "player.cinturon") == true then 
-	     	    exports.infobox:addNotification("¡Recibiste daño por el choque, cuidado!", "warning")
+				outputChatBox("Has sufrido daños por la colisión. ¡Abróchate el cinturón!", 255, 0, 0)
 				local hp = getElementHealth(c_player)
 				if (hp-30) > 1 then
 					setElementHealth(c_player , getElementHealth(c_player)-30)

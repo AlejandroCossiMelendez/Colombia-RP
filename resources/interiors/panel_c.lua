@@ -5,7 +5,7 @@ catVeh = {
 
 function abrirGUIConcesionario(sql)
 	showCursor(true)
-    ventana = guiCreateWindow(431, 215, 429, 455, "Inmobiliaria de Cali", false)
+    ventana = guiCreateWindow(431, 215, 429, 455, "Interiores a la venta - DownTown RolePlay", false)
     guiWindowSetSizable(ventana, false)
     listatodos = guiCreateGridList(30, 44, 245, 387, false, ventana)
     guiGridListAddColumn(listatodos, "ID", 0.2)

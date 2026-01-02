@@ -2,24 +2,24 @@ function ventanaPrincipal(sql1, sql2, sql3, sql4, sql5)
 	local screenW, screenH = guiGetScreenSize()
 	setElementData(getLocalPlayer(), "GUIPol", true)
 	showCursor(true)
-    GUIPolicial = guiCreateWindow((screenW - 1075) / 2, (screenH - 665) / 2, 1075, 665, "Panel Policial - Verso RP", false)
+    GUIPolicial = guiCreateWindow((screenW - 1075) / 2, (screenH - 665) / 2, 1075, 665, "Panel Policial - Red County Sheriff Department", false)
     guiWindowSetSizable(GUIPolicial, false)
 
     tabpanel = guiCreateTabPanel(51, 59, 979, 569, false, GUIPolicial)
---
-   -- tabconsultas = guiCreateTab("Servicio de consultas", tabpanel)
+--[[
+    tabconsultas = guiCreateTab("Servicio de consultas", tabpanel)
 
-   -- lmatriculas = guiCreateLabel(34, 34, 411, 49, "Consulta de matrículas", false, tabconsultas)
-   -- guiSetFont(lmatriculas, "sa-header")
-   -- ematriculas = guiCreateEdit(445, 44, 322, 29, "", false, tabconsultas)
-   -- ltelefonos = guiCreateLabel(34, 104, 411, 49, "Consulta de teléfonos", false, tabconsultas)
-   -- guiSetFont(ltelefonos, "sa-header")
-  --  etelefonos = guiCreateEdit(445, 114, 322, 29, "", false, tabconsultas)
-   -- lnombres = guiCreateLabel(34, 176, 411, 49, "Consulta de nombres", false, tabconsultas)
-   -- guiSetFont(lnombres, "sa-header")
-   -- enombres = guiCreateEdit(445, 186, 322, 29, "", false, tabconsultas)
-   -- bconsultar = guiCreateButton(793, 46, 176, 164, "Consultar", false, tabconsultas)
-
+    lmatriculas = guiCreateLabel(34, 34, 411, 49, "Consulta de matrículas", false, tabconsultas)
+    guiSetFont(lmatriculas, "sa-header")
+    ematriculas = guiCreateEdit(445, 44, 322, 29, "", false, tabconsultas)
+    ltelefonos = guiCreateLabel(34, 104, 411, 49, "Consulta de teléfonos", false, tabconsultas)
+    guiSetFont(ltelefonos, "sa-header")
+    etelefonos = guiCreateEdit(445, 114, 322, 29, "", false, tabconsultas)
+    lnombres = guiCreateLabel(34, 176, 411, 49, "Consulta de nombres", false, tabconsultas)
+    guiSetFont(lnombres, "sa-header")
+    enombres = guiCreateEdit(445, 186, 322, 29, "", false, tabconsultas)
+    bconsultar = guiCreateButton(793, 46, 176, 164, "Consultar", false, tabconsultas)
+]]
 		tabordenes = guiCreateTab("Órdenes de búsqueda", tabpanel)
 
 		gridordenes = guiCreateGridList(29, 16, 916, 427, false, tabordenes)
@@ -60,7 +60,7 @@ function ventanaPrincipal(sql1, sql2, sql3, sql4, sql5)
 		guiGridListAddColumn(gridrobados, "Denuncia Nº", 0.33) 
 		guiGridListAddColumn(gridrobados, "Matrícula", 0.33)
         guiGridListAddColumn(gridrobados, "Modelo", 0.33)
-		guiGridListAddColumn(gridrobados, "Fecha", 0.2)
+		--guiGridListAddColumn(gridrobados, "Fecha", 0.2)
 		
 		-- FIN VEHICULOS ROBADOS --
 
@@ -75,8 +75,8 @@ function ventanaPrincipal(sql1, sql2, sql3, sql4, sql5)
 		guiGridListAddColumn(gridarrestos, "Delitos", 0.3)
 		guiGridListAddColumn(gridarrestos, "Agente emisor", 0.12)
 
-         bnuevohistorial = guiCreateButton(296, 467, 179, 48, "Añadir historial", false, tabarrestos)
-         bmodifhistorial = guiCreateButton(511, 467, 179, 48, "Modificar historial", false, tabarrestos)
+        -- bnuevohistorial = guiCreateButton(296, 467, 179, 48, "Añadir historial", false, tabarrestos)
+        -- bmodifhistorial = guiCreateButton(511, 467, 179, 48, "Modificar historial", false, tabarrestos)
 		
 		tabdepositos = guiCreateTab("Archivo del depósito", tabpanel)
 		
@@ -318,13 +318,17 @@ function aplicarDatos(code, consulta, consulta2)
 		for k, v in ipairs(consulta) do
 		    local r = guiGridListAddRow(gridarmas)
 			guiGridListSetItemText(gridarmas, r, 1, tostring(v.licenciaID), false, true)
-			guiGridListSetItemText(gridarmas, r, 4, tostring(getWeaponNameFromID(tonumber(v.weapon)).." - "..tostring(v.weapon)), false, true)
-			guiGridListSetItemText(gridarmas, r, 5, tostring(v.cost), false, true)
-			guiGridListSetItemText(gridarmas, r, 6, tostring(v.time), false, true)
+			guiGridListSetItemText(gridarmas, r, 2, tostring(consulta2[tonumber(v.cIDJusticia)]), false, false)
+			guiGridListSetItemText(gridarmas, r, 3, tostring(consulta2[tonumber(v.cID)]), false, false)
+			guiGridListSetItemText(gridarmas, r, 4, tostring(getWeaponNameFromID(tonumber(v.weapon)).." - "..tostring(v.weapon)), false, false)
+			guiGridListSetItemText(gridarmas, r, 5, tostring(v.cost), false, false)
+			guiGridListSetItemText(gridarmas, r, 6, tostring(v.time), false, false)
 			if tonumber(v.status) == 0 then
-				guiGridListSetItemText(gridarmas, r, 7, "Válida", false, true)
+				guiGridListSetItemText(gridarmas, r, 7, "Válida", false, false)
 				guiGridListSetItemColor(gridarmas, r, 7, 0, 255, 0)
 			else
+				guiGridListSetItemText(gridarmas, r, 7, "Anulada ("..tostring(consulta2[tonumber(v.cIDJusticiaNull)])..")", false, false)
+				guiGridListSetItemColor(gridarmas, r, 7, 255, 0, 0)
 			end
 		end
 	end	

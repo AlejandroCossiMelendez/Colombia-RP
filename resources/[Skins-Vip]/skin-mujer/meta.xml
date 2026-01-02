@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="ByViniZx" type="misc" name="ByViniZx" description="ByViniZx" />
-     <script src="script.lua" type="client" />
-     <file src="ByViniZx.txd" />
-     <file src="ByViniZx.dff" />
-</meta>

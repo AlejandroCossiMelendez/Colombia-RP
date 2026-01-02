@@ -1,8 +1,0 @@
-<meta>
-	<info author="monsalveee_0"/>
-    <script src="config.lua" type="shared"/>
-	<script src='server.luac' type="server" />
-	<script src='blips.lua' type="server" />
-	<script src='client.luac' type="client" />
-	<file src="mando.mp3" />
-</meta>

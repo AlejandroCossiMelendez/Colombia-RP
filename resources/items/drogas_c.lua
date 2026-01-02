@@ -1,5 +1,5 @@
 local localPlayer = getLocalPlayer()
-local drugMessages = { "¡La puta madre gil!", "Estoy viajando!", "Eh bo, queres más droga?", "¡Hijo de puta!", "Ey, ¿Estas bien?, pareces un poco restrasado", "¡Es impresentable ver a tipos como vos!", "¿Que haces boludo?, ¡Estas loco!", "¡Voy a llamar a la policia!" }
+local drugMessages = { "¡Que te follen tio!", "Tio, ¡Estas volando!", "Eh tio, ¿Quieres mas drogas?", "¡Gilipolllas!", "Tio, ¿Estas bien?, pareces un poco restrasado", "¡Es impresentable ver a tipos como tú!", "¿Que haces tio?, ¡Estas loco!", "¡Voy a llamar a la policia!" }
  
 function doRandomMessage()
 	local x, y, z = getElementPosition(localPlayer)

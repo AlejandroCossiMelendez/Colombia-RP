@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="Cat" type="misc" name="60" description="60" />
-     <script src="script.lua" type="client" />
-     <file src="swat.txd" />
-     <file src="swat.dff" />
-</meta>

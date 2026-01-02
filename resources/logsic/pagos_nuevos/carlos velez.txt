@@ -1,5 +1,0 @@
-[2024-06-15 18:36:20] Cantidad $2000000 pagado a Rolman Bambino.
-[2024-06-15 23:16:13] Cantidad $50000000 pagado a Fernando Vidal.
-[2024-06-15 23:24:46] Cantidad $1200000 pagado a Fernando Vidal.
-[2024-06-17 02:58:34] Cantidad $50000000 pagado a Juan Bedoya.
-[2024-06-17 03:03:35] Cantidad $10300000 pagado a Rolman Bambino.

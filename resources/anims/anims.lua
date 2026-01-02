@@ -28,19 +28,19 @@ local anims =
 		{ block = "bar", anim = "barserve_give", time = 2000 },
 		{ { block = "bar", anim = "barserve_in", time = 1000 }, { block = "bar", anim = "barserve_loop", time = -1 } },
 	},
-	rapear =
+	batear =
 	{
-		{ block = "RAPPING", anim = "RAP_A_Loop", time = -1 },
-		{ block = "dancing", anim = "dance_loop", time = -1 },
-		{ block = "RAPPING", anim = "RAP_C_Loop", time = -1 },
+		{ block = "baseball", anim = "bat_1", time = 1000, updatePosition = true },
+		{ block = "baseball", anim = "bat_2", time = 1000, updatePosition = true },
+		{ block = "baseball", anim = "bat_3", time = 1000, updatePosition = true },
+		{ block = "baseball", anim = "bat_4", time = 1000, updatePosition = true },
+		{ block = "baseball", anim = "bat_hit_1", time = 1000, updatePosition = true },
+		{ block = "baseball", anim = "bat_hit_2", time = 1000, updatePosition = true },
+		{ block = "baseball", anim = "bat_hit_3", time = -1, updatePosition = true, loop = false },
 	},
 	bomba =
 	{
 		{ block = "bomber", anim = "bom_plant", time = 3000 },
-	},
-	paja =
-	{
-		{ block = "PAULNMAC", anim = "wank_loop", time = -1 },
 	},
 	agacharse =
 	{
@@ -48,8 +48,8 @@ local anims =
 	},
 	crack =
 	{
-		{ block = "crack", anim = "crckdeth3", time = 3000 },
-		{ block = "crack", anim = "crckdeth4", time = 3000 },
+		{ block = "crack", anim = "crckidle2", time = -1 },
+		{ block = "crack", anim = "crckidle3", time = -1 },
 		{ block = "crack", anim = "crckidle4", time = -1 },
 		{ block = "crack", anim = "crckidle1", time = -1 },
 		{ block = "wuzi", anim = "cs_dead_guy", time = -1 },

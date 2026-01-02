@@ -139,12 +139,11 @@ addEventHandler( "onClientRender", getRootElement( ),
 						local textwidth = dxGetTextWidth( tostring( text ) )
 						local width = math.max (ownerwidth, textwidth)
 						local height = ( price and 2 or 1 ) * dxGetFontHeight( )
-						dxDrawRectangle( sx - width, sy - height - 4.8, width * 2, height + 20, tocolor( 0, 0, 0, 0 ) )
+						dxDrawRectangle( sx - width, sy - height - 4.8, width * 2, height + 20, tocolor( 0, 0, 0, 200 ) )
 							
 						-- text
-						dxDrawText( tostring( text ), sx, sy - 75, sx, sy, tocolor( 46, 255, 0, 255 ), 1.1, "default-bold", "center", "center" )
-						dxDrawText( tostring( ownertext ), sx, sy + -45, sx, sy, tocolor( 255, 255, 255, 255 ), 0.99, "default-bold", "center", "center" )
-                                                dxDrawText( "Pulsa 'P' para entrar", sx, sy + -15, sx, sy, tocolor( 255, 255, 255, 255 ), 0.95, "default-bold", "center", "center" )
+						dxDrawText( tostring( text ), sx, sy - 27, sx, sy, tocolor( 255, 255, 255, 255 ), 1, "default", "center", "center" )
+						dxDrawText( tostring( ownertext ), sx, sy + 16, sx, sy, tocolor( 255, 255, 255, 255 ), 1, "default", "center", "center" )
 					end
 				end
 			else

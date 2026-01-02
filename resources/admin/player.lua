@@ -1,12 +1,21 @@
-﻿local anuncios = { "", 
-"", 
-""}
+﻿local anuncios = { "Recuerda usar /duda antes de /pm. ¡Por una atención rápida y eficaz!", 
+"¡Visita el foro en foro.dt-mta.com para enterarte de todo!", 
+"Si observas algún bug, o tienes algún problema, pulsa F1.", 
+"¿Aún no sabes que tenemos servidor de TS3? IP: ts3.dt-mta.com",
+"¿Necesitas ayuda sobre el servidor? Pulsa F1 o avisanos con /duda ;)", 
+"¿Cansado de tu personaje? Usa /borrarmipj para informarte sobre cómo borrarlo.",
+"¿Harto de trabajar mucho y ganar poco? ¡Ve a foro.dt-mta.com para entrar en una empresa!",
+"¿Sabes que tenemos navegador?, podrás acceder a foro y youtube usa (/web)!",
+"Recuerda: el F1 es sólo para problemas graves o sugerencias. ¡Usa /duda primero!",
+"Recuerda: las multicuentas, el pasar un vehículo a otro de tus PJ... ¡Es Sancionable!",
+"Recuerda: respetar los entornos de los lugares y tener un rol adecuado del personaje.",
+"¿Nos necesitas? Utiliza /duda para cualquier problema ;)"}
 
 function mensajeAleatorio()
-	outputChatBox(anuncios[math.random(1, #anuncios)], root, 108, 255, 0)
+	outputChatBox(anuncios[math.random(1, #anuncios)], root, 127, 255, 127)
 end
-setTimer(mensajeAleatorio, 8500, 1)
-setTimer(mensajeAleatorio, 85000, 0)
+setTimer(mensajeAleatorio, 10000, 1)
+setTimer(mensajeAleatorio, 900000, 0)
 --addCommandHandler("mst", mensajeAleatorio)
 
 -- addCommandHandler supporting arrays as command names (multiple commands with the same function)
@@ -159,7 +168,6 @@ end
 
 addCommandHandler( "revivir",
 	function( player, commandName, otherPlayer, health )
-	if exports.players:getOption(player, "staffduty") == true then
 		if otherPlayer then
 			local other, name = exports.players:getFromName( player, otherPlayer )
 			if other then	
@@ -195,9 +203,6 @@ addCommandHandler( "revivir",
 		else
 			outputChatBox( "Syntax: /" .. commandName .. " [player] [(optional) health]", player, 255, 255, 255 )
 		end
-	else
-		outputChatBox("Debes de estar en servicio (/staffduty)", player, 255, 0, 0)
-	end
 	end,
 	true
 )
@@ -313,7 +318,6 @@ addCommandHandler( "mandarls",
 
 addCommandHandler( "get",
 	function( player, commandName, otherPlayer )
-	if exports.players:getOption(player, "staffduty") == true then
 		if otherPlayer then
 			local other, name = exports.players:getFromName( player, otherPlayer )
 			if other then
@@ -356,16 +360,12 @@ addCommandHandler( "get",
 		else
 			outputChatBox( "Syntax: /" .. commandName .. " [player]", player, 255, 255, 255 )
 		end
-	else
-		outputChatBox("Debes de estar en servicio (/staffduty)", player, 255, 0, 0)
-	end
 	end,
 	true
 )
 
 addCommandHandler( "goto",
 	function( player, commandName, otherPlayer )
-	if exports.players:getOption(player, "staffduty") == true then
 		if otherPlayer then
 			local other, name = exports.players:getFromName( player, otherPlayer )
 			if other then
@@ -405,9 +405,6 @@ addCommandHandler( "goto",
 		else
 			outputChatBox( "Syntax: /" .. commandName .. " [player]", player, 255, 255, 255 )
 		end
-	else
-		outputChatBox("Debes de estar en servicio (/staffduty)", player, 255, 0, 0)
-	end
 	end,
 	true
 )
@@ -466,7 +463,6 @@ addCommandHandler( "pagostaff",
 
 addCommandHandler( { "freeze", "unfreeze" },
 	function( player, commandName, otherPlayer )
-	if exports.players:getOption(player, "staffduty") == true then
 		if otherPlayer then
 			local other, name = exports.players:getFromName( player, otherPlayer )
 			if other then
@@ -494,16 +490,12 @@ addCommandHandler( { "freeze", "unfreeze" },
 		else
 			outputChatBox( "Syntax: /" .. commandName .. " [player]", player, 255, 255, 255 )
 		end
-	else
-		outputChatBox("Debes de estar en servicio (/staffduty)", player, 255, 0, 0)
-	end
 	end,
 	true
 )
 
 addCommandHandler( { "sethealth", "sethp" },
 	function( player, commandName, otherPlayer, health )
-	if exports.players:getOption(player, "staffduty") == true then
 		local health = tonumber( health )
 		if otherPlayer and health and health >= 0 and health <= 100 then
 			local other, name = exports.players:getFromName( player, otherPlayer )
@@ -528,9 +520,6 @@ addCommandHandler( { "sethealth", "sethp" },
 		else
 			outputChatBox( "Syntax: /" .. commandName .. " [player] [health]", player, 255, 255, 255 )
 		end
-	else
-		outputChatBox("Debes de estar en servicio (/staffduty)", player, 255, 0, 0)
-	end
 	end,
 	true
 )
@@ -618,7 +607,7 @@ end
  
  
 
-addCommandHandler( { "adminactivo", "staffon" },
+addCommandHandler( { "staff", "admins" },
 	function( player, commandName, ... )
 		if exports.players:isLoggedIn( player ) then
 			local devs = {}
@@ -646,14 +635,14 @@ addCommandHandler( { "adminactivo", "staffon" },
 				for key, value in ipairs(devs) do
 					local duty = exports.players:getOption( value, "staffduty" )
 					local pm = getElementData(value, "pm", true)
-					outputChatBox( " [" .. exports.players:getID( value ) .. "] Dueño ["..tostring(exports.players:getUserName(value)).."] " .. getPlayerName( value ):gsub( "_", " " ) .. ( duty and " - #00FF00De servicio" or " - Fuera de servicio" ) .. ( pm and " - #00FF00PM On" or " #FFFFFF- PM Off" ) , player, 255, 255, 255, true )
+					outputChatBox( " [" .. exports.players:getID( value ) .. "] Auxiliar ["..tostring(exports.players:getUserName(value)).."] " .. getPlayerName( value ):gsub( "_", " " ) .. ( duty and " - #00FF00De servicio" or " - Fuera de servicio" ) .. ( pm and " - #00FF00PM On" or " #FFFFFF- PM Off" ) , player, 255, 255, 255, true )
 					count = count + 1
 				end
 				if count == 0 then
 					outputChatBox( "  Nadie.", player, 117, 115, 0 )
 					outputChatBox( "  Recuerda tomar fotos al F12 para reportar en el foro.", player, 255, 255, 0)
 				else
-					outputChatBox("Los Dueños no son staff, pero al no haber staff online, podrán actuar como tal.", player, 255, 255, 255)
+					outputChatBox("Los Auxiliar no son staff, pero al no haber staff online, podrán actuar como tal.", player, 255, 255, 255)
 				end
 			end
 		end

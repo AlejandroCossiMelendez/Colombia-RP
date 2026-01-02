@@ -19,7 +19,10 @@
     <export function="saveColors" />
     <export function="applyColors" />
     <export function="saveVinilos" />
-        
+    
+    <script src="indicators.lua" />
+    <script src="indicators_c.lua" type="client" size="15761" />
+    
     <export function="isModelVIP" />
     <export function="isModelVIP" type="client" />
     
@@ -46,6 +49,7 @@
     <script src="main_c.lua" type="client" size="10018" />
     
     <!-- Sistema de Cambio Manual / Embrague	-->
+    <script src="manual_c.lua" type="client" size="10938"></script>
     
     <!-- Sistema de sonido al girar marchatras	-->
     <script src="smarchaa_c.lua" type="client" size="2340"></script>

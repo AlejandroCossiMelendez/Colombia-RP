@@ -6,7 +6,7 @@
 end
  
 function bindGeneral(player)
-	if exports.factions:isPlayerInFaction(player, 3) or exports.factions:isPlayerInFaction(player, 36) then
+	if exports.factions:isPlayerInFaction(player, 3) then
 		if isPedInVehicle(player) then
 			local vehicle = getPedOccupiedVehicle(player)
 			if getElementData(vehicle, "inTunning") then
@@ -54,7 +54,7 @@ function getVehicleHandlingProperty( vehiculo, property )
 end
 
 function quitarPiezas(player, numPiezas)
-	if player and numPiezas and (exports.factions:isPlayerInFaction(player, 3) or exports.factions:isPlayerInFaction(player, 36)) then
+	if player and numPiezas and (exports.factions:isPlayerInFaction(player, 3))then
 		local piezas, slot, v = exports.items:has(player, 34)
 		if piezas then
 			if numPiezas > v.value then 
@@ -114,7 +114,7 @@ function(state)
 					outputChatBox("Has reparado el chasis del vehículo por 2 piezas.", source, 75, 255, 75)
 					playSoundFrontEnd ( source, 46 )
 				else
-					outputChatBox("No tienes las 2 piezas necesarias. Utiliza /herramienta", source, 255, 0, 0)
+					outputChatBox("No tienes las 2 piezas necesarias. Utiliza /comprarpiezas", source, 255, 0, 0)
 				end
 			elseif state == 2 then
 				if quitarPiezas(source, 3) then
@@ -125,7 +125,7 @@ function(state)
 					end
 					playSoundFrontEnd ( source, 46 )
 				else
-					outputChatBox("No tienes las 3 piezas necesarias. Utiliza /herramienta", source, 255, 0, 0)
+					outputChatBox("No tienes las 3 piezas necesarias. Utiliza /comprarpiezas", source, 255, 0, 0)
 				end
 			end
 		end
@@ -175,7 +175,7 @@ function ()
 		exports.sql:query_free("UPDATE vehicles SET alarma = 1 WHERE vehicleID = " .. vehicleID)
 		outputChatBox("Has instalado la alarma por 4 piezas.", source, 0, 255, 0)
 	else
-		outputChatBox("No tienes las 5 piezas necesarias. Utiliza /herramienta", source, 255, 0, 0)
+		outputChatBox("No tienes las 5 piezas necesarias. Utiliza /comprarpiezas", source, 255, 0, 0)
 	end
 end)
 
@@ -202,7 +202,7 @@ function confirmarInstalacionVinilos(player)
 			exports.vehicles_auxiliar:saveVinilos(vehicle)
 			outputChatBox("Has confirmado la instalación del vinilo por 200 piezas.", player, 255, 0, 0)
 		else
-			outputChatBox("No tienes las 200 piezas necesarias. Utiliza /herramienta", player, 255, 0, 0)
+			outputChatBox("No tienes las 200 piezas necesarias. Utiliza /comprarpiezas", player, 255, 0, 0)
 		end
 	end
 end
@@ -216,7 +216,7 @@ function quitarlosvinilospuestos()
 			exports.vehicles_auxiliar:saveVinilos(vehicle)
 			outputChatBox("INFO: Has quitado el vinilo que tenía el vehículo",source,255,0,0)
 		else
-			outputChatBox("(( No tienes las 50 piezas necesarias. Utiliza /herramienta ))",source, 255, 0, 0)
+			outputChatBox("(( No tienes las 50 piezas necesarias. Utiliza /comprarpiezas ))",source, 255, 0, 0)
 		end
 	end
 end
@@ -259,7 +259,7 @@ function ColorChanger ( color, r, g, b )
 					outputChatBox("Has cambiado el color primario por 4 piezas.", source, 0, 255, 0)
 					exports.vehicles_auxiliar:saveColors(vehicle)
 				else
-					outputChatBox("No tienes las 4 piezas necesarias. Utiliza /herramienta", source, 255, 0, 0)
+					outputChatBox("No tienes las 4 piezas necesarias. Utiliza /comprarpiezas", source, 255, 0, 0)
 					exports.vehicles_auxiliar:applyColors(vehicle)
 				end
 			elseif color == 2 then
@@ -269,7 +269,7 @@ function ColorChanger ( color, r, g, b )
 					outputChatBox("Has cambiado el color secundario por 3 piezas.", source, 0, 255, 0)
 					exports.vehicles_auxiliar:saveColors(vehicle)
 				else
-					outputChatBox("No tienes las 3 piezas necesarias. Utiliza /herramienta", source, 255, 0, 0)
+					outputChatBox("No tienes las 3 piezas necesarias. Utiliza /comprarpiezas", source, 255, 0, 0)
 					exports.vehicles_auxiliar:applyColors(vehicle)
 				end
 			elseif color == 3 then
@@ -278,7 +278,7 @@ function ColorChanger ( color, r, g, b )
 					outputChatBox("Has cambiado el color de los faros por 2 piezas.", source, 0, 255, 0)
 					exports.vehicles_auxiliar:saveColors(vehicle)
 				else
-					outputChatBox("No tienes las 2 piezas necesarias. Utiliza /herramienta", source, 255, 0, 0)
+					outputChatBox("No tienes las 2 piezas necesarias. Utiliza /comprarpiezas", source, 255, 0, 0)
 					exports.vehicles_auxiliar:applyColors(vehicle)
 				end
 			end
@@ -325,7 +325,7 @@ function rRuedas ( rueda )
 			end
 			playSoundFrontEnd ( source, 46 )
 		else
-			outputChatBox("No tienes las 4 piezas necesarias. Utiliza /herramienta", source, 255, 0, 0)
+			outputChatBox("No tienes las 4 piezas necesarias. Utiliza /comprarpiezas", source, 255, 0, 0)
 		end
 	end
 end
@@ -371,7 +371,7 @@ function marchas ( tipo )
 			outputChatBox("INFO: Ahora podrás conducir el vehículo sin necesidad de reducir ni subir.", source, 255, 255, 0)
 			playSoundFrontEnd ( source, 46 )
 		else
-		outputChatBox("(( No tienes las 100 piezas necesarias. Utiliza /herramienta ))", source, 255, 0, 0)
+		outputChatBox("(( No tienes las 100 piezas necesarias. Utiliza /comprarpiezas ))", source, 255, 0, 0)
 		end
 	elseif tipo == 0 then -- Modo manual
 		if quitarPiezas(source, 100) then
@@ -381,7 +381,7 @@ function marchas ( tipo )
 			exports.sql:query_free("UPDATE vehicles SET marchas = 1 WHERE vehicleID = "..tonumber(getElementData(vehicle, "idveh")))
 			playSoundFrontEnd ( source, 46 )
 		else
-		outputChatBox("(( No tienes las 100 piezas necesarias. Utiliza /herramienta ))", source, 255, 0, 0)
+		outputChatBox("(( No tienes las 100 piezas necesarias. Utiliza /comprarpiezas ))", source, 255, 0, 0)
 		end
 	end
 end
@@ -389,7 +389,7 @@ addEvent( "mecanico:marchas", true )
 addEventHandler( "mecanico:marchas", root, marchas )
 
 function aceptarFase (player)
-	if exports.factions:isPlayerInFaction(player, 3) or exports.factions:isPlayerInFaction(player, 36) then
+	if exports.factions:isPlayerInFaction(player, 3) then
 		local vehicle = getPedOccupiedVehicle(player)
 		if not vehicle then outputChatBox("No estás en un vehículo", player, 255, 0, 0) return end
 		local precioFinal = getElementData(vehicle, "mecanico.precioFinal")
@@ -427,13 +427,13 @@ end
 addCommandHandler("aceptarfase", aceptarFase)
 
 function comprarPiezas(player, cmd, cantida)
-	if exports.factions:isPlayerInFaction(player, 3) or exports.factions:isPlayerInFaction(player, 36) then
-		if not cantida then outputChatBox ("Sintaxis: /herramienta [cantidad]", player, 255, 255, 255) return end
+	if exports.factions:isPlayerInFaction(player, 3) then
+		if not cantida then outputChatBox ("Sintaxis: /comprarpiezas [cantidad]", player, 255, 255, 255) return end
 		local cantidad = math.floor(cantida)
-		if exports.factions:isPlayerInFaction(player, 3) and not isElementInRange(player, 1002.8541259766, 662.46484375, 18.46875, 5) or exports.factions:isPlayerInFaction(player, 36) and not isElementInRange(player, 345.4072265625, -70.626953125, 1.4431800842285, 5) then outputChatBox("(( No estás en el taller. ))", player, 255, 0, 0) return end
+		if exports.factions:isPlayerInFaction(player, 3) and not isElementInRange(player, 2304.76, -125.22, 26.45, 5) then outputChatBox("(( No estás en el taller. ))", player, 255, 0, 0) return end
 		if cantidad and cantidad > 0 then
 			if exports.players:takeMoney(player, tonumber(cantidad*50)) then
-				if exports.factions:isPlayerInFaction(player, 3) or exports.factions:isPlayerInFaction(player, 36) then
+				if exports.factions:isPlayerInFaction(player, 3) then
 					exports.factions:giveFactionPresupuesto(3, tonumber(cantidad*50))
 				end
 				local sitem, slot, item = exports.items:has(player, 34)
@@ -449,13 +449,13 @@ function comprarPiezas(player, cmd, cantida)
 				outputChatBox ("¡No tienes suficiente dinero! Cada pieza vale $50 dólares.", player, 255, 0, 0)
 			end
 		else
-			outputChatBox ("Sintaxis: /herramienta [cantidad]", player, 255, 255, 255)
+			outputChatBox ("Sintaxis: /comprarpiezas [cantidad]", player, 255, 255, 255)
 		end
 	else
 		outputChatBox ("(( No eres mecánico ))", player, 255, 0, 0)
 	end
 end
-addCommandHandler ("herramienta", comprarPiezas)
+addCommandHandler ("comprarpiezas", comprarPiezas)
 
 local upgradeNames = 
 {
@@ -693,7 +693,7 @@ addEvent("mecanico:canceltunning", true)
 addEventHandler("mecanico:canceltunning", getRootElement(), anularModificacionVehiculo)
 
 function confirmarModificacionVehiculo(player)
-	if exports.factions:isPlayerInFaction(player, 3) or exports.factions:isPlayerInFaction(player, 36) then
+	if exports.factions:isPlayerInFaction(player, 3) then
 		local vehicle = getPedOccupiedVehicle(player)
 		if vehicle and tonumber(getElementData(vehicle, "nPiezas")) >= 0 then
 			if exports.items:has(player, 34) or tonumber(getElementData(vehicle, "nPiezas")) == 0 then
@@ -804,7 +804,7 @@ function(state)
 end)
 
 function confirmarRevisionVehiculo(player)
-	if exports.factions:isPlayerInFaction(player, 3) or exports.factions:isPlayerInFaction(player, 36) then
+	if exports.factions:isPlayerInFaction(player, 3) then
 		local vehicle = getPedOccupiedVehicle(player)
 		if vehicle and tonumber(getElementData(vehicle, "costeRevisionPiezas")) >= 0 then
 			if exports.items:has(player, 34) then

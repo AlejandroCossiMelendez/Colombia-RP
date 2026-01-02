@@ -430,7 +430,7 @@ addEventHandler( "onClientRender", root,
 				break
 			end
 			
-			dxDrawRectangle( x - 5, window.snapTop and 0 or ( y - 5 ), width + 10, window.snapTop and window.snapBottom and screenY or not window.snapTop and window.snapBottom and ( screenY - x + 5 ) or ( height + 10 ), tocolor( 3, 7, 14, 170 ), backgroundPostGui )
+			dxDrawRectangle( x - 5, window.snapTop and 0 or ( y - 5 ), width + 10, window.snapTop and window.snapBottom and screenY or not window.snapTop and window.snapBottom and ( screenY - x + 5 ) or ( height + 10 ), tocolor( 0, 0, 0, 127 ), backgroundPostGui )
 			draw( window, y )
 			
 			-- draw left/right if it's the scoreboard/char selection and is not forced
@@ -465,7 +465,7 @@ addEventHandler( "onClientRender", root,
 	end
 )
 
-bindKey( '.', 'both',
+bindKey( 'tab', 'both',
 	function( key, state )
 		if not forcedWindow then
 			if state == 'down' then

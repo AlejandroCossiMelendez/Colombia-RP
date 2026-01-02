@@ -96,10 +96,10 @@ function drawRespawnText( )
 		local diff = respawnWait - getTickCount( )
 		if getElementData(getLocalPlayer(), "reduccNOMD") == 1 then
 			setElementData(getLocalPlayer(), "reduccNOMD", 2)
-			respawnWait = respawnWait - 700000
+			respawnWait = respawnWait - 720000
 		end
 		if diff >= 0 then
-			text = ( "Espera %.1f segundos para reaparecer o avisa y espera a los médicos (/avisarsura)" ):format( diff / 1000 )
+			text = ( "Espera %.1f segundos para reaparecer o avisa y espera a los médicos (/avisarmd)" ):format( diff / 1000 )
 		else
 			-- check if the player presses a control, wouldn't be caught by SA as the key is down
 			for key, value in ipairs( respawnKeys ) do
@@ -111,8 +111,8 @@ function drawRespawnText( )
 		end
 	
 		-- draw the text
-		dxDrawText( text, 4, 4, screenX, screenY, tocolor( 0, 0, 0, 255 ), 1.2, "default-bold", "center", "center" )
-		dxDrawText( text, 0, 0, screenX, screenY, tocolor( 255, 255, 255, 255 ), 1.2, "default-bold", "center", "center" )
+		dxDrawText( text, 4, 4, screenX, screenY, tocolor( 0, 0, 0, 255 ), 1, "pricedown", "center", "center" )
+		dxDrawText( text, 0, 0, screenX, screenY, tocolor( 255, 255, 255, 255 ), 1, "pricedown", "center", "center" )
 	end
 end
         
@@ -124,7 +124,7 @@ addEventHandler( "onClientMuerto", localPlayer,
 		local d, e, f = getElementPosition( localPlayer )
 		setCameraMatrix( a, b, c, d, e, f )
 		-- 900000
-		respawnWait = getTickCount( ) + 420000
+		respawnWait = getTickCount( ) + 900000
 		triggerEvent("onResetAFKTime", getLocalPlayer(), -900)
 		addEventHandler( "onClientRender", root, drawRespawnText )
 	end

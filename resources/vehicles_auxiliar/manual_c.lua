@@ -208,7 +208,7 @@ local function updateGearbox()
 		toggleControl("brake_reverse", true)
 	end
 	-- Información del tipo de cambio en el dx XD franki manda xd
-	--[[local tipodecambio = getElementData(vehicle,"marchas")
+	local tipodecambio = getElementData(vehicle,"marchas")
 	-- Cuadro bajo el velocimetro
 	dxDrawImage((1134/1366)*sx, (675/768)*sy, (232/1366)*sx, (75/768)*sy, "img/background.png", 0, 0, 0, tocolor(0, 0, 0, 200), true)
 	if (tipodecambio == 1) then
@@ -221,7 +221,7 @@ local function updateGearbox()
 		dxDrawImage((1257/1366)*sx, (700/768)*sy, (70/1366)*sx, (40/768)*sy, "img/automatico.png", 0, 0, 0, tocolor(255, 255, 255, 255), true)
 		dxDrawText("A", (1050/1366)*sx, (850/768)*sy, (1368/1366)*sx, (584/768)*sy, tocolor(255, 255, 255, 0.8*255), 2, "default-bold", "center", "center", false, false, true, false, false)
 		dxDrawText("A", (1050/1366)*sx, (850/768)*sy, (1368/1366)*sx, (584/768)*sy, tocolor(0, 0, 0, 0.5*255), 2, "default-bold", "center", "center", false, false, true, false, false)
-	end]]
+	end
 end
 
 addEventHandler("onClientVehicleEnter", root,

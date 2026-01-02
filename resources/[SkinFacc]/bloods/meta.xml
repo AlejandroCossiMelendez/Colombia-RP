@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="Jostin Felixx" type="misc" name="BS_GANG" description="BS_GANG" />
-     <script src="script.lua" type="client" />
-     <script src="comando.lua" type="server" />
-     <file src="ByJostin_Gang.txd" />
-     <file src="ByJostin_Gang.dff" />
-</meta>

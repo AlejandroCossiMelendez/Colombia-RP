@@ -100,7 +100,7 @@ function toggleEncubierto (player)
 		setElementData(player, "enc", true)
 	end
 end
----addCommandHandler("Gallego", toggleEncubierto)
+--addCommandHandler("enc4312", toggleEncubierto)
 
 function quitPlayer ( quitType )
 	if source and quitType then
@@ -200,7 +200,7 @@ function ponerskinvip1(player)
 	outputChatBox("(( No eres usuario VIP ))", player, 255, 0, 0)
 	end
 end
----addCommandHandler("ponerskinvip",ponerskinvip1)
+--addCommandHandler("ponerskinvip",ponerskinvip1)
 
 
 function miVIP(player)
@@ -226,7 +226,7 @@ function miVIP(player)
 		outputChatBox("(( No eres usuario VIP ))", player, 255, 0, 0)
 	end
 end
----addCommandHandler("mivip", miVIP)
+--addCommandHandler("mivip", miVIP)
 
 function mediaPing(player)
 	if not hasObjectPermissionTo( player, "command.modchat", false ) then return end
@@ -255,7 +255,7 @@ addCommandHandler("id", miID)
  
 function toggleJetPack (player)
 	if exports.players:isLoggedIn(player) and hasObjectPermissionTo( player, "command.modchat", false ) then
-		if isPedWearingJetpack(player) then -- Tiene, se lo quitamos
+		if doesPedHaveJetPack(player) then -- Tiene, se lo quitamos
 			removePedJetPack(player)
 			outputChatBox("JetPack quitado. Usa /jp para ponértelo de nuevo.", player, 0, 255, 0)
 		else

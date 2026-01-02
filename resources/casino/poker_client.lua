@@ -225,7 +225,7 @@ function showPokerDisplay ()
 	if gWindow["pokerCommunity"] then
 		guiSetVisible ( gWindow["pokerCommunity"], true )
 	else
-		gWindow["pokerCommunity"] = guiCreateWindow(screenwidth/2-450/2,screenheight/2-256/2,450,259,"Mesa de Poker - Casino Verso",false)
+		gWindow["pokerCommunity"] = guiCreateWindow(screenwidth/2-450/2,screenheight/2-256/2,450,259,"Mesa de Poker - DownTown RolePlay",false)
 		guiSetAlpha(gWindow["pokerCommunity"],1)
 		
 		guiWindowSetSizable( gWindow["pokerCommunity"], false )

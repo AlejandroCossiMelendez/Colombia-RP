@@ -3,11 +3,11 @@ local edit = {}
 local grid = {}
 local but = {}
 local lbl = {}
-local style = { [0] = "Camisetas", [1] = "Peinados y Accesorios Cabeza(Gorros, Bandanas...)", [2] = "Pantalones", [3] = "Zapatos", [4] = "Tatuajes: Brazo Izquierdo (Arriba)", [5] = "Tatuajes: Brazo Izquierdo (Abajo)", [6] = "Tatuajes: Brazo Derecho (Arriba)", [7] = "Tattoos: Brazo Derecho (Abajo)", [8] = "Tatuajes: Espalda (Arriba)", [9] = "Tatuajes: Pectoral Izquierdo", [10] = "Tatuajes: Pectoral Derecho", [11] = "Tatuajes: Estómago", [12] = "Tatuajes: Espalda (Abajo)", [13] = "Cadenas/Collares", [14] = "Relojes", [15] = "Gafas", [16] = "Sombreros/Gorras" }
+local style = { [0] = "Camisetas", [1] = "Peinados y Accesorios Cabeza(Gorros, Bandanas...)", [2] = "Pantalones", [3] = "Zapatos", [4] = "Tatuajes: Brazo Izquierdo (Arriba)", [5] = "Tatuajes: Brazo Izquierdo (Abajo)", [6] = "Tatuajes: Brazo Derecho (Arriba)", [7] = "Tattoos: Brazo Derecho (Abajo)", [8] = "Tatuajes: Espalda (Arriba)", [9] = "Tatuajes: Pectoral Izquierdo", [10] = "Tatuajes: Pectoral Derecho", [11] = "Tatuajes: Estómago", [12] = "Tatuajes: Espalda (Abajo)", [13] = "Cadenas/Collares", [14] = "Relojes", [15] = "Gafas", [16] = "Sombreros/Gorras", [18] = "Conjuntos / SKINS Antiguas" }
 -- [17] = "Extra" Lo quitamos porque son uniformes de facciones ;)
 
 function newSkinGui()
-	window[1] = guiCreateWindow(0.01,0.4,0.35,0.6,"Tienda De Ropa",true)
+	window[1] = guiCreateWindow(0.01,0.4,0.35,0.6,"Sistema de Ropas - DownTown RolePlay.",true)
 	lbl[1] = guiCreateLabel(0.01,0.01,0.95,0.18,"Si tienes algún problema con el sistema, acude a Soporte Técnico.",true,window[1])
 	guiLabelSetColor(lbl[1],3,249,61)
 	guiLabelSetHorizontalAlign(lbl[1],"center",true)

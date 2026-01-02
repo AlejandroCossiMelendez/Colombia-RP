@@ -1,6 +1,0 @@
-[2024-05-31 19:38:39] Cantidad $100000 pagado a Thiago Tobon.
-[2024-05-31 19:39:01] Cantidad $1000000 pagado a Thiago Tobon.
-[2024-06-01 14:55:49] Cantidad $4000000 pagado a Thiago Tobon.
-[2024-06-01 15:06:43] Cantidad $1000000 pagado a Thiago Tobon.
-[2024-06-01 17:29:02] Cantidad $500000 pagado a Thiago Tobon.
-[2024-06-02 02:15:42] Cantidad $1000000 pagado a Devin Escobar.

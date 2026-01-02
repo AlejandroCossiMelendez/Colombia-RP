@@ -1,8 +1,0 @@
-[2024-06-17 03:50:11] Cantidad $1000000 pagado a Leandro Pilaguano.
-[2024-06-17 03:50:18] Cantidad $700 pagado a Leandro Pilaguano.
-[2024-06-17 03:51:30] Cantidad $8000000 pagado a Leandro Pilaguano.
-[2024-06-17 03:51:43] Cantidad $900000 pagado a Leandro Pilaguano.
-[2024-06-17 03:51:46] Cantidad $900000 pagado a Leandro Pilaguano.
-[2024-06-17 03:51:49] Cantidad $900000 pagado a Leandro Pilaguano.
-[2024-06-17 03:51:59] Cantidad $199990 pagado a Leandro Pilaguano.
-[2024-06-17 03:55:41] Cantidad $10000000 pagado a Leandro Pilaguano.

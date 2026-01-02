@@ -1,8 +1,0 @@
-<meta>
-
-	<script src="main/client.lua" type="client" cache="false" />
-	<script src="main/server.lua" type="server" />
-
-	<file src="assets/images/logo.png" />
-
-</meta>

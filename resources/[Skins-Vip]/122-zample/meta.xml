@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="zmp" type="misc" name="Sbyzamples" description="dps" />
-     <script src="script.lua" type="client" />
-     <file src="byzample.dff" cache="false" />
-     <file src="byzample.txd" cache="false" />
-
-</meta>
-

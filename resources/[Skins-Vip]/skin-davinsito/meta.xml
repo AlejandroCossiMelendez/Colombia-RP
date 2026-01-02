@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="Nathaan23" type="misc" name="ByNathaan_Padrao" description="ByNathaan_Padrao" />
-     <script src="script.lua" type="client" />
-     <file src="ByNathaan.txd" />
-     <file src="ByNathaan.dff" />
-</meta>

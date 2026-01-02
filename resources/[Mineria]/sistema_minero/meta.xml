@@ -1,8 +1,0 @@
-<meta>
-    <oop>true</oop>
-
-    <script src="minero_c.lua" type="client" />
-    <script src="servidor.lua" type="server" />
-
-	<file src='files/pico.mp3' id='337'/>
-</meta>

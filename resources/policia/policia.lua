@@ -1,8 +1,35 @@
 ﻿-- 
 local _getPlayerName = getPlayerName
 local getPlayerName = function( x ) return _getPlayerName( x ):gsub( "_", " " ) end
-local arrestado = { }
 
+--
+-- /duty
+addCommandHandler( "duty",
+	function( thePlayer, commandName )
+		if exports.players:isLoggedIn( thePlayer ) then
+            local characterID = exports.players:getCharacterID( thePlayer )
+			if exports.factions:isPlayerInFaction( thePlayer, 1 ) then
+			local result = exports.sql:query_assoc_single( "SELECT factionRank FROM character_to_factions WHERE factionID = 1 AND characterID = " .. exports.players:getCharacterID(thePlayer))
+			local rango = result.factionRank
+			if getElementDimension(thePlayer) == 104 then
+				if getElementData( thePlayer, "duty" ) == true then
+					outputChatBox ("Estás fuera de servicio agente.", thePlayer, 211, 211, 211)
+					setPedArmor (thePlayer, 0)
+					removeElementData(thePlayer, "duty")
+					removeElementData(thePlayer, "wid")
+				else
+					outputChatBox ( "Estás de servicio agente.", thePlayer, 211, 211, 211 )
+					setElementData( thePlayer, "duty", true)
+					setPedArmor ( thePlayer, 100 )
+					if not exports.items:has(thePlayer, 29, 3) then
+						exports.items:give(thePlayer, 29, "3", "Arma 3", 1)
+					end
+				end
+			end
+		end
+	end
+end
+)
 
 function avisarPolicia(player) 
 	if getElementDimension(player) == 0 then
@@ -59,7 +86,7 @@ addCommandHandler("alcohol", nivelDeAlcohol)
 function refPolicia( player, cmd, aviso )
 	if player then
 		if isPedDead(player) or getElementData(player, "muerto") == true then outputChatBox("No puedes activar el botón de refuerzos una vez muerto.", player, 255, 0, 0) return end
-		if exports.factions:isPlayerInFaction(player, 1) or exports.factions:isPlayerInFaction(player, 22) or exports.factions:isPlayerInFaction(player, 27) then
+		if exports.factions:isPlayerInFaction(player, 1) then
 			if getElementDimension(player) == 0 then
 				x, y, z = getElementPosition(player)					
 			else
@@ -69,16 +96,14 @@ function refPolicia( player, cmd, aviso )
 				if not getElementData(player, "ref") then
 					if not aviso then
 						exports.factions:sendMessageToFaction(1, "#7F7FFF(( #FF0000SD#7F7FFF )) El agente "..getPlayerName( player ):gsub( "_", " " ).." pide refuerzos, acuda a sus 10-20.",127, 127, 255,true )
-						exports.factions:sendMessageToFaction(22, "#7F7FFF(( #FF0000SD#7F7FFF )) El agente "..getPlayerName( player ):gsub( "_", " " ).." pide refuerzos, acuda a sus 10-20.",127, 127, 255,true )
-						exports.factions:sendMessageToFaction(27, "#7F7FFF(( #FF0000SD#7F7FFF )) El agente "..getPlayerName( player ):gsub( "_", " " ).." pide refuerzos, acuda a sus 10-20.",127, 127, 255,true )
-                                             end
-					for key, value in ipairs(getElementsByType("player")) do
-					    if exports.factions:isPlayerInFaction(value, 1) or exports.factions:isPlayerInFaction(value, 22) or exports.factions:isPlayerInFaction(value, 27) then
-					        b = createBlip(x, y, z, 41, 2, 255, 0, 0, 255, 0, 99999.0, value)
-					        attachElements(b, player)
-					        setElementData(b, "police", tostring(getPlayerName(player)))
-					        setPlayerHudComponentVisible(value, "radar", true)
-					    end
+					end
+					for key, value in ipairs( getElementsByType("player") ) do
+						if exports.factions:isPlayerInFaction(value, 1) then
+							b = createBlip ( x, y, z, 41, 2, 255, 0, 0, 255, 0, 99999.0, value )
+							attachElements( b, player )
+							setElementData(b, "police", tostring(getPlayerName(player)))
+							setPlayerHudComponentVisible ( value, "radar", true )
+						end
 					end
 					setElementData(player, "ref", true)
 					else
@@ -87,9 +112,7 @@ function refPolicia( player, cmd, aviso )
 					end	
 					if not aviso then
 						exports.factions:sendMessageToFaction(1, "#7F7FFF(( #FF0000SD#7F7FFF )) El agente "..getPlayerName( player ):gsub( "_", " " ).." ya no necesita refuerzos , Codigo 4.",127, 127, 255,true )
-						exports.factions:sendMessageToFaction(22, "#7F7FFF(( #FF0000SD#7F7FFF )) El agente "..getPlayerName( player ):gsub( "_", " " ).." ya no necesita refuerzos , Codigo 4.",127, 127, 255,true )
-						exports.factions:sendMessageToFaction(27, "#7F7FFF(( #FF0000SD#7F7FFF )) El agente "..getPlayerName( player ):gsub( "_", " " ).." ya no necesita refuerzos , Codigo 4.",127, 127, 255,true )
-                                             end
+					end
 					removeElementData(player, "ref")
 				end
 			end
@@ -111,7 +134,7 @@ function ref2( player, cmd, aviso)
 			if x and y and z then
 				if not getElementData(player, "ref2") then
 				for key, value in ipairs( getElementsByType("player") ) do
-					if exports.factions:isPlayerInFaction(value, 1) or exports.factions:isPlayerInFaction(value, 22) or getElementData(value, "enc1") then
+					if exports.factions:isPlayerInFaction(value, 1) or getElementData(value, "enc1") then
 						if not aviso then
 							outputChatBox("#7F7FFF(( #FF0000SD#7F7FFF )) "..getPlayerName( player ):gsub( "_", " " ).." HA ENVIADO UNA SEÑAL DE SOCORRO 10-32", value, 255, 0, 0,true)
 							outputChatBox("#7F7FFF(( #FF0000SD#7F7FFF )) "..getPlayerName( player ):gsub( "_", " " ).." HA ENVIADO UNA SEÑAL DE SOCORRO 10-32", value, 255, 0, 0,true)
@@ -129,7 +152,7 @@ function ref2( player, cmd, aviso)
 					if getElementData(value, "police2") == getPlayerName(player) then destroyElement(value) end
 				end
 					for k2, v2 in ipairs (getElementsByType("player")) do
-						if exports.factions:isPlayerInFaction(v2, 1) or exports.factions:isPlayerInFaction(v2, 22) or hasObjectPermissionTo(v2, "command.encubierto", false) then
+						if exports.factions:isPlayerInFaction(v2, 1) or hasObjectPermissionTo(v2, "command.encubierto", false) then
 							if not aviso then
 								outputChatBox("#7F7FFF(( #FF0000PD#7F7FFF )) EL AGENTE "..getPlayerName( player ):gsub( "_", " " ).." #FF0000HA DESACTIVADO SU BOTÓN DE PANICO.", v2, 255, 255, 0,true)
 							end
@@ -241,83 +264,44 @@ function quitFreno (player)
 end	 
 addCommandHandler("quitarfreno", quitFreno)
 
-local discordWebhookLOGS = "https://discord.com/api/webhooks/1249135235048669294/UGzAXw5D6EN1g-zvhNcnbWHybE9axc1SbqVN1UCRqlfJ8FSIlTHFWoraosxqB6xl2pwp"
-
-local function callback() end
-
-local function sendDiscordLogMessage(message, thePlayer)
-    if thePlayer and exports.players:isLoggedIn(thePlayer) then
-        if message and #message > 0 then
-            local sendOptions = {
-                queueName = "dcq",
-                connectionAttempts = 3,
-                connectTimeout = 5000,
-                formFields = {
-                    content = string.format(
-                        ">>> %s",
-                        message
-                    )
-                }
-            }
-            fetchRemote(discordWebhookLOGS, sendOptions, callback)
-        end
-    end
-end
-
-function arrestar(player, commandName, otherPlayer, tiempo, ...)
-    local razon = table.concat({...}, " ")
-    local other, name = exports.players:getFromName(player, otherPlayer)
-    if other and razon and tiempo and tonumber(tiempo) then
-        if exports.factions:isPlayerInFaction(player, 1) then
-            if (getElementDimension(player) ~= 2578) or (getElementDimension(other) ~= 2578) then 
-                outputChatBox("(( No puedes arrestar a alguien estando fuera de Prision ))", player, 255, 0, 0) 
-                return 
-            end
-
-            for k, v in ipairs(getElementsByType("player")) do
-                if exports.factions:isPlayerInFaction(v, 1) then
-                    outputChatBox(name .. " ha sido arrestado.", v, 255, 0, 0)
-                    outputChatBox("Tiempo: ((" .. tostring(tiempo) .. " minutos)) Razón:" .. razon, v, 255, 0, 0)
-                end
-            end
-
-             if getElementDimension(other) == 2578 then
-                setElementPosition(other, 264.4736328125, 77.564453125, 1001.0390625)
-                setElementInterior(other, 6)
-                setElementDimension(other, 2578)
-
-                local skinActual = getElementModel(other)
-                setElementData(other, "originalSkin", skinActual)
-                setElementModel(other, 17)
-            else
-                outputChatBox("¡Sólo puedes arrestar a alguien en Prision!.", player, 255, 0, 0)
-                return
-            end
-
-            local nivel = exports.objetivos:getNivel(exports.players:getCharacterID(other))
-            if nivel == 3 and not exports.objetivos:isObjetivoCompletado(32, exports.players:getCharacterID(other)) then
-                exports.objetivos:addObjetivo(32, exports.players:getCharacterID(other), other)
-            end
-
-            outputChatBox("Has sido arrestado durante " .. tostring(tiempo) .. " minutos.", other, 255, 0, 0)
-            outputChatBox("Razón: " .. tostring(razon), other, 255, 0, 0)
-            setElementData(other, "ajail", tonumber(tiempo))
-
-            local agente = tostring(getPlayerName(player):gsub("_", " "))
-            local sql, error = exports.sql:query_insertid("INSERT INTO `historiales` (`historialID`, `nombre`, `dni`, `residencia`, `profesion`, `delitos`, `agente`, `fecha`) VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', CURRENT_TIMESTAMP);", getPlayerName(other):gsub("_", " "), tostring(20000000 + exports.players:getCharacterID(other)), "No Procede", "No Procede", tostring(razon) .. " (( " .. tostring(tiempo) .. " minutos.))", agente)
-            exports.sql:query_free("UPDATE characters SET ajail = " .. tiempo .. " WHERE characterID = " .. exports.players:getCharacterID(other))
-
-            local message = string.format("**Fecha:** %s\n**Agente:** %s\n**Nombre:** %s\n**Razón:** %s\n**Tiempo:** %s mes(es).", os.date("%Y/%m/%d"), agente, getPlayerName(other), razon, tiempo)
-            sendDiscordLogMessage(message, player)
-        else
-            outputChatBox("No eres policia.", player, 255, 0, 0)
-        end
-    else
-        outputChatBox("Syntax: /arrestar [jugador] [tiempo] [razón]", player, 255, 255, 255)
-    end
+function arrestar (player, commandName, otherPlayer, tiempo, ...)
+	local razon = table.concat({...}, " ")
+	local other, name = exports.players:getFromName(player, otherPlayer)
+	if other and razon and tiempo and tonumber(tiempo) then
+		if exports.factions:isPlayerInFaction(player, 1) then
+			if (getElementDimension(player) ~= 104) or (getElementDimension(other) ~= 104) then outputChatBox("(( No puedes arrestar a alguien estando fuera de comisaria ))", player, 255, 0, 0) return end
+			for k, v in ipairs(getElementsByType("player")) do
+				if exports.factions:isPlayerInFaction(v, 1) then
+					outputChatBox(name.." ha sido arrestado.", v, 255, 0, 0)
+					outputChatBox("Tiempo: (("..tostring(tiempo).." minutos)) Razón:"..razon, v, 255, 0, 0)
+				end
+			end
+			if getElementDimension(other) == 104 then
+				setElementPosition(other, 227.44, 110.82, 999.02)
+				setElementInterior(other, 10)
+				setElementDimension(other, 1)
+			else
+				outputChatBox("¡Sólo puedes arrestar a alguien en comisaria!.", player, 255, 0, 0)
+				return
+			end
+			local nivel = exports.objetivos:getNivel(exports.players:getCharacterID(other))
+			if nivel == 3 and not exports.objetivos:isObjetivoCompletado(32, exports.players:getCharacterID(other)) then
+				exports.objetivos:addObjetivo(32, exports.players:getCharacterID(other), other)
+			end
+			outputChatBox("Has sido arrestado durante "..tostring(tiempo).." minutos.", other, 255, 0, 0)
+			outputChatBox("Razón: "..tostring(razon), other, 255, 0, 0)
+			setElementData(other, "ajail", tonumber(tiempo))
+			local agente = tostring(getPlayerName(player):gsub("_", " "))
+			local sql, error = exports.sql:query_insertid("INSERT INTO `historiales` (`historialID`, `nombre`, `dni`, `residencia`, `profesion`, `delitos`, `agente`, `fecha`) VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', CURRENT_TIMESTAMP);", getPlayerName(other):gsub("_", " "), tostring(20000000+exports.players:getCharacterID(other)), "No Procede", "No Procede", tostring(razon).." (( "..tostring(tiempo).." minutos.))", agente)
+			exports.sql:query_free("UPDATE characters SET ajail = "..tiempo.." WHERE characterID = "..exports.players:getCharacterID(other))
+		else
+			outputChatBox("No eres policia.", player, 255, 0, 0)
+		end
+	else
+		outputChatBox("Syntax: /arrestar [jugador] [tiempo] [razón]", player, 255, 255, 255)
+	end
 end
 addCommandHandler("arrestar", arrestar)
-
 
 function mostrarPlaca ( player, commandName, otherPlayer )
 	if exports.factions:isPlayerInFaction(player, 1) then
@@ -335,14 +319,14 @@ function mostrarPlaca ( player, commandName, otherPlayer )
 					distance = getDistanceBetweenPoints3D ( x1, y1, z1, x2, y2, z2 )
 					if ( distance < 5) then
 						exports.chat:me( player, "le enseña su placa a " .. targetName .. "." )
-						outputChatBox( " -------- Policia Nacional Colombiana ---------- ", target, 255, 150, 0 )
+						outputChatBox( " -------- PLACA POLICIAL ---------- ", target, 255, 150, 0 )
 						outputChatBox( "Placa a nombre de: " .. getPlayerName( player ):gsub( "_", " " ) .. ".", target, 255, 150, 0 )
 						if getElementData(player, "enc1") then
-							outputChatBox( "Alto Mando Policial", target, 255, 150, 0 )
+							outputChatBox( "AGENTE FEDERAL", target, 255, 150, 0 )
 						else
-							outputChatBox( "Miembro Del Cuerpo Policial", target, 255, 150, 0 )
+							outputChatBox( "Los Santos Police Department", target, 255, 150, 0 )
 						end
-						outputChatBox( "Tiene permiso de intervenir en procedimientos policiales.", target, 255, 150, 0 )
+						outputChatBox( "El agente puede intervenir en cualquier acto policial.", target, 255, 150, 0 )
 						outputChatBox( " ------------------------- ", target, 255, 150, 0 )
 					else
 					outputChatBox( "Estas muy lejos para enseñarle tu placa. ", player, 255, 50, 0 )
@@ -358,161 +342,83 @@ addCommandHandler( "placa", mostrarPlaca )
 
 siguimientos = {}
 
-function dogFollow(theprisoner)
-    if siguimientos[theprisoner] == nil then
-        return
-    else
-        if not theprisoner then return end
-        local policia = siguimientos[theprisoner]
-        local copx, copy, copz = getElementPosition(policia)
-        local prisonerx, prisonery, prisonerz = getElementPosition(theprisoner)
-        local copangle = (360 - math.deg(math.atan2((copx - prisonerx), (copy - prisonery)))) % 360
-        setPedRotation(theprisoner, copangle)
-        local dist = getDistanceBetweenPoints2D(copx, copy, prisonerx, prisonery)
-        
-        if getElementInterior(policia) ~= getElementInterior(theprisoner) then
-            setElementInterior(theprisoner, getElementInterior(policia))
-        end
-        if getElementDimension(policia) ~= getElementDimension(theprisoner) then
-            setElementDimension(theprisoner, getElementDimension(policia))
-        end
-        
-        if dist >= 200 then
-            local x, y, z = getElementPosition(policia)
-            setElementPosition(theprisoner, x, y, z)
-        elseif dist >= 9 then
-            setPedAnimation(theprisoner, "ped", "sprint_civi")
-        elseif dist >= 6 then
-            setPedAnimation(theprisoner, "ped", "run_player")
-        elseif dist >= 3 then
-            setPedAnimation(theprisoner, "ped", "WALK_player")
-        else
-            setPedAnimation(theprisoner, false)
-        end
-        
-        if isPedInVehicle(policia) then
-            local car = getPedOccupiedVehicle(policia)
-            for i = 0, getVehicleMaxPassengers(car) do
-                local p = getVehicleOccupant(car, i)
-                if not p and not isVehicleLocked(car) then
-                    warpPedIntoVehicle(theprisoner, car, i)
-                end
-            end
-        else
-            if isPedInVehicle(theprisoner) then
-                removePedFromVehicle(theprisoner)
-            end
-        end
+function dogFollow( theprisoner)
+	if siguimientos[theprisoner] == nil then
+	else
+		if not theprisoner then return end
+		policia = siguimientos[theprisoner]
+		local copx, copy, copz = getElementPosition ( siguimientos[theprisoner] )
+		local prisonerx, prisonery, prisonerz = getElementPosition ( theprisoner )
+		copangle = ( 360 - math.deg ( math.atan2 ( ( copx - prisonerx ), ( copy - prisonery ) ) ) ) % 360
+		setPedRotation ( theprisoner, copangle )
+		local dist = getDistanceBetweenPoints2D ( copx, copy, prisonerx, prisonery )	
+		if getElementInterior(siguimientos[theprisoner]) ~= getElementInterior(theprisoner) then setElementInterior(theprisoner, getElementInterior(siguimientos[theprisoner])) end
+		if getElementDimension(siguimientos[theprisoner]) ~= getElementDimension(theprisoner) then setElementDimension(theprisoner, getElementDimension(siguimientos[theprisoner])) end
+		if dist >= 200 then
+			local x,y,z = getElementPosition(siguimientos[theprisoner])
+			setElementPosition(theprisoner, x, y, z)
+		elseif dist >= 9 then
+			setPedAnimation(theprisoner, "ped", "sprint_civi")
+		elseif dist >= 6 then
+			setPedAnimation(theprisoner, "ped", "run_player")
+		elseif dist >= 3 then
+			setPedAnimation(theprisoner, "ped", "WALK_player")
+		else
+			setPedAnimation(theprisoner, false)
+		end
+		if isPedInVehicle ( policia ) then
+			car = getPedOccupiedVehicle ( policia )
+			for i = 0, getVehicleMaxPassengers( car ) do
+			local p = getVehicleOccupant( car, i )
+				if not p and not isVehicleLocked(car) then
+					warpPedIntoVehicle ( theprisoner, car, i )
+				end
+			end
+		else
+			if isPedInVehicle ( theprisoner ) then
+				removePedFromVehicle ( theprisoner )
+			end
+		end
 
-        setTimer(dogFollow, 750, 1, theprisoner)
-    end
-end
-
-function stopFollowing(theprisoner)
-    if siguimientos[theprisoner] then
-        siguimientos[theprisoner] = nil
-        setPedAnimation(theprisoner, false)
-    end
+		local zombify = setTimer ( dogFollow, 750, 1, theprisoner )
+	end
 end
 
 addCommandHandler("esposar",
-    function(p, cmd, otro)
-        if otro then
-            if not p or isPedDead(p) then return end
-            if exports.items:has(p, 35, 4) then
-                local other, name = exports.players:getFromName(p, otro)
-                if isPedInVehicle(p) then outputChatBox("No puedes esposar a alguien si estás en un vehículo.", p, 255, 0, 0) return end
-                if not other or isPedDead(other) then outputChatBox("No puedes esposar al jugador si está muerto.", p, 255, 0, 0, true) return end
-                if getElementData(other, "muerto", true) then outputChatBox("No puedes esposar al jugador si está muerto.", p, 255, 0, 0, true) return end
-                if isPedInVehicle(other) then outputChatBox("No puedes esposar a alguien que está en un vehículo.", p, 255, 0, 0) return end
-                if other ~= p then
-                    if not arrestado[p] then
-                        if arrestado[other] then
-                            local x, y, z = getElementPosition(p)
-                            local int1, dim1 = getElementInterior(p), getElementDimension(p)
-                            local int2, dim2 = getElementInterior(other), getElementDimension(other)
-                            if getDistanceBetweenPoints3D(x, y, z, unpack({getElementPosition(other)})) < 3 and int1 == int2 and dim1 == dim2 then
-                                local pl = arrestado[p]
-                                local rx, ry, rz = getElementRotation(p)
-                                setElementData(other, "esposado", false)
-                                setElementData(other, "player.Cuffed", false)
-                                toggleControl(other, "sprint", true)
-                                toggleControl(other, "fire", true)
-                                toggleControl(other, "jump", true)
-                                toggleControl(other, "action", true)
-                                toggleControl(other, "aim_weapon", true)
-                                toggleControl(other, "next_weapon", true)
-                                toggleControl(other, "previous_weapon", true)
-                                toggleControl(other, "accelerate", true)
-                                toggleControl(other, "brake_reverse", true)
-                                toggleControl(other, "forwards", true)
-                                toggleControl(other, "backwards", true)
-                                toggleControl(other, "left", true)
-                                toggleControl(other, "right", true)
-                                setPedAnimation(p, "bd_fire", "wash_up", 3000, false, false, false, false)
-                                setPedAnimation(other)
-                                exports.chat:me(p, "le quita las esposas a " .. name:gsub("_", " ") .. " y las guarda en su CT.")
-                                arrestado[other] = nil
-                                stopFollowing(other)
-                                for i, players in ipairs(getElementsByType("player")) do
-                                    local x1, y1, z1 = getElementPosition(players)
-                                    if getDistanceBetweenPoints3D(x, y, z, x1, y1, z1) < 20 then
-                                        triggerClientEvent(players, "ejecutarSonidoPolicia", players, "esposas", x, y, z)
-                                    end
-                                end
-                            end
-                        else
-                            local x, y, z = getElementPosition(p)
-                            local int1, dim1 = getElementInterior(p), getElementDimension(p)
-                            local int2, dim2 = getElementInterior(other), getElementDimension(other)
-                            if getDistanceBetweenPoints3D(x, y, z, unpack({getElementPosition(other)})) < 3 and int1 == int2 and dim1 == dim2 then
-                                if not arrestado[other] then
-                                    local rx, ry, rz = getElementRotation(p)
-                                    arrestado[other] = p
-                                    setElementData(other, "esposado", true)
-                                    setElementData(other, "player.Cuffed", true)
-                                    exports.chat:me(p, "saca las esposas de su CT y se las coloca a " .. name:gsub("_", " ") .. ".")
-                                    setPedWeaponSlot(other, 0)
-                                    toggleControl(other, "fire", false)
-                                    toggleControl(other, "action", false)
-                                    toggleControl(other, "jump", false)
-                                    toggleControl(other, "sprint", false)
-                                    toggleControl(other, "aim_weapon", false)
-                                    toggleControl(other, "next_weapon", false)
-                                    toggleControl(other, "previous_weapon", false)
-                                    toggleControl(other, "accelerate", false)
-                                    toggleControl(other, "brake_reverse", false)
-                                    toggleControl(other, "forwards", false)
-                                    toggleControl(other, "backwards", false)
-                                    toggleControl(other, "left", false)
-                                    toggleControl(other, "right", false)
-                                    setPedAnimation(p, "bd_fire", "wash_up", 3000, false, false, false, false)
-                                    for i, players in ipairs(getElementsByType("player")) do
-                                        local x1, y1, z1 = getElementPosition(players)
-                                        if getDistanceBetweenPoints3D(x, y, z, x1, y1, z1) < 20 then
-                                            triggerClientEvent(players, "ejecutarSonidoPolicia", players, "esposas", x, y, z)
-                                        end
-                                    end
-                                    siguimientos[other] = p
-                                    dogFollow(other)
-                                end
-                            else
-                                outputChatBox("Estás demasiado lejos de " .. name .. ".", p, 255, 0, 0, true)
-                            end
-                        end
-                    else
-                        outputChatBox("Estás esposado, no puedes utilizar este comando.", p, 255, 0, 0, true)
-                    end
-                else
-                    outputChatBox("No puedes hacer eso.", p, 255, 0, 0, true)
-                end
-            else
-                outputChatBox("No tienes las esposas en tu mochila.", p, 255, 0, 0, true)
-            end
-        else
-            outputChatBox("Syntax: /" .. cmd .. " [Jugador]", p, 255, 0, 0, true)
-        end
-    end
+function(player, cmd, other)
+	if not player or isPedDead(player) then return end -- tiene cierre
+	if exports.factions:isPlayerInFaction(player, 1) then -- no tiene cierre
+		if exports.items:has(player, 35,4) then	
+			if other then
+				target, targetName = exports.players:getFromName( player, other )
+				if not target or isPedDead(target) then return end
+				x1, y1, z1 = getElementPosition ( player )
+				x2, y2, z2 = getElementPosition ( target )
+				distance = getDistanceBetweenPoints3D ( x1, y1, z1, x2, y2, z2 )
+				if ( distance < 2) then
+					if siguimientos[target] == nil then
+						siguimientos[target] = player
+						dogFollow(target)
+						exports.chat:me(player, "pone las esposas a ".. targetName)
+						showCursor(target, true)
+						toggleControl ( target, "chatbox ", true )
+						setElementData(target, "esposado", true)
+					else
+						siguimientos[target] = nil
+						exports.chat:me (player, "quita las esposas a ".. targetName)
+						showCursor(target, false)
+						toggleAllControls ( target, true )  
+						setElementData(target, "esposado", false)
+					end
+				else
+					outputChatBox("Estas demasiado lejos del fugetivo para esposarlo", player, 255, 0,0)
+				end
+			end	
+		else
+		outputChatBox("(( No llevas las esposas en tu cinturón tactico ))", player, 255, 0, 0)
+	    end
+	end
+end
 )
 
 
@@ -559,7 +465,7 @@ local balasCargador =
 
 function getArmamento (player, cmd, wid)
 	if not exports.factions:isPlayerInFaction(player, 1) then outputChatBox("No eres policía.", player, 255, 0, 0) return end
-	if not getElementDimension(player) == 70 then outputChatBox("No estás en comisaria.", player, 255, 0, 0) return end
+	if not getElementDimension(player) == 104 then outputChatBox("No estás en comisaria.", player, 255, 0, 0) return end
 	local result = exports.sql:query_assoc_single( "SELECT factionRank FROM character_to_factions WHERE factionID = 1 AND characterID = " .. exports.players:getCharacterID(player))
 	local rango = result.factionRank
 	if not rango or not result or rango < 9 then outputChatBox("No tienes suficiente rango como para acceder a este comando.", player, 255, 0, 0) return end
@@ -570,11 +476,11 @@ function getArmamento (player, cmd, wid)
 	outputChatBox("Utiliza /cargadorespd para obtener cargadores de cada arma.", player, 255, 0, 0)
 	exports.logs:addLogMessage("armaspd", getPlayerName(player):gsub("_", " ").." ha obtenido un arma "..tostring(wid)..".\n")
 end
---addCommandHandler("armaspd", getArmamento)
+addCommandHandler("armaspd", getArmamento)
 
 function getCargadores (player, cmd, wid)
 	if not exports.factions:isPlayerInFaction(player, 1) then outputChatBox("No eres policía.", player, 255, 0, 0) return end
-	if getElementDimension(player) ~= 70 then outputChatBox("No estás en comisaria.", player, 255, 0, 0) return end
+	if getElementDimension(player) ~= 104 then outputChatBox("No estás en comisaria.", player, 255, 0, 0) return end
 	local result = exports.sql:query_assoc_single( "SELECT factionRank FROM character_to_factions WHERE factionID = 1 AND characterID = " .. exports.players:getCharacterID(player))
 	local rango = result.factionRank
 	if not rango or not result or rango < 9 then outputChatBox("No tienes suficiente rango como para acceder a este comando.", player, 255, 0, 0) return end
@@ -584,18 +490,18 @@ function getCargadores (player, cmd, wid)
 	outputChatBox("Has adquirido un cargador para un arma "..tostring(wid)..".", player, 0, 255, 0)
 	exports.logs:addLogMessage("armaspd", getPlayerName(player):gsub("_", " ").." ha obtenido cargador de un arma "..tostring(wid)..".\n")
 end
---addCommandHandler("cargadorespd", getCargadores)
+addCommandHandler("cargadorespd", getCargadores)
 
 function giveUtiles (player, cmd, otherPlayer)
 	if not exports.factions:isPlayerInFaction(player, 1) then outputChatBox("No eres policía.", player, 255, 0, 0) return end
-	if getElementDimension(player) ~= 6 then outputChatBox("No estás en comisaria.", player, 255, 0, 0) return end
+	if getElementDimension(player) ~= 104 then outputChatBox("No estás en comisaria.", player, 255, 0, 0) return end
 	if otherPlayer then
 	local other, name = exports.players:getFromName(player, otherPlayer)
 	if other then
 		local result = exports.sql:query_assoc_single( "SELECT factionRank FROM character_to_factions WHERE factionID = 1 AND characterID = " .. exports.players:getCharacterID(player))
 		local rango = result.factionRank
 		if not rango or not result or rango < 9 then outputChatBox("No tienes suficiente rango como para acceder a este comando.", player, 255, 0, 0) return end
-		if exports.factions:isPlayerInFaction(other, 1) and getElementDimension(other) == 6 then
+		if exports.factions:isPlayerInFaction(other, 1) and getElementDimension(other) == 104 then
 			exports.items:give(other, 35, 1)
 			exports.items:give(other, 35, 2)
 			exports.items:give(other, 35, 3)
@@ -611,7 +517,7 @@ function giveUtiles (player, cmd, otherPlayer)
 		outputChatBox("Sintaxis: /utilespd [agente]", player, 255, 255, 255)
 	end
 end
---addCommandHandler("utilespd", giveUtiles)
+addCommandHandler("utilespd", giveUtiles)
 
 function getMunicionPD (player)
 	if not exports.factions:isPlayerInFaction(player, 1) then outputChatBox("No eres policía.", player, 255, 0, 0) return end
@@ -621,7 +527,7 @@ function getMunicionPD (player)
 	outputChatBox("Has adquirido un cargador para un arma "..tostring(wid)..".", player, 0, 255, 0)
 	exports.logs:addLogMessage("armaspd", getPlayerName(player):gsub("_", " ").." ha obtenido cargador de un arma "..tostring(wid)..".\n")
 end
---addCommandHandler("municionpd", getMunicionPD)
+addCommandHandler("municionpd", getMunicionPD)
 
 function liberarJugador ( player, commandName, otherPlayer )
 	if not otherPlayer then outputChatBox("Sintaxis: /liberar [jugador]", player, 255, 255, 255) return end
@@ -629,10 +535,10 @@ function liberarJugador ( player, commandName, otherPlayer )
 	local charID = exports.players:getCharacterID(otro)
 	if hasObjectPermissionTo(player, 'command.modchat', false) or exports.factions:isPlayerInFaction(player, 1) then
 		if getElementData( otro, "ajail") and tonumber(getElementData( otro, "ajail")) > 0 then
-			if getElementDimension(otro) == 0 then
-				setElementPosition(otro, 633.6318359375, -572.3896484375, 16.3359375)
-				setElementDimension(otro, 0)
-				setElementInterior(otro, 0)
+			if getElementDimension(otro) == 104 then
+				setElementPosition(otro, 2416.35, 49.95, 26.48)
+				setElementDimension(otro, 1)
+				setElementInterior(otro, 10)
 			end
 			if getElementData(player, "enc") then
 				outputChatBox('Alguien te ha sacado de la celda.', otro, 0, 255, 0)
@@ -653,7 +559,7 @@ addCommandHandler("liberar", liberarJugador)
 
 function getChaleco (player)
 	if not exports.factions:isPlayerInFaction(player, 1) then outputChatBox("No eres policía.", player, 255, 0, 0) return end
-	if getElementDimension(player) ~= 61 then outputChatBox("No estás en comisaria.", player, 255, 0, 0) return end
+	if getElementDimension(player) ~= 104 then outputChatBox("No estás en comisaria.", player, 255, 0, 0) return end
 	if getPedArmor(player) < 100 then
 		setPedArmor(player, 100)
 		outputChatBox("Se ha renovado tu chaleco. Usa /chaleco de nuevo para quitártelo.", player, 0, 255, 0)

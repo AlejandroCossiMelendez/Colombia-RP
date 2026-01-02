@@ -1,7 +1,0 @@
-<meta>
-	<info author="xAzke" name="Venta de Vehiculos al Estado" version="1.0a" type="script" />
-
-	<script src="server.lua" type="server" cache="false" />
-
-	<oop>true</oop>
-</meta>

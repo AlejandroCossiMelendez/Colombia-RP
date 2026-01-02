@@ -131,6 +131,7 @@ function localizedMessage( from, prefix, message, r, g, b, range, r2, g2, b2 )
 				message = message:sub( 5 )
 			end
 		end
+		prefix = " [" .. exports.players:getLanguageName( language ) .. "]" .. prefix
 		if not isPedInVehicle(from) and not getElementData(from, "anim") == true and not getElementData(from, "sentado") and not getElementData(from, "muerto") and not (getElementData(from, "sexbot")) then
 			setPedAnimation( from, "gangs", "prtial_gngtlkb", #message*500, false)
 		end
@@ -212,7 +213,7 @@ function me( source, message, prefix )
 			localMessage( source, message, 255, 40, 80 )	
 		else
 			local message = getPlayerName( source ) .. " " .. message
-			localMessage( source, message, 0, 160, 140 )	
+			localMessage( source, message, 255, 40, 80 )	
 		end	
 		return true
 	else
@@ -230,13 +231,6 @@ local function faction( player, factionID, message )
 	end
 end
 
-local function factionooc( player, factionID, message )
-	if factionID then
-		local tag = exports.factions:getFactionTag( factionID )
-		exports.factions:sendMessageToFaction( factionID, "(( FACCION OOC:  " .. tag .. " )) " .. getPlayerName( player ) .. ": " .. message, 0, 127, 255 )
-	end
-end
-
 -- overwrite MTA's default chat events
 addEventHandler( "onPlayerChat", getRootElement( ),
 	function( message, type )
@@ -246,7 +240,7 @@ addEventHandler( "onPlayerChat", getRootElement( ),
 				local pletra = string.upper(string.sub(message, 1, 1))
 				local resto = string.sub(message, 2)
 				local mensaje = tostring(pletra..resto)
-				localizedMessage( source, "[ IC ] " .. getPlayerName( source ) .. " dice: ", mensaje, 230, 230, 230, false, 127, 127, 127 )
+				localizedMessage( source, " " .. getPlayerName( source ) .. " dice: ", mensaje, 230, 230, 230, false, 127, 127, 127 )
 				exports.objetivos:addObjetivo(6, exports.players:getCharacterID(source), source)
 			elseif type == 1 then
 				me( source, message )
@@ -264,7 +258,6 @@ for i = 1, 10 do
 	addCommandHandler( "f" .. ( i > 1 and i or "" ),
 		function( thePlayer, commandName, ... )
 			if exports.players:isLoggedIn( thePlayer ) then
-			if exports.factions:isPlayerInFactionType( thePlayer, 1 ) or exports.factions:isPlayerInFactionType( thePlayer, 2 ) or exports.factions:isPlayerInFactionType( thePlayer, 3 ) then	
 				local factionID = exports.factions:getPlayerFactions( thePlayer )[ i ]
 				if factionID then
 					local message = table.concat( { ... }, " " )
@@ -274,67 +267,30 @@ for i = 1, 10 do
 						outputChatBox( "Syntax: /" .. commandName .. " [facción IC]", thePlayer, 255, 255, 255 )
 					end
 				end
-				else
-				outputChatBox("Esta facción no posee radio IC.", thePlayer, 255, 0, 0)
-				end
-			end
-		end
-	)
-end
-
-for i = 1, 10 do
-	addCommandHandler( "fo" .. ( i > 1 and i or "" ),
-		function( thePlayer, commandName, ... )
-			if exports.players:isLoggedIn( thePlayer ) then
-			if exports.factions:isPlayerInFactionType( thePlayer, 1 ) or exports.factions:isPlayerInFactionType( thePlayer, 2 ) or exports.factions:isPlayerInFactionType( thePlayer, 3 ) then	
-				local factionID = exports.factions:getPlayerFactions( thePlayer )[ i ]
-				if factionID then
-					local message = table.concat( { ... }, " " )
-					if #message > 0 then
-						factionooc( thePlayer, factionID, message )
-					else
-						outputChatBox( "Syntax: /" .. commandName .. " [facción OOC]", thePlayer, 255, 255, 255 )
-					end
-				end
-				else
-				outputChatBox("Esta facción no posee radio OOC.", thePlayer, 255, 0, 0)
-				end
 			end
 		end
 	)
 end
 
 -- /do
-local cooldowns = {}
-
-addCommandHandler("do", 
-    function(thePlayer, commandName, ...)
-        if exports.players:isLoggedIn(thePlayer) then
-            local currentTime = getTickCount()
-            local lastUse = cooldowns[thePlayer] or 0
-
-            if currentTime - lastUse < 2000 then
-                outputChatBox("Debes esperar antes de usar este comando nuevamente.", thePlayer, 255, 0, 0)
-                return
-            end
-
-            cooldowns[thePlayer] = currentTime
-
-            local message = table.concat({...}, " ")
-            if #message > 0 then
-                local pletra = string.upper(string.sub(message, 1, 1))
-                local resto = string.sub(message, 2)
-                local mensaje = tostring(pletra .. resto)
-                localMessage(thePlayer, " *" .. mensaje .. " ((" .. getPlayerName(thePlayer) .. "))", 255, 255, 40)
-            else
-                outputChatBox("Syntax: /" .. commandName .. " [Entorno IC]", thePlayer, 255, 255, 255)
-            end
-        end
-    end
+addCommandHandler( "do", 
+	function( thePlayer, commandName, ... )
+		if exports.players:isLoggedIn( thePlayer ) then
+			local message = table.concat( { ... }, " " )
+			if #message > 0 then
+				local pletra = string.upper(string.sub(message, 1, 1))
+				local resto = string.sub(message, 2)
+				local mensaje = tostring(pletra..resto)
+				localMessage( thePlayer, " *" .. mensaje .. " ((" .. getPlayerName( thePlayer ) .. "))", 255, 255, 0 )
+			else
+				outputChatBox( "Syntax: /" .. commandName .. " [Entorno IC]", thePlayer, 255, 255, 255 )
+			end
+		end
+	end
 )
 
 -- /susurrar
-addCommandHandler( { "s" }, 
+addCommandHandler( { "susurrar" }, 
 	function( thePlayer, commandName, ... )
 		if exports.players:isLoggedIn( thePlayer ) and not isPedDead( thePlayer ) then
 			local message = table.concat( { ... }, " " )
@@ -351,7 +307,7 @@ addCommandHandler( { "s" },
 )
 
 -- /gritar
-addCommandHandler( { "g" }, 
+addCommandHandler( { "gritar" }, 
 	function( thePlayer, commandName, ... )
 		if exports.players:isLoggedIn( thePlayer ) and not isPedDead( thePlayer ) then
 			local message = table.concat( { ... }, " " )
@@ -371,7 +327,7 @@ addCommandHandler( { "g" },
 addCommandHandler( { "meg", "megafono" }, 
 	function( thePlayer, commandName, ... )
 		if exports.players:isLoggedIn( thePlayer ) and not isPedDead( thePlayer ) then
-			if exports.factions:isPlayerInFaction ( thePlayer, 1) or exports.factions:isPlayerInFaction ( thePlayer, 33) or exports.factions:isPlayerInFaction ( thePlayer, 22) or exports.factions:isPlayerInFaction ( thePlayer, 27) then 
+			if exports.factions:isPlayerInFaction ( thePlayer, 1) or exports.factions:isPlayerInFaction ( thePlayer, 2) then 
 				local message = table.concat( { ... }, " " )
 				if #message > 0 and not getElementData(thePlayer, "nogui") == true then
 					local pletra = string.upper(string.sub(message, 1, 1))
@@ -396,9 +352,9 @@ addCommandHandler( { "b", "LocalOOC" },
 					outputChatBox("Un staff te ha retirado el uso del /b. Reconectando lo tendrás de nuevo.", thePlayer, 255, 0, 0)
 				else
 					if getElementData(thePlayer, "account:gmduty") == true then
-						localMessage( thePlayer, "[STAFF - ON - " .. exports.players:getID( thePlayer ) .. "] " .. getPlayerName( thePlayer ) ..  ": (( " .. message .. " ))", 0, 255, 59 )
+						localMessage( thePlayer, "[STAFF - OOC - " .. exports.players:getID( thePlayer ) .. "] " .. getPlayerName( thePlayer ) ..  ": (( " .. message .. " ))", 196, 255, 255 )
 					else
-						localMessage( thePlayer, "[OOC - " .. exports.players:getID( thePlayer ) .. "] " .. getPlayerName( thePlayer ) ..  ": " .. message .. " ", 111, 220, 217 )
+						localMessage( thePlayer, "[OOC - " .. exports.players:getID( thePlayer ) .. "] " .. getPlayerName( thePlayer ) ..  ": (( " .. message .. " ))", 196, 255, 255 )
 						setElementData( thePlayer, "nOOC", true )
 						setTimer( removeElementData, 3000, 1, thePlayer, "nOOC" )
 						exports.objetivos:addObjetivo(7, exports.players:getCharacterID(thePlayer), thePlayer)
@@ -426,9 +382,9 @@ addCommandHandler( { "o", "GlobalOOC" },
 				if #message > 0 and not getElementData(thePlayer, "nogui") == true then
 					for k, v in ipairs(getElementsByType("player")) do
 						--if hasObjectPermissionTo( v, "command.modchat", false ) then
-							outputChatBox( "[VRP-STAFF ANUNCIO GLOBAL] -(" .. getPlayerName( thePlayer ) ..  ")- " .. message .. " ", v, 3, 255, 104 )
+							outputChatBox( "[STAFF - OOC GLOBAL] ((" .. getPlayerName( thePlayer ) ..  ")) " .. message .. " ", v, 3, 255, 104 )
 						--else
-							--outputChatBox( "[agogo ] " .. message .. " ", v, 3, 255, 104 )
+							--outputChatBox( "[Administración] " .. message .. " ", v, 3, 255, 104 )
 						--end
 					end
 				else
@@ -489,7 +445,7 @@ addCommandHandler( { "announce", "ann" },
 			if #message > 0 then
 				for key, value in ipairs( getElementsByType( "player" ) ) do
 					if hasObjectPermissionTo( value, "command.announce", false ) then
-						outputChatBox( "[Anuncio] " .. getPlayerName( thePlayer ) : gsub( "_", " " ) .. ": " .. message .. " ", value, 175, 255, 67 )
+						outputChatBox( "*** " .. getPlayerName( thePlayer ):gsub( "_", " " ) .. ": " .. message .. " ***", value, 0, 255, 153 )
 					elseif not silent then
 						outputChatBox( "*** " .. message .. " ***", value, 0, 255, 153 )
 					end
@@ -511,12 +467,12 @@ addCommandHandler( { "adminchat", "a" },
 				message = getPlayerName( thePlayer ) .. ": " .. message
 				local groups = exports.players:getGroups( thePlayer )
 				if groups and #groups >= 1 then
-					message = "[ #00CCE8Altos #0097E8Rangos#97C8AD ] "..groups[1].displayName .. " " .. message
+					message = "[#05A6EEAdminchat#97C8AD] "..groups[1].displayName .. " " .. message
 				end
 				
 				for key, value in ipairs( getElementsByType( "player" ) ) do
 					if hasObjectPermissionTo( value, "command.adminchat", false ) then
-						outputChatBox( message, value, 255,231,241 ,true )
+						outputChatBox( message, value, 151,200,173 ,true )
 					end
 				end
 			else
@@ -536,7 +492,7 @@ addCommandHandler( { "modchat", "m" },
 				message = getPlayerName( thePlayer ) .. ": " .. message
 				local groups = exports.players:getGroups( thePlayer )
 				if groups and #groups >= 1 then
-					message = "#00FF46[ Staff Chat ]#fffa15 "..groups[1].displayName .. " " .. message
+					message = "[#05A6EEModchat#CDF213] "..groups[1].displayName .. " " .. message
 				end
 				if getElementData(thePlayer, "modchat") == true then setElementData(thePlayer, "modchat", false) outputChatBox("Se te ha activado automáticamente el Modchat por usarlo.", thePlayer, 0, 255, 0) end
 				if hasObjectPermissionTo( thePlayer, "command.encubierto", false ) and not getElementData(thePlayer, "account:gmduty") == true then outputChatBox("Seguridad de Encubierto. Debes de estar en duty para utilizar Modchat o usar /md.", thePlayer, 255, 255, 0) return end
@@ -581,22 +537,22 @@ addCommandHandler( "md",
 addCommandHandler( { "department", "d", "dept" },
 	function( thePlayer, commandName, ... )
 		if exports.players:isLoggedIn( thePlayer ) then
-			if exports.factions:isPlayerInFactionType( thePlayer, 1 ) or exports.factions:isPlayerInFaction( thePlayer, 22) or exports.factions:isPlayerInFaction( thePlayer, 31) or exports.factions:isPlayerInFaction( thePlayer, 2) or exports.factions:isPlayerInFaction( thePlayer, 33) or exports.factions:isPlayerInFaction( thePlayer, 27) then		
+			if exports.factions:isPlayerInFactionType( thePlayer, 1 ) then		
 				local message = table.concat( { ... }, " " )
 				if #message > 0 then
 					local players = { }
 					for key, value in ipairs( getElementsByType( "player" ) ) do
-						if exports.factions:isPlayerInFactionType( value, 1 ) or exports.factions:isPlayerInFaction( value, 22) or exports.factions:isPlayerInFaction( value, 31) or exports.factions:isPlayerInFaction( value, 2) or exports.factions:isPlayerInFaction( value, 33) or exports.factions:isPlayerInFaction( value, 27) then
+						if exports.factions:isPlayerInFactionType( value, 1 ) then
 							table.insert( players, value )
 						end
 					end
 					local pletra = string.upper(string.sub(message, 1, 1))
 					local resto = string.sub(message, 2)
 					local mensaje = tostring(pletra..resto)
-					localizedMessage( thePlayer, " [Radio Gobierno] " .. getPlayerName( thePlayer ) ..  " dice: ", mensaje, 244, 155, 66, players )
+					localizedMessage( thePlayer, " [DEPARTMENTO] " .. getPlayerName( thePlayer ) ..  " dice: ", mensaje, 244, 155, 66, players )
 					localizedMessage( thePlayer, " " .. getPlayerName( thePlayer ) .. " dice por su radio: ", mensaje, 230, 230, 230, false, 127, 127, 127 )
 				else
-					outputChatBox( "Syntax: /" .. commandName .. " [gobierno]", thePlayer, 255, 255, 255 )
+					outputChatBox( "Syntax: /" .. commandName .. " [departamento]", thePlayer, 255, 255, 255 )
 				end
 			end
 		end
@@ -607,7 +563,7 @@ addCommandHandler( { "department", "d", "dept" },
 local function pm( player, target, message, enc )
     outputChatBox( "[Mensaje enviado - ID:" .. exports.players:getID( target ) .. "] " .. getPlayerName( target ) .. ": " .. message, player, 197, 225, 7,true )
     if getElementData(target, "minpa") then
-		triggerClientEvent(target, "onSendNotification", target, getPlayerName(player).." te ha enviado un PM. ¡Vuelve para leerlo!")
+		triggerClientEvent(target, "onSendNotification", target, getPlayerName(player).." te ha enviado un PM en DownTown. ¡Vuelve para leerlo!")
 	end
 	if enc then
 		outputChatBox( "PM de Desconocido: " .. message, target, 0, 255, 255 )
@@ -822,13 +778,13 @@ addCommandHandler("ad",
 addCommandHandler("n",
 	function( thePlayer, commandName, ... )
 		if exports.players:isLoggedIn( thePlayer ) then
-			if exports.factions:isPlayerInFaction( thePlayer, 18 ) then
+			if exports.factions:isPlayerInFaction( thePlayer, 4 ) then
 				local message = table.concat( { ... }, " " )
 				if #message > 0 and not getElementData(thePlayer, "nogui") == true then
 					exports.factions:giveFactionPresupuesto( 4, 10 )
 					for k, v in ipairs(getElementsByType("player")) do
 						if not getElementData(v, "radio") or getElementData(v, "radio") ~= true then
-							outputChatBox("[NOTICIAS RCN] [ESPAÑOL] "..getPlayerName(thePlayer):gsub("_", " ").." dice: "..tostring(message), v, 62, 184, 255)
+							outputChatBox("[Inglés] [PCND] "..getPlayerName(thePlayer):gsub("_", " ").." dice: "..tostring(message), v, 62, 184, 255)
 						end
 					end
 				else
@@ -844,8 +800,8 @@ addCommandHandler("n",
 addCommandHandler("entrevista",
 function(player, cmd, other)
 	if not other then outputChatBox("Sintaxis: /entrevista [jugador]", player, 255, 255, 255) return end
-	if exports.factions:isPlayerInFaction( player, 18 ) then
-		if exports.factions:isPlayerInFaction(player, 18) then
+	if exports.factions:isPlayerInFaction( player, 4 ) then
+		if exports.factions:isPlayerInFaction(player, 4) then
 			fID = 4
 		end
 		local player2, name = exports.players:getFromName( player, other )
@@ -877,7 +833,7 @@ addCommandHandler("en",
 					exports.factions:giveFactionPresupuesto( tonumber(getElementData(thePlayer, "frID")), 50 )
 					for k, v in ipairs(getElementsByType("player")) do
 						if not getElementData(v, "radio") or getElementData(v, "radio") ~= true then
-							outputChatBox("[NOTICIAS RCN] [Entrevistado] [ESPAÑOL] "..getPlayerName(thePlayer):gsub("_", " ").." dice: "..tostring(message), v, 113, 237, 31)
+							outputChatBox("[Entrevistado] [Inglés] [PCND] "..getPlayerName(thePlayer):gsub("_", " ").." dice: "..tostring(message), v, 113, 237, 31)
 						end
 					end
 				else
@@ -892,7 +848,7 @@ addCommandHandler("en",
 
 addCommandHandler("camara",
 function(player)
-	if exports.factions:isPlayerInFaction(player, 18) then
+	if exports.factions:isPlayerInFaction(player, 4) then
 		if exports.players:takeMoney(player, 150) then
 			giveWeapon(player, 43, 100)
 			exports.factions:giveFactionPresupuesto(4, 100)
@@ -901,7 +857,7 @@ function(player)
 			outputChatBox("No tienes 200 dólares para comprar la cámara.", player, 255, 0, 0)
 		end	
 	else
-		outputChatBox("No perteneces a la facción de RCN.", player, 255, 0, 0)
+		outputChatBox("No perteneces a la facción de PCND.", player, 255, 0, 0)
 	end
 end
 )

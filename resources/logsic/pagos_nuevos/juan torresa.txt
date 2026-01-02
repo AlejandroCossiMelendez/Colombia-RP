@@ -1,7 +1,0 @@
-[2024-06-05 20:46:46] Cantidad $6000000 pagado a Alexander Castano VIP.
-[2024-06-06 03:09:52] Cantidad $500000 pagado a Daniel Acosta.
-[2024-06-06 18:01:10] Cantidad $500000 pagado a Sofia Ayala.
-[2024-06-06 18:03:56] Cantidad $2400000 pagado a Mohamed Ali.
-[2024-06-07 01:50:00] Cantidad $250000 pagado a Alejandro Perez.
-[2024-06-07 18:16:55] Cantidad $50000 pagado a Daniel Acosta.
-[2024-06-07 18:19:04] Cantidad $500000 pagado a Daniel Acosta.

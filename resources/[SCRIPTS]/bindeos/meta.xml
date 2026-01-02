@@ -1,7 +1,0 @@
-<meta>
-	<info author="mambokings" version="1.0.1" name="YOUTUBEF6" description="Panel de F6 para youtube" type="script"/>
-	
-	
-	<script src="bindeosS.lua" type="server" />
-	
-</meta>

@@ -1,8 +1,0 @@
-[2024-06-04 20:22:21] Cantidad $200000 pagado a Daniel Rosas.
-[2024-06-05 16:49:00] Cantidad $1000000 pagado a Daniel Acosta.
-[2024-06-05 17:37:17] Cantidad $10000000 pagado a Martin Ledesma.
-[2024-06-05 22:52:22] Cantidad $5000000 pagado a Daniel Acosta.
-[2024-06-07 17:51:22] Cantidad $30000000 pagado a Mohamed Ali.
-[2024-06-07 21:13:33] Cantidad $10000000 pagado a Daniel Rosas.
-[2024-06-07 21:23:14] Cantidad $1000000 pagado a Daniel Rosas.
-[2024-06-07 22:13:12] Cantidad $23000000 pagado a Daniel Acosta.

@@ -8,16 +8,17 @@ end
 
 function vercamaritas(player)
 	if exports.factions:isPlayerInFaction(player, 1) then
+		if not isElementInRange(player,  2019.6669921875, 1962.9921875, -12.739062309265, 2) then outputChatBox("(( No estás en el ordenador policial ))", player, 255, 0, 0) return end
 		setElementData(player,"concamaraspd",true)
 		triggerClientEvent(player, "VerCamarasPolicia", player)
 	else
 		outputChatBox("(( No eres Policia ))", player, 255, 0, 0)
 	end
 end
-addCommandHandler("pdcam", vercamaritas)
+addCommandHandler("cseguridad", vercamaritas)
 
 function abrirPanel(player)
-	if exports.factions:isPlayerInFaction(player, 1) or exports.factions:isPlayerInFaction(player, 33) then
+	if exports.factions:isPlayerInFaction(player, 1) or exports.factions:isPlayerInFaction(player, 6) then
 		if not getElementData(player, "GUIPol") == true then
 			local sql1 = exports.sql:query_assoc("SELECT * FROM ordenes")
 			setElementData(player, "nogui", true)
@@ -52,8 +53,16 @@ function solicitarDatos(code)
 		consulta = exports.sql:query_assoc("SELECT * FROM multas")
 	elseif tonumber(code) == 6 then
 		consulta = exports.sql:query_assoc("SELECT * FROM licencias_armas")
+		consulta2 = {}
 		for k, v in ipairs(consulta) do
 			local sql = exports.sql:query_assoc_single("SELECT characterName, characterID FROM characters WHERE characterID = "..tostring(v.cID))
+			local sql2 = exports.sql:query_assoc_single("SELECT characterName, characterID FROM characters WHERE characterID = "..tostring(v.cIDJusticia))
+			if tonumber(v.cIDJusticiaNull) > 0 then
+				local sql3 = exports.sql:query_assoc_single("SELECT characterName, characterID FROM characters WHERE characterID = "..tostring(v.cIDJusticiaNull))
+				table.insert(consulta2, tonumber(sql3.characterID), tostring(sql3.characterName))
+			end
+			table.insert(consulta2, tonumber(sql.characterID), 1 and tostring(sql.characterName) or "null")
+			table.insert(consulta2, tonumber(sql2.characterID), 1 and tostring(sql2.characterName) or "null")
 		end
 	end
 	triggerClientEvent(source, "onEnviarDatosPanel", source, tonumber(code), consulta, consulta2)
@@ -61,7 +70,7 @@ end
 addEvent("onSolicitarDatosPanel", true)
 addEventHandler("onSolicitarDatosPanel", getRootElement(), solicitarDatos)
 
-function arregloModel()
+--[[function arregloModel()
 	local sql = exports.sql:query_assoc("SELECT * FROM robos WHERE tipo = 1")
 	for k, v in ipairs(sql) do
 		local sql2 = exports.sql:query_assoc_single("SELECT model FROM vehicles WHERE vehicleID = "..tostring(v.objetoID))
@@ -71,7 +80,7 @@ function arregloModel()
 	end
 end
 addCommandHandler("am", arregloModel)
-
+]]
 function solicitarNuevaOrden (nombre, razon)
 	if source and nombre and razon then
 		local agente = tostring(getPlayerName(source):gsub("_", " "))
@@ -82,7 +91,7 @@ end
 addEvent("onOrdenBusqueda", true)
 addEventHandler("onOrdenBusqueda", getRootElement(), solicitarNuevaOrden)
 
-function solicitarNuevoHA (nombre, dni, residencia, profesion, delitos)
+--[[function solicitarNuevoHA (nombre, dni, residencia, profesion, delitos)
 	if source and nombre and dni and residencia and profesion and delitos then
 		local agente = tostring(getPlayerName(source):gsub("_", " "))
 		local sql, error = exports.sql:query_insertid("INSERT INTO `historiales` (`historialID`, `nombre`, `dni`, `residencia`, `profesion`, `delitos`, `agente`, `fecha`) VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', CURRENT_TIMESTAMP);", nombre, dni, residencia, profesion, delitos, agente)
@@ -94,14 +103,14 @@ addEventHandler("onHistorialArrestos", getRootElement(), solicitarNuevoHA)
 
 function solicitarNuevoDeposito (idv, modelo, color, propietario, razon)
 	if source and idv and modelo and color and propietario and razon then
-		local agente = tostring(getPlayerName(source):gsub("_", " "))
-		local sql, error = exports.sql:query_insertid("INSERT INTO `deposito` (`depositoID`, `vehicleID`, `modelo`, `color`, `propietario`, `razon`, `agente`, `fecha`, `estado`) VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', CURRENT_TIMESTAMP, 'En deposito');", idv, modelo, color, propietario, razon, agente)
-		if error then outputDebugString(error) else outputChatBox("Se ha añadido el vehículo al depósito correctamente.", source, 0, 255, 0) end
+		--local agente = tostring(getPlayerName(source):gsub("_", " "))
+		--local sql, error = exports.sql:query_insertid("INSERT INTO `deposito` (`depositoID`, `vehicleID`, `modelo`, `color`, `propietario`, `razon`, `agente`, `fecha`, `estado`) VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', CURRENT_TIMESTAMP, 'En deposito');", idv, modelo, color, propietario, razon, agente)
+		--if error then outputDebugString(error) else outputChatBox("Se ha añadido el vehículo al depósito correctamente.", source, 0, 255, 0) end
 		outputChatBox("Este sistema ha sido desactivado. Disculpe las molestias.", source, 255, 0, 0)
 	end
 end
 addEvent("onHistorialDeposito", true)
-addEventHandler("onHistorialDeposito", getRootElement(), solicitarNuevoDeposito)
+addEventHandler("onHistorialDeposito", getRootElement(), solicitarNuevoDeposito)]]
 
 function modificarOrden (estado, razon, ordenID)
 	if source and ordenID and estado and razon then
@@ -127,8 +136,7 @@ addEventHandler("onEliminarOrden", getRootElement(), eliminarOrden)
 
 function retirarVehiculo (depositoID, vehicleID)
 	if source and depositoID and vehicleID then
-		if not exports.factions:isPlayerInFaction(source, 33) then 
-                outputChatBox("Solo un agente de transito puede quitar cepos.", source, 255, 0, 0) return end
+		if not exports.factions:isPlayerInFaction(source, 1) then outputChatBox("Solo un agente de policía puede retirar vehículos del deposito.", source, 255, 0, 0) return end
 		if not exports.vehicles:reloadVehicle(vehicleID) then
 			outputChatBox("El vehículo ID "..tostring(vehicleID).." no existe. Si crees que es un error, acude al CAU.", source, 255, 0, 0)
 			return
@@ -182,59 +190,15 @@ function burn(p)
    if p then
 		if not hasObjectPermissionTo( p, "command.modchat", false ) then outputChatBox("Acceso denegado", p, 255, 0, 0) return end
 		outputDebugString("El jugador "..getPlayerName(p):gsub("_", " ").." ha usado el comando /fuego y ha creado fuego.")
-		exports.factions:sendMessageToFaction(6, "(( Radio: Bomberos )) CENTRAL: Se ha recibido una llamada de emergencia un posible incendio se requieren todas las unidades.",127, 127, 255 )
-		 exports.factions:sendMessageToFaction(6, "(( Radio: Bomberos )) CENTRAL: ir de urgencia , se han enviado las cordenadas al GPS.",127, 127, 255 )
 		px, py, pz = getElementPosition(p)
 		px2, py2, pz2 = px, py, pz
-		 local blip = exports.factions:createFactionBlip2(px,py,pz, 6)
 		setTimer(function ()
 			for k, v in ipairs(getElementsByType("player")) do
 				px = px+math.random(-1, 1)
 				py = py+math.random(-1, 1)
 				triggerClientEvent(v, "onCreateFireDCRP", v, px, py, pz)
 			end
-		end, 1, 2)
+		end, 1500, 240)
    end
 end 
 addCommandHandler("fuego2", burn)
-
-
-function quitarcepom(source, command, vehicleID)
-    if not exports.factions:isPlayerInFaction(source, 33) then 
-        outputChatBox("Solo un agente de tránsito puede quitar cepos.", source, 255, 0, 0)
-        return 
-    end
-	
-	if not exports.vehicles:reloadVehicle(vehicleID) then
-		outputChatBox("El vehículo ID "..tostring(vehicleID).." no existe. Si crees que es un error, acude a un staff.", source, 255, 0, 0)
-		return
-	end
-	
-    local vehicleID = tonumber(vehicleID)
-    if not vehicleID then
-        outputChatBox("Uso: /quitarcepo [ID del vehículo]", source, 255, 0, 0)
-        return
-    end
-
-    local result = exports.sql:query_assoc_single("SELECT * FROM vehicles WHERE vehicleID = "..vehicleID)
-    if not result then
-        outputChatBox("El vehículo con ID " .. tostring(vehicleID) .. " no existe en la base de datos.", source, 255, 0, 0)
-        return
-    end
-
-    if result.cepo ~= 1 then
-        outputChatBox("El vehículo con ID " .. tostring(vehicleID) .. " no tiene un cepo en la base de datos.", source, 255, 0, 0)
-        return
-    end
-
-    local success, error_message = exports.sql:query_free("UPDATE vehicles SET cepo = 0 WHERE vehicleID = "..vehicleID)
-    if not success then
-        outputDebugString("Error al quitar el cepo del vehículo " .. tostring(vehicleID) .. ": " .. tostring(error_message))
-        outputChatBox("Error al quitar el cepo del vehículo. Consulta al CAU.", source, 255, 0, 0)
-        return
-    end
-	local vehiculoExportar = exports.vehicles:getVehicle(tonumber(vehicleID))
-	removeElementData(vehiculoExportar, "cepo")
-    outputChatBox("Se ha quitado el cepo del vehículo con ID " .. tostring(vehicleID), source, 0, 255, 0)
-end
-addCommandHandler("quitcep", quitarcepom)

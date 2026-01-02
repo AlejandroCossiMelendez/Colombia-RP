@@ -1,7 +1,0 @@
-<meta>
-	<info author="Castiel" type="script" version="1.0" />
-	
-	<script src="client.lua" type="client" cache="false" />
-	<file src="Arquivos/Castiel.fx" type="client" />
-	<file src="Arquivos/marker.png" />
-</meta>

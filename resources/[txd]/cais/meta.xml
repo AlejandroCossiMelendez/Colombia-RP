@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="GomezZ" type="misc" name="Volvo-Xc90" description="Volvo-Xc90" />
-     <script src="texturem.lua" type="client" />
-	 <file src="landhub.txd" />
-	 <file src="hub5_grass.dff" />
-	 <file src="hub5_grass.col" />
-</meta>

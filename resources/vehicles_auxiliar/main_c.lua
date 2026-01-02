@@ -104,9 +104,9 @@ end
             
 function mostrarGUIGVehs(data)
 	triggerEvent("onCursor", getLocalPlayer())
-    vGestVehiculo = guiCreateWindow(390*x/1366, 140*y/768, 560*x/1366, 418*y/768, "Mis Vehiculos - VERSO RP", false)
+    vGestVehiculo = guiCreateWindow(390*x/1366, 140*y/768, 560*x/1366, 418*y/768, "Panel de Gestión de Vehículos - DownTown RolePlay", false)
 	guiWindowSetSizable(vGestVehiculo, false)
-    labelInfo = guiCreateLabel(13*x/1366, 31*y/768, 537*x/1366, 61*y/768, "Bienvenido al panel de gestión de vehículos de VERSO RP.\n\nDesde aquí podrás ver los vehículos que tienes, ver su estado, y realizar trámites con ellos, como renovarlos o venderlos al sistema de concesionarios de 2º mano.", false, vGestVehiculo)
+    labelInfo = guiCreateLabel(13*x/1366, 31*y/768, 537*x/1366, 61*y/768, "Bienvenido al panel de gestión de vehículos de DownTown RolePlay.\n\nDesde aquí podrás ver los vehículos que tienes, ver su estado, y realizar trámites con ellos, como renovarlos o venderlos al sistema de concesionarios de 2º mano.", false, vGestVehiculo)
     guiLabelSetHorizontalAlign(labelInfo, "center", true)
     gridVehiculos2 = guiCreateGridList(31*x/1366, 104*y/768, 492*x/1366, 210*y/768, false, vGestVehiculo)
     guiGridListAddColumn(gridVehiculos2, "ID vehículo", 0.18)

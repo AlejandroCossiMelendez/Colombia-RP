@@ -1,8 +1,0 @@
-<meta>
-    <script src="interior.lua" type="server" />
-    <script src="client.lua" type="client" />
-
-    <file src="Roboto.ttf" />
-    <file src="RobotoBold.ttf" />
-    <file src="sementedemaconha.png" />
-</meta>

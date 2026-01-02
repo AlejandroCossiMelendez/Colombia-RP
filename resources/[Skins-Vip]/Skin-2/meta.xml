@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="BySampaio" type="misc" name="BySampaio" description="BySampaio" />
-     <script src="script.lua" type="client" />
-     <file src="BySampaio.txd" />
-     <file src="BySampaio.dff" />
-</meta>

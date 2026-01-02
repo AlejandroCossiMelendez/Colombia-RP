@@ -118,7 +118,7 @@ bigBlind = 20
 smallBlind = bigBlind / 2
 
 -- The Marker for entering the poker
-pokerEntranceMarker = createMarker ( 1121.31, 9.27, 1002.08 -1, "cylinder", 1.5, 125, 0, 0, 125 )
+pokerEntranceMarker = createMarker ( 1121.31, 9.27, 1002.08, "cylinder", 1.5, 125, 0, 0, 125 )
 setElementInterior ( pokerEntranceMarker, 12 )
 
 -- The poker table
@@ -129,10 +129,10 @@ pokerChair2 = createObject ( 1720, 1118.6916503906, 10.396108627319, 1001.078, 0
 setElementInterior ( pokerChair1, 12 )
 setElementInterior ( pokerChair2, 12 )
 
-setElementDimension ( pokerEntranceMarker, 2482 )
-setElementDimension ( pokerTable, 2482 )
-setElementDimension ( pokerChair1, 2482 )
-setElementDimension ( pokerChair2, 2482 )
+setElementDimension ( pokerEntranceMarker, 1154 )
+setElementDimension ( pokerTable, 1154 )
+setElementDimension ( pokerChair1, 1154 )
+setElementDimension ( pokerChair2, 1154 )
 
 function pokerMarkerHit ( hit, dim )
 	if dim then
@@ -425,7 +425,7 @@ function setPlayerLeavingPoker_func ( player, id )
 		setElementFrozen ( player, false )
 		setElementPosition ( player, 1120.96, 5.48, 1002.09 )
 		setElementInterior ( player, 12 )
-		setElementDimension ( player, 2482 )
+		setElementDimension ( player, 1154 )
 		setCameraTarget ( player, player )
 		toggleAllControls ( player, true, true, true )
 		setPedAnimation ( player )

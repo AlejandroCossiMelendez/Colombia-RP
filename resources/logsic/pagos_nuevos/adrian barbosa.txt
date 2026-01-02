@@ -1,6 +1,0 @@
-[2024-06-15 00:01:26] Cantidad $500000 pagado a Mattew Hanibal.
-[2024-06-15 00:19:45] Cantidad $100000 pagado a Juan Bedoya.
-[2024-06-16 14:43:32] Cantidad $800000 pagado a Daniel Acosta.
-[2024-06-16 14:46:27] Cantidad $2410089 pagado a Daniel Acosta.
-[2024-06-16 16:53:50] Cantidad $37000000 pagado a Joelito Vin.
-[2024-06-16 19:07:14] Cantidad $10000000 pagado a Brayan Estiven.

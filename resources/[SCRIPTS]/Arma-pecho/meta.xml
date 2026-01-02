@@ -1,5 +1,0 @@
-<meta>
-	<info author="Gothem" name="Armas" version="7" type="script" description="BackWeapons script" />
-	<script src="carmas.lua" type="client"/>
-	<script src="prot.lua" type="server"/>
-</meta>

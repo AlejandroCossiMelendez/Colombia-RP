@@ -1,6 +1,0 @@
-﻿<meta>
-	<file src="1.txd" />
-	<file src="1.dff" />
-	<script type="client" src="script.lua" />
-        <script src="comando.lua" type="server" />
-</meta>

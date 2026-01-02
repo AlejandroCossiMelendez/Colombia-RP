@@ -1,81 +1,83 @@
 ﻿local mVelocidad =
 {
-	[ 445 ] = 25,
-     [ 429 ] = 13.6,
-	[ 506 ] = 17.39999961853,
+	[ 445 ] = 10,
+    [ 429 ] = 13.6,
+	[ 506 ] = 11.39999961853,
 	[ 565 ] = 12.2,
 	[ 558 ] = 10.6,
-	[ 439 ] = 15.199999809265,
+	[ 602 ] = 11.12,
+	[ 560 ] = 12.5,
+	[ 439 ] = 8.199999809265,
 	[ 550 ] = 10.4,
 	[ 566 ] = 10,
-	[ 560 ] = 15,
-     [ 426 ] = 23.4,
-	[ 451 ] = 15.8,
+	[ 451 ] = 10.8,
 	[ 555 ] = 14.5, -- otro reducido de velocidad de 15 a 14.5
-	[ 402 ] = 16.5,
-	[ 603 ] = 14,
-	[ 492 ] = 11.5,
+	[ 402 ] = 11.5,
+	[ 603 ] = 11.8,
+	[ 492 ] = 10,
 	[ 587 ] = 12.4,
-	[ 414 ] = 15,
-	[ 510 ] = 30,
-	[ 525 ] = 45,
-	[ 527 ] = 17,
-	[ 554 ] = 25,
-	[ 459 ] = 25,
-	[ 462 ] = 35,
-	[ 505 ] = 20,
 	[ 495 ] = 14.199999809265,
 	[ 545 ] = 14,
+	[ 559 ] = 12,
 	[ 400 ] = 10.5,
 	[ 404 ] = 10.6,
-	[ 441 ] = 450,
-	[ 479 ] = 60.9,
+	[ 479 ] = 8.4,
 	[ 475 ] = 10.9,
 	[ 405 ] = 10.3,
 	[ 458 ] = 8.7,
+	[ 426 ] = 9,
 	[ 567 ] = 8.6000003814697,
-	[ 559 ] = 17,
 	[ 419 ] = 10,
-	[ 466 ] = 15.800000190735,
+	[ 466 ] = 10.800000190735,
 	[ 536 ] = 10,
-	[ 529 ] = 10,
-	[ 546 ] = 14.1999998092651,
+	[ 585 ] = 10.7,
+	[ 477 ] = 11.6,
+	[ 529 ] = 8.9,
+	[ 546 ] = 8.1999998092651,
 	[ 467 ] = 9.7,
+	[ 516 ] = 9.4,
+	[ 547 ] = 10.8,
 	[ 533 ] = 12.2,
-	[ 576 ] = 15.1,
+	[ 576 ] = 9,
 	[ 517 ] = 10.2,
 	[ 540 ] = 8.9,
 	[ 412 ] = 9.6,
 	[ 551 ] = 9.8000001907349,
 	[ 421 ] = 9.6,
 	[ 580 ] = 11.2,
-	[ 561 ] = 11.8,
+	[ 561 ] = 9.7,
+	[ 542 ] = 9.4,
 	[ 401 ] = 6.7,
+	[ 589 ] = 12,
+	[ 480 ] = 13.5,
+	[ 527 ] = 9.4,
 	[ 507 ] = 9,
-	[ 470 ] = 25,
 	[ 562 ] = 12.3,
 	[ 496 ] = 10.3,
 	[ 474 ] = 7.7999998092651,
+	[ 527 ] = 9.4,
 	[ 489 ] = 10.5,
 	[ 500 ] = 11.10000038147,
-	[ 422 ] = 50,
+	[ 422 ] = 9.7,
 	[ 518 ] = 9.7,
+	[ 418 ] = 8.5,
 	[ 543 ] = 9,
 	[ 600 ] = 9.9,
 	[ 413 ] = 9,
-	[ 502 ] = 20,
 	[ 483 ] = 8.4000000953674,
 	[ 508 ] = 7.8999999046326,
 	[ 482 ] = 10.2,
 	[ 440 ] = 8.1999998092651,
-	[ 424 ] = 30,
-	[ 471 ] = 35,
-	[ 468 ] = 33.1999,
-	[ 581 ] = 30,
+	[ 424 ] = 17,
+	[ 471 ] = 14,
+	[ 468 ] = 28,
+	[ 581 ] = 26,
 	[ 461 ] = 24,
-	[ 522 ] = 50,
+	[ 522 ] = 34,
 	[ 521 ] = 30,
-	[ 579 ] = 17.5,
+	[ 586 ] = 21,
+	[ 415 ] = 12.2,
+	[ 579 ] = 11.5,
 	[ 541 ] = 11.2, -- Posible averia, si antes tenia 11.5...
 	[ 411 ] = 12.9,
 }
@@ -128,84 +130,18 @@ function solicitarMejora (veh, tipo, fase)
 			else
 				if model == 596 then
 					setVehicleHandling(veh, "driveType", "awd")
-					setVehicleHandling(veh, "engineAcceleration", 20)
-					setVehicleHandling(veh, "maxVelocity", 220)
+					setVehicleHandling(veh, "engineAcceleration", 14)
+					setVehicleHandling(veh, "maxVelocity", 152)
 				elseif model == 597 then
 					setVehicleHandling(veh, "driveType", "awd")
-					setVehicleHandling(veh, "engineAcceleration", 25)
-					setVehicleHandling(veh, "maxVelocity", 210.4)
-				elseif model == 602 then
-					setVehicleHandling(veh, "maxVelocity", 280)
+					setVehicleHandling(veh, "engineAcceleration", 14)
+					setVehicleHandling(veh, "maxVelocity", 171.4)
 				elseif model == 509 or model == 481 then
 					setVehicleHandling(veh, "maxVelocity", 40)
 				elseif model == 510 then
-					setVehicleHandling(veh, "maxVelocity", 100)
+					setVehicleHandling(veh, "maxVelocity", 50)
 				elseif model == 523 then
 					setVehicleHandling(veh, "engineAcceleration", 50)
-                                elseif model == 490 then
-					setVehicleHandling(veh, "driveType", "awd")
-					setVehicleHandling(veh, "engineAcceleration", 25)
-					setVehicleHandling(veh, "maxVelocity", 250)
-
-                                elseif model == 462  then
-					setVehicleHandling(veh, "driveType", "awd")
-					setVehicleHandling(veh, "engineAcceleration", 45)
-					setVehicleHandling(veh, "maxVelocity", 210)
-
-                                elseif model == 401  then
-					setVehicleHandling(veh, "driveType", "awd")
-					setVehicleHandling(veh, "engineAcceleration", 14)
-					setVehicleHandling(veh, "maxVelocity", 180)
-                                elseif model == 604  then
-					setVehicleHandling(veh, "driveType", "awd")
-					setVehicleHandling(veh, "engineAcceleration", 14)
-					setVehicleHandling(veh, "maxVelocity", 180)
-                                elseif model == 439  then
-					setVehicleHandling(veh, "driveType", "awd")
-					setVehicleHandling(veh, "engineAcceleration", 120)
-					setVehicleHandling(veh, "maxVelocity", 250)
-				elseif model == 401 then
-                                        setVehicleHandling(veh, "engineAcceleration", 200)
-				elseif model == 401 then
-                                        setVehicleHandling(veh, "engineAcceleration", 200)										
-                                elseif model == 550  then
-					setVehicleHandling(veh, "driveType", "awd")
-					setVehicleHandling(veh, "engineAcceleration", 150)
-					setVehicleHandling(veh, "maxVelocity", 200)
-                                elseif model == 542  then
-					setVehicleHandling(veh, "driveType", "awd")
-					setVehicleHandling(veh, "engineAcceleration", 150)
-					setVehicleHandling(veh, "maxVelocity", 200)
-				elseif model == 401 then
-                                        setVehicleHandling(veh, "engineAcceleration", 150)
-           elseif model == 598  then
-					setVehicleHandling(veh, "driveType", "awd")
-					setVehicleHandling(veh, "engineAcceleration", 20)
-					setVehicleHandling(veh, "maxVelocity", 250)
-				elseif model == 598 then
-                                        setVehicleHandling(veh, "engineAcceleration", 250)
-           elseif model == 599  then
-					setVehicleHandling(veh, "driveType", "awd")
-					setVehicleHandling(veh, "engineAcceleration", 30)
-					setVehicleHandling(veh, "maxVelocity", 250)
-				elseif model == 599 then
-                                        setVehicleHandling(veh, "engineAcceleration", 250)
-           elseif model == 418  then
-					setVehicleHandling(veh, "driveType", "awd")
-					setVehicleHandling(veh, "engineAcceleration", 20)
-					setVehicleHandling(veh, "maxVelocity", 200)
-           elseif model == 445  then
-					setVehicleHandling(veh, "driveType", "awd")
-					setVehicleHandling(veh, "engineAcceleration", 25)
-					setVehicleHandling(veh, "maxVelocity", 220)
-				elseif model == 445 then
-                                        setVehicleHandling(veh, "engineAcceleration", 220)
-
-
-
-
-
-
 				else
 					local mejora = getVehicleHandlingProperty(veh, "engineAcceleration")
 					setVehicleHandling(veh, "engineAcceleration", tonumber(mejora+pmejora))

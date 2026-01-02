@@ -123,7 +123,6 @@ local tv =
 
 local estantetv =
 {
-    [ 2419 ] = true,
     [ 2311 ] = true,
 	[ 2313 ] = true,
 	[ 2314 ] = true,
@@ -369,10 +368,10 @@ item_list =
 {
 	{ name = "Llave de Coche", image = true },--1
 	{ name = "Llave de Casa", image = true },--2
-	{ name = "Comida", image = true },--3
-	{ name = "Bebida sin alcohol", image = true },--4
-	{ name = "Ropa 1", image = true },--5
-	{ name = "Ropa 2", image = true },--6
+	{ name = "Comida", image = getFoodImage },--3
+	{ name = "Bebida sin alcohol", image = getDrinkImage },--4
+	{ name = "Ropa", image = function( value, name ) if value then return ":players/images/skins/" .. value .. ".png" end end },--5
+	{ name = "Comida", image = function( value, name ) if value then return ":items/images/co" .. value .. ".png" end end },
 	{ name = "Telefono Movil", image = true },--7
 	{ name = "Diccionario", image = function( value, name ) if value then return ":players/images/flags/" .. value .. ".png" end end },
 	{ name = "Reloj", image = true },--9
@@ -382,14 +381,14 @@ item_list =
 	{ name = "Copia de llave", image = true  },--13
 	{ name = "Caja de cigarrillos", image = true },--14
 	{ name = "Cigarrillo", image = true },--15
-	{ name = "Cedula De Ciudadania", image = true },--16
+	{ name = "DNI", image = true },--16
 	{ name = "Tarjeta de peajes", image = true },--17
 	{ name = "Porro de marihuana", image = true },--18
 	{ name = "Seta Psicodelica", image = true },--19
-	{ name = "Tussi", image = true },--20
+	{ name = "Extasis", image = true },--20
 	{ name = "Metanfetamina", image = true },--21
-	{ name = "Bolsa de marihuana(2g)", image = true },--22
-	{ name = "Bolsa de meta(3rayas)", image = true },--23
+	{ name = "Bolsa de marihuana(5g)", image = true },--22
+	{ name = "Bolsa de meta(5rayas)", image = true },--23
 	{ name = "Bandana", image = true },--24
 	{ name = "Linterna", image = true },--25
 	{ name = "Mechero", image = true },--26
@@ -402,73 +401,18 @@ item_list =
 	{ name = "Loteria", image = true },--33
 	{ name = "Pieza", image = true },--34
 	{ name = "Útil - LSPD", image = function( value, name ) if value then return ":items/images/pd" .. value .. ".png" end end }, -- 35
-	{ name = "Dinero Sucio", image = true },--36
-	{ name = "Hoja De Coca", image = true },--37
-	{ name = "Culata de Ak-47", image = true }, --38 fabrica
-	{ name = "Cuerpo de Ak-47", image = true },--39 fabrica
-	{ name = "Cargador de Ak-47", image = true },--40 fabrica
-	{ name = "Cañon de Ak-47", image = true },--41 fabrica
+	{ name = "Bolsa Speed", image = true },--36
+	{ name = "Faldo Cocaina", image = true },--37
+	{ name = "Faldo Hachi", image = true },--38
+	{ name = "Faldo Heroina", image = true },--39
+	{ name = "Bolsa LSD", image = true },--40
+	{ name = "Bote Anfetas", image = true },--41
 	{ name = "Cerradura", image = true },--42
 	{ name = "Cargador Arma", image = function( value, name ) if value then return ":items/images/w" .. value .. "c.png" end end },--43
 	{ name = "Bidón de Gasolina", image = true },--44
-	{ name = "Libreta Militar", image = true },--45
+	{ name = "Invitación especial", image = true },--45
 	{ name = "Chaleco Antibalas", image = true },--46
-	{ name = "Kit de Reparación", image = true },--47
-	{ name = "Trapo", image = true },--48
-	{ name = "Lingote de oro", image = true },--49
-	{ name = "Hierro", image = true },--50
-	{ name = "Carbon", image = true },--51
-	{ name = "Bauxita", image = true },--52
-	{ name = "Vendas", image = true },--53
-	{ name = "Pico y Pala", image = true },--54
-	{ name = "Tela", image = true }, -- 55
-	{ name = "Pescado chico", image = true },--56
-	{ name = "Bolso con dinero", image = true },--57
-	{ name = "Cuerpo de Colt-45", image = true }, --58 fabrica
-	{ name = "Cargador de Colt-45", image = true }, --59 fabrica
-	{ name = "Cañon de Colt-45", image = true }, --60 fabrica 
-	{ name = "Cañon de Tec-9", image = true }, --61 fabrica
-	{ name = "Cargador de Tec-9", image = true }, --62 fabrica
-	{ name = "Cuerpo de Tec-9", image = true }, --63 fabrica
-	{ name = "Caja de Alimentos", image = true },--64
-	{ name = "Semillas de marihuana", image = true },--65
-	{ name = "Aluminio", image = true },--66
-	{ name = "Pólvora", image = true },--67
-	{ name = "Acero", image = true },--68
-	{ name = "Horno de Fundición", image = true },--69
-	{ name = "Tijeras", image = true },--70
-	{ name = "Cafe", image = true },--71
-	{ name = "Pony Malta", image = true },--72
-	{ name = "Grinder", image = true },--73
-	{ name = "Bandeja De Procesos", image = true },--74
-	{ name = "Hamburguesa2", image = true },--75
-	{ name = "Tarjeta de Seguridad", image = true },--76
-	{ name = "Paquete Con Etiqueta", image = true },--77
-	{ name = "Paquete Sin Etiqueta", image = true },--78
-	{ name = "Maletin Con Paquetes", image = true },--79
-	{ name = "Cuerda", image = true },--80
-	{ name = "Ropa 3", image = true },--81
-	{ name = "Ropa 4", image = true },--82
-	{ name = "Ropa 5", image = true },--83
-	{ name = "Ketamina", image = true },--84
-	{ name = "Ropa 6", image = true },--85
-	{ name = "Ropa 7", image = true },--86
-	{ name = "Ropa 8", image = true },--87
-	{ name = "Ropa 9", image = true },--88
-	{ name = "Ropa 10", image = true },--89
-	{ name = "Ropa 11", image = true },--90
-	{ name = "Pistola Soldadora", image = true },--91
-	{ name = "Kit De Fabricación", image = true },--92
-	{ name = "Amper", image = true },--93
-	{ name = "Bandeja Paisa", image = true },--94
-	{ name = "Salchipapa", image = true },--95
-	{ name = "Agogo", image = true },--96
-	{ name = "Carne Con Oro", image = true },--97
-	{ name = "Jugo Hit", image = true },--98
-	{ name = "Hamburguesa", image = true },--99
-	{ name = "Arepa", image = true },--100
-	{ name = "Jeringa Con Adrenalina", image = true },--101
-	{ name = "Tabletas Sanadoras", image = true },--102
+	
 }
   
 --

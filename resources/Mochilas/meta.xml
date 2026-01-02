@@ -9,6 +9,4 @@
     <file src="Mochilas/czech.txd" />
     <file src="Mochilas/czech.dff" />
     <min_mta_version server="1.3.4-0.00000" client="1.5.2-9.07903"></min_mta_version>
-
-    <!--export function='createBackPack' type='client'/-->
 </meta>

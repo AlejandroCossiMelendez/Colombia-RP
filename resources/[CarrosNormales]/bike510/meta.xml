@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="Créditos: RealModsMTA" type="misc" name="MTL_Pounder" description="MTL_Pounder" />
-     <script src="script.lua" type="client" />
-     <file src="flatbed.txd" />
-     <file src="flatbed.dff" />
-</meta>

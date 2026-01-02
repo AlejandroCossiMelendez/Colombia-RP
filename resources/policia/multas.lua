@@ -1,5 +1,5 @@
 ﻿function multar ( thePlayer, commandName, otherPlayer, precio, ... )
- if exports.factions:isPlayerInFaction( thePlayer, 1 ) or exports.factions:isPlayerInFaction( thePlayer, 22 ) then
+ if exports.factions:isPlayerInFaction( thePlayer, 1 ) or (exports.factions:isPlayerInFaction( thePlayer, 6 ) and getElementDimension( thePlayer ) == 93 ) then
      if thePlayer and otherPlayer and precio and ... then
      local razon = table.concat({...}, " ")
      local otro, nombre = exports.players:getFromName(thePlayer, otherPlayer)

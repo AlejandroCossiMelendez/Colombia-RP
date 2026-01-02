@@ -7,7 +7,7 @@
 			--end
 		end
 	end
-	return
+	return t
 end
 
 local function staffMessage( message )
@@ -54,6 +54,53 @@ function curarJugador ( player, commandName, otherPlayer )
     end
 end
 addCommandHandler ( "curar", curarJugador )
+
+function reanimarJugador ( player, commandName, otherPlayer )
+    local otro, nombre = exports.players:getFromName ( player, otherPlayer )
+	local x, y, z = getElementPosition( player )
+	if exports.factions:isPlayerInFaction ( player, 2 ) then
+		if player ~= otro then
+			if otro then
+				if getDistanceBetweenPoints3D( x, y, z, getElementPosition( otro ) ) < 5 then
+					if getElementData(otro, "muerto") then
+						triggerClientEvent(otro, "onClientNoMuerto", otro)
+						removeElementData(otro, "muerto")
+						removeElementData(otro, "accidente")
+						local x, y, z = getElementPosition( otro )
+						local rot = getElementRotation( otro )
+						local skin = getElementModel( otro )
+						local dim = getElementDimension( otro )
+						local int = getElementInterior( otro )
+						exports.items:guardarArmas(otro, true)
+						spawnPlayer( otro, x, y, z, rot, skin, int, dim )
+						fadeCamera( otro, true )
+						setCameraTarget( otro, otro )
+						setCameraInterior( otro, int )
+						for i = 3, 9 do
+							removeElementData(otro, "herida"..tostring(i))
+							i = i+1
+						end
+						exports.factions:giveFactionPresupuesto(2, 300)
+						exports.chat:me( player, "intenta reanimar a " .. nombre .. " y lo consigue." )
+						setTimer( function ()
+						if otro and isElement(otro) then
+						setElementHealth( otro, 20 ) end end, 5000, 1, otro )
+						outputDebugString("El médico "..getPlayerName(player):gsub("_", " ").. " ha reanimado a "..nombre..".")
+						exports.logs:addLogMessage("medico", "El médico "..getPlayerName(player):gsub("_", " ").. " ha reanimado a "..nombre.."\n")	
+						outputChatBox("La facción ha ganado 300 dólares con la reanimación.", player, 0, 255, 0)
+					else
+						outputChatBox("El jugador no necesita una reanimación.", player, 255, 0, 0)
+					end
+				end
+			else
+				outputChatBox ( "Jugador no encontrado.", player, 255, 0, 0 )
+			end
+		else
+			outputChatBox ( "No puedes reanimarte a tí mismo.", player, 255, 0, 0 )
+		end
+    end
+end
+addCommandHandler ( "reanimar", reanimarJugador )
 
 --[[local firefighterPed = createPed ( 279, 1858.79, -2572.08, 80.74, 357.48, false )
 setElementDimension ( firefighterPed, 10 )
@@ -221,11 +268,7 @@ local cmdS = {
 	["adminchat"] = true,
 	["modchat"] = true,
 	["id"] = true,
-	["conteomd"] = true,
-	["aceptar"] = true,
-	["avisarsura"] = true,
-	["daritem"] = true,
-	["curarme"] = true,
+	["avisarmd"] = true,
 	["aduda"] = true,
 	["anularduda"] = true,
 	["srun"] = true,

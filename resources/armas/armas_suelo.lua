@@ -103,11 +103,15 @@ function recogerArma ( thePlayer )
 			armaARetirar = true
 			local sql = exports.sql:query_assoc_single("SELECT * FROM armas_suelo WHERE ID = "..getElementData(v, "sqlIDarma"))
 			if sql.ID then
+				if (exports.players:getCharacterID(thePlayer) == sql.characterID) or getElementData(thePlayer, "account:gmduty") == true then
 					exports.chat:me ( thePlayer, "recoge un arma del suelo." )
 					setPedAnimation ( thePlayer, "BOMBER", "BOM_Plant", 3000, false )
 					exports.items:give( thePlayer , 29, tostring(sql.model), "Arma " .. tostring(sql.model), sql.ammo)
 					exports.sql:query_free( "DELETE FROM armas_suelo WHERE ID = " .. sql.ID )
 					destroyElement ( v )
+				else
+					outputChatBox("Este arma no es tuya.", thePlayer, 255, 0, 0)
+				end
 			else
 				outputChatBox("Se ha producido un error grave. Inténtalo más tarde.", thePlayer, 255, 0, 0)
 			end

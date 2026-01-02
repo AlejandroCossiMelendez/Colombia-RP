@@ -260,7 +260,7 @@ addEventHandler( "onPlayerNetworkStatus", root,
 	function( status, ticks )
 		if status == 1 then
 			if ticks > 3000 then
-				outputChatBox("Red mala, verifica tu internet.", source, 255, 0, 0)
+				outputChatBox("Hemos detectado un problema con tu conexión. Por favor, revísala.", source, 255, 0, 0)
 			end
 		end
 	end

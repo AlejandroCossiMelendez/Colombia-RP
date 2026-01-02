@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="ByWSx" type="misc" name="skin" description="skin" />
-     <script src="script.lua" type="client" />
-     <script src="comando.lua" type="server" />
-     <file src="ByWSx.txd" />
-     <file src="ByWSx.dff" />
-</meta>

@@ -51,7 +51,7 @@ function newsPaperEdit()
 	else
 	    showCursor(true)
 	    guiSetInputEnabled(true)
-		newsWnd = guiCreateWindow(494,144,523,496,"Redacción Noticias RCN",false)
+		newsWnd = guiCreateWindow(494,144,523,496,"Redacción San Fierro News Deparment",false)
 		guiWindowSetSizable(newsWnd,false)
 		changeButt = guiCreateButton(13,460,157,25,"Publicar",false,newsWnd)
 		closeButt = guiCreateButton(357,460,157,25,"Cerrar",false,newsWnd)

@@ -1,6 +1,0 @@
-addEventHandler('onClientResourceStart',resourceRoot,function () 
-txd = engineLoadTXD( 'BySampaio.txd' ) 
-engineImportTXD( txd, 39 ) 
-dff = engineLoadDFF('BySampaio.dff', 39) 
-engineReplaceModel( dff, 39 )
-end)

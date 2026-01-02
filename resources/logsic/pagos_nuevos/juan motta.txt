@@ -1,4 +1,0 @@
-[2024-06-05 02:08:45] Cantidad $1000000 pagado a Devin Escobar.
-[2024-06-05 20:13:56] Cantidad $2000000 pagado a Martin Elias Diaz.
-[2024-06-06 00:38:03] Cantidad $5000000 pagado a Mohamed Ali.
-[2024-06-06 02:51:17] Cantidad $310000000 pagado a Valentin Perez.

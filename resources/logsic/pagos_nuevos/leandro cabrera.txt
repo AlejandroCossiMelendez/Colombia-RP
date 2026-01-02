@@ -1,6 +1,0 @@
-[2024-06-10 04:12:39] Cantidad $1000000 pagado a Alejandro Gambino.
-[2024-06-13 01:40:24] Cantidad $5000000 pagado a Jhoel Pilaguano.
-[2024-06-13 01:47:38] Cantidad $2000000 pagado a Jhoel Pilaguano.
-[2024-06-13 01:49:32] Cantidad $5000000 pagado a Jhoel Pilaguano.
-[2024-06-13 02:51:43] Cantidad $100000 pagado a Jhoel Pilaguano.
-[2024-06-13 02:59:03] Cantidad $100000 pagado a Jhoel Pilaguano.

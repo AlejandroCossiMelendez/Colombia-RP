@@ -29,6 +29,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <script src="spectate.lua" type="server" />
     <script src="duda.lua" type="server" />
     <script src="gestiones.lua" type="server" />
+    <script src="teletransporte.lua" type="client" size="2364" />
     <export function="numDudas" type="server" />
     <export function="actualizarPosicion" type="server" />
     <export function="resolverDudaWeb" type="server" />

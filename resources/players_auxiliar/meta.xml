@@ -26,6 +26,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <script src="registration.lua" />
     <script src="respawn.lua" />
     <script src="respawn_c.lua" type="client" size="5581" />
+    <script src="afk.lua" />
     <script src="bodas_c.lua" type="client" size="456" />
     <script src="bodas.lua" />
+    <script src="afk_c.lua" type="client" size="2059" />
 </meta>

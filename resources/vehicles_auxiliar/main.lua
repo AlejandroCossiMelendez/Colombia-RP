@@ -277,10 +277,10 @@ function miDeposito (player)
 		end
 	end
 end
-addCommandHandler("mxdps", miDeposito)
+addCommandHandler("mideposito", miDeposito)
 
 
-local markerDeposito = createMarker(1, "cylinder", 2, 102, 204, 255, 255)
+local markerDeposito = createMarker(2422.62, 48.8, 25.7, "cylinder", 2, 102, 204, 255, 255)
 
 function retirarDeposito (player, cmd, id)
 	if not isElementInRange(player, 2422.62, 48.8, 26.48, 10) then outputChatBox("Acude al punto azul del parking de policía para retirarlo.", player, 255, 0, 0) return end

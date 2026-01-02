@@ -1,8 +1,0 @@
-<meta>
-    <info author="AdidaZ" name="Admin Comandos" version="1.4" />
-    
-    
-    <script src="setskin.lua" type="server" />
-   
-    <min_mta_version server="1.5.5-9.14060" client="1.5.2-9.07903"></min_mta_version>
-</meta>

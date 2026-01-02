@@ -1,6 +1,6 @@
 ﻿-- Soporte Administrativo para poder ver los comandos mediante un panel.
 
-VadminInfo = guiCreateWindow(406, 218, 339, 367, "Soporte - Administración", false)
+VadminInfo = guiCreateWindow(406, 218, 339, 367, "Soporte - Administración DTRP", false)
 guiWindowSetSizable(VadminInfo, false)
 
 ComandosInfoM = guiCreateMemo(144, 22, 185, 335, "Pulsa tu rango.", false, VadminInfo)

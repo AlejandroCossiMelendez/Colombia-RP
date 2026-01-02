@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="maykol" type="misc" name="By-MYK_Iver" description="By-MYK_Iver" />
-     <script src="script.lua" type="client" />
-     <file src="Iver_txd.txd" />
-     <file src="Iver_dff.dff" />
-</meta>

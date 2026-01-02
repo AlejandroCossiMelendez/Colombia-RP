@@ -399,8 +399,8 @@ end
 windows.mecanico = {
 	{
 		type = "label",
-		text = "Panel Mecanico",
-		font = "calibri",
+		text = "Montgomery Motor Workshop",
+		font = "default-bold",
 		alignX = "center",
 	},
 	{
@@ -535,7 +535,7 @@ windows.mecanico = {
 windows.mecanico_repair =  {
 	{
 		type = "label",
-		text = "Panel mecanico",
+		text = "Montgomery Motor Workshop",
 		font = "default-bold",
 		alignX = "center",
 	},
@@ -612,7 +612,7 @@ windows.mecanico_repair =  {
 windows.mecanico_repair_ruedas_1 =  {
 	{
 		type = "label",
-		text = "Panel mecanico",
+		text = "Montgomery Motor Workshop",
 		font = "default-bold",
 		alignX = "center",
 	},
@@ -697,7 +697,7 @@ windows.mecanico_repair_ruedas_1 =  {
 windows.mecanico_repair_ruedas_2 =  {
 	{
 		type = "label",
-		text = "Panel mecanico",
+		text = "Montgomery Motor Workshop",
 		font = "default-bold",
 		alignX = "center",
 	},
@@ -754,7 +754,7 @@ windows.mecanico_repair_ruedas_2 =  {
 windows.mecanico_ruedas = {
 	{
 		type = "label",
-		text = "Panel mecanico",
+		text = "Montgomery Motor Workshop",
 		font = "default-bold",
 		alignX = "center",
 	},
@@ -812,7 +812,7 @@ windows.mecanico_ruedas = {
 windows.mecanico_tunning = {
 	{
 		type = "label",
-		text = "Panel mecanico",
+		text = "Montgomery Motor Workshop",
 		font = "default-bold",
 		alignX = "center",
 	},
@@ -891,7 +891,7 @@ windows.mecanico_tunning = {
 windows.mecanico_color = {
 	{
 		type = "label",
-		text = "Panel mecanico",
+		text = "Montgomery Motor Workshop",
 		font = "default-bold",
 		alignX = "center",
 	},
@@ -996,7 +996,7 @@ windows.mecanico_color = {
 windows.mecanico_vinilos = {
 	{
 		type = "label",
-		text = "Panel mecanico",
+		text = "Montgomery Motor Workshop",
 		font = "default-bold",
 		alignX = "center",
 	},
@@ -1101,7 +1101,7 @@ windows.mecanico_vinilos = {
 windows.mecanico_fases = {
 	{
 		type = "label",
-		text = "Panel mecanico",
+		text = "Montgomery Motor Workshop",
 		font = "default-bold",
 		alignX = "center",
 	},
@@ -1171,7 +1171,7 @@ windows.mecanico_fases = {
 windows.mecanico_otras = {
 	{
 		type = "label",
-		text = "Panel mecanico",
+		text = "Montgomery Motor Workshop",
 		font = "default-bold",
 		alignX = "center",
 	},

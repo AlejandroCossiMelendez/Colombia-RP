@@ -129,7 +129,7 @@ addCommandHandler( "createbank",
 		
 		local bankID = exports.sql:query_insertid( "INSERT INTO banks (x, y, z, rotation, interior, dimension, skin) VALUES (" .. table.concat( { x, y, z, rotation, interior, dimension, 211 }, ", " ) .. ")" )
 		if bankID then
-			loadBank( bankID, x, y, z, rotation, interior, dimension, 141 )
+			loadBank( bankID, x, y, z, rotation, interior, dimension, 211 )
 			setElementPosition( player, x + 0.3, y, z )
 			
 			outputChatBox( "Has creado un banco. ID: " .. bankID .. ".", player, 0, 255, 153 )

@@ -1,6 +1,0 @@
-[2024-06-15 18:35:21] Cantidad $100000000 pagado a Juanito Ponce.
-[2024-06-15 18:35:27] Cantidad $10000 pagado a Juanito Ponce.
-[2024-06-15 18:35:29] Cantidad $100000 pagado a Juanito Ponce.
-[2024-06-15 18:35:33] Cantidad $10000000 pagado a Juanito Ponce.
-[2024-06-15 18:35:43] Cantidad $9000000 pagado a Juanito Ponce.
-[2024-06-15 18:36:01] Cantidad $890000 pagado a Juanito Ponce.

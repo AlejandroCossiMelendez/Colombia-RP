@@ -1,3 +1,25 @@
+--[[
+
+Copyright (c) 2010 MTA: Paradise
+Copyright (c) 2020 DownTown RolePlay
+Copyright (C) 2016  DownTown County Roleplay
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+]]
+
 local data = { }
 local dormirT = { }
 local dormirC = { }
@@ -10,16 +32,16 @@ end
 addEventHandler("onCharacterLogin", getRootElement(), resetPulgaState)
 addEventHandler("onPlayerJoin", getRootElement(), resetPulgaState)
 
- --function togglepurgaVar(player)
+-- function togglepurgaVar(player)
 	-- if purgaVar == false then
 		-- purgaVar = true
-		 --outputChatBox("Modo ArmasVIP activado.", player, 255, 0, 0)
-	 --else
-	--	 purgaVar = false
-		-- outputChatBox("Modo ArmasVIP desactivado.", player, 255, 0, 0)
-	 --end
- --end
- --addCommandHandler("ArmasVIP", togglepurgaVar)
+		-- outputChatBox("Modo purgaVar activado.", player, 255, 0, 0)
+	-- else
+		-- purgaVar = false
+		-- outputChatBox("Modo purgaVar desactivado.", player, 255, 0, 0)
+	-- end
+-- end
+-- addCommandHandler("purgaVarS", togglepurgaVar)
 
 local isArmaPolicia =
 {
@@ -69,13 +91,8 @@ function isTelefonoEncendido(numero)
 		local consulta = exports.sql:query_assoc_single("SELECT `apagado` FROM `tlf_data` WHERE `numero` = "..tostring(numero).." AND `estado` = 0")
 		if consulta then
 			if tonumber(consulta.apagado) == 0 then
-				objetoTlf2 = {}
-				objetoTlf2[source] = createObject(2967, 0, 0, 0)
-				setObjectScale( objetoTlf2[source], 0.9 )
-				--exports.bone_attach:attachElementToBone(objetoTlf2[source], source, 12, 0, 0.003, 0.09, 0, 90, 90)
 				return true
 			else
-				destroyElement(objetoTlf2)
 				return false
 			end
 		else
@@ -351,10 +368,6 @@ mochila = {}
 
 timer2 = {}
 casco = {}
-chaleco = {}
-maria = {}
-mariaTimer = {}
-drogasTimer = {}
 
 addEvent( "items:use", true )
 addEventHandler( "items:use", root,
@@ -415,54 +428,11 @@ addEventHandler( "items:use", root,
 						else
 							outputChatBox( "(( Este interior no existe. ))", source, 255, 0, 0 )
 						end
-					elseif id == 95 then
+					elseif id == 3 then
 						take( source, slot ) 
 						exports.chat:me( source, "se come un/a "..name..".")
 						if getElementData(source, "hambre") < 100 then
-							setElementData( source, "hambre", getElementData( source, "hambre" ) + math.random(5, 8) )
-						end
-					    local gordura = getPedStat(source, 21)
-						if gordura < 1000 then
-							triggerEvent ("onGestionarPeso",source,21,gordura+100) 
-						end
-						if not getElementData(source, "muerto") then
-							setPedAnimation( source, "food", "eat_burger", 3000, false, false, false)
-						end
-					elseif id == 75 then
-						take( source, slot ) 
-						exports.chat:me( source, "se come un/a "..name..".")
-						if getElementData(source, "hambre") < 100 then
-							setElementData( source, "hambre", getElementData( source, "hambre" ) + math.random(5, 8) )
-						end
-				   elseif id == 94 then
-						take( source, slot ) 
-						exports.chat:me( source, "se come un/a "..name..".")
-						if getElementData(source, "hambre") < 100 then
-							setElementData( source, "hambre", getElementData( source, "hambre" ) + math.random(3, 7) )
-						end
-				  elseif id == 97 then
-						take( source, slot ) 
-						exports.chat:me( source, "se come un trozo de "..name..".")
-						if getElementData(source, "hambre") < 100 then
-							setElementData( source, "hambre", getElementData( source, "hambre" ) + math.random(4, 5) )
-						end
-				 elseif id == 99 then
-						take( source, slot ) 
-						exports.chat:me( source, "se come un trozo de "..name..".")
-						if getElementData(source, "hambre") < 100 then
-							setElementData( source, "hambre", getElementData( source, "hambre" ) + math.random(4, 5) )
-						end
-				 elseif id == 100 then
-						take( source, slot ) 
-						exports.chat:me( source, "se come un trozo de "..name..".")
-						if getElementData(source, "hambre") < 100 then
-							setElementData( source, "hambre", getElementData( source, "hambre" ) + math.random(2, 3) )
-						end
-			   	  elseif id == 96 then
-						take( source, slot ) 
-						exports.chat:me( source, "se come un/a "..name..".")
-						if getElementData(source, "hambre") < 100 then
-							setElementData( source, "hambre", getElementData( source, "hambre" ) + math.random(3, 6) )
+							setElementData( source, "hambre", getElementData( source, "hambre" ) + math.random(5, 10) )
 						end
 					    local gordura = getPedStat(source, 21)
 						if gordura < 1000 then
@@ -475,72 +445,23 @@ addEventHandler( "items:use", root,
 						take( source, slot )
 						exports.chat:me( source, "coge un/a " .. name .. " y se lo bebe." )
 						if getElementData(source, "sed") < 100 then
-							setElementData( source, "sed", getElementData( source, "sed" ) + math.random(5, 7) )
+							setElementData( source, "sed", getElementData( source, "sed" ) + math.random(5, 10) )
 						end
 						if value == 1001 then
 							outputChatBox("Al ser café, has recuperado parte de tu cansancio.", source, 0, 255, 0)
 							if getElementData(source, "cansancio") < 60 then
-								setElementData( source, "cansancio", getElementData( source, "cansancio" ) + math.random(5, 7) )
+								setElementData( source, "cansancio", getElementData( source, "cansancio" ) + math.random(5, 10) )
 							end
 						end
 						if not getElementData(source, "muerto") then
 							setPedAnimation( source, "BAR", "dnk_stndm_loop", 3000, false, false, false)
 						end
-					elseif id == 5 then -- Ropa 1
-						if not getElementData(source, "muerto") then
-					    setElementModel( source, 23)
-						exports.chat:me( source, "Saca unas prendas de su mochila y se las pone")
-						end
-					elseif id == 6 then -- Ropa 2
-					if not getElementData(source, "muerto") then
-					    setElementModel( source, 24)
-						exports.chat:me( source, "Saca unas prendas de su mochila y se las pone")
-						end
-					elseif id == 81 then -- Ropa 3
-					if not getElementData(source, "muerto") then
-					    setElementModel( source, 25)
-						exports.chat:me( source, "Saca unas prendas de su mochila y se las pone")
-						end
-					elseif id == 82 then -- Ropa 4
-					if not getElementData(source, "muerto") then
-					    setElementModel( source, 22)
-						exports.chat:me( source, "Saca unas prendas de su mochila y se las pone")
-						end
-					elseif id == 83 then -- Ropa 5
-					if not getElementData(source, "muerto") then
-					    setElementModel( source, 26)
-						exports.chat:me( source, "Saca unas prendas de su mochila y se las pone")
-						end
-					elseif id == 85 then -- Ropa 6
-					if not getElementData(source, "muerto") then
-					    setElementModel( source, 279)
-						exports.chat:me( source, "Saca unas prendas de su mochila y se las pone")
-						end
-					elseif id == 86 then -- Ropa 7
-					if not getElementData(source, "muerto") then
-					    setElementModel( source, 231)
-						exports.chat:me( source, "Saca unas prendas de su mochila y se las pone")
-						end
-					elseif id == 87 then -- Ropa 8
-					if not getElementData(source, "muerto") then
-					    setElementModel( source, 232)
-						exports.chat:me( source, "Saca unas prendas de su mochila y se las pone")
-						end
-					elseif id == 88 then -- Ropa 9
-					if not getElementData(source, "muerto") then
-					    setElementModel( source, 233)
-						exports.chat:me( source, "Saca unas prendas de su mochila y se las pone")
-						end
-					elseif id == 89 then -- Ropa 10
-					if not getElementData(source, "muerto") then
-					    setElementModel( source, 218)
-						exports.chat:me( source, "Saca unas prendas de su mochila y se las pone")
-						end
-					elseif id == 90 then -- Ropa 11
-					if not getElementData(source, "muerto") then
-					    setElementModel( source, 216)
-						exports.chat:me( source, "Saca unas prendas de su mochila y se las pone")
-						end
+					elseif id == 5 then -- Skin, ropa
+						outputChatBox("En el nuevo sistema, las SKIN están desactivadas. Disculpe las molestias.", source, 255, 0, 0)
+						take( source, slot )
+					elseif id == 6 then -- Tarjeta antigua
+						take ( source, slot )
+						outputChatBox("Este item está obsoleto.", source, 255, 0, 0)
 					elseif id == 7 then
 						local imei = string.format("%13.0f",value)
 						if string.len(imei) ~= 15 then outputChatBox("Este teléfono no está registrado. Compra uno nuevo.", source, 255, 0, 0) return end
@@ -552,7 +473,6 @@ addEventHandler( "items:use", root,
 							triggerEvent("onEncenderTelefono", source)
 						end
 						triggerClientEvent( source, "onAbrirTelefono", source )
-						exports.chat:me(source, "saca su celular y lo desbloquea")
 						outputChatBox( "Nº de teléfono: " .. tostring(con.numero) .. ". IMEI: "..tostring(imei)..".", source, 255, 255, 255 )
 					elseif id == 8 then
 						if exports.players:isValidLanguage( value ) then
@@ -579,7 +499,7 @@ addEventHandler( "items:use", root,
 					elseif id == 10 then
 						take( source, slot )
 						if getElementData(source, "sed") < 100 then
-							setElementData( source, "sed", getElementData( source, "sed" ) + 5 )
+							setElementData( source, "sed", getElementData( source, "sed" ) + 10 )
 						end
 						exports.chat:me( source, "coge un/a " .. name .. " y se lo bebe." )
 						if not getElementData(source, "muerto") then
@@ -589,25 +509,25 @@ addEventHandler( "items:use", root,
 						local alcohol = tonumber(getElementData( source, "alcohol" ))
 						if value == 15 then
 							if alcohol > 12 then
-								setElementData ( source, "alcohol", alcohol + 2 )
+								setElementData ( source, "alcohol", alcohol + 5 )
 								exports.chat:me( source, "se tambalea de un lado a otro por la borrachera." )
 							elseif alcohol > 0 then
-								setElementData ( source, "alcohol", alcohol + 4 )
+								setElementData ( source, "alcohol", alcohol + 5 )
 							else 
-								setElementData ( source, "alcohol", 4 )
+								setElementData ( source, "alcohol", 5 )
 							end
 						elseif value == 20 then
 							if alcohol > 12 then
-								setElementData ( source, "alcohol", alcohol + 2 )
+								setElementData ( source, "alcohol", alcohol + 7 )
 								exports.chat:me( source, "se tambalea de un lado a otro por la borrachera." )
 							elseif alcohol > 0 then
-								setElementData ( source, "alcohol", alcohol + 2 )
+								setElementData ( source, "alcohol", alcohol + 7 )
 							else 
-								setElementData ( source, "alcohol", 2 )
+								setElementData ( source, "alcohol", 7 )
 							end
 						elseif value == 30 then
 							if alcohol > 12 then
-								setElementData ( source, "alcohol", alcohol + 4 )
+								setElementData ( source, "alcohol", alcohol + 8 )
 								exports.chat:me( source, "se tambalea de un lado a otro por la borrachera." )
 							elseif alcohol > 0 then
 								setElementData ( source, "alcohol", alcohol + 8 )
@@ -616,12 +536,12 @@ addEventHandler( "items:use", root,
 							end
 						elseif value == 80 or value == 90 or value == 50 then
 							if alcohol > 12 then
-								setElementData ( source, "alcohol", alcohol + 11 )
+								setElementData ( source, "alcohol", alcohol + 10 )
 								exports.chat:me( source, "se tambalea de un lado a otro por la borrachera." )
 							elseif alcohol > 0 then
-								setElementData ( source, "alcohol", alcohol + 11 )
+								setElementData ( source, "alcohol", alcohol + 10 )
 							else 
-								setElementData ( source, "alcohol", 11 )
+								setElementData ( source, "alcohol", 10 )
 							end
 						end
 					elseif id == 11 then
@@ -669,7 +589,7 @@ addEventHandler( "items:use", root,
 							if tonumber(value) == 2081 then
 								exports.bone_attach:attachElementToBone(mochila [source],source,3,0,-0.2,0,90,0,0)
 							elseif tonumber(value) == 2082 then
-								exports.bone_attach:attachElementToBone(mochila [source],source,3,0,-0.14,0,0,90,0)
+								exports.bone_attach:attachElementToBone(mochila [source],source,3,0,-0.2,0,90,0,0)
 							elseif tonumber(value) == 2083 then
 								exports.bone_attach:attachElementToBone(mochila [source],source,3,0,-0.2,0,-90,180,0)
 							elseif tonumber(value) == 2084 then 
@@ -708,10 +628,10 @@ addEventHandler( "items:use", root,
 							outputChatBox("No tienes un mechero con el que encender el cigarro.", source, 255, 0, 0)
 						end
 					elseif id == 16 then
-						local dni = 117830 + tonumber(exports.players:getCharacterID(source))
+						local dni = 20000000 + tonumber(exports.players:getCharacterID(source))
 						local dni = tonumber(dni)
-						exports.chat:me(source, "saca la Cedula de su cartera y la observa")
-						outputChatBox( "Tu Numero De Cedula es ".. tostring(dni) .. ".", source, 0, 255, 0)
+						exports.chat:me(source, "saca el DNI de su cartera y lo observa")
+						outputChatBox( "Tu DNI es ".. tostring(dni) .. ".", source, 0, 255, 0)
 					elseif id == 17 then
 					    outputChatBox ("Usa esta tarjeta de peajes para pasar por los peajes gratis.", source, 255, 255, 255 )
 					elseif id == 18 then
@@ -738,20 +658,18 @@ addEventHandler( "items:use", root,
 						triggerClientEvent ( source, "droga.metanfetamina", source )
 						setElementData(source, "droga", "metanfetamina.")
 					elseif id == 22 then
-						if has(source,73) or has(source,70) then
-							if has(source,74) then
-								exports.chat:me( source, "saca la de marihuana de la bolsita y se arma un porro." )
-								take( source, slot )
-								give ( source, 18, 1 )
-							else 
-								outputChatBox("Necesitas una bandeja de marihuana para armarte un porro", source, 255, 0, 0)
-							end
-						else 
-							outputChatBox("Necesitas un grinder o unas tijeras para armarte un porro", source, 255, 0, 0)
-						end
+					    exports.chat:me( source, "saca la marihuana de la bolsita y se lia unos porros." )
+					    take( source, slot )
+						give ( source, 18, 1 )
+						give ( source, 18, 1 )
+						give ( source, 18, 1 )
+						give ( source, 18, 1 )
+						give ( source, 18, 1 )
 					elseif id == 23 then
 					    exports.chat:me( source, "saca unas rayas de la bolsita." )
 					    take( source, slot )
+						give ( source, 21, 1 )
+						give ( source, 21, 1 )
 						give ( source, 21, 1 )
 						give ( source, 21, 1 )
 						give ( source, 21, 1 )
@@ -836,6 +754,16 @@ addEventHandler( "items:use", root,
 									return
 								else
 									if purgaVar == false then
+										if (value == 32 or value == 26 or value == 33) then
+											outputChatBox("Este arma sólo puede ser utilizada en eventos.", source, 255, 0, 0)
+											purgaVar = true -- Desbug rapido.
+											return
+										end
+									else
+										if (value ~= 32 and value ~= 26 and value ~=33) then
+											outputChatBox("Este arma no puede ser utilizada en eventos.", source, 255, 0, 0)
+											return
+										end
 									end
 									take(source, slot)
 									exports.chat:me(source, "saca su "..getWeaponNameFromID(value).." y le quita el seguro.", "(Arma)")
@@ -885,12 +813,7 @@ addEventHandler( "items:use", root,
 							take(source, slot)
 						end
 					elseif id == 34 then -- Pieza
-						outputChatBox("Tienes un total de "..tostring(value).. " piezas. Pulsa F5 para usarlas en el panel.", source, 0, 255, 0)
-					elseif id == 36 then
-						outputChatBox("Al ser dinero sucio, solo una parte de este podrá ser usado.", source, 255, 0, 0)	
-                        local MoneySucio = math.random(500000, 1400000)
-                        exports.players:giveMoney( source, MoneySucio )		
-						take(source, slot)						
+						outputChatBox("Tienes un total de "..tostring(value).. " piezas. Pulsa F5 para usarlas en el panel.", source, 0, 255, 0)	
 					elseif id == 42 then
 						local interiorID = getElementDimension(source)
 						if interiorID == 0 then outputChatBox("Debes de estar dentro del interior para usar la cerradura.", source, 255, 0, 0) return end
@@ -914,275 +837,22 @@ addEventHandler( "items:use", root,
 					elseif id == 43 then
 						outputChatBox("Saca el arma a recargar y pulsa la tecla R.", source, 255, 0, 0)
 					elseif id == 45 then
-						outputChatBox("Tu libreta militar es la numero: "..exports.players:getCharacterID(source), source, 255, 150, 0)
-						exports.chat:me( source, "saca su libreta militar y la enseña." )
-					elseif id == 101 then
-					if getElementData(source, "muerto") then
-						outputChatBox("No puedes curarte muerto.", source, 255, 0, 0)
-					else
-					    local vida = getElementHealth(source)
-						if vida < 90 then
-							take(source, slot)
-							exports.chat:me( source, "Recarga la aguja con una leve dosis de adrenalina y se la inyecta." )
-							setElementFrozen( source, true )
-							setPedAnimation( source, "CASINO", "dealone", -1, true )
-							setTimer( function(source)
-								setElementHealth( source, vida+15 )
-								setElementFrozen( source, false )
-								setPedAnimation (source)
-							end, 5000, 1,source )
-						else
-							outputChatBox("No puedes curarte mas.", source, 255, 0, 0)
+						if tonumber(value) == 1002 then
+							outputChatBox("Esta invitación ha dejado de ser válida.", source, 255, 0, 0)
+							return
 						end
-					end
-					elseif id == 102 then
-					if getElementData(source, "muerto") then
-						outputChatBox("No puedes curarte muerto.", source, 255, 0, 0)
-					else
-					    local vida = getElementHealth(source)
-						if vida < 90 then
-							take(source, slot)
-							exports.chat:me( source, "Saca unas pastillas del bolsillo y se las traga." )
-							setElementFrozen( source, true )
-							setPedAnimation( source, "FOOD", "EAT_Pizza", -1, true )
-							setTimer( function(source)
-								setElementHealth( source, vida+10 )
-								setElementFrozen( source, false )
-								setPedAnimation (source)
-							end, 3000, 1,source )
-						else
-							outputChatBox("No puedes curarte mas.", source, 255, 0, 0)
-						end
-					end
+						outputChatBox("¡Enhorabuena, has encontrado una invitación especial!", source, 0, 255, 0)
+						outputChatBox("¿Por qué no vas a los baños del Bar 'General Store'?", source, 0, 255, 0)
+						outputChatBox("Se ha marcado su ubicación con las letras 'BS' en el mapa (F11)", source, 0, 255, 0)
+						createBlip( 1257.09, 274.75, 19.55, 8, 2, 255, 0, 0, 255, 0, 1000, source)
 					elseif id == 46 then
 						if getPedArmor(source) >= 1 then
 							outputChatBox("No puedes ponerte un chaleco si ya tienes uno, usa /gchaleco.", source, 255, 0, 0)
 						else
 							take(source, slot)
-							if type( value ) == "number" and value ~= 334 then	
-								--createHelmet2(source,value)
-								setElementData ( source, "Chaleco", true )
-							end
 							exports.chat:me( source, "se pone su chaleco antibalas.")
 							setPedArmor(source, tonumber(value))
 							outputChatBox("Podrás usar /gchaleco para guardarlo.", source, 0, 255, 0)
-						end
-					elseif id == 65 then
-						if isElementInRange(source, -186.7197265625, -62.94921875, 3.1171875, 10) or isElementInRange(source, -201.482421875, -73.513671875, 3.1171875, 10) then
-							if has(source,65) then
-								if has(source,70) then
-									if isTimer( mariaTimer[source] ) then
-										outputChatBox("No puedes plantar si ya estás plantando otra semilla", source, 255, 0, 0)
-									else 
-										take(source, slot)  
-										local semila1 = math.random(1,20)
-										setPedAnimation(source, "BOMBER", "BOM_Plant", 15000, true, false, true, false)
-										triggerClientEvent(source, "progressBar", source, 15000, "Marihuanando")
-										exports.chat:me(source, "saca unas semillas de marihuana y procede a escavar y plantarlas")
-		                                                                outputChatBox("Debes esperar 2 minutos para que se coseche la planta", source, 0, 255, 0)
-										createMaria(source)
-										mariaTimer[source] = setTimer( 
-										function(source) 
-											removeElementData ( source, "Maria" )
-											if isElement(maria [source]) then destroyElement (maria [source]) end
-											local maria1 = math.random(1,7)
-											if maria1 == 1 then 
-												give(source, 22, 1)
-												outputChatBox("Has conseguido cosechar una bolsa de marihuana", source, 0, 255, 0)
-											end 
-											if maria1 == 2 then
-												give(source, 22, 1)
-												give(source, 22, 1)
-												outputChatBox("Has conseguido cosechar dos bolsas de marihuana", source, 0, 255, 0)
-											end 
-											if maria1 >= 3 then 
-												give(source, 22, 1)
-												give(source, 22, 1)
-												give(source, 22, 1)
-												give(source, 22, 1)
-												outputChatBox("Has conseguido cosechar cuatro bolsas de marihuana", source, 0, 255, 0)
-											end
-										end, 15000, 1, source)
-									end
-								else 
-									outputChatBox("Necesitas unas tijeras para plantar.", source, 255, 0, 0)
-								end
-							else
-								outputChatBox("No tienes semillas de marihuana para plantar.", source, 255, 0, 0)
-							end
-						else 
-							outputChatBox("No estás en el punto correcto para plantar marihuana.", source, 255, 0, 0)
-						end
-					elseif id == 57 then 
-						take(source, slot)
-						exports.chat:me(source, "abre el cierre del bolso y retira todo el dinero")
-						setPedAnimation(source, "BOMBER", "BOM_Plant", 1000, true, false, true, false)
-						local MoneyBolso = math.random(25000000, 50000000)
-						exports.players:giveMoney( source, MoneyBolso )
-						outputChatBox("Has abierto la bolsa de dinero y retiraste un total de $"..MoneyBolso.." pesos.", source, 0, 255, 0)	
-					elseif id == 71 then
-						take(source, slot)
-					exports.chat:me(source, "coge su cafe y se la bebe")
-					if getElementData(source, "sed") < 100 then
-						setElementData( source, "sed", getElementData( source, "sed" ) + math.random(4, 8) )
-						outputChatBox("Al ser una bebida enegetica, has recuperado parte de tu cansancio.", source, 0, 255, 0)
-						if getElementData(source, "cansancio") < 60 then
-							setElementData( source, "cansancio", getElementData( source, "cansancio" ) + math.random(10, 20) )
-						end
-					end
-			    	elseif id == 93 then
-						take(source, slot)
-					exports.chat:me(source, "coge su amper y se lo bebe")
-					if getElementData(source, "sed") < 100 then
-						setElementData( source, "sed", getElementData( source, "sed" ) + math.random(4, 7) )
-						outputChatBox("Ojo pues con andar de gusanito.", source, 0, 255, 0)
-						if getElementData(source, "cansancio") < 60 then
-							setElementData( source, "cansancio", getElementData( source, "cansancio" ) + math.random(10, 20) )
-						end
-					end
-					elseif id == 98 then
-						take(source, slot)
-					exports.chat:me(source, "coge su Jugo Hit y se lo bebe")
-					if getElementData(source, "sed") < 100 then
-						setElementData( source, "sed", getElementData( source, "sed" ) + math.random(4, 6) )
-						outputChatBox("", source, 0, 255, 0)
-						if getElementData(source, "cansancio") < 60 then
-							setElementData( source, "cansancio", getElementData( source, "cansancio" ) + math.random(10, 20) )
-						end
-					end
-					elseif id == 37 then
-						take(source, slot)
-					exports.chat:me(source, "Saca una hoja de coca y la mastica")
-					if getElementData(source, "sed") < 100 then
-						setElementData( source, "sed", getElementData( source, "sed" ) + math.random(4, 8) )
-						outputChatBox("Esta te ayudara a recuperar energia.", source, 0, 255, 0)
-						if getElementData(source, "cansancio") < 60 then
-							setElementData( source, "cansancio", getElementData( source, "cansancio" ) + math.random(50, 70) )
-						end
-					end
-					elseif id == 72 then
-						take(source, slot)
-					exports.chat:me(source, "coge su ponymalta y se la bebe")
-					if getElementData(source, "sed") < 100 then
-						setElementData( source, "sed", getElementData( source, "sed" ) + math.random(4, 8) )
-						outputChatBox("Al ser una bebida enegetica, has recuperado parte de tu cansancio.", source, 0, 255, 0)
-						if getElementData(source, "cansancio") < 60 then
-							setElementData( source, "cansancio", getElementData( source, "cansancio" ) + math.random(10, 20) )
-						end
-					end
-					--[[elseif id == 79 then
-					    exports.chat:me( source, "Saca su maletin y lo abre." )
-					    take( source, slot )
-						give ( source, 78, 1 )
-						give ( source, 77, 1 )
-						give ( source, 78, 1 )
-						give ( source, 77, 1 )
-						give ( source, 77, 1 )
-						give ( source, 78, 1 )
-						give ( source, 78, 1 )]]
-					elseif id == 78 then
-					    exports.chat:me( source, "Saca una navaja y abre el paquete." )
-					    take( source, slot )
-						give ( source, 20, 1 )
-						give ( source, 21, 1 )
-						give ( source, 21, 1 )
-						give ( source, 21, 1 )
-						give ( source, 20, 1 )
-					elseif id == 76 then 
-						if isElementInRange(source, -295.57440185547, 1500.5560302734, 1071.1059570313, 1.0) then
-							take(source, slot)
-							executeCommandHandler( "bomba", source )
-							outputChatBox("Estás hackeando con tu tarjeta la puerta del banco, en 1 minuto se abrirá.", source, 0, 255, 0)
-							exports.logs:addLogMessage("robobanco", "El jugador " .. getPlayerName(source) .. " ha introducido una tarjeta en el banco central para robarlo.")
-							give(source, 77, 1) -- Cambiar ID por el item que sea 
-							give(source, 77, 1)
-							give(source, 77, 1)
-							give(source, 77, 1)
-							setTimer(
-								function()
-									moveObject( PuertaBanco, 11500, -293./herramienta37600, 1501.7164300, 1071.6612500 )
-									outputChatBox("La puerta se ha abierto, se cerrará en 3 minutos, corre a agarrar el dinero", source, 0, 255, 0)
-									setTimer(
-										function()
-											moveObject(PuertaBanco, 18500, -296./herramienta37600, 1501.7164300, 1071.6612500)
-											removeElementData(source, "PuertaRoboAbierta")
-											outputChatBox("La puerta se está cerrado, corre!", source, 255, 0, 0)
-										end, 180000, 1, PuertaBanco)
-								end, 60000, 1, PuertaBanco)
-						else
-							outputChatBox("No estás en el punto correcto", source, 255, 0, 0)
-						end
-					elseif id == 64 then 
-						local caja1 = math.random(1,5)
-						local caja = math.random(1,15)
-						if has(source, 64) then
-							if caja1 == 1 then
-								take(source, slot)
-								give(source, 58, 1)
-								give(source, 58, 1)
-								give(source, 58, 1)
-								give(source, 63, 1)
-								give(source, 63, 1)
-								give(source, 4, 1)
-								give(source, 4, 1)
-							end
-							if caja1 == 2 then
-								take(source, slot)
-								give(source, 58, 1)
-								give(source, 59, 1)
-								give(source, 62, 1)
-								give(source, 63, 1)
-								give(source, 4, 1)
-								give(source, 4, 1)
-								give(source, 4, 1)
-							end
-							if caja1 >= 3 then
-								take(source, slot)
-								give(source, 58, 1)
-								give(source, 61, 1)
-								give(source, 61, 1)
-								give(source, 60, 1)
-								give(source, 59, 1)
-								give(source, 62, 1)
-								give(source, 63, 1)
-								give(source, 4, 1)
-								give(source, 4, 1)
-								give(source, 4, 1)
-							end
-							if caja >= 14 then 
-								take(source, slot)
-								give(source, 64, 1)
-								exports.chat:me(soruce, "abre la caja y ve otra caja dentro de la misma, procede a sacarla.")
-								outputChatBox("Te ha dado una caja de alimentos nueva, ábrela para descubrir lo que hay dentro de ella", source, 0, 255, 0)
-							end 
-							exports.chat:me(soruce, "abre la caja y saca los alimentos y bebidas de dentro de la misma.")
-						end
-					elseif id == 44 then
-						local vehicle = getPedOccupiedVehicle( source )
-						vehFuel = getElementData ( vehicle, "fuel" )
-						if vehFuel < 99 then
-							setElementData ( vehicle, "fuel", 100 )
-							vehFuel = 100
-							take(source,slot)
-							outputChatBox("Has llenado el vehículo de gasolina, recuerda rolearlo o serás sancionado", source, 255, 0, 0)
-						else 
-							outputChatBox("Tienes gasolina en el coche", source, 255, 0, 0)
-						end
-					elseif id == 47 then
-						local vehicle = getPedOccupiedVehicle(source)
-						if vehicle then
-							local seat = getPedOccupiedVehicleSeat(source)
-							if seat == 0 then
-								take(source, slot)
-								exports.chat:me( source, "utilizó su kit de reparación para reparar el vehículo.")
-								triggerClientEvent(source, "progressBar", source, 3000, "Reparando")
-								setPedAnimation( source, "BD_FIRE", "wash_up", -1, true )
-								setElementHealth(vehicle, 1000)
-							else
-								outputChatBox("No puedes usar este kit de reparación en el asiento del pasajero. Necesitas ser el conductor.", source, 255, 0, 0)
-							end
-						else
-							outputChatBox("Tienes que estar en un vehículo para usar este kit de reparación.", source, 255, 0, 0)
 						end
 					else
 						exports.chat:me( source, "mira su " .. name .. ". No pasa nada..." )	
@@ -1222,6 +892,7 @@ addEventHandler( "items:use2", root,
 	end
 )
 
+
 function utilizarCargador (player)
 	-- Forzamos recarga 
 	load(player, true)
@@ -1235,6 +906,15 @@ function utilizarCargador (player)
 			--
 			value = tonumber(t.value)
 			if purgaVar == false then
+				if (value == 32 or value == 26 or value == 33) then
+					outputChatBox("Este arma sólo puede ser utilizada en eventos.", player, 255, 0, 0)
+					return
+				end
+			else
+				if (value ~= 32 and value ~= 26 and value ~=33) then
+					outputChatBox("Este arma no puede ser utilizada en eventos.", player, 255, 0, 0)
+					return
+				end
 			end
 			--
 				if giveWeapon(player, tonumber(t.value), tonumber(t.value2)) then
@@ -1326,8 +1006,7 @@ function guardarChaleco (player)
 	if getPedArmor(player) >= 1 then
 		exports.chat:me( source, "guarda su chaleco antibalas.")
 		give(player, 46, tonumber(getPedArmor(player)), "Chaleco Antibalas")
-		setPedArmor(player, 0)	
-		removeElementData ( player, "Chaleco" )
+		setPedArmor(player, 0)
 	else
 		outputChatBox("No tienes un chaleco puesto que guardar.", player, 255, 0, 0)
 	end
@@ -1335,6 +1014,18 @@ end
 addCommandHandler("gchaleco", guardarChaleco)
 
  
+function guardarArma (player)
+	local weapon = getPedWeapon(player)
+	local ammo = getPedTotalAmmo(player)
+	if weapon and weapon >= 1 then
+		exports.chat:me(player, "guarda su "..getWeaponNameFromID(weapon)..".", "(/guardararma)")
+		outputChatBox("Has guardado tu "..getWeaponNameFromID(weapon).." con "..ammo.." balas.", player, 0, 255, 0)		
+		local name = "Arma "..tostring(weapon)
+		give(player, 29, tonumber(weapon), tostring(name), tonumber(ammo))
+		takeWeapon(player, weapon)
+	end
+end
+addCommandHandler("guardararma", guardarArma)
 
 function guardarArmas (player)
 	for i=1,12 do
@@ -1362,7 +1053,7 @@ function guardarArmas2 (player)
 			else
 				outputChatBox("Has guardado tu "..getWeaponNameFromID(weapon).." sin balas.", player, 0, 255, 0)
 			end
-			local name = "Arma ["..getPlayerName(player):gsub("_", " ").."]"..tostring(weapon)
+			local name = "Arma "..tostring(weapon)
 			give(player, 29, tonumber(weapon), tostring(name), tonumber(ammo))
 			takeWeapon(player, weapon)
 		end
@@ -1372,7 +1063,6 @@ addCommandHandler("guardararmas", guardarArmas2)
 
 tabaco = {}
 caladas = {}
-kitrepair = {}
 maxCaladas = 15
 
 function fumar (source)
@@ -1389,29 +1079,6 @@ function fumar (source)
 end
 addEvent("onFumarCigarro", true)
 addEventHandler("onFumarCigarro", root, fumar)
-
---[[function kitRepair( player, commandName, otherPlayer )
-	local mecanicos = getMecanicos ()
-	if #mecanicos > 0 then
-		outputChatBox("Hay mecánicos conectados, ve al taller o llama a un mecánico para reparar tu vehículo.", player, 255, 0, 0)
-	else
-		if exports.items:has(player,47,1) then
-			if exports.players:isLoggedIn( player ) then
-				local vehicle = getPedOccupiedVehicle( player )
-				if vehicle and getVehicleOccupant( vehicle ) == player then
-					if not getElementData(player, "muerto") then
-						setPedAnimation(player, "ped", "fixn_car_loop", -1, false, false, false, false)
-					end
-					if getElementData(vehicle, "cepo") and getElementData(vehicle, "cepo") == 1 then outputChatBox("No puedes reparar un vehículo que tiene un cepo.", player, 255, 0, 0) return end
-					fixVehicle(vehicle)
-					if isElement (kitrepair [player]) then destroyElement (kitrepair [player]) end
-					outputChatBox( "Has reparado el vehículo con un kit de reparación.", player, 0, 255, 153 )
-					end
-				end
-			end
-		end
-	end
-addCommandHandler("usarkit", kitRepair)]]--
 
 function startSmoking (source)
 	toggleControl (source,"fire",false)
@@ -1526,47 +1193,6 @@ function createHelmet (s,m)
 	exports.chat:me (s, "se pone el casco.")
 end
 
-function createHelmet2 (s,m)
-	--local x,y,z = getElementPosition (s)
-	--local dim = getElementDimension (s)
-	--local int = getElementInterior (s)
-	--if isElement (chaleco [s]) then destroyElement (chaleco [s]) end
-	--chaleco [s] = createObject ( 0, x, y, z )
-	--setObjectScale ( chaleco [s], 1.1 )
-	setElementData ( s, "Chaleco", true )
-	--setElementDimension ( chaleco [s], dim )
-	--setElementInterior ( chaleco [s], int )
-	--exports.bone_attach:attachElementToBone(chaleco [s],s,3,0.0,0.03,0.05,180,90,180)
-	exports.chat:me (s, "se pone el chaleco.")
-end
-
-PuertaBanco = createObject ( 2634, -296.7937600, 1501.7164300, 1071.6612500, 0, 0, 180)
-setElementDimension(PuertaBanco, 7)
-setElementInterior(PuertaBanco, 14)
-MarkerBanco = createMarker(-295.63006591797, 1500.5462646484, 1071.1059570313-1, "cylinder", 1.4, 255, 0, 0, 100)
-setElementDimension(MarkerBanco, 7)
-setElementInterior(MarkerBanco, 14)
-local MarkerRobo1 = createMarker(-297.07244873047, 1516.2093505859, 1070.9940185547-1, "cylinder", 1.5, 255, 0, 0, 100)
-setElementDimension(MarkerRobo1, 7)
-setElementInterior(MarkerRobo1, 14)
-local MarkerRobo2 = createMarker(-294.84393310547, 1509.7845458984, 1070.9940185547-1, "cylinder", 1.5, 255, 0, 0, 100)
-setElementDimension(MarkerRobo2, 7)
-setElementInterior(MarkerRobo2, 14)
-local MarkerRobo3 = createMarker(-298.99627685547, 1509.8782958984, 1070.9940185547-1, "cylinder", 1.5, 255, 0, 0, 100)
-setElementDimension(MarkerRobo3, 7)
-setElementInterior(MarkerRobo3, 14)
-local MarkerLabDrogas = createMarker(4304.53515625, 219.7724609375, 8.8059387207031-1, "cylinder", 1.5, 255, 200, 0, 100)
-setElementInterior(MarkerLabDrogas, 4)
-setElementDimension(MarkerLabDrogas, 2095)
-
-function createMaria (s)
-	local x,y,z = getElementPosition (s)
-	if isElement (maria [s]) then destroyElement (maria [s]) end
-	maria [s] = createObject(3409, x, y, z-1)
-	setObjectScale ( maria [s], 1.3 )
-	setElementData ( s, "Maria", true )
-end
-
 function actualizarPosicion (player)
 	if isElement (tabaco [player]) then
 		setElementDimension ( tabaco [player], getElementDimension(player) )
@@ -1586,7 +1212,6 @@ function onLogout ()
 	if isElement (mochila [source]) then destroyElement (mochila [source]) end
 	if isElement (casco [source]) then removeElementData(source, "Cascos") destroyElement (casco [source]) end
 	if isElement (tabaco [source]) then destroyElement (tabaco [source]) end
-	if isElement (maria [source]) then removeElementData(source, "Maria") destroyElement (maria [source]) end
 end
 addEventHandler ("onCharacterLogout", getRootElement(),onLogout) 
 addEventHandler ("onPlayerQuit", getRootElement(),onLogout) 
@@ -1676,9 +1301,6 @@ function darItemAUsuario(player,cmd,id)
 		end
 		exports.chat:me( player, "entrega un/a "..tostring(getElementData(player, "daritem.name")).." a "..getPlayerName(otro):gsub("_", " "), "(Dar Item)" )
 		exports.chat:me( otro, "coge el/la "..tostring(getElementData(player, "daritem.name")).." que le ha dado "..getPlayerName(player):gsub("_", " "), "(Dar Item)")
-		exports.logsic:addLogMessage("daritem", ""..getPlayerName(player):gsub("_", " ").." entrega un/a "..tostring(getElementData(player, "daritem.name")).." a "..getPlayerName(otro):gsub("_", " "))
-		exports.logsic:addLogMessage("daritem", ""..getPlayerName(otro):gsub("_", " ").." coge el/la "..tostring(getElementData(player, "daritem.name")).." que le ha dado "..getPlayerName(player):gsub("_", " "))
-		
 		-- Now, we should check if player has clock and bag to render it or not.
 		if has(player, 9) then
 			setPlayerHudComponentVisible(player, "clock", true)
@@ -1778,9 +1400,7 @@ addEventHandler( "items:getFromMaletero", root,
 					end
 				end
 				-- FIN PARCHE --
-				local vehicleID = getElementData(source, "mid")
 				exports.chat:me(source, "saca un/a "..(v.name or exports.items:getName( v.item )).." del maletero.")
-				exports.logs:addLogMessage("agarrarmaletero", getPlayerName(source):gsub("_", " ").. " saca un/a "..(v.name or exports.items:getName( v.item )).." del maletero. (ID Vehículo: "..vehicleID..")")
 				exports.sql:query_free("DELETE FROM maleteros WHERE `index` = "..slot)
 			end
 			local sql2 = exports.sql:query_assoc("SELECT `index`, item, value, value2, name FROM maleteros WHERE vehicleID = "..getElementData(source, "mid"))
@@ -1822,7 +1442,6 @@ addEventHandler( "items:giveToMaletero", root,
 							exports.sql:query_free("UPDATE maleteros SET value2 = "..tonumber(value2).." WHERE `index` = "..index)
 						end
 						exports.chat:me( source, "guarda un/a "..(name or exports.items:getName( id )).." en el maletero." )
-						exports.logs:addLogMessage("guardarmaletero", getPlayerName(source):gsub("_", " ").. " guarda un/a "..(name or exports.items:getName( id )).." en el maletero. (ID Vehículo: "..vehicleID..")")
 						if id == 9 then
 							if has(source, 9) then
 								setPlayerHudComponentVisible(source, "clock", true)
@@ -1897,9 +1516,7 @@ addEventHandler( "items:getFromMueble", root,
 					end
 				end
 				-- FIN PARCHE --
-				local idmueble = getElementData(source, "muebleID")
 				exports.chat:me(source, "coge un/a "..(v.name or exports.items:getName( v.item )).." del mueble.")
-				exports.logs:addLogMessage("agarrarmueble", getPlayerName(source):gsub("_", " ").. " coge un/a "..(v.name or exports.items:getName( v.item )).." del mueble. (ID Mueble: "..idmueble..")")
 				exports.sql:query_free("DELETE FROM items_muebles WHERE `index` = "..slot)
 			end
 			local sql2 = exports.sql:query_assoc("SELECT `index`, item, value, value2, name FROM items_muebles WHERE muebleID = "..getElementData(source, "muebleID"))
@@ -1938,9 +1555,7 @@ addEventHandler( "items:giveToMueble", root,
 						if value2 then			
 							exports.sql:query_free("UPDATE items_muebles SET value2 = "..tonumber(value2).." WHERE `index` = "..index)
 						end
-						local idmueble = getElementData(source, "muebleID")
 						exports.chat:me( source, "guarda un/a "..(name or exports.items:getName( id )).." en el mueble." )
-						exports.logs:addLogMessage("guardarmueble", getPlayerName(source):gsub("_", " ").. " guarda un/a "..(name or exports.items:getName( id )).." en el mueble. (ID Mueble: "..idmueble..")")
 						if id == 9 then
 							if has(source, 9) then
 								setPlayerHudComponentVisible(source, "clock", true)
@@ -2302,7 +1917,8 @@ end
 addCommandHandler("givecargador", darCargadorStaff)
          
 function dormirCoche (player)
-	if getPedOccupiedVehicle(player) and getVehicleType(getPedOccupiedVehicle(player)) == "Automobile" then		
+	if getPedOccupiedVehicle(player) and getVehicleType(getPedOccupiedVehicle(player)) == "Automobile" then
+		if getVehicleController(getPedOccupiedVehicle(player)) == player then outputChatBox("No puedes dormir si eres el conductor.", player, 255, 0, 0) return end
 		setVehicleLocked(player, true)
 		dormirT[player] = setTimer(
 		function(player)
@@ -2363,12 +1979,6 @@ function standUpCoche(player)
 	end
 end
 addEventHandler("onVehicleExit", root, standUpCoche)
-
-function destruirObjetoTel(source)
-	destroyElement(objetoTlf2[source])
-end 
-addCommandHandler("dtlf", destruirObjetoTel)
-addCommandHandler("gt", destruirObjetoTel)
 
 function mostrarDNI( player, commandName, otherPlayer )
     if player then

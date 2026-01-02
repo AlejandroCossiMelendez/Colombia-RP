@@ -1,12 +1,12 @@
 function newsPaperEditt(player) 
-	if exports.factions:isPlayerInFaction ( player, 18) then
+	if exports.factions:isPlayerInFaction ( player, 4) then
 		triggerClientEvent(player, "ShowEditor", player)
-		outputChatBox("Se ha abierto el editor del periódico de Noticias RCN.", player, 0, 255, 0, false)
+		outputChatBox("Se ha abierto el editor del periódico de Palomino Creek News Department.", player, 0, 255, 0, false)
 	else
-		outputChatBox("(( No perteneces a Noticias RCN ))", player, 255, 0, 0, false)
+		outputChatBox("(( No perteneces a PCND ))", player, 255, 0, 0, false)
 	end
 end
-addCommandHandler("editarpdc", newsPaperEditt)
+addCommandHandler("editarperiodico", newsPaperEditt)
 
 function leerperiodico(player)
 	if getElementData(player, "newspaper") == true then
@@ -19,14 +19,14 @@ function leerperiodico(player)
 		outputChatBox("(( No tienes un periódico comprado. ))", player, 255, 0, 0, false)
 	end
 end
-addCommandHandler("leerpdc", leerperiodico)
+addCommandHandler("leerperiodico", leerperiodico)
 
 function tirarperiodico(player)
 	if not getElementData(player, "newspaper") == true then outputChatBox("(( Cómo vas a tirar algo que no tienes... ))", player, 255, 0, 0) return end
 	   exports.chat:me(player, "coge y tira el periódico a la papelera.")
 	   setElementData(player, "newspaper", false)
 end
-addCommandHandler("tirarpdc", tirarperiodico)
+addCommandHandler("tirarperiodico", tirarperiodico)
 
 
 function setDaNewsText(p, message)

@@ -1,8 +1,0 @@
-[2024-06-15 00:09:55] Cantidad $2800000 pagado a Joelito Vin.
-[2024-06-15 00:10:12] Cantidad $250000000 pagado a Joelito Vin.
-[2024-06-15 00:10:15] Cantidad $25000000 pagado a Joelito Vin.
-[2024-06-15 00:10:24] Cantidad $1000000 pagado a Joelito Vin.
-[2024-06-15 00:11:42] Cantidad $180000000 pagado a Joelito Vin.
-[2024-06-15 00:11:44] Cantidad $18000000 pagado a Joelito Vin.
-[2024-06-15 00:12:21] Cantidad $7000000 pagado a Joelito Vin.
-[2024-06-15 00:28:35] Cantidad $1000000 pagado a Neide Sol.

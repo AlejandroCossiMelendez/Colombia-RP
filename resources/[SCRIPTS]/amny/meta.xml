@@ -1,5 +1,0 @@
-<meta>
-    <info author="Shadow·#1776" version="1" name="Givemoney, Setmoney" description="Comandos de dinero para dowtown." type="script" />
-
-    <script src="comandos.lua" type='server' />
-</meta>

@@ -122,4 +122,4 @@ setTimer(function()
 	if not status then
 		clearing_nonexisting_peds = coroutine.create(forgetNonExistingPeds)
 	end
-	end,100000,0)
+	end,1000,0)

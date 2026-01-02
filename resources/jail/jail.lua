@@ -15,57 +15,50 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]
 
-timerjail = setTimer(function()
-    for k, player in ipairs(getElementsByType("player")) do
-        local tjail = tonumber(getElementData(player, "tjail"))
-        local ajail = tonumber(getElementData(player, "ajail"))
-        local tpd = tonumber(getElementData(player, "tpd"))
-        
-        if tjail and tjail >= 1 then
-            setElementHealth(player, 100)
-            setElementData(player, "tjail", tjail-1)
-            local userID = exports.players:getUserID(player)
-            if userID then
-                exports.sql:query_free("UPDATE wcf1_user SET tjail = " .. tonumber(tjail-1) .. " WHERE userID = " .. userID)
-            end
-            if tjail == 1 then
-                setElementHealth(player, 100)
-                triggerEvent("onJailFinalizar", player, player)
-            end
-        end
-        
-        if ajail and (not tjail or tjail == 0) then
-            setElementHealth(player, 100)
-            if ajail >= 2 then
-                setElementData(player, "ajail", getElementData(player, "ajail")-1)
-                exports.sql:query_free("UPDATE characters SET ajail = " .. tonumber(ajail-1) .. " WHERE characterID = " .. exports.players:getCharacterID(player))
-            elseif ajail == 1 then
-                removeElementData(player, "ajail")
-                exports.sql:query_free("UPDATE characters SET ajail = 0 WHERE characterID = " .. exports.players:getCharacterID(player))
-                outputChatBox("Tu tiempo de prisión ha finalizado.", player, 0, 255, 0)
-                setElementPosition(player, 2408.85, 49.22, 26.48)
-                setElementRotation(player, 0, 0, 176.11)
-                setElementInterior(player, 0)
-                setElementDimension(player, 0)
-
-                local skinActual = getElementData(player, "originalSkin")
-                if skinActual then
-                    setElementModel(player, skinActual)
-                    removeElementData(player, "originalSkin")
-                end
-            end
-        end
-        
-        if tpd then                
-            if tpd == 59 then
-                exports.payday:darPayday(player)
-                setElementData(player, "tpd", 0)
-            else
-                setElementData(player, "tpd", tonumber(tpd+1))
-            end
-        end
-    end            
-end, 60000, 0)
+timerjail = setTimer ( 	
+function ()	  
+	for k, player in ipairs(getElementsByType("player")) do
+		local tjail = tonumber(getElementData(player, "tjail"))
+		local ajail = tonumber(getElementData(player, "ajail"))
+		local tpd = tonumber(getElementData(player, "tpd"))
+		if tjail and tjail >= 1 then
+			setElementHealth(player, 100)
+			setElementData(player, "tjail", tjail-1)
+			local userID = exports.players:getUserID(player)
+			if userID then
+				exports.sql:query_free( "UPDATE wcf1_user SET tjail = "..tonumber(tjail-1).." WHERE userID = " .. userID )
+			end
+			if tjail == 1 then
+				setElementHealth(player, 100)
+				triggerEvent("onJailFinalizar", player, player)
+			end
+		end
+		if ajail and (not tjail or tjail == 0) then
+			setElementHealth(player, 100)
+			if ajail >= 2 then
+				setElementData(player, "ajail", getElementData(player, "ajail")-1)
+				exports.sql:query_free( "UPDATE characters SET ajail = "..tonumber(ajail-1).." WHERE characterID = " .. exports.players:getCharacterID(player) )
+			elseif ajail == 1 then
+				removeElementData(player, "ajail")
+				exports.sql:query_free( "UPDATE characters SET ajail = 0 WHERE characterID = " .. exports.players:getCharacterID(player) )
+				outputChatBox("Tu tiempo de prisión ha finalizado.", player, 0, 255, 0)
+				setElementPosition(player, 2408.85, 49.22, 26.48)
+				setElementRotation(player, 0, 0, 176.11)
+				setElementInterior(player, 0)
+				setElementDimension(player, 0)
+			end
+		end
+		if tpd then				
+			if tpd == 59 then -- Pasó un minuto y ya hay que dar el PayDay ;D
+				exports.payday:darPayday(player)
+				setElementData(player, "tpd", 0)
+			else
+				setElementData(player, "tpd", tonumber(tpd+1))
+			end
+		end
+	end			
+end 
+, 60000, 0 )
  
 function jailPlayer ( player, otro, tiemp, razon )
 	local nombre = getPlayerName(otro):gsub("_", " ")
@@ -207,7 +200,7 @@ function unjail ( player, commandName, idsancion )
 					end
 					if isElement(otro) then
 						if getElementData( otro, "tjail") and tonumber(getElementData( otro, "tjail")) >= 1 then
-							setElementPosition(otro, 216.953125, -87.599609375, 1.5679597854614)
+							setElementPosition(otro, 2408.85, 49.22, 26.48)
 							outputChatBox('El staff '..getPlayerName(player):gsub("_", " ").. ' te ha liberado del jail.', otro, 0, 255, 0)
 							outputChatBox('Has liberado a '..getPlayerName(otro):gsub("_", " ").. ' del jail.', player, 0, 255, 0)
 							exports.logs:addLogMessage("unjail", 'El staff '..getPlayerName(player):gsub("_", " ").. ' ha liberado a '..getPlayerName(otro):gsub("_", " ").. ' del jail.' )
@@ -253,15 +246,15 @@ addEventHandler( "onCharacterLogin", root, entradaJail )
 
 function continuarjail (otro, tiempo, tipo)
 	if tipo == 1 then
-		setElementPosition(otro, 264.6796875, 78.09765625, 1001.0390625)
+		setElementPosition(otro, 265.65182495117, 79.20386505127, 1002.6829833984)
 		setElementInterior(otro, 6)
 		setElementDimension(otro, 35)
 		setElementData(otro, "tjail", tonumber(tiempo))
 		outputChatBox ("Sigues jaileado, y tienes que cumplir tu tiempo.", otro, 255, 0, 0)
 	elseif tipo == 2 then
-		setElementPosition(otro, 227.287109375, 110.421875, 999.015625)
+		setElementPosition(otro, 227.44, 110.82, 999.02)
 		setElementInterior(otro, 10)
-		setElementDimension(otro, 61)
+		setElementDimension(otro, 104)
 		setElementData(otro, "ajail", tonumber(tiempo))
 		outputChatBox("Sigues arrestado, y tienes que cumplir tu tiempo.", otro, 255, 0, 0)
 	end
@@ -271,7 +264,7 @@ addEventHandler("onJail", root, continuarjail)
 
 function tiempofinal ( otro )
 	local userID = getElementData(otro, "data.userid")
-    setElementPosition(otro, 216.953125, -87.599609375, 1.5679597854614)
+    setElementPosition(otro, 2408.85, 49.22, 26.48)
 	outputChatBox("Tu tiempo en jail ha finalizado. Esperamos no volver a verte.", otro, 0, 255, 0)
     setElementInterior(otro, 0)
     setElementDimension(otro, 0)

@@ -1,9 +1,0 @@
-<map edf:definitions="editor_main">
-    <object id="object (cs_roadbridge04) (1)" breakable="false" interior="0" alpha="255" dimension="0" model="18450" scale="1" doublesided="false" collisions="true" posX="-174.39999" posY="-1676.4" posZ="1.3" rotX="0" rotY="0" rotZ="-88"></object>
-    <object id="object (multicarpark01_lvS) (1)" breakable="false" interior="0" alpha="255" dimension="0" model="8390" scale="1" doublesided="false" collisions="true" posX="-171" posY="-1785.9" posZ="21" rotX="0" rotY="0" rotZ="2"></object>
-    <object id="object (hc_shed02_SFS) (1)" breakable="false" interior="0" alpha="255" dimension="0" model="10401" scale="1" doublesided="false" collisions="true" posX="-181" posY="-1651.3" posZ="3.7" rotX="0" rotY="0" rotZ="137"></object>
-    <object id="object (VgsN_nitree_r01) (1)" breakable="false" interior="0" alpha="255" dimension="0" model="3509" scale="1" doublesided="false" collisions="true" posX="-180.8" posY="-1699.3" posZ="1.7" rotX="0" rotY="0" rotZ="0"></object>
-    <object id="object (VgsN_nitree_r01) (2)" breakable="false" interior="0" alpha="255" dimension="0" model="3509" scale="1" doublesided="false" collisions="true" posX="-181.2" posY="-1686.3" posZ="1.7" rotX="0" rotY="0" rotZ="0"></object>
-    <object id="object (VgsN_nitree_r01) (3)" breakable="false" interior="0" alpha="255" dimension="0" model="3509" scale="1" doublesided="false" collisions="true" posX="-167.10001" posY="-1685.4" posZ="1.7" rotX="0" rotY="0" rotZ="0"></object>
-    <object id="object (VgsN_nitree_r01) (4)" breakable="false" interior="0" alpha="255" dimension="0" model="3509" scale="1" doublesided="false" collisions="true" posX="-166.60001" posY="-1698.5" posZ="1.7" rotX="0" rotY="0" rotZ="0"></object>
-</map>

@@ -1,6 +1,0 @@
-[2024-06-08 05:07:12] Cantidad $30000000 pagado a Santi Carranza.
-[2024-06-08 16:52:29] Cantidad $400000 pagado a James Rodriguezz.
-[2024-06-10 05:16:42] Cantidad $30000000 pagado a Santi Carranza.
-[2024-06-10 05:56:34] Cantidad $7000000 pagado a Valentin Farias.
-[2024-06-11 02:33:49] Cantidad $10000000 pagado a Alejandro Perez.
-[2024-06-11 02:39:42] Cantidad $10000000 pagado a Alejandro Perez.

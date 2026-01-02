@@ -72,9 +72,9 @@ function sufrirAtaque (atacante, arma, parte, muerto, staff)
 			if arma == 0 then
 				if muerto == true then
 					if not staff then
-						outputChatBox("["..getPlayerName(atacante):gsub("_", " ").."] Te ha dejado en estado critico.", source, 255, 128, 0)
-						outputChatBox("Has dejado muy herido a ["..getPlayerName(source):gsub("_", " ").."].", atacante, 255, 128, 0)
-						outputChatBox("Usa /cargar para llevartelo (DEBES DE ROLEARLO)", atacante, 255, 255, 0)
+						outputChatBox("El jugador "..getPlayerName(atacante):gsub("_", " ").." te ha matado a puño.", source, 177, 177, 177)
+						outputChatBox("Has matado a golpes a "..getPlayerName(source):gsub("_", " ")..".", atacante, 177, 177, 177)
+						outputChatBox("Usa /llevarse [jugador] para llevartelo (DEBES DE ROLEARLO)", atacante, 255, 255, 0)
 					end
 					if isPedInVehicle(source) then removePedFromVehicle(source) end
 					if isPedDead(source) then
@@ -83,8 +83,9 @@ function sufrirAtaque (atacante, arma, parte, muerto, staff)
 						fadeCamera( source, true )
 						setCameraTarget( source, source )
 					end
-					setPedAnimation(source, "crack", "crckdeth3", -1, false, false, false)
-					exports.infobox:addNotification(source, "Te moriste, rolea heridas y usa /conteomd", "success")
+					setPedAnimation(source, "crack", "crckidle2", -1, true, false, false)
+					outputChatBox("Estás GRAVEMENTE herido o MUERTO. Debes de rolear heridas.", source, 255, 0, 0)
+					outputChatBox("Puedes usar /avisarmd si según el rol alguien puede avisar a los médicos.", source, 255, 0, 0)
 					setElementHealth(source, 1)
 					setElementData(source, "muerto", true)
 					--triggerClientEvent(source, "onClientMuerto", source)
@@ -98,8 +99,9 @@ function sufrirAtaque (atacante, arma, parte, muerto, staff)
 							outputChatBox("El jugador "..getPlayerName(atacante):gsub("_", " ").." te ha matado a puño.", source, 177, 177, 177)
 							outputChatBox("Has matado a golpes a "..getPlayerName(source):gsub("_", " ")..".", atacante, 177, 177, 177)
 							outputChatBox("Usa /llevarse [jugador] para llevartelo (DEBES DE ROLEARLO)", atacante, 255, 255, 0)
-							setPedAnimation(source, "crack", "crckdeth3", -1, false, false, false)
-				        	exports.infobox:addNotification(source, "Te moriste, rolea heridas y usa /conteomd", "success")
+							setPedAnimation(source, "crack", "crckidle2", -1, true, false, false)
+							outputChatBox("Estás GRAVEMENTE herido o MUERTO. Debes de rolear heridas.", source, 255, 0, 0)
+							outputChatBox("Puedes usar /avisarmd si según el rol alguien puede avisar a los médicos.", source, 255, 0, 0)
 							setElementHealth(source, 1)
 							setElementData(source, "muerto", true)
 							--triggerClientEvent(source, "onClientMuerto", source)
@@ -120,8 +122,9 @@ function sufrirAtaque (atacante, arma, parte, muerto, staff)
 						fadeCamera( source, true )
 						setCameraTarget( source, source )
 					end
-					setPedAnimation(source, "crack", "crckdeth3", -1, false, false, false)
-					exports.infobox:addNotification(source, "Te moriste, rolea heridas y usa /conteomd", "success")
+					setPedAnimation(source, "crack", "crckidle2", -1, true, false, false)
+					outputChatBox("Estás GRAVEMENTE herido o MUERTO. Debes de rolear heridas.", source, 255, 0, 0)
+					outputChatBox("Puedes usar /avisarmd si según el rol alguien puede avisar a los médicos.", source, 255, 0, 0)
 					setElementHealth(source, 1)
 					setElementData(source, "muerto", true)
 					--triggerClientEvent(source, "onClientMuerto", source)
@@ -164,8 +167,8 @@ function sufrirAtaque (atacante, arma, parte, muerto, staff)
 								if getPedArmor(source) >= hpq then -- Con el chaleco tiene bastante.
 									setPedArmor(source, tonumber(getPedArmor(source)-hpq))
 									if not sinMSJ [arma] then
-										outputChatBox(""..getPlayerName(atacante):gsub("_", " ").." Te ha disparado con un/una "..getWeaponNameFromID(arma)..".", source, 177, 177, 177)
-										outputChatBox("Disparaste a "..getPlayerName(source):gsub("_", " ").." con un/una "..getWeaponNameFromID(arma)..".", atacante, 177, 177, 177)
+										outputChatBox("El jugador "..getPlayerName(atacante):gsub("_", " ").." te ha atacado con un/una "..getWeaponNameFromID(arma)..".", source, 177, 177, 177)
+										outputChatBox("Has atacado a "..getPlayerName(source):gsub("_", " ").." con un/una "..getWeaponNameFromID(arma)..".", atacante, 177, 177, 177)
 									end
 								else -- Pues calculamos la diferencia, y lo que le falte se lo quitamos de vida.
 									dif = hpq-getPedArmor(source)
@@ -173,15 +176,16 @@ function sufrirAtaque (atacante, arma, parte, muerto, staff)
 									if dif < tonumber(getElementHealth(source)) then 
 										setElementHealth(source, tonumber(getElementHealth(source)-dif))
 										if not sinMSJ [arma] then
-											outputChatBox(""..getPlayerName(atacante):gsub("_", " ").." Te ha disparado con un/una "..getWeaponNameFromID(arma)..".", source, 177, 177, 177)
-											outputChatBox("Disparaste a "..getPlayerName(source):gsub("_", " ").." con un/una "..getWeaponNameFromID(arma)..".", atacante, 177, 177, 177)
+											outputChatBox("El jugador "..getPlayerName(atacante):gsub("_", " ").." te ha atacado con un/una "..getWeaponNameFromID(arma)..".", source, 177, 177, 177)
+											outputChatBox("Has atacado a "..getPlayerName(source):gsub("_", " ").." con un/una "..getWeaponNameFromID(arma)..".", atacante, 177, 177, 177)
 										end
 									else -- Ha muerto
-										outputChatBox(""..getPlayerName(atacante):gsub("_", " ").." Te ha disparado con un/una "..getWeaponNameFromID(arma)..".", source, 177, 177, 177)
+										outputChatBox("El jugador "..getPlayerName(atacante):gsub("_", " ").." te ha matado con un/una "..getWeaponNameFromID(arma)..".", source, 177, 177, 177)
 										outputChatBox("Has matado a "..getPlayerName(source):gsub("_", " ").." con un/una "..getWeaponNameFromID(arma)..".", atacante, 177, 177, 177)
-										outputChatBox("Usa /cargar para llevartelo (DEBES DE ROLEARLO)", atacante, 255, 255, 0)
-										setPedAnimation(source, "crack", "crckdeth3", -1, false, false, false)
-					                    exports.infobox:addNotification(source, "Te moriste, rolea heridas y usa /conteomd", "success")
+										outputChatBox("Usa /llevarse [jugador] para llevartelo (DEBES DE ROLEARLO)", atacante, 255, 255, 0)
+										setPedAnimation(source, "crack", "crckidle2", -1, true, false, false)
+										outputChatBox("Estás GRAVEMENTE herido o MUERTO. Debes de rolear heridas.", source, 255, 0, 0)
+										outputChatBox("Puedes usar /avisarmd si según el rol alguien puede avisar a los médicos.", source, 255, 0, 0)
 										setElementHealth(source, 1)
 										setElementData(source, "muerto", true)
 										--triggerClientEvent(source, "onClientMuerto", source)
@@ -190,15 +194,16 @@ function sufrirAtaque (atacante, arma, parte, muerto, staff)
 							elseif hpq < tonumber(getElementHealth(source)) then 
 								setElementHealth(source, tonumber(getElementHealth(source)-hpq))
 								if not sinMSJ [arma] then
-									outputChatBox(""..getPlayerName(atacante):gsub("_", " ").." Te ha disparado con un/una "..getWeaponNameFromID(arma)..".", source, 177, 177, 177)
-									outputChatBox("Has disparado a "..getPlayerName(source):gsub("_", " ").." con un/una "..getWeaponNameFromID(arma)..".", atacante, 177, 177, 177)
+									outputChatBox("El jugador "..getPlayerName(atacante):gsub("_", " ").." te ha atacado con un/una "..getWeaponNameFromID(arma)..".", source, 177, 177, 177)
+									outputChatBox("Has atacado a "..getPlayerName(source):gsub("_", " ").." con un/una "..getWeaponNameFromID(arma)..".", atacante, 177, 177, 177)
 								end
 							else -- Ha muerto
 								outputChatBox("El jugador "..getPlayerName(atacante):gsub("_", " ").." te ha matado con un/una "..getWeaponNameFromID(arma)..".", source, 177, 177, 177)
 								outputChatBox("Has matado a "..getPlayerName(source):gsub("_", " ").." con un/una "..getWeaponNameFromID(arma)..".", atacante, 177, 177, 177)
 								outputChatBox("Usa /llevarse [jugador] para llevartelo (DEBES DE ROLEARLO)", atacante, 255, 255, 0)
-								setPedAnimation(source, "crack", "crckdeth3", -1, false, false, false)
-				            	exports.infobox:addNotification(source, "Te moriste, rolea heridas y usa /conteomd", "success")
+								setPedAnimation(source, "crack", "crckidle2", -1, true, false, false)
+								outputChatBox("Estás GRAVEMENTE herido o MUERTO. Debes de rolear heridas.", source, 255, 0, 0)
+								outputChatBox("Puedes usar /avisarmd si según el rol alguien puede avisar a los médicos.", source, 255, 0, 0)
 								setElementHealth(source, 1)
 								setElementData(source, "muerto", true)
 								--triggerClientEvent(source, "onClientMuerto", source)
@@ -220,16 +225,18 @@ function sufrirAtaque (atacante, arma, parte, muerto, staff)
 					fadeCamera( source, true )
 					setCameraTarget( source, source )
 				end
-				setPedAnimation(source, "crack", "crckdeth3", -1, false, false, false)
-				exports.infobox:addNotification(source, "Te moriste, rolea heridas y usa /conteomd", "success")
+				setPedAnimation(source, "crack", "crckidle2", -1, true, false, false)
+				outputChatBox("Estás GRAVEMENTE herido o MUERTO. Debes de rolear heridas.", source, 255, 0, 0)
+				outputChatBox("Puedes usar /avisarmd si según el rol alguien puede avisar a los médicos.", source, 255, 0, 0)
 				setElementHealth(source, 1)
 				setElementData(source, "muerto", true)
 				--triggerClientEvent(source, "onClientMuerto", source)
 			else
 				outputChatBox("Te has hecho daño tú mismo.", source, 177, 177, 177)
 				if muerto == true then
-					setPedAnimation(source, "crack", "crckdeth3", -1, false, false, false)
-					exports.infobox:addNotification(source, "Te moriste, rolea heridas y usa /conteomd", "success")
+					setPedAnimation(source, "crack", "crckidle2", -1, true, false, false)
+					outputChatBox("Estás GRAVEMENTE herido o MUERTO. Debes de rolear heridas.", source, 255, 0, 0)
+					outputChatBox("Puedes usar /avisarmd si según el rol alguien puede avisar a los médicos.", source, 255, 0, 0)
 					setElementHealth(source, 1)
 					setElementData(source, "muerto", true)
 					--triggerClientEvent(source, "onClientMuerto", source)
@@ -258,92 +265,27 @@ function forzarRolHeridas()
 end
 addEventHandler("onCharacterLogin", getRootElement(), forzarRolHeridas)
 
---[[function avisarMD (player)
+function avisarMD (player)
 	if player and getElementData(player, "muerto") == true then
 		if hayMedicos() then
 			if getElementData(player, "MDavisado") == true then
-				outputChatBox("¡Ten paciencia! Sólo puedes dar el aviso a MD cada 20 segundos.", player, 255, 0, 0)
-				setElementData(player, "reduccNOMD", 1)
+				outputChatBox("¡Ten paciencia! Sólo puedes dar el aviso a MD cada 60 segundos.", player, 255, 0, 0)
 				return
 			end
 			avisarMedicos(player)
 			outputChatBox("Se ha avisado a los médicos por entorno. Ten paciencia.", player, 255, 255, 0)
 			setElementData(player, "MDavisado", true)
-			setTimer(removeElementData, 20000, 1, player, "MDavisado")
-			
-			triggerClientEvent(player, "onClientMuerto", player)
-			outputChatBox("Si el medico no viene, te puedes regenerar esperando el tiempo.", player, 255, 255, 0)
+			setTimer(removeElementData, 60000, 1, player, "MDavisado")
 		else
 			if not getElementData(player, "reduccNOMD") or getElementData(player, "reduccNOMD") ~= 2 then
 				triggerClientEvent(player, "onClientMuerto", player)
-				outputChatBox("Si el medico no viene, te puedes regenerar esperando el tiempo.", player, 255, 255, 0)
+				outputChatBox("No hay médicos disponibles. Se ha reducido la espera a 3 minutos.", player, 255, 0, 0)
 				setElementData(player, "reduccNOMD", 1)
 			end
 		end
 	end
 end
-addCommandHandler("conteomd", avisarMD)]]
-
--- Variable global para controlar si el temporizador está activo
-local temporizadorActivo = {}
-
-function revivirop(player)
-    if getElementData(player, "muerto") then
-        if temporizadorActivo[player] then
-            outputChatBox("¡Ya hay un proceso de revivir en curso para ti!", player, 255, 0, 0)
-            return
-        end
-
-        avisarMedicos(player)
-	    exports.infobox:addNotification(player, "Aviso enviado. Tambien se inició un contador para revivir, espera...", "success")
-		
-        local segundosRestantes = 150
-        temporizadorActivo[player] = true 
-
-        local timer
-        timer = setTimer(function()
-            if getElementData(player, "muerto") then
-                if segundosRestantes > 2 then
-                    exports.infobox:addNotification(player, "¡Serás revivido en " .. segundosRestantes .. " segundos!", "info")
-                    segundosRestantes = segundosRestantes - 10
-                else
-                    exports.infobox:addNotification(player, "¡Te has reanimado correctamente!", "success")
-                    local x, y, z = getElementPosition(player)
-					local rot = getElementRotation( player )
-			    	local skin = getElementModel( player )
-					local dim = getElementDimension( player )
-				    local int = getElementInterior( player )	
-                    removeElementData(player, "muerto")
-                    exports.items:guardarArmas(player, true)
-						setTimer(function()
-							spawnPlayer(player, x, y, z, rot, skin, int, dim)
-							setElementHealth(player, 35)
-							exports.infobox:addNotification(player, "Espera 10 segundos para continuar", "warning")
-							setElementFrozen(player, true)
-							setPedAnimation(player, "clothes", "clo_pose_legs", -1, true, false, false)
-							setTimer(function()
-								setElementFrozen(player, false)
-								setPedAnimation(player)
-							    	exports.infobox:addNotification(player, "Ya puedes continuar, ¡Recuerda rolear heridas!", "warning")
-							end, 10000, 1)
-						end, 2000, 1)
-                    temporizadorActivo[player] = false  
-                    killTimer(timer) 
-                end
-            else
-                temporizadorActivo[player] = false  
-                killTimer(timer) 
-                revivirop(player)
-            end
-        end, 10000, segundosRestantes)
-    else
-        outputChatBox("¡No estás muerto!", player, 255, 255, 0)
-    end
-end
-
-addCommandHandler("conteomd", revivirop)
-
-	
+addCommandHandler("avisarmd", avisarMD)
 
 addEvent( "onPlayerRespawn", true )
 addEventHandler( "onPlayerRespawn", root,
@@ -374,9 +316,7 @@ addEventHandler( "onPlayerRespawn", root,
 					setTimer(
 						function( source )
 							if isElement( source ) and exports.players:isLoggedIn( source ) then
-								x, y, z, r = getElementPosition(player)
-								spawnPlayer( source, x, y, z, r, getElementModel( source ), 0, 0 )
-								setElementHealth(source, 10)
+								spawnPlayer( source, 1245.86, 334.74, 19.55, 336.32, getElementModel( source ), 0, 0 )
 								fadeCamera( source, true )
 								setCameraTarget( source, source )
 								setCameraInterior( source, 0 )

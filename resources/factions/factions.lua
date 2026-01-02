@@ -52,27 +52,24 @@ local function loadFaction( factionID, name, type, tag, groupID, presupuesto )
 	factions[ factionID ] = { name = name, type = type, tag = tag, group = groupID, ranks = ranks, presupuesto = presupuesto, factionID = factionID }
 end
 
+
+
 local function loadPlayer( player )
-    local characterID = exports.players:getCharacterID( player )
-    if characterID then
-        p[ player ] = { factions = { }, rfactions = { }, types = { } }
-        local result = exports.sql:query_assoc( "SELECT factionID, factionLeader, factionRank, factionSueldo FROM character_to_factions WHERE characterID = " .. characterID )
-        for key, value in ipairs( result ) do
-            local factionID = value.factionID
-            if factions[ factionID ] then
-                table.insert( p[ player ].factions, factionID )
-                p[ player ].rfactions[ factionID ] = { leader = value.factionLeader, id = factionID, sueldo = value.factionSueldo }
-                p[ player ].types[ factions[ factionID ].type ] = true
-                setElementData( player, "player:FactionD", { name = getFactionName( factionID ) } )
-                local x = exports.sql:query_assoc( "SELECT factionRankName FROM faction_ranks WHERE factionID = " .. factionID .. " AND factionRankID = " .. value.factionRank )
-                for k, v in ipairs( x ) do
-                    setElementData( player, "player:1212121", v.factionRankName )
-                end
-            else
-                outputDebugString( "Faction " .. factionID .. " does not exist, removing players from it." )
-            end
-        end
-    end
+	local characterID = exports.players:getCharacterID( player )
+	if characterID then
+		p[ player ] = { factions = { }, rfactions = { }, types = { } }
+		local result = exports.sql:query_assoc( "SELECT factionID, factionLeader, factionSueldo FROM character_to_factions WHERE characterID = " .. characterID )
+		for key, value in ipairs( result ) do
+			local factionID = value.factionID
+			if factions[ factionID ] then
+				table.insert( p[ player ].factions, factionID )
+				p[ player ].rfactions[ factionID ] = { leader = value.factionLeader, id = factionID, sueldo = value.factionSueldo }
+				p[ player ].types[ factions[ factionID ].type ] = true
+			else
+				outputDebugString( "Faction " .. factionID .. " does not exist, removing players from it." )
+			end
+		end
+	end
 end
 
 addEventHandler( "onResourceStart", resourceRoot,
@@ -336,7 +333,7 @@ local function joinFaction( inviter, player, faction )
 			-- let's add him into the faction
 			-- Comprobación nivel 2 y dar objetivo.
 			local nivel = exports.objetivos:getNivel(exports.players:getCharacterID(player))
-			if nivel < 2 then outputChatBox( "No puedes invitar a este jugador porque necesita al menos nivel 2", inviter, 255, 0, 0) return end
+			if nivel < 2 then outputChatBox("No puedes invitar a este jugador porque necesita al menos nivel 2.", inviter, 255, 0, 0) return end
 			if nivel == 2 and not exports.objetivos:isObjetivoCompletado(12, exports.players:getCharacterID(player)) then
 				exports.objetivos:addObjetivo(12, exports.players:getCharacterID(player), player)
 			end
@@ -766,689 +763,99 @@ function darRopaTrabajo (player, cmd, tip)
 				outputChatBox("[2] Uniforme Agente Blanco", player, 255, 255, 255)
 				return
 			elseif tipo == 1 then
-				setElementModel(player, 265)
+				setElementModel(player, 10)
 			elseif tipo == 2 then
 				setElementModel(player, 9)
 			end
 		else
 			if not tip then 
 				outputChatBox("Tienes varios uniformes a tu disposición. Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Uniforme Goes", player, 255, 255, 255)
-				outputChatBox("[2] Uniforme Motociclista", player, 255, 255, 255)
-				outputChatBox("[3] Uniforme Oficial", player, 255, 255, 255)
-				outputChatBox("[4] Uniforme Dijin", player, 255, 255, 255)
-				outputChatBox("[5] Uniforme Director General", player, 255, 255, 255)
+				outputChatBox("[1] Uniforme Aplicado a Ropa del PJ. (solo color negro)", player, 255, 255, 255)
+				outputChatBox("[2] Agente Negro (Tenpenny)", player, 255, 255, 255)
+				outputChatBox("[3] Traje Buzo (Agua)", player, 255, 255, 255)
+				--outputChatBox("[3] Agente Blanco (Pulaski)", player, 255, 255, 255)
+				--outputChatBox("[4] Agente Latino (Jimmy)", player, 255, 255, 255)
+				outputChatBox("[5] Uniforme 1 (Sin Bigote)", player, 255, 255, 255)
+				outputChatBox("[6] Uniforme 2 (Con Bigote)", player, 255, 255, 255)
+				outputChatBox("[7] Uniforme 3 (Alto Cargo)", player, 255, 255, 255)
+				outputChatBox("[8] Uniforme Motorista", player, 255, 255, 255)
+				outputChatBox("[9] Uniforme S.W.A.T", player, 255, 255, 255)
+				outputChatBox("[10] Uniforme 4 (Alto Cargo 2)", player, 255, 255, 255)
 				return
 			elseif tipo == 1 then
-				setElementModel(player, 285)
+				setElementModel(player, 0)
+				addPedClothes(player, "policetr", "policetr", 17)
 			elseif tipo == 2 then
-				setElementModel(player, 284)
+				setElementModel(player, 265)
 			elseif tipo == 3 then
-				setElementModel(player, 282)
+				setElementModel(player, 279)
+				--setElementModel(player, 266)
 			elseif tipo == 4 then
+				--setElementModel(player, 267)
+			elseif tipo == 5 then
 				setElementModel(player, 280)
-			elseif tipo == 5 then
+			elseif tipo == 6 then
 				setElementModel(player, 281)
-			else
-				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
-				return
-			end
-		end
------------------------------------------------------------------ SURA ----------------------------------------------------
-	elseif isPlayerInFaction(player, 2) then -- IDS: 274 a 279
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Tienes varios uniformes a tu disposición.", player, 0, 255, 0)
-				outputChatBox("[1] Doctora.", player, 255, 255, 255)
-				outputChatBox("[2] Uniforme Bombero (Tierra)", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 276)
-			elseif tipo == 2 then
-				setElementModel(player, 277)
-			else
-				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Tienes varios uniformes a tu disposición.", player, 0, 255, 0)
-				outputChatBox("[1] Uniforme Medicos", player, 255, 255, 255)
-				outputChatBox("[2] Uniforme Lideres", player, 255, 255, 255)
-				outputChatBox("[3] Uniforme Directivos", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 274)
-			elseif tipo == 2 then
-				setElementModel(player, 275)
-			elseif tipo == 3 then
-				setElementModel(player, 278)
-			else
-				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
-				return
-			end
-		end 
------------------------------------------------------------------ GOBIERNO ----------------------------------------------------
-	elseif isPlayerInFaction(player, 31) then -- IDS: 274 a 279
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Tienes varios uniformes a tu disposición.", player, 0, 255, 0)
-				outputChatBox("[1] Doctora.", player, 255, 255, 255)
-				outputChatBox("[2] Uniforme Bombero (Tierra)", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 276)
-			elseif tipo == 2 then
-				setElementModel(player, 277)
-			else
-				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Tienes varios uniformes a tu disposición.", player, 0, 255, 0)
-				outputChatBox("[1] Uniforme Empleados", player, 255, 255, 255)
-				outputChatBox("[2] Uniforme Lideres", player, 255, 255, 255)
-				outputChatBox("[3] Uniforme Directivos", player, 255, 255, 255)
-				outputChatBox("[4] Uniforme Campañas", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 147)
-			elseif tipo == 2 then
-				setElementModel(player, 165)
-			elseif tipo == 3 then
-				setElementModel(player, 228)
-			elseif tipo == 4 then
-				setElementModel(player, 153)
-			else
-				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
-				return
-			end
-		end 
------------------------------------------------------------ TDA ---------------------------------------------------
-	elseif isPlayerInFaction(player, 46) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Guerrillo", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 10)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Guerrillo", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 10)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
------------------------------------------------------------ MALDONADO ---------------------------------------------------
-	elseif isPlayerInFaction(player, 41) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Gangster", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 41)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Gangster", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 41)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
------------------------------------------------------------ AVIANCA ---------------------------------------------------
-	elseif isPlayerInFaction(player, 35) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa piloto", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 61)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa piloto", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 61)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
------------------------------------------------------------ CARTEL DE SAPOS ---------------------------------------------------
-	elseif isPlayerInFaction(player, 48) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa sicario", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 273)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa sicario", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 273)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
-
------------------------------------------------------------ MANRRIQUE LA 45 ---------------------------------------------------
-	elseif isPlayerInFaction(player, 37) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Guerrillo", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 301)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Guerrillo", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 301)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
------------------------------------------------------------ FARC ---------------------------------------------------
-	elseif isPlayerInFaction(player, 11) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa trabajo", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 109)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa trabajo", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 109)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
------------------------------------------------------------ ORDEN MUNDIAL ---------------------------------------------------
-	elseif isPlayerInFaction(player, 26) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Guerrillo", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 210)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Guerrillo", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 210)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
------------------------------------------------------------ TRANSITO ---------------------------------------------------
-	elseif isPlayerInFaction(player, 33) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Transito", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 96)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Transito", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 96)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
------------------------------------------------------------ CJNG ---------------------------------------------------
-	elseif isPlayerInFaction(player, 10) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Sicario", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 73)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Sicario", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 73)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
------------------------------------------------------------ COSANOSTRA ---------------------------------------------------
-	elseif isPlayerInFaction(player, 13) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Sicario", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 161)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Sicario", player, 255, 255, 255)
-				outputChatBox("[2] Ropa Jefe", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 161)
-			elseif tipo == 2 then
-				setElementModel(player, 48)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
-		----------------------------------------------- MAFIA TURKA ---------------------------------------------------
-	elseif isPlayerInFaction(player, 47) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Sicario", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 39)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Sicario", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 39)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end  
-		----------------------------------------------- MAFIA GANISHKA ---------------------------------------------------
-	elseif isPlayerInFaction(player, 28) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Sicario", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 142)
-			elseif tipo == 2 then
-				setElementModel(player, 144)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa Sicario", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 142)
-			elseif tipo == 2 then
-				setElementModel(player, 144)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
------------------------------------------------------------ MECA ILEGAL ---------------------------------------------------
-	elseif isPlayerInFaction(player, 36) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa mecanico", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 305)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa mecanico", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 305)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
------------------------------------------------------------ Barrio A ---------------------------------------------------
-	elseif isPlayerInFaction(player, 39) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa chimba", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 14)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa chimba", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 14)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
------------------------------------------------------------ DEA ---------------------------------------------------
-	elseif isPlayerInFaction(player, 27) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Tienes varios uniformes a tu disposición.", player, 0, 255, 0)
-				outputChatBox("[1] Uniforme DEA 1", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 287)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Tienes varios uniformes a tu disposición.", player, 0, 255, 0)
-				outputChatBox("[1] Uniforme DEA 1", player, 255, 255, 255)
-				outputChatBox("[2] Uniforme DEA 2", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 113)
-			elseif tipo == 2 then
-				setElementModel(player, 12)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
------------------------------------------------------------ ELN ---------------------------------------------------
-	elseif isPlayerInFaction(player, 10) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa sicario", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 11)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa sicario", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 11)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
------------------------------------------------------------ PARACOS ---------------------------------------------------
-	elseif isPlayerInFaction(player, 44) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa sicario", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 142)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
-				outputChatBox("[1] Ropa sicario", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 142)
-			else
-				outputChatBox("¡Tipo incorrecto!", player, 255, 0, 0)
-				return
-			end
-		end 
--------------------------------------------------------------------------EJN--------------------------------------------------------
-	elseif isPlayerInFaction(player, 22) then
-		if tonumber(s.genero) == 2 then
-			if not tip then 
-	 			outputChatBox("Tienes varios uniformes a tu disposición.", player, 0, 255, 0)
-				outputChatBox("[1] Uniforme EJC 1", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 287)
-			else
-				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
-				return
-			end
-		else
-			if not tip then 
-	 			outputChatBox("Tienes varios uniformes a tu disposición.", player, 0, 255, 0)
-				outputChatBox("[1] Uniforme EJC 1", player, 255, 255, 255)
-				outputChatBox("[2] Uniforme EJC 2", player, 255, 255, 255)
-				outputChatBox("[3] Uniforme EJC 3", player, 255, 255, 255)
-				outputChatBox("[4] Uniforme EJC 4", player, 255, 255, 255)
-				outputChatBox("[5] Uniforme EJC 5", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 287)
-			elseif tipo == 2 then
-				setElementModel(player, 304)
-			elseif tipo == 3 then
-				setElementModel(player, 288)
-			elseif tipo == 4 then
-				setElementModel(player, 286)
-			elseif tipo == 5 then
+			elseif tipo == 7 then
+				setElementModel(player, 282)
+			elseif tipo == 8 then
+				setElementModel(player, 284)  
+			elseif tipo == 9 then
+				setElementModel(player, 285)
+			elseif tipo == 10 then
 				setElementModel(player, 283)
 			else
 				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
 				return
 			end
-		end 
--------------------------------------------------------------------------------------------------------------------------------------------
-elseif isPlayerInFaction(player, 25) then
+		end
+	elseif isPlayerInFaction(player, 2) then -- IDS: 274 a 279
 		if tonumber(s.genero) == 2 then
 			if not tip then 
-	 			outputChatBox("Tienes varios uniformes a tu disposición.", player, 0, 255, 0)
-				outputChatBox("[1] Uniforme Oficial", player, 255, 255, 255)
+	 			outputChatBox("Tienes varios uniformes a tu disposición. Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
+				outputChatBox("[1] Doctora.", player, 255, 255, 255)
+				outputChatBox("[2] Uniforme Bombero (Tierra)", player, 255, 255, 255)
+				outputChatBox("[3] Uniforme Bombero (Agua)", player, 255, 255, 255)
 				return
 			elseif tipo == 1 then
-				setElementModel(player, 38)
+				setElementModel(player, 278)
+			elseif tipo == 2 then
+				setElementModel(player, 277)
+			elseif tipo == 3 then
+				setElementModel(player, 279)
 			else
 				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
 				return
 			end
 		else
 			if not tip then 
-	 			outputChatBox("Tienes varios uniformes a tu disposición.", player, 0, 255, 0)
-				outputChatBox("[1] Uniforme Oficial", player, 255, 255, 255)
+	 			outputChatBox("Tienes varios uniformes a tu disposición. Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
+				outputChatBox("[1] Uniforme Aplicado a Ropa del PJ. (solo color negro)", player, 255, 255, 255)
+				outputChatBox("[2] Doctor Negro (Camisa Blanca)", player, 255, 255, 255)
+				outputChatBox("[3] Doctor Latino (Camisa Azul)", player, 255, 255, 255)
+				outputChatBox("[4] Doctor Blanco (Camisa Verde)", player, 255, 255, 255)
+				outputChatBox("[5] Uniforme Bombero (Tierra)", player, 255, 255, 255)
+				outputChatBox("[6] Uniforme Bombero (Agua)", player, 255, 255, 255)
 				return
 			elseif tipo == 1 then
-				setElementModel(player, 38)
+				setElementModel(player, 0)
+				addPedClothes(player, "medictr", "medictr", 17)
+			elseif tipo == 2 then
+				setElementModel(player, 274)
+			elseif tipo == 3 then
+				setElementModel(player, 275)
+			elseif tipo == 4 then
+				setElementModel(player, 276)
+			elseif tipo == 5 then
+				setElementModel(player, 277)
+			elseif tipo == 6 then
+				setElementModel(player, 279)
 			else
 				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
 				return
 			end
 		end 
-
----------------------------------------------------------------------------------------------------------------------
 	elseif isPlayerInFaction(player, 3) then -- IDS: 305, 309, 268, 50
-		if tonumber(s.genero) == 2 then
-			setElementModel(player, 69)
-		else
-			if not tip then 
-	 			outputChatBox("Tienes varios uniformes de trabajo a tu disposición.", player, 0, 255, 0)
-				outputChatBox("[1] Uniforme Mecanico", player, 255, 255, 255)
-				outputChatBox("[2] Uniforme Mecanico Directivos", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 309)
-			elseif tipo == 2 then
-				setElementModel(player, 50)
-			else
-				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
-				return
-			end
-		end
-		
-	elseif isPlayerInFaction(player, 43) then -- IDS: 305, 309, 268, 50
-		if tonumber(s.genero) == 2 then
-			setElementModel(player, 175)
-		else
-			if not tip then 
-	 			outputChatBox("Tienes varios uniformes de trabajo a tu disposición.", player, 0, 255, 0)
-				outputChatBox("[1] Uniforme Normal", player, 255, 255, 255)
-				outputChatBox("[2] Uniforme Jefe", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 175)
-			elseif tipo == 2 then
-				setElementModel(player, 174)
-			else
-				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
-				return
-			end
-		end
-	elseif isPlayerInFaction(player, 100) then 
-		if tonumber(s.genero) == 2 then
-			setElementModel(player, 175)
-		else
-			if not tip then 
-	 			outputChatBox("Tienes varios uniformes de trabajo a tu disposición.", player, 0, 255, 0)
-				outputChatBox("[1] Uniforme Normal", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 285)
-			else
-				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
-				return
-			end
-		end
-
-	elseif isPlayerInFaction(player, 35) then -- IDS: 305, 309, 268, 50
-		if tonumber(s.genero) == 2 then
-			setElementModel(player, 175)
-		else
-			if not tip then 
-	 			outputChatBox("Tienes varios uniformes de trabajo a tu disposición.", player, 0, 255, 0)
-				outputChatBox("[1] Uniforme Miembros", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 70)
-			else
-				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
-				return
-			end
-		end
-	elseif isPlayerInFaction(player, 37) then -- IDS: 305, 309, 268, 50
-		if tonumber(s.genero) == 2 then
-			setElementModel(player, 175)
-		else
-			if not tip then 
-	 			outputChatBox("Tienes varios uniformes de trabajo a tu disposición.", player, 0, 255, 0)
-				outputChatBox("[1] Uniforme Normal", player, 255, 255, 255)
-				return
-			elseif tipo == 1 then
-				setElementModel(player, 240)
-			else
-				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
-				return
-			end
-		end		
-		elseif isPlayerInFaction(player, 16) then -- IDS: 305, 309, 268, 50
 		if tonumber(s.genero) == 2 then
 			setElementModel(player, 69)
 		else
@@ -1456,18 +863,90 @@ elseif isPlayerInFaction(player, 25) then
 	 			outputChatBox("Tienes varios monos de trabajo a tu disposición. Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
 				outputChatBox("[1] Mono Aplicado a Ropa del PJ. (solo color negro)", player, 255, 255, 255)
 				outputChatBox("[2] Mono Mecánico (Latino)", player, 255, 255, 255)
+				--outputChatBox("[3] Mono Mecánico (Rubio)", player, 255, 255, 255)
+				outputChatBox("[4] Mono Mecánico (Gorro USA)", player, 255, 255, 255)
+				outputChatBox("[5] Mono Mecánico (Anciano)", player, 255, 255, 255)
 				return
 			elseif tipo == 1 then
-				setElementModel(player, 11)
+				setElementModel(player, 0)
 				addPedClothes(player, "garageleg", "garagetr", 17)
 			elseif tipo == 2 then
-				setElementModel(player, 0)
+				setElementModel(player, 50)
 			elseif tipo == 3 then
 				--setElementModel(player, 268)
 			elseif tipo == 4 then
-				setElementModel(player, 0)
+				setElementModel(player, 305)
 			elseif tipo == 5 then
+				setElementModel(player, 309)
+			else
+				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
+				return
+			end
+		end
+	elseif isPlayerInFaction(player, 5) then -- IDS: 185, 186, 187, 147, 163 - 166, 227, 228
+		if tonumber(s.genero) == 2 then -- 76, 141, 148, 150, 219
+			if not tip then 
+	 			outputChatBox("Tienes varios trajes a tu disposición. Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
+				outputChatBox("[1] Trajeada USA 1.", player, 255, 255, 255)
+				outputChatBox("[2] Trajeada USA 2", player, 255, 255, 255)
+				outputChatBox("[3] Trajeada Japonesa 1", player, 255, 255, 255)
+				outputChatBox("[4] Trajeada Japonesa 2", player, 255, 255, 255)
+				outputChatBox("[5] Trajeada Japonesa 3", player, 255, 255, 255)
+				return
+			elseif tipo == 1 then
+				setElementModel(player, 76)
+			elseif tipo == 2 then
+				setElementModel(player, 219)
+			elseif tipo == 3 then
+				setElementModel(player, 141)
+			elseif tipo == 4 then
+				setElementModel(player, 148)
+			elseif tipo == 5 then
+				setElementModel(player, 150)
+			else
+				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
+				return
+			end
+		else
+			if not tip then 
+	 			outputChatBox("Tienes varios trajes a tu disposición. Elige uno con /ropatrabajo [número]", player, 0, 255, 0)
+				outputChatBox("[1] Traje aplicado a Ropa del PJ (solo color negro).", player, 255, 255, 255)
+				outputChatBox("[2] Camisa rayas moradas", player, 255, 255, 255)
+				outputChatBox("[3] Trajeado Japonés 1", player, 255, 255, 255)
+				outputChatBox("[4] Trajeado Japonés 2", player, 255, 255, 255)
+				outputChatBox("[5] Trajeado Japonés 3", player, 255, 255, 255)
+				outputChatBox("[6] Trajeado Japonés 4", player, 255, 255, 255)
+				outputChatBox("[7] Trajeado Blanco", player, 255, 255, 255)
+				outputChatBox("[8] Seguridad 1", player, 255, 255, 255)
+				outputChatBox("[9] Seguridad 2", player, 255, 255, 255)
+				return
+			elseif tipo == 1 then
 				setElementModel(player, 0)
+				addPedClothes(player, "pimptr", "pimptr", 17)
+			elseif tipo == 2 then
+				setElementModel(player, 185)
+			elseif tipo == 3 then
+				setElementModel(player, 186)
+			elseif tipo == 4 then
+				setElementModel(player, 187)
+			elseif tipo == 5 then
+				setElementModel(player, 227)
+			elseif tipo == 6 then
+				setElementModel(player, 228)
+			elseif tipo == 7 then
+				setElementModel(player, 147)
+			elseif tipo == 8 then
+				if tonumber(s.color) == 1 then -- Blanco
+					setElementModel(player, 164)
+				else
+					setElementModel(player, 163)
+				end
+			elseif tipo == 9 then
+				if tonumber(s.color) == 1 then -- Blanco
+					setElementModel(player, 165)
+				else
+					setElementModel(player, 166)
+				end
 			else
 				outputChatBox("¡Tipo incorrecto! Usa /ropatrabajo para ver los tipos disponibles.", player, 255, 0, 0)
 				return
@@ -1508,7 +987,7 @@ elseif isPlayerInFaction(player, 25) then
 		end		
 	else
 		outputChatBox("Tu facción no tiene ninguna ropa de trabajo asignada.", player, 255, 0, 0)
-		outputChatBox("Si deseas comprar la skin, acude al discord.", player, 255, 255, 255)
+		outputChatBox("Si eres líder o dueño de facción, puedes solicitarlo en el CAU.", player, 255, 255, 255)
 		return
 	end
 	if tonumber(s.genero) == 1 and tonumber(s.color) == 1 and getElementModel(player) == 0 then
@@ -1517,7 +996,7 @@ elseif isPlayerInFaction(player, 25) then
 	exports.chat:me(player, "se pone su ropa de trabajo.")
 	outputChatBox("Usa /qrt para quitarte la ropa de trabajo.", player, 0, 255, 0)
 end
-addCommandHandler("rtrabajo", darRopaTrabajo)
+addCommandHandler("ropatrabajo", darRopaTrabajo)
 
 function toggleRopaTortura (player, cmd, tipo)
 	if isElementInWater(player) then outputChatBox("No puedes usar este comando en el agua.", player, 255, 0, 0) return end

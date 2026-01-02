@@ -1,8 +1,0 @@
-[2024-06-11 04:29:31] Cantidad $2000000 pagado a Leandro Cabrera.
-[2024-06-11 04:29:56] Cantidad $241334 pagado a Leandro Cabrera.
-[2024-06-13 01:37:43] Cantidad $3000000 pagado a Leandro Cabrera.
-[2024-06-13 01:45:23] Cantidad $2000000 pagado a Leandro Cabrera.
-[2024-06-13 01:48:49] Cantidad $5000000 pagado a Leandro Cabrera.
-[2024-06-13 01:51:11] Cantidad $2000000 pagado a Leandro Cabrera.
-[2024-06-13 02:04:37] Cantidad $3000000 pagado a Leandro Cabrera.
-[2024-06-14 00:19:09] Cantidad $1 pagado a Leandro Cabrera.

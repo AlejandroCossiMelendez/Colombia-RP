@@ -13,22 +13,22 @@ local druminteral = "img/cards.png"
 -- general settings 
 local settings = {}
 settings.drumColor = tocolor(0, 100, 255)
-settings.stake = 100000 -- starting stake
-settings.stakeMax = 1000000 -- maximum stake
-settings.stakeMin = 100000 -- minimum stake
-settings.stakeStep = 50000 -- step of a stake
+settings.stake = 5 -- starting stake
+settings.stakeMax = 100 -- maximum stake
+settings.stakeMin = 5 -- minimum stake
+settings.stakeStep = 5 -- step of a stake
 settings.font = "font/Roboto.ttf"
 settings.language = "english"
 settings.jackpotSound = "sounds/jackpot.ogg" -- SOURCE: https://www.freesound.org/people/Robinhood76/sounds/51671/ "This work is licensed under the Attribution Noncommercial License."
 settings.positionsCol = {  -- slot machine colshape positions
 	-- {x, y, z, size, dimension, interior}
-	{1124.87, 3, 1000.68, 0.5, 2482, 12},
-	{1125.89, 3, 1000.68, 0.5, 2482, 12},
-	{1126.93, 3, 1000.68, 0.5, 2482, 12},
-	{1127.92, 3, 1000.68, 0.5, 2482, 12},
-	{1132.89, -1.67, 1000.68, 0.5, 2482, 12},
-	{1134.94, 0.61, 1000.68, 0.5, 2482, 12},
-	{1135.09, -3.87, 1000.68, 0.5, 2482, 12},
+	{1124.87, 3, 1000.68, 0.5, 1, 12},
+	{1125.89, 3, 1000.68, 0.5, 1, 12},
+	{1126.93, 3, 1000.68, 0.5, 1, 12},
+	{1127.92, 3, 1000.68, 0.5, 1, 12},
+	{1132.89, -1.67, 1000.68, 0.5, 1, 12},
+	{1134.94, 0.61, 1000.68, 0.5, 1, 12},
+	{1135.09, -3.87, 1000.68, 0.5, 1, 12},
 	--[[
 	{1958.2,986.6,992.47,0.5, 1068, 10},
 	{1963.06,991.47,992.47,0.5, 1068, 10},
@@ -249,10 +249,10 @@ local function generateSets()
 		end
 		setSettings[i].speed = setSettings[i].speedBasic * 40
 	end
-	if getElementData(getLocalPlayer(), "gananciaCasino") and tonumber(getElementData(getLocalPlayer(), "gananciaCasino")) >= 100000 then -- El que mucho corre, pronto para :D
-		setList[1][setSettings[1].count - 1][3] = cards[math.random(1,6)][1]
-		setList[2][setSettings[2].count - 1][3] = cards[math.random(7,10)][1]
-		setList[3][setSettings[3].count - 1][3] = cards[math.random(11,15)][1]
+	if getElementData(getLocalPlayer(), "gananciaCasino") and tonumber(getElementData(getLocalPlayer(), "gananciaCasino")) >= 50000 then -- El que mucho corre, pronto para :D
+		setList[1][setSettings[1].count - 1][3] = cards[math.random(1,4)][1]
+		setList[2][setSettings[2].count - 1][3] = cards[math.random(5,8)][1]
+		setList[3][setSettings[3].count - 1][3] = cards[math.random(9,12)][1]
 	end
 	collectgarbage("collect")
 end
@@ -458,6 +458,7 @@ local function onPlayerLeave()
 	removeEventHandler("onClientRender", root, main)
 	setElementFrozen(localPlayer, false)
 	showChat(true)
+	setPlayerHudComponentVisible("all", true)
 	for k,v in ipairs(prizesPanel.labels) do
 		guiSetVisible(v, false)
 	end
@@ -553,6 +554,7 @@ local function showGUI(el, md)
 	addEventHandler("onClientRender", root, main)
 	setElementFrozen(localPlayer, true)
 	showChat(false)
+	setPlayerHudComponentVisible("all", false)
 	guiSetText(gui.labelMoney, getPlayerMoney().."$")
 	for k,v in ipairs(prizesPanel.labels) do
 		guiSetVisible(v, true)

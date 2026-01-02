@@ -1,5 +1,0 @@
-function AndrixxClient ()
-txd = engineLoadTXD("sunset02_law2.txd") 
-engineImportTXD(txd, 1 )
-end
-addEventHandler( "onClientResourceStart", resourceRoot, AndrixxClient )

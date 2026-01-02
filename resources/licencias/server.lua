@@ -1,5 +1,6 @@
-﻿function darlicenciaArmas ( thePlayer, commandName, otherPlayer, weaponID, cost )
-if not exports.factions:isPlayerInFaction(thePlayer, 1) then outputChatBox("No perteneces a la facción de Justicia.", thePlayer, 255, 0, 0) return end
+﻿
+function darlicenciaArmas ( thePlayer, commandName, otherPlayer, weaponID, cost )
+if not exports.factions:isPlayerInFaction(thePlayer, 6) then outputChatBox("No perteneces a la facción de Justicia.", thePlayer, 255, 0, 0) return end
 	if weaponID and tonumber(weaponID) and cost and tonumber(cost) and tonumber(cost) >= 0 and tonumber(weaponID) <= 46 and tonumber(weaponID) >= 0 then
 		if not otherPlayer then outputChatBox("Sintaxis: /"..commandName.." [jugador] [ID arma] [coste]", thePlayer, 255, 255, 255) return end
 		local other, name = exports.players:getFromName( thePlayer, otherPlayer )
@@ -31,10 +32,10 @@ if not exports.factions:isPlayerInFaction(thePlayer, 1) then outputChatBox("No p
 		outputChatBox("Sintaxis: /"..commandName.." [jugador] [ID arma] [coste]", thePlayer, 255, 255, 255)
 	end	
 end
-addCommandHandler ( "entregarlicenciaarmas", darlicenciaArmas )
+addCommandHandler ( "darlicenciaarmas", darlicenciaArmas )
 
 function quitarLicenciaArmas ( thePlayer, commandName, licenseID )
-if not exports.factions:isPlayerInFaction(thePlayer, 1) then outputChatBox("No perteneces a la facción de Justicia.", thePlayer, 255, 0, 0) return end
+if not exports.factions:isPlayerInFaction(thePlayer, 6) then outputChatBox("No perteneces a la facción de Justicia.", thePlayer, 255, 0, 0) return end
 	if licenseID and tonumber(licenseID) then
 		local sql = exports.sql:query_assoc_single("SELECT licenciaID FROM licencias_armas WHERE status = 0 AND licenciaID = "..tostring(licenseID))
 		if sql then

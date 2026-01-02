@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="ByCaiqueS" type="misc" name="[ByCaiqueS]" description="ByCaiqueS" />
-     <script src="script.lua" type="client" />
-     <file src="utilityvan.txd" />
-     <file src="utilityvan.dff" />
-</meta>

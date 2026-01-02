@@ -5,8 +5,12 @@
     <script src="armas_suelo.lua" />
     
     <script src="armasmod_c.lua" type="client" size="1137" />
+    <file src="Armas/22.txd" />
+    <file src="Armas/22.dff" />
     <file src="Armas/24.txd" />
     <file src="Armas/24.dff" />
+    <file src="Armas/31.txd" />
+    <file src="Armas/31.dff" />
     <file src="Armas/29.txd" />
     <file src="Armas/29.dff" />
     <file src="Armas/34.txd" />

@@ -1,4 +1,0 @@
-[2024-05-27 03:13:56] Cantidad $3600000 pagado a Juan Romes.
-[2024-05-27 03:13:58] Cantidad $3600000 pagado a Juan Romes.
-[2024-05-27 03:13:59] Cantidad $360000 pagado a Juan Romes.
-[2024-05-27 03:14:00] Cantidad $360000 pagado a Juan Romes.

@@ -62,8 +62,8 @@ addEventHandler( "players:register", root,
 								triggerClientEvent( source, "players:registrationResult", source, 0 ) -- Inicio de sesion automático.
 								exports.sql:query_free( "UPDATE wcf1_user SET regIP = '%s' WHERE username = '%s'", getPlayerIP(source), username )
 								exports.sql:query_free( "UPDATE wcf1_user SET regSerial = '%s' WHERE username = '%s'", getPlayerSerial(source), username )
-								outputChatBox ( "Bienvenid@ a VERSO ROLEPLAY.", source, 0, 255, 0 )
-								outputChatBox ( "Abre el panel -F1- Para ver una guia", source, 0, 255, 0)
+								outputChatBox ( "Bienvenido por primera vez a DownTown RolePlay.", source, 0, 255, 0 )
+								outputChatBox ( "Te recomendamos que utilices /duda para obtener asistencia", source, 0, 255, 0)
 							end 
 						else
 							triggerClientEvent( source, "players:registrationResult", source, 3 )

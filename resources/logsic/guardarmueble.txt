@@ -1,3 +1,0 @@
-[2023-11-09 14:27:06] Oscar Gomez guarda un/a Llaves de propiedad en el mueble. (ID Mueble: 63)
-[2023-11-09 14:48:04] Oscar Gomez guarda un/a Llaves de propiedad en el mueble. (ID Mueble: 9)
-[2023-11-09 14:49:13] GO Harry guarda un/a Llaves de propiedad en el mueble. (ID Mueble: 9)

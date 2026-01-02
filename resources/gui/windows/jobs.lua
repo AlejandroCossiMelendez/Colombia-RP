@@ -138,7 +138,7 @@ windows.jobs_pescador = {
 			{	
 				image = "images/okay.png",
 				title = "Conseguir empleo",
-				text = "Necesitas dinero? Te damos la oportunidad de \nconseguirlo manejando.",
+				text = "¿Necesitas dinero? Te damos la oportunidad de \nconseguirlo pescando.",
 				onHover = function( cursor, pos )
 					dxDrawRectangle( pos[1], pos[2], pos[3] - pos[1], pos[4] - pos[2], tocolor( unpack( { 75, 255, 75, 31 } ) ) )
 				end,
@@ -215,10 +215,11 @@ windows.jobs_repartidor = {
 	},
 }
 
-windows.jobs_butanero = {
+
+windows.jobs_conductor = {
 	{
 		type = "label",
-		text = "Repartidor Ilegal",
+		text = "Conductor",
 		font = "bankgothic",
 		alignX = "center",
 	},
@@ -235,7 +236,7 @@ windows.jobs_butanero = {
 				end,
 				onClick = function (key)
 					if key == 1 then
-						triggerServerEvent("onConseguirEmpleo", getLocalPlayer(), "Butanero")
+						triggerServerEvent("onConseguirEmpleo", getLocalPlayer(), "conductor")
 					end
 				end,
 			},
@@ -247,7 +248,53 @@ windows.jobs_butanero = {
 					dxDrawRectangle( pos[1], pos[2], pos[3] - pos[1], pos[4] - pos[2], tocolor( unpack( { 255, 75, 75, 31 } ) ) )
 				end,
 				onClick = function (key)
-					triggerServerEvent("onDejarEmpleo", getLocalPlayer(), "Butanero")
+					triggerServerEvent("onDejarEmpleo", getLocalPlayer(), "conductor")
+				end,
+				onCreate = function ()
+				table.insert( windows.jobs_conductor, closeButton )
+				end,
+			}
+		}
+	},
+	{
+	  closeButton
+	},
+}
+
+
+windows.jobs_butanero = {
+	{
+		type = "label",
+		text = "Butanero",
+		font = "bankgothic",
+		alignX = "center",
+	},
+	{
+		type = "pane",
+		panes = 
+		{
+			{	
+				image = "images/okay.png",
+				title = "Conseguir empleo",
+				text = "¿Necesitas dinero? Te damos la oportunidad de \nconseguirlo conduciendo.",
+				onHover = function( cursor, pos )
+					dxDrawRectangle( pos[1], pos[2], pos[3] - pos[1], pos[4] - pos[2], tocolor( unpack( { 75, 255, 75, 31 } ) ) )
+				end,
+				onClick = function (key)
+					if key == 1 then
+						triggerServerEvent("onConseguirEmpleo", getLocalPlayer(), "butanero")
+					end
+				end,
+			},
+			{	
+				image = "images/error.png",
+				title = "Dejar empleo",
+				text = "¿Has encontrado un trabajo mejor?¿No te llega el\nsueldo? Ha llegado la hora de que dejes tu empleo",
+				onHover = function( cursor, pos )
+					dxDrawRectangle( pos[1], pos[2], pos[3] - pos[1], pos[4] - pos[2], tocolor( unpack( { 255, 75, 75, 31 } ) ) )
+				end,
+				onClick = function (key)
+					triggerServerEvent("onDejarEmpleo", getLocalPlayer(), "butanero")
 				end,
 				onCreate = function ()
 				table.insert( windows.jobs_butanero, closeButton )
@@ -265,7 +312,7 @@ windows.jobs_butanero = {
 windows.jobs_basurero = {
 	{
 		type = "label",
-		text = "Veolia Medellin",
+		text = "Vertedero San Fierro",
 		font = "bankgothic",
 		alignX = "center",
 	},

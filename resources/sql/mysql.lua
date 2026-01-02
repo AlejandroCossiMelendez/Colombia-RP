@@ -24,10 +24,10 @@ local max_results = 3000
 -- connection functions
 local function connect( )
 
-	local server = "us-va-01.vexyhost.com"
-	local user = "u4936_axgeGewQsd"
-	local password = "5Pyep=tCGInHp@Hh2Q.Xs=Am"
-	local db = "s4936_cversorp"
+	local server = "127.0.0.1"
+	local user = "USUARIO_DB"
+	local password = "CLAVE_DB"
+	local db = "NOMBRE_DB"
 	local port = 3306
 	local socket = "/var/lib/mysql/mysql.sock"
 

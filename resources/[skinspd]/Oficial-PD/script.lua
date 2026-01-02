@@ -1,6 +1,0 @@
-addEventHandler('onClientResourceStart',resourceRoot,function () 
-txd = engineLoadTXD( 'ByWSx.txd' ) 
-engineImportTXD( txd, 282 ) 
-dff = engineLoadDFF('ByWSx.dff', 282) 
-engineReplaceModel( dff, 282 )
-end)

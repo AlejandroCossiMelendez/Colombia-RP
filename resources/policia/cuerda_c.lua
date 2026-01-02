@@ -123,12 +123,12 @@ function render()
 						
 						local speed = tonumber(getElementData(v,"abseilspeed"))
 						
-						if getPedControlState("forwards") and not getPedControlState("backwards") then
+						if getControlState("forwards") and not getControlState("backwards") then
 							speed = speed - (getTickCount()-tick)*0.0005
 							if speed < -0.4 then
 								speed = -0.4
 							end
-						elseif getPedControlState("backwards") and not getPedControlState("forwards") then
+						elseif getControlState("backwards") and not getControlState("forwards") then
 							speed = speed + (getTickCount()-tick)*0.0005
 							if speed > -0.1 then
 								speed = -0.1

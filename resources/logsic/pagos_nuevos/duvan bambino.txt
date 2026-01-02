@@ -1,4 +1,0 @@
-[2024-06-03 14:17:33] Cantidad $4000000 pagado a Samuel Marin.
-[2024-06-05 03:25:03] Cantidad $600000 pagado a Rolman Bambino.
-[2024-06-06 03:45:59] Cantidad $500000 pagado a Daniel Acosta.
-[2024-06-06 21:59:46] Cantidad $12590000 pagado a Daniel Acosta.

@@ -1,6 +1,15 @@
 dudauto = {
-	{pregunta = "hp", respuesta = "Especifica bien tu duda, para una mejor atencion"},
-	{pregunta = "puta", respuesta = "Usa el comando /conteomd"},
+	{pregunta = "foro", respuesta = "La dirección de nuestro foro es https://foro.dt-mta.com"},
+	{pregunta = "ts3", respuesta = "La dirección de nuestro TS3 es ts3.dt-mta.com"},
+	{pregunta = "ts", respuesta = "La dirección de nuestro TS3 es ts3.dt-mta.com"},
+	{pregunta = "teamspeak", respuesta = "La dirección de nuestro TS3 es ts3.dt-mta.com"},
+	{pregunta = "login", respuesta = "Intenta iniciar sesión ahora, sino reconecta"},
+	{pregunta = "sesion", respuesta = "Intenta iniciar sesión ahora, sino reconecta"},
+	{pregunta = "inventario", respuesta = "Prueba ahora, se ha aplicado un arreglo"},
+	{pregunta = "items", respuesta = "Prueba ahora, se ha aplicado un arreglo"},
+	{pregunta = "volcado", respuesta = "Al bajar del vehículo se desvuelca automáticamente"},
+	{pregunta = "volque", respuesta = "Al bajar del vehículo se desvuelca automáticamente"},
+	{pregunta = "trabajo", respuesta = "Usa /trabajos y si quieres uno mejor acude al foro http://foro.dt-mta.com"},
 }
 
 
@@ -19,7 +28,7 @@ end
 
 local function staffMessage( message )
 	for key, value in ipairs( getStaff( true ) ) do
-		outputChatBox( message, value, 65, 195, 255,true)
+		outputChatBox( message, value, 255, 204, 255,true)
 	end
 end
 
@@ -37,7 +46,7 @@ end
 
 local function adminMessage( message )
 	for key, value in ipairs( getAdmins( true ) ) do
-		outputChatBox( message, value, 65, 195, 255,true )
+		outputChatBox( message, value, 255, 204, 255,true )
 	end
 end
 
@@ -120,7 +129,7 @@ function resolverDuda(thePlayer, commandName, otherPlayer, ...)
 				end
 				-- Sistema AntiAbsusos de Dudas
 				if other == thePlayer then
-					banPlayer(thePlayer, true, true, true, "AntiSeteo Verso", "Seteo de Dudas Resueltas", 0)
+					banPlayer(thePlayer, true, true, true, "AntiAbuso DTRP", "Seteo de Dudas Resueltas", 0)
 				end
 				local dudaID = getElementData(other, "dudaID")
 				exports.sql:query_free("UPDATE `dudas` SET `userIDStaff` = '"..exports.players:getUserID(thePlayer).."',`dudaRespuesta` = '"..tostring(respuesta).."' WHERE `dudaID` = "..tostring(dudaID))
@@ -146,11 +155,11 @@ function gestionDudas(source)
 		for key2, value2 in ipairs( getElementsByType("player") ) do
 			if getElementData(value2, "laduda") then
 				hd = true
-				outputChatBox("[DUDA] [" .. exports.players:getID( value2 ) .. "] "  .. getPlayerName( value2 ):gsub( "_", " " ) .. " tiene una duda pendiente. Usa /gd " .. exports.players:getID( value2 ) .. " para saber qué pregunta.", source, 65, 195, 255)
+				outputChatBox("[DUDA] [" .. exports.players:getID( value2 ) .. "] "  .. getPlayerName( value2 ):gsub( "_", " " ) .. " tiene una duda pendiente. Usa /gd " .. exports.players:getID( value2 ) .. " para saber qué pregunta.", source, 255, 204, 255)
 			end
 		end
 		if hd == false then
-			outputChatBox("[DUDA] No hay dudas pendientes.",source, 65, 195, 255)
+			outputChatBox("[DUDA] No hay dudas pendientes.",source, 255, 204, 255)
 		end
 	else
 		outputChatBox("(( Acceso Denegado ))", source, 255, 0, 0)
@@ -164,9 +173,9 @@ function gestionarDuda (thePlayer, commandName, otherPlayer)
 		local other, name = exports.players:getFromName(thePlayer, otherPlayer, true)
 		if other and thePlayer then
 			if getElementData(other, "laduda") then
-				outputChatBox("[DUDA] ID [" .. exports.players:getID( other ) .. "] pregunta: ".. tostring(getElementData(other, "laduda")), thePlayer, 65, 195, 255)
+				outputChatBox("[DUDA] ID [" .. exports.players:getID( other ) .. "] pregunta: ".. tostring(getElementData(other, "laduda")), thePlayer, 255, 204, 255)
 			else
-				outputChatBox("[DUDA] Este jugador no tiene una duda pendiente.",thePlayer, 65, 195, 255)
+				outputChatBox("[DUDA] Este jugador no tiene una duda pendiente.",thePlayer, 255, 204, 255)
 			end
 		end
 	else

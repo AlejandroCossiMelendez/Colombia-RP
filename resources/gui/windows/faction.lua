@@ -56,8 +56,8 @@ windows.faction =
 		type = "grid",
 		columns =
 		{
-			{ name = "Miembro", width = 0.2 },
-			{ name = "Prioridad", width = 0.2, alignX = "center" },
+			{ name = "Nombre", width = 0.2 },
+			{ name = "Derechos", width = 0.2, alignX = "center" },
 			{ name = "Rango", width = 0.2, alignX = "center" },
 			{ name = "Sueldo", width = 0.2, alignX = "center" },
 			{ name = "Actividad", width = 0.2, alignX = "center" }
@@ -329,7 +329,7 @@ function updateFaction( fnum, members, presupuesto, name, ranks )
 			end
 			local function click( ) 
 			local sueldo = tonumber(guiGetText( destroy[ "g:faction_sueldo:cantidad" ] ))
-				if sueldo and math.floor(sueldo) > 100001 and math.floor(sueldo) < 500001 then
+				if sueldo and math.floor(sueldo) > 199 and math.floor(sueldo) < 801 then
 					hide( )
 					triggerServerEvent( "faction:cambiarsueldo", localPlayer, fnum, getElementData(localPlayer, "nsueldo"), math.floor(sueldo) )
 					triggerServerEvent( "faction:show", localPlayer, -fnum )
@@ -345,7 +345,7 @@ function updateFaction( fnum, members, presupuesto, name, ranks )
 			},
 			{
 				type = "label",
-				text = "Máximo 500,000$ y mínimo 100,000$.",
+				text = "Máximo 800$ y mínimo 200$.",
 				alignX = "center",
 			},
 			{

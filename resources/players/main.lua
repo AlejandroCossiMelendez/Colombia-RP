@@ -28,11 +28,11 @@ p = { }
 -- Import Groups
 -- CONTRA PRIORITY MAS BAJO, QUIERE DECIR QUE TIENE MAS PRIORIDAD
 local groups = {
-	{ groupName = "Developers", groupID = 1, aclGroup = "Desarrollador", displayName = "Admin Supremo", nametagColor = { 0, 0, 0 }, priority = 2 },
-	{ groupName = "MTA Administrators", groupID = 2, aclGroup = "Administrador", displayName = "Administrador", nametagColor = { 114, 255, 48 }, priority = 1 },
-	{ groupName = "MTA Moderators", groupID = 16, aclGroup = "Moderador", displayName = "Moderador", nametagColor = { 38, 255, 136 }, priority = 4 },
-	{ groupName = "GameOperator", groupID = 3, aclGroup = "GameOperator", displayName = "GameOperator", nametagColor = { 255, 155, 0 }, priority = 3 },
-	{ groupName = "Helper", groupID = 12, aclGroup = "Helper", displayName = "Ayudante", nametagColor = { 53, 228, 146 }, priority = 5 },
+	{ groupName = "Developers", groupID = 1, aclGroup = "Desarrollador", displayName = "Desarrollador", nametagColor = { 0, 255, 60 }, priority = 2 },
+	{ groupName = "MTA Administrators", groupID = 2, aclGroup = "Administrador", displayName = "Administrador", nametagColor = { 127, 255, 127 }, priority = 1 },
+	{ groupName = "MTA Moderators", groupID = 17, aclGroup = "Moderador", displayName = "Moderador", nametagColor = { 247, 157, 47 }, priority = 4 },
+	{ groupName = "GameOperator", groupID = 3, aclGroup = "GameOperator", displayName = "GameOperator", nametagColor = { 255, 71, 71 }, priority = 3 },
+	{ groupName = "Helper", groupID = 12, aclGroup = "Helper", displayName = "Helper", nametagColor = { 3, 177, 252 }, priority = 5 },
 }
 
 local function updateNametagColor( player )
@@ -49,7 +49,7 @@ local function updateNametagColor( player )
 				end
 			end
 		elseif getOption( player, "vip" ) then
-			nametagColor = { 120, 20, 255 }
+			nametagColor = { 180, 0, 255 }
 			nametagColor.priority = 50
 		end
 	end
@@ -116,7 +116,7 @@ local function aclUpdate( player, saveAclIfChanged )
 										outputChatBox("MODO DE EMERGENCIA: por seguridad sólo se puede acceder desde el PC que registró la cuenta.", player, 255, 0, 0)
 										outputChatBox("Sus datos (IP, Serial) serán grabados por seguridad. Su sesión ha sido cerrada. Contacte con Jefferson.", player, 255, 0, 0)
 										--outputChatBox("Puede usar /clogin [codigo] para permitir el login desde este PC temporalmente.", player, 0, 255, 0)
-										exports.logsic:addLogMessage("cuentastaff", "Cuenta: " .. info.username .. " IP:" .. getPlayerIP(player) .. " Serial: " .. getPlayerSerial(player))
+										exports.logs:addLogMessage("cuentastaff", "Cuenta: " .. info.username .. " IP:" .. getPlayerIP(player) .. " Serial: " .. getPlayerSerial(player))
 										logOut(player)
 										triggerEvent( "onCharacterLogout", player )
 										setPlayerTeam( player, nil )
@@ -329,13 +329,13 @@ local function showLoginScreen( player, screenX, screenY, token, ip )
 	toggleAllControls( player, false, true, false )
 	
 	
-	spawnPlayer( source, 262.8056640625, -76.7841796875, 2.9544613361359 )
+	spawnPlayer( source, 2638.927734375, -23.5126953125, 82.537460327148, 198.10025024414, 0, 0, 1 )
 	setElementFrozen( source, true )
 	setElementAlpha( source, 0 )
 	setCameraInterior( source, 0 )
 	setElementDimension( source , 0)
 
-	setCameraMatrix( source, 2124.322265625, 1897.1611328125, 23.335201263428, 0, 0, 0, 0, 70)
+	setCameraMatrix( source, 2638.927734375, -23.5126953125, 82.543014526367, 2546.4130859375, 14.1376953125, 77.696334838867, 0, 70)
 	setPlayerNametagColor( source, 127, 127, 127 )
 	-- check for ip/serial bans
 	if exports.sql:query_assoc_single( "SELECT * FROM wcf1_user WHERE banned = 1 AND ( lastIP = '%s' OR lastSerial = '%s' )", getPlayerIP( player ), getPlayerSerial( player ) ) then
@@ -628,7 +628,7 @@ addEventHandler( getResourceName( resource ) .. ":spawn", root,
 						setCameraInterior( source, char.interior )
 					end 
 					if char.nuevo == 1 then
-						spawnPlayer( source, 2285.0244140625, -77.7734375, 26.484375, 0, 0, 0 )
+						spawnPlayer( source, 2260.63, -87.93, 26.45, 179.428710937, 0, 0, 0 )
 						fadeCamera( source, true )
 						setCameraTarget( source, source )
 						setCameraInterior( source, 0 )
@@ -760,11 +760,11 @@ addEventHandler( getResourceName( resource ) .. ":spawn", root,
 					
 					-- set last login to now
 					exports.sql:query_free( "UPDATE characters SET lastLogin = NOW() WHERE characterID = " .. tonumber( charID ) )
-					exports.logsic:addLogMessage("login", char.characterName.. " ha logueado. IP: "..getPlayerIP(source)..". Serial: "..getPlayerSerial(source)..".\n")
-					--[[if char.condiciones < exports.condiciones:getVersion() then
+					exports.logs:addLogMessage("login", char.characterName.. " ha logueado. IP: "..getPlayerIP(source)..". Serial: "..getPlayerSerial(source)..".\n")
+					if char.condiciones < exports.condiciones:getVersion() then
 						local cons = exports.sql:query_assoc_single("SELECT * FROM `condiciones` ORDER BY `condiciones`.`version` DESC LIMIT 1")
 						triggerClientEvent("onMostrarCondiciones", source, tostring(cons.version), tostring(cons.texto))
-                    end]]
+                    end
 				end
 			end
 		end

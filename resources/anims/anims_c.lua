@@ -25,19 +25,19 @@ addEventHandler( "onClientRender", root,
 			if getElementData(localPlayer, "muerto") == true then
 				return
 			else
-				textanim = "Parar animaci�n con ( Espacio )."
+				textanim = "Pulsa espacio para parar la animación."
 			end
 			if getElementData(localPlayer, "tazed") == true then
-				textanim = "Estas tazeado."
+				textanim = "Estás tazeado."
 			elseif getElementData(localPlayer, "sexbot") == true then
 				textanim = "Di al bot terminar para parar."
 			--elseif getElementData(localPlayer, "muerto") == true then
-				--textanim = "Estas gravemente herido o muerto. No puedes moverte."
+				--textanim = "Estás gravemente herido o muerto. No puedes moverte."
 			elseif getElementData(localPlayer, "gym_bici_estatica") == true or getElementData(localPlayer, "gym_banco_pesas") == true then
 				textanim = "Pulsa espacio para dejar de hacer ejercicio."
 			end
-			dxDrawText( textanim, 4, 4, screenX, screenY * 0.95 + 2, tocolor( 0, 0, 0, 255 ), 1.3, "optima", "center", "bottom", false, false, true )
-			dxDrawText( textanim, 0, 0, screenX, screenY * 0.95, tocolor( 251, 255, 0, 255 ), 1.3, "optima", "center", "bottom", false, false, true )
+			dxDrawText( textanim, 4, 4, screenX, screenY * 0.95 + 2, tocolor( 0, 0, 0, 255 ), 1, "pricedown", "center", "bottom", false, false, true )
+			dxDrawText( textanim, 0, 0, screenX, screenY * 0.95, tocolor( 255, 255, 255, 255 ), 1, "pricedown", "center", "bottom", false, false, true )
 		end
 	end
 )
@@ -51,7 +51,7 @@ function verAnimaciones ()
 	outputChatBox ("/crack [1-5] /escuchar /gritar /animar [1-2] /asustado [1-2]", 0, 255, 0)
 	outputChatBox ("También puedes usar /anims para ver un panel con TODAS las animaciones.", 255, 255, 0)
 end
-addCommandHandler ("anims", verAnimaciones)
+addCommandHandler ("veranims", verAnimaciones)
 addCommandHandler ("veranimaciones", verAnimaciones)
 
 -- Sistema de animaciones tipo GUI --
@@ -89,7 +89,7 @@ function dumpXMLToTable(parentNode, key)
 end
 
 function ani_start()
-	ani_window = guiCreateWindow(0.8,0.30,0.20,0.40,"Panel De Animaciones",true)
+	ani_window = guiCreateWindow(0.8,0.30,0.20,0.40,"Animaciones - DownTown RolePlay",true)
 		guiWindowSetSizable(ani_window,false)
    
 	ani_tab_panel = guiCreateTabPanel(0.05, 0.07, 0.90, 0.90, true, ani_window)
@@ -314,5 +314,5 @@ function ani_init()
 		ani_zamknij()
 	end
 end
-addCommandHandler("panims", ani_init)
-addCommandHandler("panimaciones", ani_init)
+addCommandHandler("anims", ani_init)
+addCommandHandler("animaciones", ani_init)

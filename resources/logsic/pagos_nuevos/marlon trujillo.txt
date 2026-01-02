@@ -1,7 +1,0 @@
-[2024-06-15 21:34:30] Cantidad $5000000 pagado a Roberto Garcia.
-[2024-06-16 17:48:03] Cantidad $100000 pagado a Juan Olarte.
-[2024-06-17 03:27:33] Cantidad $9000000 pagado a Valentin Perez.
-[2024-06-17 04:22:03] Cantidad $9000000 pagado a Mattew Hanibal.
-[2024-06-17 04:31:17] Cantidad $3000000 pagado a Mattew Hanibal.
-[2024-06-17 05:45:28] Cantidad $280000 pagado a Fernando Vidal.
-[2024-06-17 06:23:07] Cantidad $5000000 pagado a Fermin Alberto.

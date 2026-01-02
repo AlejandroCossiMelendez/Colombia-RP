@@ -1,8 +1,0 @@
-[2024-05-30 22:21:11] Cantidad $2000000 pagado a Andres Grienko.
-[2024-05-30 22:41:47] Cantidad $700000 pagado a Davinsito Towers VIP.
-[2024-06-01 01:20:37] Cantidad $25000000 pagado a Sebastian Hernandez.
-[2024-06-01 02:45:14] Cantidad $10000000 pagado a Johan Brooks VIP.
-[2024-06-01 03:09:19] Cantidad $50000000 pagado a Wilbert Ulerio.
-[2024-06-01 04:49:37] Cantidad $20000000 pagado a Pablo Villas.
-[2024-06-01 19:30:03] Cantidad $10500000 pagado a Chapo Guzman..
-[2024-06-01 19:38:13] Cantidad $5000000 pagado a Javier Morales.

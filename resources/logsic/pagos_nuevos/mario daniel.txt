@@ -1,7 +1,0 @@
-[2024-06-16 22:04:39] Cantidad $8000000 pagado a Mateo Restrepo.
-[2024-06-16 22:13:16] Cantidad $400000 pagado a Mateo Restrepo.
-[2024-06-16 22:25:59] Cantidad $9000000 pagado a Mateo Restrepo.
-[2024-06-17 03:23:26] Cantidad $500000 pagado a Adolfo Hitler.
-[2024-06-17 17:31:43] Cantidad $7000000 pagado a Mateo Restrepo.
-[2024-06-17 17:32:16] Cantidad $1000000 pagado a Mateo Restrepo.
-[2024-06-17 17:35:16] Cantidad $300000 pagado a Mateo Restrepo.

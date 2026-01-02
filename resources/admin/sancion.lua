@@ -1,23 +1,23 @@
 
 local sanciones = {
 	[-1] = "Liberación de Jail",
-	[1] = "#1 DM / TTO",
+	[1] = "#1 DM",
 	[2] = "#2 PG / Forzar Rol",
-	[3] = "#3 MG / MG2",
-	[4] = "#4 RK / SK / CK / TK",
-	[5] = "#5 Flamming / IOOC / Mentir o ignorar Staff/AIOOC",
-	[6] = "#6 IHQ / AHQ / ICN / RSL",
-	[7] = "#7 Troll / BD / CJ / VDM",
-	[8] = "#8 Flood / SPAM / PI)",
-	[9] = "#9 BA / AA2 / LA",
+	[3] = "#3 MG",
+	[4] = "#4 RK",
+	[5] = "#5 Flamming / IOOC / Mentir o ignorar Staff",
+	[6] = "#6 Abuso Canal OOC / Cortar Rol",
+	[7] = "#7 Troll / BD / CJ",
+	[8] = "#8 SPAM (Publicidad)",
+	[9] = "#9 BA",
 	[10] = "#10 Multicuentas",
-	[11] = "#11 NRA / NRH / NRE / NRC",
+	[11] = "#11 NRE / NRH / NRC",
 	[12] = "#12 Evasión De Rol",
 	[13] = "#13 Reporte Innecesario (Reportante)",
-	[14] = "#14 NIP / NVVPJ / ZZ",
-	[15] = "#15 MUD / MUA / MUT",
-	[16] = "#16 BJ / CA",
-	[17] = "#17 MUDVT / AVP",
+	[14] = "#14 NA",
+	[15] = "#15 Mal Uso /AD",
+	[16] = "#16 Tener 2 PJ en una facción",
+	[17] = "#17 Fuera de Zona de Rol",
 	[18] = "#18 Buen rol / buena actuación",
 }
 --[[
@@ -144,187 +144,175 @@ Tipo 4 = Punto positivo, sin sancion
 ]]
 function calcularSancion(player, norma)
 	local vez = getVecesSancionado(player, norma)+1
-	if norma == 1 then -- #1 DM / TTO
+	if norma == 1 then -- #1 DM / DMCar
 		if vez == 1 then 
 			return 1, 10
 		elseif vez == 2 then
-			return 1, 18
-		elseif vez == 3 then
-			return 1, 25
-		elseif vez == 4 then
-			return 1, 28
-		elseif vez == 5 then
-			return 1, 32
-		elseif vez >= 6 then
-			return 1, 45
-		end
-	elseif norma == 2 then -- #2 PG / Forzar Rol
-		if vez == 1 then 
-			return 1, 15
-		elseif vez == 2 then
 			return 1, 20
 		elseif vez == 3 then
-			return 1, 35
-		elseif vez == 4 then
 			return 1, 40
+		elseif vez == 4 then
+			return 1, 80
 		elseif vez == 5 then
-			return 1, 50
+			return 1, 120
 		elseif vez >= 6 then
-			return 1, 55
+			return 1, 150
 		end
-	elseif norma == 3 then -- #3 MG / MG2
+	elseif norma == 2 then -- #2 PG
 		if vez == 1 then 
 			return 1, 10
 		elseif vez == 2 then
 			return 1, 20
 		elseif vez == 3 then
-			return 1, 25
+			return 1, 60
 		elseif vez == 4 then
+			return 1, 100
+		elseif vez == 5 then
+			return 1, 140
+		elseif vez >= 6 then
+			return 1, 200
+		end
+	elseif norma == 3 then -- #3 MG / MK
+		if vez == 1 then 
+			return 1, 10
+		elseif vez == 2 then
+			return 1, 20
+		elseif vez == 3 then
+			return 1, 40
+		elseif vez == 4 then
+			return 1, 100
+		elseif vez == 5 then
+			return 1, 150
+		elseif vez >= 6 then
+			return 1, 200
+		end
+	elseif norma == 4 then -- #4 RK
+		if vez == 1 then 
 			return 1, 30
-		elseif vez == 5 then
-			return 1, 35
-		elseif vez >= 6 then
-			return 1, 40
-		end
-	elseif norma == 4 then -- #4 RK / SK / CK / TK
-		if vez == 1 then 
-			return 1, 12
 		elseif vez == 2 then
-			return 1, 24
+			return 1, 60
 		elseif vez == 3 then
-			return 1, 37
+			return 1, 90
 		elseif vez == 4 then
-			return 1, 42
+			return 1, 140
 		elseif vez == 5 then
-			return 1, 52
+			return 1, 180
 		elseif vez >= 6 then
-			return 1, 55
+			return 1, 300
 		end
 	elseif norma == 5 then -- #5 Faltas Respeto / Mentir o ignorar Staff
 		if vez == 1 then 
-			return 1, 20
-		elseif vez == 2 then
-			return 1, 25
-		elseif vez == 3 then
 			return 1, 30
+		elseif vez == 2 then
+			return 1, 60
+		elseif vez == 3 then
+			return 1, 150
 		elseif vez == 4 then
-			return 1, 35
+			return 1, 300
 		elseif vez >= 5 then
-			return 2, 40
+			return 2, 10080
 		end
 	elseif norma == 6 then -- #6 Abuso Canal OOC / Cortar Rol
 		if vez == 1 then 
-			return 1, 10
+			return 1, 20
 		elseif vez == 2 then
-			return 1, 17
+			return 1, 40
 		elseif vez == 3 then
-			return 1, 23
+			return 1, 120
 		elseif vez == 4 then
-			return 1, 29
+			return 1, 300
 		elseif vez >= 5 then
-			return 1, 35
+			return 1, 500
 		end
 	elseif norma == 7 then -- #7 Troll / BD / CJ
 		if vez == 1 then 
 			return 1, 5
 		elseif vez == 2 then
-			return 1, 9
-		elseif vez == 3 then
-			return 1, 12
-		elseif vez == 4 then
-			return 1, 15
-		elseif vez == 5 then
 			return 1, 20
+		elseif vez == 3 then
+			return 1, 40
+		elseif vez == 4 then
+			return 1, 80
+		elseif vez == 5 then
+			return 1, 120
 		elseif vez >= 6 then
-			return 1, 30
+			return 1, 300
 		end
 	elseif norma == 8 then -- #8 SPAM
 		if vez == 1 then 
-			return 1, 30
+			return 2, 1440
 		elseif vez == 2 then
-			return 1, 40
+			return 2, 7200
 		elseif vez == 3 then
-			return 1, 50
-		elseif vez == 4 then
-			return 1, 60
-		elseif vez == 5 then
-			return 1, 65
-		elseif vez >= 6 then
-			return 1, 70
+			return 2, 43200
+		elseif vez >= 4 then
+			return 2, 259200
 		end
 	elseif norma == 9 then -- #9 BA
 		if vez == 1 then 
-			return 1, 17
+			return 3, 10080
 		elseif vez == 2 then
-			return 1, 22
+			return 3, 21600
 		elseif vez == 3 then
-			return 1, 25
-		elseif vez == 4 then
-			return 1, 30
-		elseif vez == 5 then
-			return 1, 32
-		elseif vez >= 6 then
-			return 1, 38
+			return 3, 57600
+		elseif vez >= 4 then
+			return 3, 259200
 		end
 	elseif norma == 10 then -- #10 Multicuentas
 		if vez == 1 then 
-			return 3, 60
+			return 3, 10080
 		elseif vez == 2 then
-			return 3, 70
+			return 3, 21600
 		elseif vez == 3 then
-			return 3, 80
+			return 3, 57600
 		elseif vez >= 4 then
-			return 3, 90
+			return 3, 259200
 		end
 	elseif norma == 11 then -- #11 NRE / NRH / NRC
 		if vez == 1 then 
-			return 1, 10
-		elseif vez == 2 then
-			return 1, 15
-		elseif vez == 3 then
 			return 1, 20
+		elseif vez == 2 then
+			return 1, 40
+		elseif vez == 3 then
+			return 1, 120
 		elseif vez == 4 then
-			return 1, 25
+			return 1, 300
 		elseif vez >= 5 then
-			return 1, 30
+			return 1, 500
 		end
 	elseif norma == 12 then -- #12 Evasión de Rol
 		if vez == 1 then 
-			return 1, 30
+			return 1, 20
 		elseif vez == 2 then
 			return 1, 40
 		elseif vez == 3 then
-			return 1, 50
+			return 1, 120
 		elseif vez == 4 then
-			return 1, 60
+			return 1, 300
 		elseif vez >= 5 then
-			return 1, 70
+			return 1, 500
 		end
 	elseif norma == 13 then -- #13 Reporte Innecesario (Reportante)
 		if vez == 1 then 
-			return 1, 10
+			return 1, 5
 		elseif vez == 2 then
 			return 1, 20
 		elseif vez == 3 then
-			return 1, 30
-		elseif vez == 4 then
 			return 1, 40
+		elseif vez == 4 then
+			return 1, 60
 		elseif vez >= 5 then
-			return 1, 50
+			return 1, 80
 		end
 	elseif norma == 14 then -- #14 NA
 		if vez == 1 then 
-			return 1, 12
+			return 3, 10080
 		elseif vez == 2 then
-			return 1, 20
+			return 3, 21600
 		elseif vez == 3 then
-			return 1, 27
-		elseif vez == 4 then
-			return 1, 30
-		elseif vez == 5 then
-			return 1, 35
-		elseif vez >= 6 then
-			return 1, 40
+			return 3, 57600
+		elseif vez >= 4 then
+			return 3, 259200
 		end
 	elseif norma == 15 then -- #15 Mal Uso /AD
 		if vez == 1 then 
@@ -332,22 +320,22 @@ function calcularSancion(player, norma)
 		elseif vez == 2 then
 			return 1, 15
 		elseif vez == 3 then
-			return 1, 20
+			return 1, 40
 		elseif vez >= 4 then
-			return 1, 30
+			return 1, 60
 		end
 	elseif norma == 16 then -- #16 Tener 2 PJ en una facción
 		if vez == 1 then 
-			return 1, 14
+			return 1, 25
 		elseif vez == 2 then
-			return 1, 23
+			return 1, 85
 		elseif vez == 3 then
-			return 1, 35
+			return 1, 300
 		elseif vez >= 4 then
-			return 2, 40
+			return 2, 10080
 		end
 	elseif norma == 17 then -- #17 Fuera de Zona de Rol
-		return 1, 7
+		return 1, 20
 	elseif norma == 18 then -- #18 Buen rol / buena actuación
 		return 4, 1
 	else

@@ -185,13 +185,6 @@ windows.maletero_coger =
 		onClick = function( ) hide( ) showCursor( false ) triggerServerEvent("onRolDeCerrarMaletero", getLocalPlayer()) triggerServerEvent("onCerrarMaletero", getLocalPlayer()) end,
 	},
 }
-function cerrarGUIdeMaletero()
-    -- Aquí colocas el código para cerrar la GUI y ejecutar las acciones asociadas
-    hide() -- Suponiendo que 'hide()' sea una función para ocultar la GUI
-    showCursor(false)
-    triggerServerEvent("onRolDeCerrarMaletero", getLocalPlayer())
-    triggerServerEvent("onCerrarMaletero", getLocalPlayer())
-end
 
 function updateMaletero()
 	local t = exports.vehicles:getMaletero()

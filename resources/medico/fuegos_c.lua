@@ -1,6 +1,6 @@
 local fireModel = 2023
 
-function iniciarFuegosAntiHackers (fX,fY,fZ)
+function startTheFire (fX,fY,fZ)
     setTimer ( function()
 		createFire(fX,fY,fZ,60)
 	end, 420000, 1)
@@ -17,5 +17,5 @@ function iniciarFuegosAntiHackers (fX,fY,fZ)
 	local fire = engineLoadDFF("fire.dff",1)
 	engineReplaceModel(fire,fireModel)
 end
-addEvent("iniciarFuegosAntiHackers",true)
-addEventHandler( "iniciarFuegosAntiHackers", getRootElement(), iniciarFuegosAntiHackers)
+addEvent("startTheFire",true)
+addEventHandler( "startTheFire", getRootElement(), startTheFire)

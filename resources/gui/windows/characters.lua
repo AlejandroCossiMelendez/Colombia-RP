@@ -66,8 +66,8 @@ function updateCharacters( characters )
 	end
 	
 	-- add new char & logout
-	if c < 2 then
-		add( "Nuevo Personaje", "Seleciona esta opción para crear un nuevo personaje. Máximo 2 por cuenta.", -1, -1 )
+	if c < 3 then
+		add( "Nuevo Personaje", "Seleciona esta opción para crear un nuevo personaje. Máximo 3 por cuenta.", -1, -1 )
 	end
 	add( "Desconectar", "Esta opción es para desconectarse.\nDeberás de volver a iniciar sesión.", -2, -2 )
 	

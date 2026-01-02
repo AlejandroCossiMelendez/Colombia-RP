@@ -1,6 +1,0 @@
-[2024-06-12 00:37:50] Cantidad $270000 pagado a Liam Geniuz.
-[2024-06-12 17:18:37] Cantidad $1000000 pagado a Neide Sol.
-[2024-06-12 17:18:43] Cantidad $10000000 pagado a Neide Sol.
-[2024-06-13 01:55:05] Cantidad $500000 pagado a Liam Geniuz.
-[2024-06-13 02:04:49] Cantidad $100000 pagado a Liam Geniuz.
-[2024-06-14 19:24:35] Cantidad $98000000 pagado a Liam Geniuz.

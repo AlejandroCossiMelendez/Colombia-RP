@@ -1,6 +1,0 @@
-﻿<meta>
-     <info author="SerjaoModder" type="misc" name="SerjaoModder" description="SerjaoModder" />
-     <script src="script.lua" type="client" />
-     <file src="yosemite.txd" />
-     <file src="yosemite.dff" />
-</meta>

@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="Mexico RolePlay" type="misc" name="SOLO MEXICO" description="MEXICO ALV" />
-     <script src="script.lua" type="client" />
-     <file src="vehiculo.txd" />
-     <file src="vehiculo.dff" />
-</meta>

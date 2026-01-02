@@ -1,6 +1,6 @@
-tx1 = "" --- the text up
-tx2 = "" --- the text in medium
-tx3 = "" --- the text under
+tx1 = "Bienvenid@ a DownTown RolePlay" --- the text up
+tx2 = "Estamos preparando todo para jugar" --- the text in medium
+tx3 = "Mientras, visita foro.dt-mta.com" --- the text under
 
 dis = textCreateDisplay()
 sx1 = textCreateTextItem(tx1, 0.1, 0.15, "medium", 0, 0, 0, 255, 3, "left", "top", 127)
@@ -77,7 +77,7 @@ addEventHandler("onPlayerJoin",root,
 		fadeCamera(source, true, 5)
 		setElementInterior(source,0)
 		setElementDimension(source,0)
-		setCameraMatrix( source, 2121.98046875, 1906.1630859375, 22.956468582153, 2121.98046875, 1906.1630859375, 22.956468582153, 0, 70)
+		setCameraMatrix( source, 2638.927734375, -23.5126953125, 82.543014526367, 2546.4130859375, 14.1376953125, 77.696334838867, 0, 70)
 		--setCameraMatrix( source, 1570.5653076172, -1786.5192871094, 205.96751403809, 1648.2738037109, -1730.7985839844, 176.69990539551, 0, 70)
 	end
 )

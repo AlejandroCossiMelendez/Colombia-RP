@@ -1,6 +1,0 @@
-﻿<meta>
-     <info author="Serjao" type="misc" name="Serjao" description="Serjao" />
-     <script src="script.lua" type="client" />
-     <file src="skin.txd" />
-     <file src="skin.dff" />
-</meta>

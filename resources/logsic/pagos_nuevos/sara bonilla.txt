@@ -1,4 +1,0 @@
-[2024-05-27 15:58:38] Cantidad $1630700 pagado a Juan Lesito.
-[2024-05-27 16:16:37] Cantidad $150000 pagado a Valentin Perez.
-[2024-05-27 16:16:47] Cantidad $1000000 pagado a Valentin Perez.
-[2024-05-27 16:24:36] Cantidad $2000000 pagado a Valentin Perez.

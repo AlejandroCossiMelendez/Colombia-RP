@@ -1,7 +1,7 @@
 ﻿local localPlayer = getLocalPlayer()
              
 function solicitarLicencia(cmd, licencia)
-	if getElementDimension(localPlayer) ~= 71 then outputChatBox("¡No estás en la autoescuela!", 255, 0, 0) return end
+	if getElementDimension(localPlayer) ~= 60 then outputChatBox("¡No estás en la autoescuela!", 255, 0, 0) return end
 	if not licencia then
 		outputChatBox("Listado de Licencias Disponibles", 255, 255, 0)
 		outputChatBox("Usa /licencia [ID de licencia] para acceder.", 255, 255, 255)
@@ -41,7 +41,7 @@ questions = {
 	{"En una carretera con dos o más carriles que viajan en la misma dirección, el conductor debe:", "Conducir en cualquier carril.", "Conducir en el carril izquierdo.", "Conducir en el carril derecho, excepto para pasar.", 3},
 	{"Cuando hay niebla debe:", "Poner los faros para poder ver mejor.", "Poner los faros e ir mas despacio.", "No encender los faros pero si ir mas despacio.", 2},
 	{"Al entrar en un coche tienes que...", "Arrancar el vehículo, ponerse el cinturón y circular.", "Ponerse el cinturón, arrancar el vehículo y circular.", "Empujar el coche por detras para que arranque solo.", 2},
-	{"Vas conduciendo y ves que un camión va en carril contrario, kamikaze. ¿Qué haces?", "Ignorarlo y seguir con tu ruta.", "Sacar el teléfono móvil y avisar al 123.", "Parar en un lado de la carretera y avisar al 112.", 3},
+	{"Vas conduciendo y ves que un camión va en carril contrario, kamikaze. ¿Qué haces?", "Ignorarlo y seguir con tu ruta.", "Sacar el teléfono móvil y avisar al 112.", "Parar en un lado de la carretera y avisar al 112.", 3},
 	{"Estás en un cruce y tienes una señal triangular roja, apuntando hacia abajo. ¿Que significa?", "Significa que hay que parar el vehículo.", "Significa que debes de ceder el paso.", "Ambas son incorrectas.", 2},
 	{"¿Qué significa ver un semáforo en ambar parpadeando?", "Significa que hay que parar el vehículo.", "Significa que la carretera está cortada.", "Ambas son incorrectas.", 3},
 	{"¿Está permitido conducir bajo los efectos del alcohol?", "Sí, pero no una cantidad superior a 0.2 g/l.", "No, no se permite.", "No hay límite de alcoholemia, se puede conducir.", 2},
@@ -303,14 +303,22 @@ testRoute = {
 	{2301.74,215.7,23.84},
 	{2068.54,255.61,24.42},
 	{1908.37,357.78,19.98},
-	{2068.54,255.61,24.42},
-	{2301.74,215.7,23.84},
-	{2346.8,121.69,25.99},
-	{2396.61,55.59,25.99},
-	{2466.08,29.26,25.99},
-	{2369.34,-29.98,25.99},
-	{2341.7,58.81,25.99},
-	{2340.72,183.17,25.99},
+	{1640.69,385.21,19.45},
+	{1426.14,423.76,19.54},
+	{1341.33,368.83,19.06},
+	{1276.79,349.49,19.06},
+	{1214.17,331.1,19.06},
+	{1234.61,256.52,19.06},
+	{1248.39,188.08,19.05},
+	{1306.49,237.55,19.06},
+	{1493.06,156.23,30.47},
+	{1586.43,124.2,29.28},
+	{1789.58,80.72,34.24},
+	{2072.52,40.06,26.02},
+	{2219.44,40.08,25.99},
+	{2296.26,74.59,25.99},
+	{2346.5,151.76,25.99},
+	{2324.05,191.77,26.1},
 }
 
 testVehicle = { [436]=true } -- Previons need to be spawned at the start point.
@@ -357,7 +365,7 @@ function startDrivingTest(element)
 			outputChatBox("#FF9933Tendrá que completar la ruta sin dañar el vehículo de pruebas. Buena suerte.", 255, 194, 14, true)
 			outputChatBox("¡Recuerda, abróchate el cinturón!", 255, 255, 0)
 		else
-			outputChatBox("Necesitas 150 pesos para aprobar el examen práctico.", 255, 0, 0 )
+			outputChatBox("Necesitas 150 dólares para aprobar el examen práctico.", 255, 0, 0 )
 		end
 	end
 end

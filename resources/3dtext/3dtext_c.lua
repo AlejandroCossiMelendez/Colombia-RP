@@ -58,10 +58,10 @@ addEventHandler( "onClientRender", getRootElement( ),
 					pickups[ element ] = { pickup = pickup }
 				end
 				if isLineOfSightClear( cx, cy, cz, px, py, pz + 0.5, true, true, true, true, false, false, true, localPlayer ) then
-					local sx, sy = getScreenFromWorldPosition( px, py, pz + 0.4 )
+					local sx, sy = getScreenFromWorldPosition( px, py, pz + 0.5 )
 					if sx and sy then
-						dxDrawText( tostring( text ), sx + 2, sy + 2, sx, sy, tocolor( 0, 0, 0, 255 ), 1, "default-bold", "center", "center" )
-						dxDrawText( tostring( text ), sx, sy, sx, sy, tocolor( 255, 255, 255, 255 ), 1, "default-bold", "center", "center" )
+						dxDrawText( tostring( text ), sx + 2, sy + 2, sx, sy, tocolor( 0, 0, 0, 255 ), 1, "default", "center", "center" )
+						dxDrawText( tostring( text ), sx, sy, sx, sy, tocolor( 255, 255, 255, 255 ), 1, "default", "center", "center" )
 					end
 				end
 			else

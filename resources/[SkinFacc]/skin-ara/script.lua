@@ -1,6 +1,0 @@
-addEventHandler('onClientResourceStart',resourceRoot,function () 
-txd = engineLoadTXD( 'BopeNathaan.txd' ) 
-engineImportTXD( txd, 173 ) 
-dff = engineLoadDFF('BopeNathaan.dff', 173) 
-engineReplaceModel( dff, 173 )
-end)

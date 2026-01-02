@@ -243,7 +243,7 @@ function LineaConIMEI(imei)
 end
 
 function obtenerTitular(player, cmd, id, tipo)
-	if hasObjectPermissionTo(player, "command.acceptreport", false) or exports.factions:isPlayerInFaction(player, 1) or exports.factions:isPlayerInFaction(player, 33) then
+	if hasObjectPermissionTo(player, "command.acceptreport", false) or exports.factions:isPlayerInFaction(player, 1) then
 	if not id or not tipo then outputChatBox("Síntaxis: /"..tostring(cmd).." [ID/numero] [1=vehiculo, 2=interior, 3=numero telefono]", player, 255, 255, 255) return end
 		local tipo = tonumber(tipo)
 		if tipo == 1 then
@@ -393,7 +393,7 @@ end
 addCommandHandler("borrarmipj", borrarMiPJ)
 
 function inactivoVehiculo(player, c, vehicleID)
-	if hasObjectPermissionTo(player, "command.modchat", false) then
+	--[[if hasObjectPermissionTo(player, "command.modchat", false) then
 		if not vehicleID then outputChatBox("Sintaxis: /inactivo [vehicleID]", player, 255, 255, 255) return end
 		local vehicle = exports.vehicles:getVehicle(tonumber(vehicleID))
 		if vehicle then
@@ -403,34 +403,34 @@ function inactivoVehiculo(player, c, vehicleID)
 		end
 	else
 		outputChatBox("Acceso denegado.", player, 255, 0, 0)
-	end
+	end]]
+	outputChatBox("Comando desactivado, el sistema ha sido removido.", player, 255, 0, 0)
 end
-   addCommandHandler("inactivo", inactivoVehiculo)
+addCommandHandler("inactivo", inactivoVehiculo)
 
 function activoVehiculo(player, c, vehicleID)
-	local money = getPlayerMoney(player)
-	if (money > 49999) then
-		if not vehicleID then outputChatBox("Sintaxis: /sacarveh [vehicleID]", player, 255, 255, 255) return end
-			local vehicle = exports.vehicles:getVehicle(tonumber(vehicleID))
-			if not vehicle then
-				local sql = exports.sql:query_assoc_single("SELECT cepo FROM vehicles WHERE vehicleID = "..tostring(vehicleID))
-				if sql then
-					exports.infobox:addNotification(player, "Has sacado de garaje tu vehiculo con ID "..tostring(vehicleID), "success")
-					exports.sql:query_free("UPDATE vehicles SET inactivo = 0 WHERE vehicleID = ".. vehicleID)
-					exports.vehicles:reloadVehicle(tonumber(vehicleID))
-					exports.players:takeMoney(player, 50000)
-				else
-			       exports.infobox:addNotification(player, "Vehiculo eliminado, lo sentimos", "error")
-				end
+	--[[if hasObjectPermissionTo(player, "command.modchat", false) then
+		if not vehicleID then outputChatBox("Sintaxis: /activo [vehicleID]", player, 255, 255, 255) return end
+		local vehicle = exports.vehicles:getVehicle(tonumber(vehicleID))
+		if not vehicle then
+			local sql = exports.sql:query_assoc_single("SELECT cepo FROM vehicles WHERE vehicleID = "..tostring(vehicleID))
+			if sql then
+				if tonumber(sql.cepo) == 1 then outputChatBox("¡Ups! Este vehículo tiene cepo. Avisa al usuario.", player, 255, 0, 0) return end
+				outputChatBox("Has marcado como activo el vehículo con ID "..tostring(vehicleID), player, 0, 255, 0)
+				exports.sql:query_free("UPDATE vehicles SET inactivo = 0 WHERE vehicleID = ".. vehicleID)
+				exports.vehicles:reloadVehicle(tonumber(vehicleID))
+			else
+				outputChatBox("¡Ups! Este vehículo no existe. Revisa el ID especificado.", player, 255, 0, 0)
 			end
+		end
 	else
-		exports.infobox:addNotification(player, "No tienes los 50,000 que cuesta el servicio", "error")
-	end
+		outputChatBox("Acceso denegado.", player, 255, 0, 0)
+	end]]
+	outputChatBox("Comando desactivado, el sistema ha sido removido.", player, 255, 0, 0)
 end
-	
-addCommandHandler("sacarveh", activoVehiculo)
+addCommandHandler("activo", activoVehiculo)
 
---[[function avisoATitulares()
+function avisoATitulares()
 	local charID = exports.players:getCharacterID(source)
 	if charID then
 		local sql = exports.sql:query_assoc("SELECT vehicleID FROM vehicles WHERE inactivo = 1 AND characterID = "..charID)
@@ -439,29 +439,23 @@ addCommandHandler("sacarveh", activoVehiculo)
 		end
 	end
 end
-addEventHandler("onCharacterLogin", getRootElement(), avisoATitulares)]]
+addEventHandler("onCharacterLogin", getRootElement(), avisoATitulares)
 
 function inactivoMasivo ( player, c )
-	local dim = getElementDimension(player)
-	local int = getElementInterior (player)
-	if dim == 0 and int == 0 then
-		if hasObjectPermissionTo( player, "command.modchat", false ) then
-			local x, y, z = getElementPosition( player )
-			local dimension = getElementDimension( player )
-			local interior = getElementInterior( player )
-			for index, vehicle in ipairs ( getElementsByType ( "vehicle" ) ) do
-				local px, py, pz = getElementPosition( vehicle )
-				if getDistanceBetweenPoints3D( x, y, z, px, py, pz ) <= 5 then
-					local idveh = tonumber(getElementData ( vehicle, "idveh" ))
-					inactivoVehiculo(player, c, idveh)
-				end
+	if hasObjectPermissionTo( player, "command.modchat", false ) then
+		local x, y, z = getElementPosition( player )
+		local dimension = getElementDimension( player )
+		local interior = getElementInterior( player )
+		for index, vehicle in ipairs ( getElementsByType ( "vehicle" ) ) do
+			local px, py, pz = getElementPosition( vehicle )
+			if getDistanceBetweenPoints3D( x, y, z, px, py, pz ) <= 5 then
+				local idveh = tonumber(getElementData ( vehicle, "idveh" ))
+				inactivoVehiculo(player, c, idveh)
 			end
 		end
-	else
-		outputChatBox("Tienes que estar en la dimension 0 y interior 0", player, 255, 0, 0) 
 	end
 end
-addCommandHandler("inactivoMasivo", inactivoMasivo)
+--addCommandHandler("inactivoMasivo", inactivoMasivo)
 
 local function getJugadoresFaccion( factionID )
 	local p = { }

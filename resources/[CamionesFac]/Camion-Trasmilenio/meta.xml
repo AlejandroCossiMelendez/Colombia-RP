@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="2N" type="misc" name="AlfaRomeo" description="AlfaRomeo" />
-     <script src="script.lua" type="client" />
-     <file src="coach.txd" />
-     <file src="coach.dff" />
-</meta>
