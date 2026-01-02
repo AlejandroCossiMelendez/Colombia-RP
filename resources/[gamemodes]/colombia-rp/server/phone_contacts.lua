@@ -33,21 +33,47 @@ addEventHandler("saveContacts", root, function(contactsJson)
     
     -- Parsear JSON de contactos
     -- CRÍTICO: fromJSON en MTA puede tener problemas con arrays JSON
-    -- Intentar primero con parseo manual usando loadstring que es más confiable
+    -- Usar parseo manual que es más confiable para arrays
     local contacts = nil
     local success, result = pcall(function()
-        -- Primero intentar parseo manual (más confiable para arrays)
+        -- Parseo manual: convertir JSON array a tabla Lua
+        -- Reemplazar [ por { y ] por } para convertir array JSON a tabla Lua
         local luaCode = contactsJson:gsub("%[", "{"):gsub("%]", "}")
+        outputServerLog("[PHONE] Código Lua generado: " .. string.sub(luaCode, 1, 200))
+        
         local func = loadstring("return " .. luaCode)
         if func then
             local parsed = func()
-            if parsed and type(parsed) == "table" and #parsed > 0 then
-                return parsed
+            outputServerLog("[PHONE] Parseo manual exitoso. Tipo: " .. type(parsed) .. ", Longitud: " .. tostring(parsed and #parsed or 0))
+            
+            if parsed and type(parsed) == "table" then
+                -- Verificar que sea un array válido
+                if #parsed > 0 then
+                    outputServerLog("[PHONE] Array válido encontrado con " .. #parsed .. " elementos")
+                    return parsed
+                else
+                    -- Puede ser un objeto, verificar si tiene elementos con índices numéricos
+                    local count = 0
+                    local tempArray = {}
+                    for k, v in pairs(parsed) do
+                        if type(k) == "number" and type(v) == "table" and v.name and v.number then
+                            count = count + 1
+                            table.insert(tempArray, v)
+                        end
+                    end
+                    if count > 0 then
+                        outputServerLog("[PHONE] Parseo manual encontró " .. count .. " elementos con índices numéricos")
+                        return tempArray
+                    end
+                end
             end
+        else
+            outputServerLog("[PHONE] ERROR: No se pudo crear función loadstring")
         end
         
-        -- Si el parseo manual falla, intentar con fromJSON
+        -- Si el parseo manual falla, intentar con fromJSON como fallback
         if type(fromJSON) == "function" then
+            outputServerLog("[PHONE] Intentando parseo con fromJSON como fallback...")
             return fromJSON(contactsJson)
         end
         
