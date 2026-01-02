@@ -27,8 +27,18 @@ local function getItemGiveFunc()
         return give
     end
     -- Si no está disponible, intentar exports como fallback
-    local success = pcall(function() return exports.items:give end)
-    if success then
+    local success, result = pcall(function() 
+        -- Verificar si exports.items existe y tiene la función give
+        if exports.items then
+            local testSuccess = pcall(function() 
+                local testFunc = exports.items.give
+                return testFunc ~= nil
+            end)
+            return testSuccess
+        end
+        return false
+    end)
+    if success and result then
         return function(element, item, val, name) 
             local s, r = pcall(function() return exports.items:give(element, item, val, name) end)
             return s and r or false
@@ -41,8 +51,21 @@ end
 function getAllItemsList()
     local itemsList = {}
     
-    -- Las funciones de items están incluidas directamente en el gamemode
-    -- Usar la función global getName directamente (de items_list.lua)
+    -- Intentar usar item_list directamente si está disponible
+    if item_list and type(item_list) == "table" then
+        for i = 1, #item_list do
+            if item_list[i] and item_list[i].name then
+                table.insert(itemsList, {
+                    id = i,
+                    name = item_list[i].name
+                })
+            end
+        end
+        outputServerLog("[ITEMS] Lista de items obtenida desde item_list: " .. #itemsList .. " items")
+        return itemsList
+    end
+    
+    -- Si item_list no está disponible, intentar usar getName
     local getNameFunc = getItemNameFunc()
     
     if not getNameFunc then
@@ -51,7 +74,7 @@ function getAllItemsList()
         return itemsList
     end
     
-    -- Obtener la lista de items
+    -- Obtener la lista de items usando getName
     for i = 1, 102 do -- Basado en item_list que tiene 102 items
         local itemName = getNameFunc(i)
         
@@ -63,6 +86,7 @@ function getAllItemsList()
         end
     end
     
+    outputServerLog("[ITEMS] Lista de items obtenida usando getName: " .. #itemsList .. " items")
     return itemsList
 end
 

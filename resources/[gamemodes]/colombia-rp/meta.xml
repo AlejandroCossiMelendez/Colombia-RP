@@ -21,11 +21,11 @@
     <script src="server/chat.lua" type="server" />
     <script src="server/voice.lua" type="server" />
     <script src="server/admin_panel.lua" type="server" />
-    <script src="server/items_integration.lua" type="server" />
-    <!-- Incluir scripts del sistema de items -->
+    <!-- Incluir scripts del sistema de items ANTES de items_integration -->
     <script src="items/items_list.lua" type="server" />
     <script src="items/items.lua" type="server" />
     <script src="items/mochilas_suelo.lua" type="server" />
+    <script src="server/items_integration.lua" type="server" />
     <script src="server/main.lua" type="server" />
     
     <!-- Scripts del cliente -->

@@ -136,9 +136,12 @@ function load( element, force )
 					['subscribers'] = { },
 					id = elementID
 				}
-				local i = exports.sql:query_assoc( "SELECT `index`, item, value, value2, name FROM items WHERE owner = " .. elementID .. " ORDER BY `index` ASC" )
-				for key, value in ipairs( i ) do
-					table.insert( data[ element ].items, value )
+				-- Usar nuestras funciones de base de datos en lugar de exports.sql
+				local i = queryDatabase( "SELECT `index`, item, value, value2, name FROM items WHERE owner = " .. elementID .. " ORDER BY `index` ASC" )
+				if i then
+					for key, value in ipairs( i ) do
+						table.insert( data[ element ].items, value )
+					end
 				end
 				if getElementType( element ) == "player" then
 					data[ element ].subscribers[ element ] = true
@@ -173,9 +176,21 @@ function give( element, item, val, name, value2 )
 		if type( item ) == 'number' and ( type( val ) == "number" or type( val ) == "string" ) then
 			name2 = "NULL"
 			if name then
-				name2 = "'" .. exports.sql:escape_string( tostring( name ) ) .. "'"
+				-- Usar nuestra función de escape o la función global si existe
+				if escapeString then
+					name2 = "'" .. escapeString( tostring( name ) ) .. "'"
+				else
+					-- Fallback: escape básico
+					local escaped = tostring(name):gsub("'", "\\'")
+					name2 = "'" .. escaped .. "'"
+				end
 			else
-				name = tostring(exports.items:getName(item))
+				-- Usar getName directamente si está disponible
+				if getName then
+					name = tostring(getName(item))
+				else
+					name = "Item " .. item
+				end
 			end
 			local value = nil
 			if tonumber(item) == 7 then
@@ -183,8 +198,12 @@ function give( element, item, val, name, value2 )
 			else
 				value = val
 			end
-			local index, error = exports.sql:query_insertid( "INSERT INTO items (owner, item, value, name) VALUES (" .. getID( element ) .. ", " .. item .. ", '%s', " .. name2 .. ")", value )
-			if error then outputDebugString(error) return end
+			-- Usar nuestra función de insertar con ID
+			local index, error = queryInsertId( "INSERT INTO items (owner, item, value, name) VALUES (" .. getID( element ) .. ", " .. item .. ", '" .. tostring(value) .. "', " .. name2 .. ")" )
+			if error then 
+				outputDebugString("[ITEMS] Error al insertar item: " .. tostring(error))
+				return false, error
+			end
 			if index then
 				-- Parche para sistema de mochilas, registro automático de nuevas mochilas.
 				if item == 12 and not value2 then
@@ -192,7 +211,7 @@ function give( element, item, val, name, value2 )
 				end
 				table.insert( data[ element ].items, { index = index, item = item, value = value, value2 = value2, name = name } )
 				if value2 then
-					exports.sql:query_free("UPDATE items SET value2 = "..tonumber(value2).." WHERE `index` = "..index)
+					executeDatabase("UPDATE items SET value2 = "..tonumber(value2).." WHERE `index` = "..index)
 				end
 				notify( element )
 				return true
@@ -207,7 +226,7 @@ end
 function take( element, slot )
 	if load( element ) then
 		if data[ element ].items[ slot ] then
-			local success, error = exports.sql:query_free( "DELETE FROM items WHERE `index` = " .. data[ element ].items[ slot ].index )
+			local success = executeDatabase( "DELETE FROM items WHERE `index` = " .. data[ element ].items[ slot ].index )
 			if success then
 				table.remove( data[ element ].items, slot )
 				notify( element )
