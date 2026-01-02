@@ -22,18 +22,24 @@ end)
 
 -- Control K: Bloquear/Desbloquear puertas
 bindKey("k", "down", function()
-    if not vehicleControlsEnabled then return end
+    -- Debug: confirmar que la tecla se presionó
+    outputChatBox("[DEBUG] Tecla K presionada", 255, 255, 0)
     
-    -- NO bloquear si hay GUI abierto - permitir usar la tecla siempre
-    -- (el servidor verificará las llaves)
+    if not vehicleControlsEnabled then 
+        outputChatBox("[DEBUG] Controles deshabilitados", 255, 0, 0)
+        return 
+    end
     
     local vehicle = getPedOccupiedVehicle(localPlayer)
+    outputChatBox("[DEBUG] Vehículo ocupado: " .. tostring(vehicle ~= nil), 255, 255, 0)
     
     -- Si no está en un vehículo, buscar el más cercano
     if not vehicle then
         local px, py, pz = getElementPosition(localPlayer)
         local nearbyVehicle = nil
         local minDistance = 5.0
+        
+        outputChatBox("[DEBUG] Buscando vehículo cercano...", 255, 255, 0)
         
         for _, veh in ipairs(getElementsByType("vehicle")) do
             -- Verificar que sea un vehículo del sistema (tiene matrícula o dueño)
@@ -52,13 +58,15 @@ bindKey("k", "down", function()
         
         if nearbyVehicle then
             vehicle = nearbyVehicle
+            outputChatBox("[DEBUG] Vehículo cercano encontrado: " .. (getElementData(vehicle, "vehicle:plate") or "Sin matrícula"), 0, 255, 0)
         else
-            -- No mostrar mensaje, simplemente no hacer nada
+            outputChatBox("[DEBUG] No hay vehículo cerca (máx 5m)", 255, 0, 0)
             return
         end
     end
     
     if not vehicle or not isElement(vehicle) then
+        outputChatBox("[DEBUG] Vehículo inválido", 255, 0, 0)
         return
     end
     
@@ -66,11 +74,12 @@ bindKey("k", "down", function()
     local isLocked = getVehicleLocked(vehicle)
     local newState = not isLocked
     
-    -- Debug: mostrar en chat que se presionó la tecla
-    -- outputChatBox("[DEBUG] Presionaste K - Vehículo: " .. (getElementData(vehicle, "vehicle:plate") or "Sin matrícula"), 255, 255, 0)
+    local plate = getElementData(vehicle, "vehicle:plate") or "Sin matrícula"
+    outputChatBox("[DEBUG] Enviando evento - Vehículo: " .. plate .. " | Estado actual: " .. tostring(isLocked) .. " | Nuevo estado: " .. tostring(newState), 0, 255, 255)
     
     -- Enviar al servidor para verificar llaves y cambiar estado
     triggerServerEvent("vehicle:toggleLock", localPlayer, vehicle, newState)
+    outputChatBox("[DEBUG] Evento enviado al servidor", 0, 255, 0)
 end)
 
 -- Control L: Prender/Apagar luces
