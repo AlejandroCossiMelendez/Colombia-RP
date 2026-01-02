@@ -127,7 +127,8 @@ input {
     position: absolute;
     top: 8px;
     right: 13px;
-    z-index: 999;
+    z-index: 100;
+    pointer-events: none;
 }
 
 .battery .bar {
@@ -147,6 +148,8 @@ input {
     bottom: 1.55mm;
     left: 50%;
     transform: translate(-50%, 0);
+    z-index: 100;
+    cursor: pointer;
 }
 
 
@@ -422,15 +425,15 @@ input {
 
 .add-contact-form {
     position: absolute;
-    top: 0;
+    top: 50px;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: 50px;
     background-color: #181818;
     padding: 30px 20px;
     display: flex;
     flex-direction: column;
-    z-index: 10;
+    z-index: 5;
     border-radius: calc(var(--px-radius) - 2.5px);
     overflow-y: auto;
     box-sizing: border-box;
@@ -444,7 +447,7 @@ input {
 }
 
 .add-contact-form input {
-    width: calc(100% - 30px);
+    width: 100%;
     padding: 15px;
     background-color: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);

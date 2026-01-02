@@ -167,8 +167,16 @@ function hideAddContactForm() {
 
 // Función para agregar contacto
 function addContact() {
-    const name = get('#contactName').value.trim();
-    const number = get('#contactNumber').value.trim();
+    const nameInput = get('#contactName');
+    const numberInput = get('#contactNumber');
+    
+    if (!nameInput || !numberInput) {
+        console.error('No se encontraron los campos del formulario');
+        return;
+    }
+    
+    const name = nameInput.value.trim();
+    const number = numberInput.value.trim();
     
     if (!name || !number) {
         alert('Por favor completa todos los campos');
@@ -182,13 +190,34 @@ function addContact() {
         return;
     }
     
+    // Verificar si el contacto ya existe
+    const exists = contacts.some(c => c.number === number);
+    if (exists) {
+        alert('Este número ya está en tus contactos');
+        return;
+    }
+    
+    // Agregar el contacto
     contacts.push({ name, number });
+    console.log('Contacto agregado:', { name, number });
+    console.log('Total de contactos:', contacts.length);
+    
+    // Recargar la lista de contactos
     loadContacts();
+    
+    // Ocultar el formulario
     hideAddContactForm();
     
     // Guardar en MTA (opcional, para persistencia)
-    if (window.mta) {
-        window.mta.triggerEvent('saveContacts', JSON.stringify(contacts));
+    if (window.mta && window.mta.triggerEvent) {
+        try {
+            window.mta.triggerEvent('saveContacts', JSON.stringify(contacts));
+            console.log('Contactos guardados en MTA');
+        } catch (e) {
+            console.error('Error al guardar contactos:', e);
+        }
+    } else {
+        console.warn('MTA no está disponible, los contactos se guardarán solo en memoria');
     }
 }
 
