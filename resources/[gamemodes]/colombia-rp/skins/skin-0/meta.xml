@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<meta>
-     <info author="JKING" type="misc" name="Skin-0" description="Skin colombiana para modelo 0" />
-     <script src="script.lua" type="client" />
-     <file src="skin-0.txd" type="client" />
-     <file src="skin-0.dff" type="client" />
-</meta>

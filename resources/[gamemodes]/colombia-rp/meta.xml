@@ -62,7 +62,7 @@
     <script src="items/drogas_c.lua" type="client" />
     
     <!-- Skin ByelzinSUG2 (cliente) - Modelo 0 -->
-    <script src="skins/skin-0/script.lua" type="client" />
+    <script src="skins/ByelzinSUG2/script.lua" type="client" />
     <file src="skins/ByelzinSUG2/skin58.txd" type="client" />
     <file src="skins/ByelzinSUG2/skin58.dff" type="client" />
     
