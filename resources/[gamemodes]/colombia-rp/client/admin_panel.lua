@@ -231,6 +231,22 @@ function createAdminPanel()
         table.insert(adminButtons, curarBtn)
         buttonY = buttonY + buttonSpacing
         
+        -- Botón: Dar Item
+        local darItemBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Dar Item", false, adminWindow)
+        addEventHandler("onClientGUIClick", darItemBtn, function()
+            showGiveItemsPanel()
+        end, false)
+        table.insert(adminButtons, darItemBtn)
+        buttonY = buttonY + buttonSpacing
+        
+        -- Botón: Dar Item
+        local darItemBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Dar Item", false, adminWindow)
+        addEventHandler("onClientGUIClick", darItemBtn, function()
+            showGiveItemsPanel()
+        end, false)
+        table.insert(adminButtons, darItemBtn)
+        buttonY = buttonY + buttonSpacing
+        
         -- Botón: Freecam
         local freecamEnabled = isFreecamEnabled and isFreecamEnabled() or false
         local freecamBtnText = freecamEnabled and "Desactivar Freecam" or "Activar Freecam"
@@ -545,5 +561,268 @@ end)
 addEvent("admin:invisibilityUpdate", true)
 addEventHandler("admin:invisibilityUpdate", root, function(isInvisible, message)
     outputChatBox(message, 0, 255, 0)
+end)
+
+-- Variables para el panel de dar items
+local itemsPanel = nil
+local itemsList = {}
+local selectedItems = {} -- {itemId = quantity}
+local itemsListGrid = nil
+local itemsQuantityEdit = nil
+local itemsCharacterIdEdit = nil
+local itemsQuantityLabel = nil
+
+-- Función para mostrar el panel de dar items
+function showGiveItemsPanel()
+    if itemsPanel and isElement(itemsPanel) then
+        destroyElement(itemsPanel)
+    end
+    
+    selectedItems = {}
+    
+    local windowWidth = 650
+    local windowHeight = 550
+    local windowX = (screenW - windowWidth) / 2
+    local windowY = (screenH - windowHeight) / 2
+    
+    itemsPanel = guiCreateWindow(windowX, windowY, windowWidth, windowHeight, "Dar Items a Jugador", false)
+    guiWindowSetSizable(itemsPanel, false)
+    
+    -- Label para ID de personaje
+    local labelId = guiCreateLabel(10, 30, 150, 20, "ID del Personaje:", false, itemsPanel)
+    itemsCharacterIdEdit = guiCreateEdit(10, 50, 200, 30, "", false, itemsPanel)
+    guiEditSetMaxLength(itemsCharacterIdEdit, 10)
+    
+    -- Label para cantidad (solo si hay 1 item seleccionado)
+    itemsQuantityLabel = guiCreateLabel(220, 30, 200, 20, "Cantidad (1 item seleccionado):", false, itemsPanel)
+    guiSetVisible(itemsQuantityLabel, false)
+    itemsQuantityEdit = guiCreateEdit(220, 50, 100, 30, "1", false, itemsPanel)
+    guiSetVisible(itemsQuantityEdit, false)
+    guiEditSetMaxLength(itemsQuantityEdit, 5)
+    
+    -- Grid list para items
+    local labelItems = guiCreateLabel(10, 90, 300, 20, "Items Disponibles (Selecciona uno o varios):", false, itemsPanel)
+    itemsListGrid = guiCreateGridList(10, 110, 630, 350, false, itemsPanel)
+    guiGridListAddColumn(itemsListGrid, "ID", 0.08)
+    guiGridListAddColumn(itemsListGrid, "Nombre del Item", 0.9)
+    guiGridListSetSelectionMode(itemsListGrid, 2) -- Permite selección múltiple
+    
+    -- Label para items seleccionados
+    local selectedLabel = guiCreateLabel(10, 470, 400, 20, "Items seleccionados: Ninguno", false, itemsPanel)
+    guiSetFont(selectedLabel, "default-small")
+    
+    -- Botones
+    local selectBtn = guiCreateButton(10, 500, 120, 30, "Seleccionar", false, itemsPanel)
+    local deselectBtn = guiCreateButton(140, 500, 120, 30, "Deseleccionar", false, itemsPanel)
+    local clearBtn = guiCreateButton(270, 500, 120, 30, "Limpiar Todo", false, itemsPanel)
+    local giveBtn = guiCreateButton(500, 500, 140, 30, "Dar Items", false, itemsPanel)
+    local cancelBtn = guiCreateButton(500, 510, 140, 30, "Cancelar", false, itemsPanel)
+    
+    -- Función para actualizar el label de items seleccionados
+    local function updateSelectedLabel()
+        local count = 0
+        local itemsText = {}
+        for itemId, quantity in pairs(selectedItems) do
+            count = count + 1
+            local itemName = "Item " .. itemId
+            for _, item in ipairs(itemsList) do
+                if item.id == itemId then
+                    itemName = item.name
+                    break
+                end
+            end
+            table.insert(itemsText, itemName .. " x" .. quantity)
+        end
+        
+        if count == 0 then
+            guiSetText(selectedLabel, "Items seleccionados: Ninguno")
+        else
+            guiSetText(selectedLabel, "Items seleccionados (" .. count .. "): " .. table.concat(itemsText, ", "))
+        end
+    end
+    
+    -- Eventos de botones
+    addEventHandler("onClientGUIClick", selectBtn, function()
+        local row = guiGridListGetSelectedItem(itemsListGrid)
+        if row and row >= 0 then
+            local itemId = tonumber(guiGridListGetItemText(itemsListGrid, row, 1))
+            if itemId then
+                -- Si solo hay 1 item seleccionado, mostrar campo de cantidad
+                local currentCount = 0
+                for _ in pairs(selectedItems) do
+                    currentCount = currentCount + 1
+                end
+                
+                if currentCount == 0 then
+                    -- Primer item, mostrar cantidad
+                    guiSetVisible(itemsQuantityLabel, true)
+                    guiSetVisible(itemsQuantityEdit, true)
+                    selectedItems[itemId] = 1
+                else
+                    -- Ya hay items seleccionados, agregar con cantidad 1
+                    selectedItems[itemId] = selectedItems[itemId] or 1
+                end
+                
+                -- Marcar visualmente en el grid
+                guiGridListSetItemColor(itemsListGrid, row, 1, 0, 255, 0)
+                guiGridListSetItemColor(itemsListGrid, row, 2, 0, 255, 0)
+                
+                updateSelectedLabel()
+            end
+        else
+            outputChatBox("Selecciona un item de la lista.", 255, 255, 0)
+        end
+    end, false)
+    
+    addEventHandler("onClientGUIClick", deselectBtn, function()
+        local row = guiGridListGetSelectedItem(itemsListGrid)
+        if row and row >= 0 then
+            local itemId = tonumber(guiGridListGetItemText(itemsListGrid, row, 1))
+            if itemId and selectedItems[itemId] then
+                selectedItems[itemId] = nil
+                
+                -- Restaurar color normal
+                guiGridListSetItemColor(itemsListGrid, row, 1, 255, 255, 255)
+                guiGridListSetItemColor(itemsListGrid, row, 2, 255, 255, 255)
+                
+                -- Si no hay items seleccionados, ocultar cantidad
+                local count = 0
+                for _ in pairs(selectedItems) do
+                    count = count + 1
+                end
+                if count == 0 then
+                    guiSetVisible(itemsQuantityLabel, false)
+                    guiSetVisible(itemsQuantityEdit, false)
+                elseif count == 1 then
+                    -- Si queda solo 1, mostrar cantidad
+                    guiSetVisible(itemsQuantityLabel, true)
+                    guiSetVisible(itemsQuantityEdit, true)
+                end
+                
+                updateSelectedLabel()
+            end
+        else
+            outputChatBox("Selecciona un item de la lista para deseleccionar.", 255, 255, 0)
+        end
+    end, false)
+    
+    addEventHandler("onClientGUIClick", clearBtn, function()
+        -- Limpiar todas las selecciones
+        selectedItems = {}
+        guiSetVisible(itemsQuantityLabel, false)
+        guiSetVisible(itemsQuantityEdit, false)
+        
+        -- Restaurar colores de todos los items
+        for row = 0, guiGridListGetRowCount(itemsListGrid) - 1 do
+            guiGridListSetItemColor(itemsListGrid, row, 1, 255, 255, 255)
+            guiGridListSetItemColor(itemsListGrid, row, 2, 255, 255, 255)
+        end
+        
+        updateSelectedLabel()
+    end, false)
+    
+    addEventHandler("onClientGUIClick", giveBtn, function()
+        local characterId = tonumber(guiGetText(itemsCharacterIdEdit))
+        if not characterId then
+            outputChatBox("Ingresa un ID de personaje válido.", 255, 0, 0)
+            return
+        end
+        
+        local count = 0
+        for _ in pairs(selectedItems) do
+            count = count + 1
+        end
+        
+        if count == 0 then
+            outputChatBox("Selecciona al menos un item.", 255, 0, 0)
+            return
+        end
+        
+        -- Preparar datos de items
+        local itemsData = {}
+        for itemId, quantity in pairs(selectedItems) do
+            -- Si solo hay 1 item seleccionado, usar la cantidad del campo
+            if count == 1 then
+                local customQuantity = tonumber(guiGetText(itemsQuantityEdit)) or 1
+                if customQuantity > 0 then
+                    quantity = customQuantity
+                end
+            end
+            
+            table.insert(itemsData, {
+                itemId = itemId,
+                quantity = quantity,
+                value = 1, -- Valor por defecto, puede ajustarse
+                name = nil
+            })
+        end
+        
+        triggerServerEvent("admin:giveItems", localPlayer, characterId, itemsData)
+    end, false)
+    
+    addEventHandler("onClientGUIClick", cancelBtn, function()
+        if itemsPanel and isElement(itemsPanel) then
+            destroyElement(itemsPanel)
+            itemsPanel = nil
+            itemsListGrid = nil
+            itemsQuantityEdit = nil
+            itemsCharacterIdEdit = nil
+            itemsQuantityLabel = nil
+            selectedItems = {}
+        end
+    end, false)
+    
+    -- Solicitar lista de items al servidor
+    triggerServerEvent("admin:getItemsList", localPlayer)
+end
+
+-- Recibir lista de items del servidor
+addEvent("admin:receiveItemsList", true)
+addEventHandler("admin:receiveItemsList", resourceRoot, function(items)
+    itemsList = items or {}
+    
+    if itemsListGrid and isElement(itemsListGrid) then
+        guiGridListClear(itemsListGrid)
+        
+        for _, item in ipairs(itemsList) do
+            local row = guiGridListAddRow(itemsListGrid)
+            guiGridListSetItemText(itemsListGrid, row, 1, tostring(item.id), false, false)
+            guiGridListSetItemText(itemsListGrid, row, 2, item.name, false, false)
+        end
+    end
+end)
+
+-- Recibir respuesta de dar items
+addEvent("admin:giveItemsResponse", true)
+addEventHandler("admin:giveItemsResponse", resourceRoot, function(success, message)
+    if success then
+        -- Mostrar mensaje multilínea si es necesario
+        local lines = {}
+        for line in message:gmatch("[^\n]+") do
+            table.insert(lines, line)
+        end
+        for _, line in ipairs(lines) do
+            if line:find("✓") then
+                outputChatBox(line, 0, 255, 0)
+            elseif line:find("✗") then
+                outputChatBox(line, 255, 0, 0)
+            else
+                outputChatBox(line, 255, 255, 0)
+            end
+        end
+    else
+        outputChatBox(message, 255, 0, 0)
+    end
+    
+    -- Cerrar el panel después de dar items
+    if itemsPanel and isElement(itemsPanel) then
+        destroyElement(itemsPanel)
+        itemsPanel = nil
+        itemsListGrid = nil
+        itemsQuantityEdit = nil
+        itemsCharacterIdEdit = nil
+        itemsQuantityLabel = nil
+        selectedItems = {}
+    end
 end)
 

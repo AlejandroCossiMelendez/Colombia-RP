@@ -20,6 +20,7 @@
     <script src="server/chat.lua" type="server" />
     <script src="server/voice.lua" type="server" />
     <script src="server/admin_panel.lua" type="server" />
+    <script src="server/items_integration.lua" type="server" />
     <script src="server/main.lua" type="server" />
     
     <!-- Scripts del cliente -->
