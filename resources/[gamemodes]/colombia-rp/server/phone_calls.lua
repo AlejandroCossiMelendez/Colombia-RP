@@ -464,101 +464,91 @@ function endCallVoice(call)
     
     -- Restaurar voz por proximidad
     if isElement(call.caller) then
-        -- Limpiar datos PRIMERO
+        -- Limpiar datos PRIMERO - esto es crítico para que el sistema de proximidad funcione
         setElementData(call.caller, "phone:inCall", false)
         setElementData(call.caller, "phone:callPartner", nil)
         setElementData(call.caller, "phone:speakerEnabled", false)
         
-        -- Limpiar configuración de voz de llamada
-        -- IMPORTANTE: Según voice.lua, para restaurar proximidad NO debemos llamar a setPlayerVoiceBroadcastTo
-        -- Solo limpiamos el ignore list y dejamos que MTA use proximidad automáticamente
-        -- Pero primero necesitamos resetear el broadcast que configuramos durante la llamada
-        setPlayerVoiceBroadcastTo(call.caller, {}) -- Resetear broadcast
-        setPlayerVoiceIgnoreFrom(call.caller, {}) -- Limpiar ignore list
+        -- Resetear broadcast inmediatamente para que deje de escuchar solo al otro jugador
+        -- Luego el sistema de proximidad se encargará de configurar correctamente
+        setPlayerVoiceBroadcastTo(call.caller, {})
+        setPlayerVoiceIgnoreFrom(call.caller, {})
         
-        -- El sistema de proximidad se actualizará automáticamente en el próximo ciclo (500ms)
-        -- Pero forzamos una actualización inmediata después de un delay para asegurar que funcione
+        -- Forzar actualización del sistema de proximidad después de un delay
+        -- Esto asegura que la configuración de proximidad se aplique correctamente
         setTimer(function()
             if isElement(call.caller) and not getElementData(call.caller, "phone:inCall") then
                 -- Verificar que no esté en frecuencia
                 local frecuencia = getElementData(call.caller, "frecuencia.voz")
                 if not frecuencia or tonumber(frecuencia) == -1 or tonumber(frecuencia) >= 2000 then
-                    -- Llamar directamente a la función de proximidad para aplicar la configuración
-                    if updatePlayerProximityVoice then
-                        updatePlayerProximityVoice(call.caller)
-                    else
-                        -- Si la función no está disponible aún, aplicar la lógica directamente
-                        local x, y, z = getElementPosition(call.caller)
-                        local playersToIgnore = {}
-                        
-                        for _, otherPlayer in ipairs(getElementsByType("player")) do
-                            if otherPlayer ~= call.caller and isElement(otherPlayer) then
-                                if getElementData(otherPlayer, "character:selected") then
-                                    local ox, oy, oz = getElementPosition(otherPlayer)
-                                    local distance = getDistanceBetweenPoints3D(x, y, z, ox, oy, oz)
-                                    
-                                    if distance > 5 then
-                                        table.insert(playersToIgnore, otherPlayer)
-                                    end
+                    -- Aplicar configuración de proximidad directamente
+                    local x, y, z = getElementPosition(call.caller)
+                    local playersToIgnore = {}
+                    
+                    for _, otherPlayer in ipairs(getElementsByType("player")) do
+                        if otherPlayer ~= call.caller and isElement(otherPlayer) then
+                            if getElementData(otherPlayer, "character:selected") then
+                                local ox, oy, oz = getElementPosition(otherPlayer)
+                                local distance = getDistanceBetweenPoints3D(x, y, z, ox, oy, oz)
+                                
+                                if distance > 5 then
+                                    table.insert(playersToIgnore, otherPlayer)
                                 end
                             end
                         end
-                        
-                        setPlayerVoiceIgnoreFrom(call.caller, playersToIgnore)
                     end
+                    
+                    -- Configurar ignore list para proximidad
+                    setPlayerVoiceIgnoreFrom(call.caller, playersToIgnore)
+                    -- NO configurar broadcast - dejar que MTA use proximidad por defecto
                 end
             end
-        end, 600, 1) -- Delay de 600ms para asegurar que el sistema de proximidad se ejecute
+        end, 200, 1)
         
         outputServerLog("[PHONE] Voz restaurada para " .. getPlayerName(call.caller))
     end
     
     if isElement(call.receiver) then
-        -- Limpiar datos PRIMERO
+        -- Limpiar datos PRIMERO - esto es crítico para que el sistema de proximidad funcione
         setElementData(call.receiver, "phone:inCall", false)
         setElementData(call.receiver, "phone:callPartner", nil)
         setElementData(call.receiver, "phone:speakerEnabled", false)
         
-        -- Limpiar configuración de voz de llamada
-        -- IMPORTANTE: Según voice.lua, para restaurar proximidad NO debemos llamar a setPlayerVoiceBroadcastTo
-        -- Solo limpiamos el ignore list y dejamos que MTA use proximidad automáticamente
-        -- Pero primero necesitamos resetear el broadcast que configuramos durante la llamada
-        setPlayerVoiceBroadcastTo(call.receiver, {}) -- Resetear broadcast
-        setPlayerVoiceIgnoreFrom(call.receiver, {}) -- Limpiar ignore list
+        -- Resetear broadcast inmediatamente para que deje de escuchar solo al otro jugador
+        -- Luego el sistema de proximidad se encargará de configurar correctamente
+        setPlayerVoiceBroadcastTo(call.receiver, {})
+        setPlayerVoiceIgnoreFrom(call.receiver, {})
         
-        -- El sistema de proximidad se actualizará automáticamente en el próximo ciclo (500ms)
-        -- Pero forzamos una actualización inmediata después de un delay para asegurar que funcione
+        -- Forzar actualización del sistema de proximidad después de un delay
+        -- Esto asegura que la configuración de proximidad se aplique correctamente
         setTimer(function()
             if isElement(call.receiver) and not getElementData(call.receiver, "phone:inCall") then
                 -- Verificar que no esté en frecuencia
                 local frecuencia = getElementData(call.receiver, "frecuencia.voz")
                 if not frecuencia or tonumber(frecuencia) == -1 or tonumber(frecuencia) >= 2000 then
-                    -- Llamar directamente a la función de proximidad para aplicar la configuración
-                    if updatePlayerProximityVoice then
-                        updatePlayerProximityVoice(call.receiver)
-                    else
-                        -- Si la función no está disponible aún, aplicar la lógica directamente
-                        local x, y, z = getElementPosition(call.receiver)
-                        local playersToIgnore = {}
-                        
-                        for _, otherPlayer in ipairs(getElementsByType("player")) do
-                            if otherPlayer ~= call.receiver and isElement(otherPlayer) then
-                                if getElementData(otherPlayer, "character:selected") then
-                                    local ox, oy, oz = getElementPosition(otherPlayer)
-                                    local distance = getDistanceBetweenPoints3D(x, y, z, ox, oy, oz)
-                                    
-                                    if distance > 5 then
-                                        table.insert(playersToIgnore, otherPlayer)
-                                    end
+                    -- Aplicar configuración de proximidad directamente
+                    local x, y, z = getElementPosition(call.receiver)
+                    local playersToIgnore = {}
+                    
+                    for _, otherPlayer in ipairs(getElementsByType("player")) do
+                        if otherPlayer ~= call.receiver and isElement(otherPlayer) then
+                            if getElementData(otherPlayer, "character:selected") then
+                                local ox, oy, oz = getElementPosition(otherPlayer)
+                                local distance = getDistanceBetweenPoints3D(x, y, z, ox, oy, oz)
+                                
+                                if distance > 5 then
+                                    table.insert(playersToIgnore, otherPlayer)
                                 end
                             end
                         end
-                        
-                        setPlayerVoiceIgnoreFrom(call.receiver, playersToIgnore)
                     end
+                    
+                    -- Configurar ignore list para proximidad
+                    setPlayerVoiceIgnoreFrom(call.receiver, playersToIgnore)
+                    -- NO configurar broadcast - dejar que MTA use proximidad por defecto
                 end
             end
-        end, 600, 1) -- Delay de 600ms para asegurar que el sistema de proximidad se ejecute
+        end, 200, 1)
         
         outputServerLog("[PHONE] Voz restaurada para " .. getPlayerName(call.receiver))
     end
