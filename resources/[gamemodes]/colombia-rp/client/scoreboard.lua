@@ -4,13 +4,20 @@ local screenWidth, screenHeight = guiGetScreenSize()
 
 -- Ocultar el scoreboard por defecto de MTA
 addEventHandler("onClientResourceStart", resourceRoot, function()
-    -- El scoreboard personalizado reemplazará al por defecto
+    -- Ocultar el scoreboard por defecto de MTA
+    setPlayerHudComponentVisible("radar", false)
 end)
 
 -- Ocultar el scoreboard por defecto cuando se presiona TAB
 addEventHandler("onClientPlayerSpawn", localPlayer, function()
     -- Asegurar que el scoreboard por defecto no interfiera
+    setPlayerHudComponentVisible("radar", false)
 end)
+
+-- Ocultar el scoreboard por defecto cuando se presiona TAB
+addCommandHandler("scoreboard", function()
+    -- Este comando se ejecuta cuando se presiona TAB, pero lo manejamos manualmente
+end, false)
 
 -- Toggle del scoreboard (TAB)
 bindKey("tab", "both", function(key, keyState)
@@ -20,6 +27,12 @@ bindKey("tab", "both", function(key, keyState)
         scoreboardVisible = false
     end
 end)
+
+-- Interceptar el comando scoreboard para evitar que se muestre el por defecto
+addCommandHandler("scoreboard", function()
+    -- No hacer nada, nuestro scoreboard personalizado se maneja con bindKey
+    -- Esto previene que se muestre el scoreboard por defecto
+end, true)
 
 -- Renderizar scoreboard personalizado
 addEventHandler("onClientRender", root, function()
@@ -145,6 +158,8 @@ function updatePlayerNames()
             if charName and charSurname and charId then
                 local displayName = charName .. " " .. charSurname .. " (ID: " .. charId .. ")"
                 setPlayerNametagText(player, displayName)
+                -- Asegurar que el nametag esté visible y en la posición correcta
+                setPlayerNametagShowing(player, true)
             end
         end
     end

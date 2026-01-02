@@ -3,6 +3,11 @@ local screenWidth, screenHeight = guiGetScreenSize()
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
     outputChatBox("Colombia RP cargado correctamente", 0, 255, 0)
+    
+    -- Configurar nametags para que aparezcan arriba del jugador
+    for _, player in ipairs(getElementsByType("player")) do
+        setPlayerNametagShowing(player, true)
+    end
 end)
 
 -- Configurar cámara de vista previa mientras espera login

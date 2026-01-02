@@ -277,6 +277,8 @@ addEventHandler("selectCharacter", getRootElement(), function(characterId)
         -- Actualizar nombre del jugador para mostrar personaje + ID
         local displayName = character.name .. " " .. character.surname .. " (ID: " .. character.id .. ")"
         setPlayerNametagText(source, displayName)
+        -- Asegurar que el nametag esté visible y en la posición correcta
+        setPlayerNametagShowing(source, true)
         
         outputChatBox("¡Bienvenido, " .. character.name .. " " .. character.surname .. "!", source, 0, 255, 0)
         outputChatBox("Has aparecido en el mundo. ¡Disfruta tu aventura!", source, 0, 255, 255)

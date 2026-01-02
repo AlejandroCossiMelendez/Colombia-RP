@@ -27,48 +27,30 @@ addEventHandler("onClientRender", root, function()
         local minutes = math.floor(deathTimeRemaining / 60)
         local seconds = math.floor(deathTimeRemaining % 60)
         
-        -- Texto principal
-        local mainText = "HAS MUERTO"
-        local timeText = ""
-        
-        if minutes > 0 then
-            timeText = string.format("Serás trasladado al hospital en %d:%02d", minutes, seconds)
-        else
-            timeText = string.format("Serás trasladado al hospital en %d segundos", seconds)
-        end
-        
         -- Dibujar fondo semi-transparente
         dxDrawRectangle(0, 0, screenWidth, screenHeight, tocolor(0, 0, 0, 180), false)
         
         -- Dibujar texto principal (HAS MUERTO)
-        dxDrawText(mainText, 
-            screenWidth / 2, screenHeight / 2 - 80, 
-            screenWidth / 2, screenHeight / 2 - 80,
+        dxDrawText("HAS MUERTO", 
+            screenWidth / 2, screenHeight / 2 - 120, 
+            screenWidth / 2, screenHeight / 2 - 120,
             tocolor(255, 0, 0, 255), 
             3.0, "default-bold", "center", "center", false, false, false, false, false)
         
-        -- Dibujar cuenta regresiva
+        -- Dibujar contador grande (solo números)
+        local timeText = ""
+        if minutes > 0 then
+            timeText = string.format("%d:%02d", minutes, seconds)
+        else
+            timeText = string.format("%d", seconds)
+        end
+        
+        -- Contador grande en el centro
         dxDrawText(timeText, 
             screenWidth / 2, screenHeight / 2 - 20, 
             screenWidth / 2, screenHeight / 2 - 20,
             tocolor(255, 255, 0, 255), 
-            2.0, "default-bold", "center", "center", false, false, false, false, false)
-        
-        -- Dibujar barra de progreso
-        local progress = 1 - (deathTimeRemaining / 360) -- 360 segundos = 6 minutos
-        local barWidth = screenWidth * 0.4
-        local barHeight = 20
-        local barX = (screenWidth - barWidth) / 2
-        local barY = screenHeight / 2 + 20
-        
-        -- Fondo de la barra
-        dxDrawRectangle(barX, barY, barWidth, barHeight, tocolor(50, 50, 50, 200), false)
-        
-        -- Barra de progreso
-        dxDrawRectangle(barX, barY, barWidth * progress, barHeight, tocolor(255, 0, 0, 200), false)
-        
-        -- Borde de la barra
-        dxDrawRectangle(barX, barY, barWidth, barHeight, tocolor(255, 255, 255, 100), false)
+            5.0, "default-bold", "center", "center", false, false, false, false, false)
     end
 end)
 
