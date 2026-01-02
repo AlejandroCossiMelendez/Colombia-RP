@@ -4,9 +4,33 @@ function spawnPlayerAtLocation(player, x, y, z, rotation, interior, dimension)
         return false
     end
     
-    spawnPlayer(player, x, y, z, rotation, 0, interior, dimension)
+    -- Asegurar altura mínima para evitar caídas al vacío
+    local spawnZ = z
+    if spawnZ < 5.0 then
+        spawnZ = 15.0
+    end
+    
+    spawnPlayer(player, x, y, spawnZ, rotation, 0, interior, dimension)
     setCameraTarget(player, player)
     fadeCamera(player, true)
+    
+    -- Ajustar posición después del spawn para asegurar que esté en una altura segura
+    setTimer(function()
+        if isElement(player) then
+            local px, py, pz = getElementPosition(player)
+            -- Usar processLineOfSight para encontrar el suelo
+            local hit, hitX, hitY, hitZ = processLineOfSight(px, py, pz + 50, px, py, pz - 50, true, true, false, true, false, false, false, false, player)
+            if hit then
+                -- Si está muy cerca del suelo o debajo, ajustar altura
+                if pz - hitZ < 2.0 or pz < hitZ then
+                    setElementPosition(player, px, py, hitZ + 2.0)
+                end
+            elseif pz < 5.0 then
+                -- Si no hay suelo detectado y la altura es muy baja, aumentar
+                setElementPosition(player, px, py, 15.0)
+            end
+        end
+    end, 100, 1)
     
     return true
 end

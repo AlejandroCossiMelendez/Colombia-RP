@@ -219,7 +219,12 @@ addEvent("characterCreateResponse", true)
 addEventHandler("characterCreateResponse", resourceRoot, function(success, message)
     if success then
         -- El personaje se spawnea automáticamente desde el servidor
-        -- No necesitamos recargar la lista porque el GUI se ocultará
+        -- Recargar la lista de personajes por si acaso el GUI sigue visible
+        setTimer(function()
+            if characterWindow and guiGetVisible(characterWindow) then
+                triggerServerEvent("requestCharacters", getLocalPlayer())
+            end
+        end, 1000, 1)
     else
         outputChatBox("Error: " .. message, 255, 0, 0)
     end

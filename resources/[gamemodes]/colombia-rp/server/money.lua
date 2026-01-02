@@ -1,19 +1,22 @@
 -- Sistema de Dinero
-function getPlayerMoney(player)
+-- Usamos prefijos para evitar conflictos con funciones nativas de MTA
+
+function getCharacterMoney(player)
     local money = getElementData(player, "character:money")
     return money or 0
 end
 
-function givePlayerMoney(player, amount)
+function giveCharacterMoney(player, amount)
     if not isElement(player) or amount <= 0 then
         return false
     end
     
-    local currentMoney = getPlayerMoney(player)
+    local currentMoney = getCharacterMoney(player)
     local newMoney = currentMoney + amount
     
     setElementData(player, "character:money", newMoney)
-    setPlayerMoney(player, newMoney)
+    -- Usar la función nativa de MTA para dar dinero
+    givePlayerMoney(player, amount) -- Función nativa de MTA
     
     -- Guardar en base de datos
     local characterId = getElementData(player, "character:id")
@@ -24,12 +27,12 @@ function givePlayerMoney(player, amount)
     return true
 end
 
-function takePlayerMoney(player, amount)
+function takeCharacterMoney(player, amount)
     if not isElement(player) or amount <= 0 then
         return false
     end
     
-    local currentMoney = getPlayerMoney(player)
+    local currentMoney = getCharacterMoney(player)
     
     if currentMoney < amount then
         return false
@@ -38,7 +41,8 @@ function takePlayerMoney(player, amount)
     local newMoney = currentMoney - amount
     
     setElementData(player, "character:money", newMoney)
-    setPlayerMoney(player, newMoney)
+    -- Usar la función nativa de MTA para quitar dinero
+    takePlayerMoney(player, amount) -- Función nativa de MTA
     
     -- Guardar en base de datos
     local characterId = getElementData(player, "character:id")
@@ -49,13 +53,21 @@ function takePlayerMoney(player, amount)
     return true
 end
 
-function setPlayerMoney(player, amount)
+function setCharacterMoney(player, amount)
     if not isElement(player) or amount < 0 then
         return false
     end
     
     setElementData(player, "character:money", amount)
-    givePlayerMoney(player, amount) -- MTA función nativa
+    -- Usar la función nativa de MTA directamente
+    local currentMoney = getCharacterMoney(player)
+    local difference = amount - currentMoney
+    
+    if difference > 0 then
+        givePlayerMoney(player, difference) -- Función nativa de MTA
+    elseif difference < 0 then
+        takePlayerMoney(player, math.abs(difference)) -- Función nativa de MTA
+    end
     
     -- Guardar en base de datos
     local characterId = getElementData(player, "character:id")
@@ -68,7 +80,7 @@ end
 
 -- Comandos
 addCommandHandler("dinero", function(player, cmd, amount)
-    local money = getPlayerMoney(player)
+    local money = getCharacterMoney(player)
     outputChatBox("Tu dinero: $" .. money, player, 255, 255, 0)
 end)
 
@@ -91,12 +103,11 @@ addCommandHandler("dar", function(player, cmd, targetName, amount)
         return
     end
     
-    if takePlayerMoney(player, amount) then
-        givePlayerMoney(target, amount)
+    if takeCharacterMoney(player, amount) then
+        giveCharacterMoney(target, amount)
         outputChatBox("Le diste $" .. amount .. " a " .. getPlayerName(target), player, 0, 255, 0)
         outputChatBox(getPlayerName(player) .. " te dio $" .. amount, target, 0, 255, 0)
     else
         outputChatBox("No tienes suficiente dinero", player, 255, 0, 0)
     end
 end)
-

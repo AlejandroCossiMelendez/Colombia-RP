@@ -132,10 +132,33 @@ addEventHandler("createCharacter", getRootElement(), function(name, surname, age
                             
                             outputServerLog("[CHARACTERS] Spawneando personaje recién creado ID: " .. newCharacterId .. " para " .. getPlayerName(source))
                             
-                            -- Spawnear personaje
-                            spawnPlayer(source, character.posX, character.posY, character.posZ, character.rotation, character.skin, character.interior, character.dimension)
+                            -- Spawnear personaje con altura segura
+                            local spawnZ = character.posZ
+                            -- Si la altura es muy baja, aumentarla para evitar caídas
+                            if spawnZ < 5.0 then
+                                spawnZ = 15.0
+                            end
+                            spawnPlayer(source, character.posX, character.posY, spawnZ, character.rotation, character.skin, character.interior, character.dimension)
                             setElementHealth(source, character.health)
                             setElementModel(source, character.skin)
+                            
+                            -- Asegurar que el jugador esté en una posición segura después del spawn
+                            setTimer(function()
+                                if isElement(source) then
+                                    local x, y, z = getElementPosition(source)
+                                    -- Usar processLineOfSight para encontrar el suelo
+                                    local hit, hitX, hitY, hitZ = processLineOfSight(x, y, z + 50, x, y, z - 50, true, true, false, true, false, false, false, false, source)
+                                    if hit then
+                                        -- Si está muy cerca del suelo o debajo, ajustar altura
+                                        if z - hitZ < 2.0 or z < hitZ then
+                                            setElementPosition(source, x, y, hitZ + 2.0)
+                                        end
+                                    elseif z < 5.0 then
+                                        -- Si no hay suelo detectado y la altura es muy baja, aumentar
+                                        setElementPosition(source, x, y, 15.0)
+                                    end
+                                end
+                            end, 100, 1)
                             
                             -- Activar cámara del jugador
                             setTimer(function()
@@ -153,7 +176,7 @@ addEventHandler("createCharacter", getRootElement(), function(name, surname, age
                             triggerClientEvent(source, "showHUD", resourceRoot)
                             
                             -- Actualizar dinero
-                            setPlayerMoney(source, character.money)
+                            setCharacterMoney(source, character.money)
                             
                             outputChatBox("¡Bienvenido, " .. character.name .. " " .. character.surname .. "!", source, 0, 255, 0)
                             outputChatBox("Has aparecido en el mundo. ¡Disfruta tu aventura!", source, 0, 255, 255)
@@ -198,12 +221,35 @@ addEventHandler("selectCharacter", getRootElement(), function(characterId)
         
         outputServerLog("[CHARACTERS] Spawneando personaje ID: " .. characterId .. " para " .. getPlayerName(source))
         
-        -- Spawnear personaje
-        spawnPlayer(source, character.posX, character.posY, character.posZ, character.rotation, character.skin, character.interior, character.dimension)
+        -- Spawnear personaje con altura segura
+        local spawnZ = character.posZ
+        -- Si la altura es muy baja, aumentarla para evitar caídas
+        if spawnZ < 5.0 then
+            spawnZ = 15.0
+        end
+        spawnPlayer(source, character.posX, character.posY, spawnZ, character.rotation, character.skin, character.interior, character.dimension)
         setElementHealth(source, character.health)
         setElementModel(source, character.skin)
         
-        outputServerLog("[CHARACTERS] Personaje spawneado en: " .. character.posX .. ", " .. character.posY .. ", " .. character.posZ)
+        outputServerLog("[CHARACTERS] Personaje spawneado en: " .. character.posX .. ", " .. character.posY .. ", " .. spawnZ)
+        
+        -- Asegurar que el jugador esté en una posición segura después del spawn
+        setTimer(function()
+            if isElement(source) then
+                local x, y, z = getElementPosition(source)
+                -- Usar processLineOfSight para encontrar el suelo
+                local hit, hitX, hitY, hitZ = processLineOfSight(x, y, z + 50, x, y, z - 50, true, true, false, true, false, false, false, false, source)
+                if hit then
+                    -- Si está muy cerca del suelo o debajo, ajustar altura
+                    if z - hitZ < 2.0 or z < hitZ then
+                        setElementPosition(source, x, y, hitZ + 2.0)
+                    end
+                elseif z < 5.0 then
+                    -- Si no hay suelo detectado y la altura es muy baja, aumentar
+                    setElementPosition(source, x, y, 15.0)
+                end
+            end
+        end, 100, 1)
         
         -- Activar cámara del jugador
         setTimer(function()
@@ -222,7 +268,7 @@ addEventHandler("selectCharacter", getRootElement(), function(characterId)
         triggerClientEvent(source, "showHUD", resourceRoot)
         
         -- Actualizar dinero
-        setPlayerMoney(source, character.money)
+        setCharacterMoney(source, character.money)
         
         outputChatBox("¡Bienvenido, " .. character.name .. " " .. character.surname .. "!", source, 0, 255, 0)
         outputChatBox("Has aparecido en el mundo. ¡Disfruta tu aventura!", source, 0, 255, 255)
