@@ -17,81 +17,56 @@ LISTADO DE MODS OBLIGATORIOS PARA EL JUGADOR:
  ID 508 CARAVANA ENTRABLE
 ]]
 
+-- Función auxiliar para cargar y reemplazar modelos de forma segura
+local function safeLoadModel(txdPath, dffPath, modelID)
+	if not txdPath or not dffPath or not modelID then
+		outputDebugString("descargadorv2: Invalid parameters for model " .. tostring(modelID), 1)
+		return false
+	end
+	
+	local txd = engineLoadTXD(txdPath, modelID)
+	if not txd then
+		outputDebugString("descargadorv2: Failed to load TXD: " .. txdPath, 1)
+		return false
+	end
+	
+	if not engineImportTXD(txd, modelID) then
+		outputDebugString("descargadorv2: Failed to import TXD for model " .. tostring(modelID), 1)
+		return false
+	end
+	
+	local dff = engineLoadDFF(dffPath, modelID)
+	if not dff then
+		outputDebugString("descargadorv2: Failed to load DFF: " .. dffPath, 1)
+		return false
+	end
+	
+	if not engineReplaceModel(dff, modelID) then
+		outputDebugString("descargadorv2: Failed to replace model " .. tostring(modelID), 1)
+		return false
+	end
+	
+	return true
+end
+
 function reemplazarModelosObligatorios() 
-  txd1 = engineLoadTXD("mods/Mascotas/88.txd", 88 )
-  engineImportTXD(txd1, 88)
-  dff1 = engineLoadDFF("mods/Mascotas/88.dff", 88 )
-  engineReplaceModel(dff1, 88)
+  -- Cargar modelos con validación de errores
+  safeLoadModel("mods/Mascotas/88.txd", "mods/Mascotas/88.dff", 88)
+  safeLoadModel("mods/Mascotas/89.txd", "mods/Mascotas/89.dff", 89)
+  safeLoadModel("mods/Mascotas/243.txd", "mods/Mascotas/243.dff", 243)
+  safeLoadModel("mods/Mascotas/244.txd", "mods/Mascotas/244.dff", 244)
+  safeLoadModel("mods/Mascotas/252.txd", "mods/Mascotas/252.dff", 252)
+  safeLoadModel("mods/Skins/279.txd", "mods/Skins/279.dff", 279)
+  -- safeLoadModel("mods/Vehs Facciones/431.txd", "mods/Vehs Facciones/431.dff", 431) -- Comentado
+  safeLoadModel("mods/Vehs Facciones/525.txd", "mods/Vehs Facciones/525.dff", 525)
+  safeLoadModel("mods/Vehs Facciones/578.txd", "mods/Vehs Facciones/578.dff", 578)
+  safeLoadModel("mods/Vehs Facciones/604.txd", "mods/Vehs Facciones/604.dff", 604)
+  safeLoadModel("mods/Skins/278.txd", "mods/Skins/278.dff", 278)
+  safeLoadModel("mods/Skins/9.txd", "mods/Skins/9.dff", 9)
+  safeLoadModel("mods/Vehs Facciones/416.txd", "mods/Vehs Facciones/416.dff", 416)
+  safeLoadModel("mods/Vehs LowPoly/journey.txd", "mods/Vehs LowPoly/journey.dff", 508)
+  safeLoadModel("mods/Skins/10.txd", "mods/Skins/10.dff", 10)
   
-  txd2 = engineLoadTXD("mods/Mascotas/89.txd", 89 )
-  engineImportTXD(txd2, 89)
-  dff2 = engineLoadDFF("mods/Mascotas/89.dff", 89 )
-  engineReplaceModel(dff2, 89)
-  
-  txd3 = engineLoadTXD("mods/Mascotas/243.txd", 243 )
-  engineImportTXD(txd3, 243)
-  dff3 = engineLoadDFF("mods/Mascotas/243.dff", 243 )
-  engineReplaceModel(dff3, 243)
-  
-  txd4 = engineLoadTXD("mods/Mascotas/244.txd", 244 )
-  engineImportTXD(txd4, 244)
-  dff4 = engineLoadDFF("mods/Mascotas/244.dff", 244 )
-  engineReplaceModel(dff4, 244)
-  
-  txd5 = engineLoadTXD("mods/Mascotas/252.txd", 252 )
-  engineImportTXD(txd5, 252)
-  dff5 = engineLoadDFF("mods/Mascotas/252.dff", 252 )
-  engineReplaceModel(dff5, 252)
-  
-  txd6 = engineLoadTXD("mods/Skins/279.txd", 279 )
-  engineImportTXD(txd6, 279)
-  dff6 = engineLoadDFF("mods/Skins/279.dff", 279 )
-  engineReplaceModel(dff6, 279)
-  
-  -- txd7 = engineLoadTXD("mods/Vehs Facciones/431.txd", 431 )
-  -- engineImportTXD(txd7, 431)
-  -- dff7 = engineLoadDFF("mods/Vehs Facciones/431.dff", 431 )
-  -- engineReplaceModel(dff7, 431)
-  
-  txd8 = engineLoadTXD("mods/Vehs Facciones/525.txd", 525 )
-  engineImportTXD(txd8, 525)
-  dff8 = engineLoadDFF("mods/Vehs Facciones/525.dff", 525 )
-  engineReplaceModel(dff8, 525)
-  
-  txd9 = engineLoadTXD("mods/Vehs Facciones/578.txd", 578 )
-  engineImportTXD(txd9, 578)
-  dff9 = engineLoadDFF("mods/Vehs Facciones/578.dff", 578 )
-  engineReplaceModel(dff9, 578)
-  
-  txd10 = engineLoadTXD("mods/Vehs Facciones/604.txd", 604 )
-  engineImportTXD(txd10, 604)
-  dff10 = engineLoadDFF("mods/Vehs Facciones/604.dff", 604 )
-  engineReplaceModel(dff10, 604)
-  
-  txd11 = engineLoadTXD("mods/Skins/278.txd", 278 )
-  engineImportTXD(txd11, 278)
-  dff11 = engineLoadDFF("mods/Skins/278.dff", 278 )
-  engineReplaceModel(dff11, 278)
-  
-  txd12 = engineLoadTXD("mods/Skins/9.txd", 9 )
-  engineImportTXD(txd12, 9)
-  dff12 = engineLoadDFF("mods/Skins/9.dff", 9 )
-  engineReplaceModel(dff12, 9)
-  
-  txd13 = engineLoadTXD("mods/Vehs Facciones/416.txd", 416 )
-  engineImportTXD(txd13, 416)
-  dff13 = engineLoadDFF("mods/Vehs Facciones/416.dff", 416 )
-  engineReplaceModel(dff13, 416)
-  
-  txd14 = engineLoadTXD("mods/Vehs LowPoly/journey.txd", 508 )
-  engineImportTXD(txd14, 508)
-  dff14 = engineLoadDFF("mods/Vehs LowPoly/journey.dff", 508 )
-  engineReplaceModel(dff14, 508)
-  
-  txd15 = engineLoadTXD("mods/Skins/10.txd", 10 )
-  engineImportTXD(txd15, 10)
-  dff15 = engineLoadDFF("mods/Skins/10.dff", 10 )
-  engineReplaceModel(dff15, 10)
-  
+  outputDebugString("descargadorv2: Modelos obligatorios cargados", 3)
 end
 addEventHandler ( "onClientResourceStart", getResourceRootElement(getThisResource()), reemplazarModelosObligatorios)

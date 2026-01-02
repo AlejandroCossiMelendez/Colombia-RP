@@ -135,18 +135,37 @@ addEventHandler("onClientFileDownloadComplete", root,
 	function(filename, success)
 		if success then
 			local name = tostring( downloads[filename][2] )
+			local modelID = downloads[filename][1]
+			
 			if filename:find(".txd") then
 				local txd = engineLoadTXD( filename )
-				engineImportTXD( txd, downloads[filename][1] ) --Pending
-				removeDownloadQueue(name)
+				if txd then
+					if engineImportTXD( txd, modelID ) then
+						removeDownloadQueue(name)
+					else
+						outputDebugString("descargadorv2: Failed to import TXD for model " .. tostring(modelID) .. " (" .. filename .. ")", 1)
+					end
+				else
+					outputDebugString("descargadorv2: Failed to load TXD: " .. filename, 1)
+				end
 			elseif filename:find(".dff") then
 				local dff = engineLoadDFF ( filename )
-				engineReplaceModel ( dff, downloads[filename][1] ) --Pending
-				removeDownloadQueue(name)
+				if dff then
+					if engineReplaceModel ( dff, modelID ) then
+						removeDownloadQueue(name)
+					else
+						outputDebugString("descargadorv2: Failed to replace model " .. tostring(modelID) .. " (" .. filename .. ")", 1)
+					end
+				else
+					outputDebugString("descargadorv2: Failed to load DFF: " .. filename, 1)
+				end
 			end
+			
 			local file = fileOpen(filename)
-			currentSize[filename] = fileGetSize(file)
-			fileClose(file)
+			if file then
+				currentSize[filename] = fileGetSize(file)
+				fileClose(file)
+			end
 			refresh()
 		end
 	end
