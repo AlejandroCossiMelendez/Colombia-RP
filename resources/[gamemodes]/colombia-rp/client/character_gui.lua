@@ -8,7 +8,11 @@ function loadCharacterBrowser()
 end
 
 function whenCharacterBrowserReady()
-    -- El navegador está listo, solicitar lista de personajes
+    -- El navegador está listo, asegurar que el cursor esté visible
+    showCursor(true)
+    guiSetInputEnabled(true)
+    guiSetInputMode("no_binds_when_editing")
+    -- Solicitar lista de personajes
     triggerServerEvent("requestCharacters", localPlayer)
 end
 
@@ -42,9 +46,14 @@ function showCharacterGUI()
     addEventHandler("onClientBrowserCreated", characterBrowser, loadCharacterBrowser)
     addEventHandler("onClientBrowserDocumentReady", characterBrowser, whenCharacterBrowserReady)
     
-    -- Mostrar cursor y habilitar input
+    -- Mostrar cursor y habilitar input (también con un pequeño delay para asegurar)
     showCursor(true)
     guiSetInputEnabled(true)
+    setTimer(function()
+        showCursor(true)
+        guiSetInputEnabled(true)
+        guiSetInputMode("no_binds_when_editing")
+    end, 100, 1)
 end
 
 function hideCharacterGUI()
