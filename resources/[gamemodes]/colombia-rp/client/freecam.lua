@@ -45,18 +45,18 @@ function enableFreecam()
     freecamRotY = 0
     
     freecamEnabled = true
-    showCursor(true) -- Mostrar cursor pero lo centraremos
+    -- No mostrar cursor automáticamente, se mostrará cuando sea necesario
     setElementFrozen(localPlayer, true) -- Congelar al jugador
     
     -- Hacer invisible al jugador mientras usa freecam
     setElementAlpha(localPlayer, 0)
     setPlayerNametagShowing(localPlayer, false)
     
-    -- Centrar el cursor inicialmente
+    -- Inicializar variables del mouse
     screenW, screenH = guiGetScreenSize()
-    setCursorPosition(screenW / 2, screenH / 2)
     lastMouseX, lastMouseY = screenW / 2, screenH / 2
     mouseInitialized = false
+    cursorManuallyReleased = false
     
     -- Obtener rotación inicial de la cámara actual
     local camX, camY, camZ, lx, ly, lz = getCameraMatrix()
@@ -167,8 +167,57 @@ local lastMouseX, lastMouseY = 0, 0
 local mouseInitialized = false
 local centerX, centerY = 0, 0
 
+-- Variable para rastrear si el cursor fue liberado manualmente (tecla M)
+local cursorManuallyReleased = false
+
+-- Función para verificar si hay un GUI abierto
+function isGUIOpen()
+    -- Verificar si hay ventanas GUI activas en el recurso
+    local windows = getElementsByType("gui-window", resourceRoot)
+    for _, window in ipairs(windows) do
+        if isElement(window) and guiGetVisible(window) then
+            return true
+        end
+    end
+    
+    -- Verificar si hay otros elementos GUI visibles
+    local buttons = getElementsByType("gui-button", resourceRoot)
+    for _, button in ipairs(buttons) do
+        if isElement(button) and guiGetVisible(button) then
+            local parent = guiGetParent(button)
+            if parent and isElement(parent) and getElementType(parent) == "gui-window" and guiGetVisible(parent) then
+                return true
+            end
+        end
+    end
+    
+    return false
+end
+
+-- Detectar cuando se presiona M para liberar el cursor
+addEventHandler("onClientKey", root, function(key, press)
+    if freecamEnabled and key == "m" then
+        if press then
+            cursorManuallyReleased = true
+        else
+            -- Cuando se suelta M, esperar un momento antes de volver a centrar
+            setTimer(function()
+                if freecamEnabled and not isGUIOpen() then
+                    cursorManuallyReleased = false
+                end
+            end, 100, 1)
+        end
+    end
+end)
+
 addEventHandler("onClientCursorMove", root, function(relX, relY, absX, absY)
     if not freecamEnabled then
+        mouseInitialized = false
+        return
+    end
+    
+    -- Si hay un GUI abierto o el cursor fue liberado manualmente, no centrar el cursor ni rotar la cámara
+    if isGUIOpen() or cursorManuallyReleased then
         mouseInitialized = false
         return
     end
@@ -200,16 +249,32 @@ addEventHandler("onClientCursorMove", root, function(relX, relY, absX, absY)
             freecamRotX = -90
         end
         
-        -- Centrar el cursor de nuevo
-        setCursorPosition(centerX, centerY)
-        lastMouseX, lastMouseY = centerX, centerY
+        -- Centrar el cursor de nuevo solo si no hay GUI abierto y no fue liberado manualmente
+        if not isGUIOpen() and not cursorManuallyReleased then
+            setCursorPosition(centerX, centerY)
+            lastMouseX, lastMouseY = centerX, centerY
+        end
     end
 end)
 
 -- Renderizar freecam (movimiento del mouse se maneja en otro handler)
 addEventHandler("onClientRender", root, function()
     if freecamEnabled then
-        updateFreecam()
+        -- Solo actualizar la cámara si no hay GUI abierto
+        if not isGUIOpen() and not cursorManuallyReleased then
+            updateFreecam()
+            
+            -- Si el cursor no está visible, mostrarlo y centrarlo para el control de la cámara
+            if not isCursorShowing() then
+                showCursor(true)
+                screenW, screenH = guiGetScreenSize()
+                local centerX, centerY = screenW / 2, screenH / 2
+                setCursorPosition(centerX, centerY)
+            end
+        else
+            -- Si hay GUI abierto o cursor liberado, solo actualizar la posición de la cámara sin centrar el cursor
+            updateFreecam()
+        end
     end
 end)
 
