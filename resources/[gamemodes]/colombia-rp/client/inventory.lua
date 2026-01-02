@@ -264,14 +264,57 @@ function drawInventory()
             
             -- Dibujar imagen del item
             local itemId = item.item_id or item.item
+            local itemValue = item.value or item.item_value
             if itemId then
-                local imagePath = ":colombia-rp/items/images/" .. itemId .. ".png"
                 local imageSize = w - 20 -- Tamaño de la imagen con padding
                 local imageX = x + 10
                 local imageY = y + 10
                 
-                -- Intentar dibujar la imagen (MTA carga las imágenes automáticamente si están en meta.xml)
-                dxDrawImage(imageX, imageY, imageSize, imageSize, imagePath, 0, 0, 0, tocolor(255, 255, 255, 255), false)
+                -- Obtener la ruta de la imagen usando el sistema de items
+                local imagePath = nil
+                
+                -- Intentar usar getImage si está disponible (desde items_list.lua)
+                if getImage then
+                    imagePath = getImage(itemId, itemValue, item.item_name)
+                    -- Si getImage devuelve una ruta con :items/, cambiarla a :colombia-rp/
+                    if imagePath and string.find(imagePath, ":items/") then
+                        imagePath = string.gsub(imagePath, ":items/", ":colombia-rp/")
+                    end
+                end
+                
+                -- Si no hay función getImage o no devolvió nada, usar ruta estándar
+                if not imagePath then
+                    imagePath = ":colombia-rp/items/images/" .. itemId .. ".png"
+                end
+                
+                -- Intentar múltiples rutas para la imagen (con diferentes extensiones y formatos)
+                local imagePaths = {
+                    imagePath,
+                    ":colombia-rp/items/images/" .. itemId .. ".png",
+                    ":colombia-rp/items/images/" .. itemId .. ".PNG",
+                    "items/images/" .. itemId .. ".png",
+                    ":colombia-rp/items/images/" .. tostring(itemId) .. ".png"
+                }
+                
+                local imageDrawn = false
+                for _, path in ipairs(imagePaths) do
+                    if path then
+                        local success = pcall(function()
+                            dxDrawImage(imageX, imageY, imageSize, imageSize, path, 0, 0, 0, tocolor(255, 255, 255, 255), false)
+                        end)
+                        if success then
+                            imageDrawn = true
+                            break
+                        end
+                    end
+                end
+                
+                -- Si ninguna imagen se pudo cargar, dibujar un placeholder
+                if not imageDrawn then
+                    -- Dibujar un rectángulo gris como placeholder
+                    dxDrawRectangle(imageX, imageY, imageSize, imageSize, tocolor(100, 100, 100, 200), false)
+                    dxDrawText("?", imageX + imageSize/2, imageY + imageSize/2, imageX + imageSize/2, imageY + imageSize/2, tocolor(255, 255, 255, 255), 1.5, "default-bold", "center", "center", false, false, false, false, false)
+                end
             end
             
             -- Nombre del item (centrado con múltiples sombras y glow)

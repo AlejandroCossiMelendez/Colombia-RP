@@ -296,20 +296,49 @@
     
     <!-- Imágenes de items -->
     <file src="items/images/1.png" type="client" />
+    <file src="items/images/2.png" type="client" />
     <file src="items/images/3.png" type="client" />
+    <file src="items/images/4.png" type="client" />
     <file src="items/images/5.png" type="client" />
     <file src="items/images/6.png" type="client" />
     <file src="items/images/7.png" type="client" />
     <file src="items/images/8.png" type="client" />
     <file src="items/images/9.png" type="client" />
+    <file src="items/images/10.png" type="client" />
+    <file src="items/images/11.png" type="client" />
+    <file src="items/images/12.png" type="client" />
+    <file src="items/images/13.png" type="client" />
+    <file src="items/images/14.png" type="client" />
+    <file src="items/images/15.png" type="client" />
+    <file src="items/images/16.png" type="client" />
+    <file src="items/images/17.png" type="client" />
+    <file src="items/images/18.png" type="client" />
+    <file src="items/images/19.png" type="client" />
+    <file src="items/images/20.png" type="client" />
+    <file src="items/images/21.png" type="client" />
+    <file src="items/images/22.png" type="client" />
+    <file src="items/images/23.png" type="client" />
+    <file src="items/images/24.png" type="client" />
+    <file src="items/images/25.png" type="client" />
+    <file src="items/images/26.png" type="client" />
+    <file src="items/images/27.png" type="client" />
+    <file src="items/images/28.png" type="client" />
+    <file src="items/images/29.png" type="client" />
+    <file src="items/images/30.png" type="client" />
+    <file src="items/images/31.png" type="client" />
     <file src="items/images/32.png" type="client" />
     <file src="items/images/33.png" type="client" />
+    <file src="items/images/34.png" type="client" />
+    <file src="items/images/35.png" type="client" />
     <file src="items/images/36.png" type="client" />
     <file src="items/images/37.png" type="client" />
     <file src="items/images/38.png" type="client" />
     <file src="items/images/39.png" type="client" />
     <file src="items/images/40.png" type="client" />
     <file src="items/images/41.png" type="client" />
+    <file src="items/images/42.png" type="client" />
+    <file src="items/images/43.png" type="client" />
+    <file src="items/images/44.png" type="client" />
     <file src="items/images/45.png" type="client" />
     <file src="items/images/46.png" type="client" />
     <file src="items/images/47.png" type="client" />
@@ -368,6 +397,7 @@
     <file src="items/images/100.png" type="client" />
     <file src="items/images/101.png" type="client" />
     <file src="items/images/102.png" type="client" />
+    <file src="items/images/200.png" type="client" />
     <file src="items/images/w1.png" type="client" />
     <file src="items/images/w2.png" type="client" />
     <file src="items/images/w3.png" type="client" />
@@ -430,6 +460,7 @@
     <file src="items/images/armario.png" type="client" />
     <file src="items/images/beer.png" type="client" />
     <file src="items/images/blackdevil.png" type="client" />
+    <file src="items/images/cerveza.png" type="client" />
     <file src="items/images/bs1.png" type="client" />
     <file src="items/images/bs2.png" type="client" />
     <file src="items/images/bs3.png" type="client" />
