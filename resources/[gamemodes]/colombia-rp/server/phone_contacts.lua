@@ -252,6 +252,13 @@ addEventHandler("saveContacts", root, function(contactsJson)
     end
     
     outputServerLog("[PHONE] Contactos guardados: " .. tostring(insertCount) .. " exitosos, " .. tostring(errorCount) .. " errores")
+    
+    -- Mostrar mensaje de confirmación al jugador
+    if insertCount > 0 then
+        outputChatBox("✓ " .. tostring(insertCount) .. " contacto(s) guardado(s) correctamente.", player, 0, 255, 0)
+    elseif errorCount > 0 then
+        outputChatBox("Error: No se pudieron guardar algunos contactos. Intenta de nuevo.", player, 255, 0, 0)
+    end
 end)
 
 -- Evento para cargar contactos
