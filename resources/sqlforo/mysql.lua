@@ -25,10 +25,10 @@ local enabled = false
 -- connection functions
 local function connect( )
  
-	local server = "127.0.0.1"
-	local user = "USUARIO_DB"
-	local password = "CLAVE_DB"
-	local db = "NOMBRE_DB"
+	local server = "localhost"
+	local user = "mta_user"
+	local password = "15306266_Mta"
+	local db = "mta_login"
 	local port = 3306
 	local socket = "/var/lib/mysql/mysql.sock"
 
