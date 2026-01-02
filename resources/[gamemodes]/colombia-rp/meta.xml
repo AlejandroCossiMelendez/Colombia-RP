@@ -21,8 +21,7 @@
     <script src="client/hud.lua" type="client" />
     <script src="client/main.lua" type="client" />
     
-    <!-- Archivos -->
-    <file src="client/login.html" />
+    <!-- Archivos (ya no necesarios para login, pero se mantienen para character GUI) -->
     <file src="client/character.html" />
     <file src="client/hud.html" />
 </meta>
