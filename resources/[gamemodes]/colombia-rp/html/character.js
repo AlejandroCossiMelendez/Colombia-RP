@@ -20,7 +20,14 @@ function loadCharacters(characters) {
         characters.forEach(char => {
             const card = document.createElement('div');
             card.className = 'character-card';
+            const skinId = char.skin || 30;
+            const gender = char.gender || 0;
+            const genderText = gender === 0 ? 'Masculino' : 'Femenino';
             card.innerHTML = `
+                <div class="character-skin-preview">
+                    <div class="skin-id">Skin ID: ${skinId}</div>
+                    <div class="skin-gender">${genderText}</div>
+                </div>
                 <div class="character-name">${char.name || ''} ${char.surname || ''}</div>
                 <div class="character-info">Edad: ${char.age || 18} años</div>
                 <div class="character-info">Dinero: $${formatMoney(char.money || 0)}</div>

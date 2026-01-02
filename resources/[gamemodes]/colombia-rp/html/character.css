@@ -96,6 +96,31 @@ body {
     opacity: 1;
 }
 
+.character-skin-preview {
+    background: rgba(0, 150, 255, 0.2);
+    border: 2px solid rgba(0, 150, 255, 0.4);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    text-align: center;
+    backdrop-filter: blur(5px);
+}
+
+.skin-id {
+    font-size: 18px;
+    font-weight: 700;
+    color: #00c853;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.skin-gender {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
 .character-name {
     font-size: 24px;
     font-weight: 700;
