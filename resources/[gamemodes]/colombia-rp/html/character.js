@@ -23,10 +23,20 @@ function loadCharacters(characters) {
             const skinId = char.skin || 30;
             const gender = char.gender || 0;
             const genderText = gender === 0 ? 'Masculino' : 'Femenino';
+            
+            // Crear representación visual de la skin
+            const skinColor = getSkinColor(skinId);
+            const skinIcon = getSkinIcon(gender);
             card.innerHTML = `
-                <div class="character-skin-preview">
-                    <div class="skin-id">Skin ID: ${skinId}</div>
-                    <div class="skin-gender">${genderText}</div>
+                <div class="character-skin-preview" style="background: linear-gradient(135deg, ${skinColor.primary} 0%, ${skinColor.secondary} 100%);">
+                    <div class="skin-visual">
+                        <div class="skin-icon">${skinIcon}</div>
+                        <div class="skin-shadow"></div>
+                    </div>
+                    <div class="skin-info">
+                        <div class="skin-id">Skin ID: ${skinId}</div>
+                        <div class="skin-gender">${genderText}</div>
+                    </div>
                 </div>
                 <div class="character-name">${char.name || ''} ${char.surname || ''}</div>
                 <div class="character-info">Edad: ${char.age || 18} años</div>
@@ -223,6 +233,30 @@ document.addEventListener('click', function(e) {
         closeGenderDropdown();
     }
 });
+
+// Función para obtener color basado en el ID de la skin
+function getSkinColor(skinId) {
+    const colors = [
+        { primary: '#4a90e2', secondary: '#357abd' }, // Azul
+        { primary: '#50c878', secondary: '#3a9d5f' }, // Verde
+        { primary: '#ff6b6b', secondary: '#ee5a5a' }, // Rojo
+        { primary: '#ffa500', secondary: '#ff8c00' }, // Naranja
+        { primary: '#9b59b6', secondary: '#8e44ad' }, // Morado
+        { primary: '#1abc9c', secondary: '#16a085' }, // Turquesa
+        { primary: '#e74c3c', secondary: '#c0392b' }, // Rojo oscuro
+        { primary: '#3498db', secondary: '#2980b9' }, // Azul claro
+    ];
+    return colors[skinId % colors.length] || colors[0];
+}
+
+// Función para obtener icono basado en el género
+function getSkinIcon(gender) {
+    if (gender === 0) {
+        return '👤'; // Masculino
+    } else {
+        return '👩'; // Femenino
+    }
+}
 
 // Funciones expuestas para MTA
 window.loadCharacters = loadCharacters;

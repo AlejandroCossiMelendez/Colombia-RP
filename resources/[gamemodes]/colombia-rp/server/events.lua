@@ -21,6 +21,8 @@ addEvent("requestCharacters", true)
 addEvent("selectCharacter", true)
 addEvent("createCharacter", true)
 addEvent("deleteCharacter", true)
+addEvent("requestSkinPreview", true)
+addEvent("receiveSkinPreview", true)
 outputServerLog("[EVENTS] Eventos de personajes registrados")
 
 -- Eventos de inventario

@@ -97,17 +97,70 @@ body {
 }
 
 .character-skin-preview {
-    background: rgba(0, 150, 255, 0.2);
-    border: 2px solid rgba(0, 150, 255, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 12px;
-    padding: 15px;
+    padding: 20px;
     margin-bottom: 15px;
     text-align: center;
     backdrop-filter: blur(5px);
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.character-skin-preview::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+.skin-visual {
+    position: relative;
+    z-index: 2;
+    margin-bottom: 15px;
+}
+
+.skin-icon {
+    font-size: 80px;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.skin-shadow {
+    width: 60px;
+    height: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 50%;
+    margin: 10px auto 0;
+    filter: blur(5px);
+}
+
+.skin-info {
+    margin-top: 10px;
 }
 
 .skin-id {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     color: #00c853;
     margin-bottom: 5px;
@@ -115,7 +168,7 @@ body {
 }
 
 .skin-gender {
-    font-size: 12px;
+    font-size: 11px;
     color: rgba(255, 255, 255, 0.7);
     text-transform: uppercase;
     letter-spacing: 1px;

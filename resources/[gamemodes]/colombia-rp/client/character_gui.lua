@@ -262,6 +262,8 @@ addEventHandler("receiveCharacters", resourceRoot, function(charList)
                 json = json .. "\"surname\":\"" .. (char.surname or ""):gsub("\"", "\\\"") .. "\","
                 json = json .. "\"age\":" .. (char.age or 18) .. ","
                 json = json .. "\"money\":" .. (char.money or 0) .. ","
+                json = json .. "\"skin\":" .. (char.skin or 30) .. ","
+                json = json .. "\"gender\":" .. (char.gender or 0) .. ","
                 json = json .. "\"lastLogin\":\"" .. (char.lastLogin or "Nunca"):gsub("\"", "\\\"") .. "\""
                 json = json .. "}"
             end
