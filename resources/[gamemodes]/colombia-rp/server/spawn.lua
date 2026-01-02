@@ -223,6 +223,9 @@ function respawnAtDeathLocation(player)
     return true
 end
 
+-- Tabla para almacenar timers de actualización de armor
+local armorUpdateTimers = {}
+
 -- Evento cuando el jugador muere
 -- Actualizar armor del chaleco cuando el jugador recibe daño
 addEventHandler("onPlayerDamage", root, function(attacker, weapon, bodypart, loss)
@@ -241,8 +244,9 @@ addEventHandler("onPlayerDamage", root, function(attacker, weapon, bodypart, los
         local characterId = getElementData(source, "character:id")
         if characterId then
             -- Usar un timer para evitar actualizar en cada frame de daño
-            if not source.armorUpdateTimer or not isTimer(source.armorUpdateTimer) then
-                source.armorUpdateTimer = setTimer(function(player)
+            local playerTimer = armorUpdateTimers[source]
+            if not playerTimer or not isTimer(playerTimer) then
+                armorUpdateTimers[source] = setTimer(function(player)
                     if isElement(player) then
                         local charId = getElementData(player, "character:id")
                         local armor = math.floor(getPedArmor(player))
@@ -250,6 +254,8 @@ addEventHandler("onPlayerDamage", root, function(attacker, weapon, bodypart, los
                         if charId then
                             executeDatabase("UPDATE characters SET armor = ? WHERE id = ?", armor, charId)
                         end
+                        -- Limpiar el timer de la tabla
+                        armorUpdateTimers[player] = nil
                     end
                 end, 1000, 1, source) -- Actualizar después de 1 segundo
             end
@@ -263,7 +269,20 @@ addEventHandler("onPlayerDamage", root, function(attacker, weapon, bodypart, los
             if characterId then
                 executeDatabase("UPDATE characters SET armor = 0 WHERE id = ?", characterId)
             end
+            -- Limpiar el timer si existe
+            if armorUpdateTimers[source] and isTimer(armorUpdateTimers[source]) then
+                killTimer(armorUpdateTimers[source])
+                armorUpdateTimers[source] = nil
+            end
         end
+    end
+end)
+
+-- Limpiar timers cuando el jugador se desconecta
+addEventHandler("onPlayerQuit", root, function()
+    if armorUpdateTimers[source] and isTimer(armorUpdateTimers[source]) then
+        killTimer(armorUpdateTimers[source])
+        armorUpdateTimers[source] = nil
     end
 end)
 
