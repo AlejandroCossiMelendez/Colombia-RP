@@ -19,6 +19,7 @@
     <script src="server/bank.lua" type="server" />
     <script src="server/chat.lua" type="server" />
     <script src="server/voice.lua" type="server" />
+    <script src="server/admin_panel.lua" type="server" />
     <script src="server/main.lua" type="server" />
     
     <!-- Scripts del cliente -->
@@ -33,6 +34,7 @@
     <script src="client/hype_hud.lua" type="client" />
     <script src="client/hype_stamina.lua" type="client" />
     <script src="client/voice.lua" type="client" />
+    <script src="client/admin_panel.lua" type="client" />
     
     <!-- Radar HD -->
     <script src="client/radar.lua" type="client" />

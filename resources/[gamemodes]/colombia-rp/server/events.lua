@@ -47,4 +47,10 @@ addEvent("onCerrarMisFrecuencias", true)
 addEvent("onCharacterSelected", false) -- Evento interno del servidor
 outputServerLog("[EVENTS] Eventos de voz registrados: onConectarAFrecuencia, onAbrirMisFrecuencias, onCerrarMisFrecuencias, onCharacterSelected")
 
+-- Eventos del panel de administración
+addEvent("admin:revivePlayer", true)
+addEvent("admin:getCoords", true)
+addEvent("admin:reviveResponse", true)
+outputServerLog("[EVENTS] Eventos del panel de administración registrados: admin:revivePlayer, admin:getCoords, admin:reviveResponse")
+
 outputServerLog("[EVENTS] Todos los eventos registrados correctamente")
