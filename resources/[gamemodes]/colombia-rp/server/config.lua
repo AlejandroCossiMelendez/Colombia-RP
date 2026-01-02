@@ -36,3 +36,14 @@ Config.Needs = {
     updateInterval = 60000 -- Actualizar cada 60 segundos
 }
 
+-- Configuración de muerte y respawn
+Config.Death = {
+    respawnTime = 360000, -- Tiempo de respawn en milisegundos (6 minutos = 360000)
+    hospitalX = 1178.25, -- Coordenadas del hospital
+    hospitalY = -1324.13,
+    hospitalZ = 14.11,
+    hospitalRotation = 270.86,
+    hospitalInterior = 0,
+    hospitalDimension = 0
+}
+
