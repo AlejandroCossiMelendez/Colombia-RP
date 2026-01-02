@@ -4,10 +4,59 @@
 addEvent("saveContacts", true)
 addEventHandler("saveContacts", root, function(contactsJson)
     local player = source
+    local characterSelected = getElementData(player, "character:selected")
     local characterId = getElementData(player, "character:id")
     
-    if not characterId then
-        outputServerLog("[PHONE] ERROR: No se pudo obtener character_id para guardar contactos")
+    if not characterSelected or not characterId then
+        outputServerLog("[PHONE] ERROR: No se pudo obtener character_id para guardar contactos (selected: " .. tostring(characterSelected) .. ", id: " .. tostring(characterId) .. ")")
+        -- Reintentar después de 1 segundo
+        setTimer(function()
+            if isElement(player) then
+                local retrySelected = getElementData(player, "character:selected")
+                local retryCharacterId = getElementData(player, "character:id")
+                if retrySelected and retryCharacterId and contactsJson then
+                    -- Procesar el guardado
+                    local contacts = nil
+                    local success, result = pcall(function()
+                        if type(fromJSON) == "function" then
+                            return fromJSON(contactsJson)
+                        else
+                            return loadstring("return " .. contactsJson)()
+                        end
+                    end)
+                    
+                    if success and result and type(result) == "table" then
+                        contacts = result
+                    else
+                        outputServerLog("[PHONE] ERROR: No se pudo parsear el JSON de contactos en el reintento")
+                        return
+                    end
+                    
+                    -- Eliminar contactos antiguos
+                    local deleteQuery = "DELETE FROM phone_contacts WHERE character_id = ?"
+                    local deleteSuccess = executeDatabase(deleteQuery, retryCharacterId)
+                    
+                    if not deleteSuccess then
+                        outputServerLog("[PHONE] ERROR: No se pudieron eliminar los contactos antiguos")
+                        return
+                    end
+                    
+                    -- Insertar nuevos contactos
+                    local insertCount = 0
+                    for _, contact in ipairs(contacts) do
+                        if contact.name and contact.number then
+                            local insertQuery = "INSERT INTO phone_contacts (character_id, contact_name, contact_number) VALUES (?, ?, ?)"
+                            local insertSuccess = executeDatabase(insertQuery, retryCharacterId, contact.name, contact.number)
+                            if insertSuccess then
+                                insertCount = insertCount + 1
+                            end
+                        end
+                    end
+                    
+                    outputServerLog("[PHONE] Contactos guardados después del reintento para personaje ID " .. retryCharacterId .. ": " .. insertCount .. " contactos")
+                end
+            end
+        end, 1000, 1)
         return
     end
     

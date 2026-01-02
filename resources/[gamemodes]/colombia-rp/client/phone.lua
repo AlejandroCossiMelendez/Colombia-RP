@@ -87,6 +87,15 @@ function openPhone()
         return
     end
     
+    -- Verificar que el personaje esté completamente seleccionado antes de abrir el teléfono
+    local characterSelected = getElementData(localPlayer, "character:selected")
+    local characterId = getElementData(localPlayer, "character:id")
+    
+    if not characterSelected or not characterId then
+        outputChatBox("Espera a que tu personaje esté completamente cargado.", 255, 165, 0)
+        return
+    end
+    
     -- Cerrar inventario si está abierto (usar evento para evitar dependencias)
     triggerEvent("closeInventoryForPhone", localPlayer)
     
@@ -214,6 +223,15 @@ end)
 -- Evento del servidor para abrir el teléfono
 addEvent("openPhone", true)
 addEventHandler("openPhone", resourceRoot, function(phoneNumber, contactsList)
+    -- Verificar que el personaje esté completamente seleccionado antes de abrir el teléfono
+    local characterSelected = getElementData(localPlayer, "character:selected")
+    local characterId = getElementData(localPlayer, "character:id")
+    
+    if not characterSelected or not characterId then
+        outputChatBox("Espera a que tu personaje esté completamente cargado antes de usar el teléfono.", 255, 165, 0)
+        return
+    end
+    
     if phoneNumber then
         -- Guardar el número de teléfono en el elemento data del jugador
         setElementData(localPlayer, "phone:number", phoneNumber)
