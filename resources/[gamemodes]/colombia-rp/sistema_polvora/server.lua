@@ -1,6 +1,11 @@
 -- SERVER.LUA - Sistema de Pólvora y Pirotecnia
 -- Integrado con el sistema de dinero e inventario del gamemode
 
+-- Verificar que la función give esté disponible
+if not give then
+    outputServerLog("[POLVORA] ERROR: La función give() no está disponible. Asegúrate de que items.lua esté cargado.")
+end
+
 -- Posición del NPC vendedor
 local npcPos = {x = 2040.73865, y = 1543.47925, z = 10.67188, rot = 180}
 
@@ -52,18 +57,24 @@ addEventHandler("polvora:comprarItem", root, function(itemID, precio, nombre)
             end
             
             if itemData then
-                -- Agregar item al inventario usando el sistema del gamemode
-                -- El item_data contiene el tipo de efecto para identificarlo
-                local itemDataStr = "polvora:" .. itemData.efecto
-                local success, message = addItemToInventory(player, itemData.itemId, nombre, 1, itemDataStr)
+                -- Agregar item al inventario usando el sistema de items (función give)
+                -- La función give está disponible globalmente desde items.lua
+                -- give(player, itemId, value, name)
+                -- value = 1 (cantidad), name = nombre del item
+                outputServerLog("[POLVORA] Intentando dar item " .. itemData.itemId .. " (" .. nombre .. ") a " .. getPlayerName(player))
+                
+                local success, errorMsg = give(player, itemData.itemId, 1, nombre)
                 
                 if success then
                     outputChatBox("✓ Has comprado: " .. nombre .. " por $" .. precio .. " - Revisa tu inventario", player, 0, 255, 0)
                     triggerClientEvent(player, "mostrarInfobox", player, "success", "¡" .. nombre .. " comprado!")
+                    outputServerLog("[POLVORA] ✓ Item " .. itemData.itemId .. " (" .. nombre .. ") dado correctamente a " .. getPlayerName(player))
                 else
                     -- Si falla, devolver el dinero
                     giveCharacterMoney(player, precio)
-                    outputChatBox("Error: " .. (message or "No se pudo agregar el item al inventario"), player, 255, 0, 0)
+                    local errorText = errorMsg or "give() retornó false"
+                    outputChatBox("Error: No se pudo agregar el item al inventario: " .. errorText, player, 255, 0, 0)
+                    outputServerLog("[POLVORA] ✗ ERROR al dar item " .. itemData.itemId .. " a " .. getPlayerName(player) .. " - " .. errorText)
                 end
             else
                 -- Si no se encuentra el item, devolver el dinero
