@@ -43,6 +43,7 @@ function updatePlayerProximityVoice(player)
     end
     
     -- Configurar para ignorar jugadores lejanos
+    -- Esto permite que MTA use proximidad por defecto para los cercanos
     setPlayerVoiceIgnoreFrom(player, playersToIgnore)
 end
 

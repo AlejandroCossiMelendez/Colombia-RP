@@ -463,92 +463,137 @@ function endCallVoice(call)
     outputServerLog("[PHONE] Terminando chat de voz para la llamada")
     
     -- Restaurar voz por proximidad
+    -- El problema es que el broadcast todavía está configurado con el otro jugador de la llamada
+    -- Necesitamos resetearlo, pero setPlayerVoiceBroadcastTo({}) bloquea la voz
+    -- Solución: Resetear el broadcast con TODOS los jugadores del servidor temporalmente,
+    -- esto "desconfigura" el broadcast de llamada y permite que el sistema de proximidad funcione
+    
     if isElement(call.caller) then
-        -- Limpiar datos PRIMERO - esto es crítico para que el sistema de proximidad funcione
+        -- Limpiar datos PRIMERO
         setElementData(call.caller, "phone:inCall", false)
         setElementData(call.caller, "phone:callPartner", nil)
         setElementData(call.caller, "phone:speakerEnabled", false)
         
-        -- Resetear broadcast inmediatamente para que deje de escuchar solo al otro jugador
-        -- Luego el sistema de proximidad se encargará de configurar correctamente
-        setPlayerVoiceBroadcastTo(call.caller, {})
+        -- CRÍTICO: El broadcast todavía está configurado con el otro jugador de la llamada
+        -- Necesitamos resetearlo, pero setPlayerVoiceBroadcastTo({}) bloquea la voz
+        -- Solución: Resetear el broadcast con TODOS los jugadores del servidor temporalmente
+        -- Esto "desconfigura" el broadcast de llamada y permite que el sistema de proximidad funcione
+        
+        -- Obtener TODOS los jugadores del servidor para resetear el broadcast
+        local allPlayers = {}
+        for _, otherPlayer in ipairs(getElementsByType("player")) do
+            if otherPlayer ~= call.caller and isElement(otherPlayer) then
+                if getElementData(otherPlayer, "character:selected") then
+                    table.insert(allPlayers, otherPlayer)
+                end
+            end
+        end
+        
+        -- Resetear broadcast con todos los jugadores (esto "desconfigura" el broadcast de llamada)
+        -- Si hay jugadores, usar todos; si no, usar lista vacía
+        if #allPlayers > 0 then
+            setPlayerVoiceBroadcastTo(call.caller, allPlayers)
+        else
+            setPlayerVoiceBroadcastTo(call.caller, {})
+        end
+        
+        -- Limpiar ignore list inmediatamente
         setPlayerVoiceIgnoreFrom(call.caller, {})
         
-        -- Forzar actualización del sistema de proximidad después de un delay
-        -- Esto asegura que la configuración de proximidad se aplique correctamente
+        -- Después de un delay, el sistema de proximidad configurará el ignore list
+        -- para limitar a 5 metros, y el broadcast se ajustará automáticamente
         setTimer(function()
             if isElement(call.caller) and not getElementData(call.caller, "phone:inCall") then
-                -- Verificar que no esté en frecuencia
                 local frecuencia = getElementData(call.caller, "frecuencia.voz")
                 if not frecuencia or tonumber(frecuencia) == -1 or tonumber(frecuencia) >= 2000 then
-                    -- Aplicar configuración de proximidad directamente
-                    local x, y, z = getElementPosition(call.caller)
-                    local playersToIgnore = {}
+                    -- Llamar a la función de proximidad que configura ignore list
+                    if updatePlayerProximityVoice then
+                        updatePlayerProximityVoice(call.caller)
+                    end
                     
-                    for _, otherPlayer in ipairs(getElementsByType("player")) do
-                        if otherPlayer ~= call.caller and isElement(otherPlayer) then
-                            if getElementData(otherPlayer, "character:selected") then
-                                local ox, oy, oz = getElementPosition(otherPlayer)
-                                local distance = getDistanceBetweenPoints3D(x, y, z, ox, oy, oz)
-                                
-                                if distance > 5 then
-                                    table.insert(playersToIgnore, otherPlayer)
+                    -- Después de que el sistema de proximidad configure el ignore list,
+                    -- resetear el broadcast para que MTA use proximidad por defecto
+                    -- Esto es necesario porque el broadcast todavía está configurado con todos los jugadores
+                    setTimer(function()
+                        if isElement(call.caller) and not getElementData(call.caller, "phone:inCall") then
+                            -- NO configurar broadcast - dejar que MTA use proximidad por defecto
+                            -- Solo asegurarnos de que el ignore list esté configurado correctamente
+                            local frecuencia2 = getElementData(call.caller, "frecuencia.voz")
+                            if not frecuencia2 or tonumber(frecuencia2) == -1 or tonumber(frecuencia2) >= 2000 then
+                                if updatePlayerProximityVoice then
+                                    updatePlayerProximityVoice(call.caller)
                                 end
                             end
                         end
-                    end
-                    
-                    -- Configurar ignore list para proximidad
-                    setPlayerVoiceIgnoreFrom(call.caller, playersToIgnore)
-                    -- NO configurar broadcast - dejar que MTA use proximidad por defecto
+                    end, 200, 1)
                 end
             end
-        end, 200, 1)
+        end, 300, 1)
         
         outputServerLog("[PHONE] Voz restaurada para " .. getPlayerName(call.caller))
     end
     
     if isElement(call.receiver) then
-        -- Limpiar datos PRIMERO - esto es crítico para que el sistema de proximidad funcione
+        -- Limpiar datos PRIMERO
         setElementData(call.receiver, "phone:inCall", false)
         setElementData(call.receiver, "phone:callPartner", nil)
         setElementData(call.receiver, "phone:speakerEnabled", false)
         
-        -- Resetear broadcast inmediatamente para que deje de escuchar solo al otro jugador
-        -- Luego el sistema de proximidad se encargará de configurar correctamente
-        setPlayerVoiceBroadcastTo(call.receiver, {})
+        -- CRÍTICO: El broadcast todavía está configurado con el otro jugador de la llamada
+        -- Necesitamos resetearlo, pero setPlayerVoiceBroadcastTo({}) bloquea la voz
+        -- Solución: Resetear el broadcast con TODOS los jugadores del servidor temporalmente
+        -- Esto "desconfigura" el broadcast de llamada y permite que el sistema de proximidad funcione
+        
+        -- Obtener TODOS los jugadores del servidor para resetear el broadcast
+        local allPlayers = {}
+        for _, otherPlayer in ipairs(getElementsByType("player")) do
+            if otherPlayer ~= call.receiver and isElement(otherPlayer) then
+                if getElementData(otherPlayer, "character:selected") then
+                    table.insert(allPlayers, otherPlayer)
+                end
+            end
+        end
+        
+        -- Resetear broadcast con todos los jugadores (esto "desconfigura" el broadcast de llamada)
+        -- Si hay jugadores, usar todos; si no, usar lista vacía
+        if #allPlayers > 0 then
+            setPlayerVoiceBroadcastTo(call.receiver, allPlayers)
+        else
+            setPlayerVoiceBroadcastTo(call.receiver, {})
+        end
+        
+        -- Limpiar ignore list inmediatamente
         setPlayerVoiceIgnoreFrom(call.receiver, {})
         
-        -- Forzar actualización del sistema de proximidad después de un delay
-        -- Esto asegura que la configuración de proximidad se aplique correctamente
+        -- Después de un delay, el sistema de proximidad configurará el ignore list
+        -- para limitar a 5 metros, y el broadcast se ajustará automáticamente
         setTimer(function()
             if isElement(call.receiver) and not getElementData(call.receiver, "phone:inCall") then
-                -- Verificar que no esté en frecuencia
                 local frecuencia = getElementData(call.receiver, "frecuencia.voz")
                 if not frecuencia or tonumber(frecuencia) == -1 or tonumber(frecuencia) >= 2000 then
-                    -- Aplicar configuración de proximidad directamente
-                    local x, y, z = getElementPosition(call.receiver)
-                    local playersToIgnore = {}
+                    -- Llamar a la función de proximidad que configura ignore list
+                    if updatePlayerProximityVoice then
+                        updatePlayerProximityVoice(call.receiver)
+                    end
                     
-                    for _, otherPlayer in ipairs(getElementsByType("player")) do
-                        if otherPlayer ~= call.receiver and isElement(otherPlayer) then
-                            if getElementData(otherPlayer, "character:selected") then
-                                local ox, oy, oz = getElementPosition(otherPlayer)
-                                local distance = getDistanceBetweenPoints3D(x, y, z, ox, oy, oz)
-                                
-                                if distance > 5 then
-                                    table.insert(playersToIgnore, otherPlayer)
+                    -- Después de que el sistema de proximidad configure el ignore list,
+                    -- resetear el broadcast para que MTA use proximidad por defecto
+                    -- Esto es necesario porque el broadcast todavía está configurado con todos los jugadores
+                    setTimer(function()
+                        if isElement(call.receiver) and not getElementData(call.receiver, "phone:inCall") then
+                            -- NO configurar broadcast - dejar que MTA use proximidad por defecto
+                            -- Solo asegurarnos de que el ignore list esté configurado correctamente
+                            local frecuencia2 = getElementData(call.receiver, "frecuencia.voz")
+                            if not frecuencia2 or tonumber(frecuencia2) == -1 or tonumber(frecuencia2) >= 2000 then
+                                if updatePlayerProximityVoice then
+                                    updatePlayerProximityVoice(call.receiver)
                                 end
                             end
                         end
-                    end
-                    
-                    -- Configurar ignore list para proximidad
-                    setPlayerVoiceIgnoreFrom(call.receiver, playersToIgnore)
-                    -- NO configurar broadcast - dejar que MTA use proximidad por defecto
+                    end, 200, 1)
                 end
             end
-        end, 200, 1)
+        end, 300, 1)
         
         outputServerLog("[PHONE] Voz restaurada para " .. getPlayerName(call.receiver))
     end
