@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colombia RP - Selección de Personaje</title>
+    <link rel="stylesheet" href="character.css">
+    <script src="character.js" defer></script>
+</head>
+<body>
+    <div class="bg"></div>
+    <div class="overlay"></div>
+
+    <div class="container">
+        <h1 class="title">Selecciona tu Personaje</h1>
+        
+        <div id="characters" class="characters-grid">
+            <!-- Los personajes se cargarán aquí dinámicamente -->
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <!-- Modal para crear personaje -->
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <h2>Crear Nuevo Personaje</h2>
+            <form onsubmit="createCharacter(event)">
+                <div class="form-group">
+                    <label>Nombre:</label>
+                    <input type="text" id="charName" placeholder="Ingresa el nombre" required>
+                </div>
+                <div class="form-group">
+                    <label>Apellido:</label>
+                    <input type="text" id="charSurname" placeholder="Ingresa el apellido" required>
+                </div>
+                <div class="form-group">
+                    <label>Edad:</label>
+                    <input type="number" id="charAge" min="18" max="100" value="25" placeholder="18-100" required>
+                </div>
+                <div class="form-group">
+                    <label>Género:</label>
+                    <select id="charGender" required>
+                        <option value="0">Masculino</option>
+                        <option value="1">Femenino</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Crear Personaje</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideCreateModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+
