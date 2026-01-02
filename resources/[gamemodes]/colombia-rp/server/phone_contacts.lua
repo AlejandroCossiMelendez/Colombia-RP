@@ -47,16 +47,19 @@ addEventHandler("saveContacts", root, function(contactsJson)
     end)
     
     if not success then
-        outputServerLog("[PHONE] ERROR: Error al parsear JSON de contactos")
+        outputServerLog("[PHONE] ERROR: Error al parsear JSON de contactos: " .. tostring(result))
         return
     end
+    
+    outputServerLog("[PHONE] JSON parseado exitosamente. Tipo: " .. type(result))
     
     -- Si result es nil o no es una tabla, verificar si es un array vacío
     if not result then
         -- Array vacío es válido, simplemente no hay contactos
         contacts = {}
+        outputServerLog("[PHONE] Result es nil, usando array vacío")
     elseif type(result) ~= "table" then
-        outputServerLog("[PHONE] ERROR: JSON parseado no es una tabla")
+        outputServerLog("[PHONE] ERROR: JSON parseado no es una tabla, es: " .. type(result))
         return
     else
         contacts = result
@@ -73,11 +76,14 @@ addEventHandler("saveContacts", root, function(contactsJson)
         if k == "number" then hasNumber = true end
     end
     
+    outputServerLog("[PHONE] Estructura del JSON: arrayLength=" .. tostring(arrayLength) .. ", pairCount=" .. tostring(pairCount) .. ", hasName=" .. tostring(hasName) .. ", hasNumber=" .. tostring(hasNumber))
+    
     -- Si el array está vacío pero tiene las propiedades name y number directamente, 
     -- significa que fromJSON devolvió el objeto del array en lugar del array
     if arrayLength == 0 and hasName and hasNumber then
         -- Convertir el objeto único a un array con un elemento
         contacts = {contacts}
+        outputServerLog("[PHONE] Convertido objeto único a array")
     elseif arrayLength == 0 and pairCount > 0 then
         -- Intentar convertir objeto a array
         local tempArray = {}
@@ -93,11 +99,58 @@ addEventHandler("saveContacts", root, function(contactsJson)
         end
         if #tempArray > 0 then
             contacts = tempArray
+            outputServerLog("[PHONE] Convertido objeto a array con " .. #tempArray .. " elementos")
         end
     end
     
+    -- Verificar que contacts sea un array válido
+    if type(contacts) ~= "table" then
+        outputServerLog("[PHONE] ERROR: contacts no es una tabla después del procesamiento")
+        return
+    end
+    
+    -- Contar contactos válidos usando ipairs
+    local validContacts = {}
+    for i, contact in ipairs(contacts) do
+        if type(contact) == "table" and contact.name and contact.number then
+            table.insert(validContacts, contact)
+        end
+    end
+    
+    -- Si encontramos contactos válidos con ipairs pero el array length es diferente, usar los válidos
+    if #validContacts > 0 and #validContacts ~= #contacts then
+        outputServerLog("[PHONE] Usando contactos válidos encontrados con ipairs: " .. #validContacts .. " contactos")
+        contacts = validContacts
+    end
+    
+    outputServerLog("[PHONE] Contactos finales después del procesamiento: " .. #contacts)
+    
     -- Si después de todo el procesamiento el array está vacío, está bien (no hay contactos)
     -- No necesitamos hacer nada especial, simplemente continuar con el proceso de eliminación e inserción
+    
+    -- CRÍTICO: Asegurarnos de que todos los contactos se procesen correctamente
+    -- Usar pairs en lugar de ipairs para capturar todos los elementos, incluso si los índices no son consecutivos
+    local allContacts = {}
+    for k, v in pairs(contacts) do
+        if type(k) == "number" and type(v) == "table" then
+            -- Es un elemento del array con índice numérico
+            table.insert(allContacts, v)
+        elseif type(v) == "table" and v.name and v.number then
+            -- Es un objeto con propiedades name y number
+            table.insert(allContacts, v)
+        end
+    end
+    
+    -- Si encontramos contactos con pairs pero no con ipairs, usar los encontrados con pairs
+    if #allContacts > #contacts then
+        outputServerLog("[PHONE] Encontrados " .. #allContacts .. " contactos con pairs vs " .. #contacts .. " con ipairs")
+        contacts = allContacts
+    elseif #allContacts > 0 and #allContacts == #contacts then
+        -- Ambos métodos encontraron la misma cantidad, usar los de pairs para asegurar
+        contacts = allContacts
+    end
+    
+    outputServerLog("[PHONE] Contactos finales después del procesamiento completo: " .. #contacts)
     
     -- Eliminar contactos antiguos del personaje
     local deleteQuery = "DELETE FROM phone_contacts WHERE character_id = ?"
@@ -111,6 +164,7 @@ addEventHandler("saveContacts", root, function(contactsJson)
     
     -- Si el array está vacío, solo eliminar y terminar
     if #contacts == 0 then
+        outputServerLog("[PHONE] No hay contactos para insertar, solo se eliminaron los antiguos")
         return
     end
     
@@ -119,6 +173,7 @@ addEventHandler("saveContacts", root, function(contactsJson)
     local errorCount = 0
     outputServerLog("[PHONE] Total de contactos a insertar: " .. tostring(#contacts))
     
+    -- Usar ipairs para procesar en orden
     for i, contact in ipairs(contacts) do
         -- Validar que el contacto tenga los campos necesarios
         local name = contact.name
