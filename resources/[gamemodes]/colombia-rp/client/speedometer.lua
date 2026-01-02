@@ -16,9 +16,56 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
     createSpeedometerBrowser()
 end)
 
+-- Función para cargar el HTML del velocímetro
+function loadSpeedometerBrowser()
+    if source and isElement(source) then
+        local browser = guiGetBrowser(source)
+        if browser then
+            loadBrowserURL(browser, "http://mta/local/html/speedometer.html")
+            outputChatBox("[DEBUG] Velocímetro: URL cargada", 0, 255, 0)
+        end
+    end
+end
+
+-- Función cuando el documento está listo
+function whenSpeedometerBrowserReady()
+    outputChatBox("[DEBUG] Velocímetro: Documento listo", 0, 255, 0)
+    local browser = guiGetBrowser(speedometerBrowser)
+    if browser and isElement(browser) then
+        -- Verificar que las funciones estén disponibles
+        setTimer(function()
+            if isElement(browser) then
+                executeBrowserJavascript(browser, 
+                    "console.log('Verificando funciones...'); " ..
+                    "console.log('window.showSpeedometer:', typeof window.showSpeedometer); " ..
+                    "console.log('window.updateSpeedometer:', typeof window.updateSpeedometer);"
+                )
+                -- Si estamos en un vehículo, mostrar el velocímetro
+                if isInVehicle and currentVehicle then
+                    setTimer(function()
+                        if isElement(browser) then
+                            executeBrowserJavascript(browser, 
+                                "try { " ..
+                                "if(typeof window.showSpeedometer === 'function') { " ..
+                                "window.showSpeedometer(); " ..
+                                "console.log('Velocímetro mostrado desde documentReady'); " ..
+                                "} " ..
+                                "} catch(e) { console.log('Error: ' + e); }"
+                            )
+                        end
+                    end, 300, 1)
+                end
+            end
+        end, 500, 1)
+    end
+end
+
 -- Función para crear el navegador del velocímetro
 function createSpeedometerBrowser()
     if speedometerBrowser and isElement(speedometerBrowser) then
+        -- Remover eventos anteriores
+        removeEventHandler("onClientBrowserCreated", speedometerBrowser, loadSpeedometerBrowser)
+        removeEventHandler("onClientBrowserDocumentReady", speedometerBrowser, whenSpeedometerBrowserReady)
         destroyElement(speedometerBrowser)
         speedometerBrowser = nil
     end
@@ -27,66 +74,12 @@ function createSpeedometerBrowser()
     speedometerBrowser = guiCreateBrowser(0, 0, screenW, screenH, false, false, false)
     
     if speedometerBrowser then
-        local browser = guiGetBrowser(speedometerBrowser)
-        
         -- Hacer visible el navegador inmediatamente
         guiSetVisible(speedometerBrowser, true)
         
-        -- Esperar a que el navegador esté listo
-        addEventHandler("onClientBrowserCreated", browser, function()
-            setTimer(function()
-                if isElement(browser) then
-                    loadBrowserURL(browser, "http://mta/local/html/speedometer.html")
-                    outputChatBox("[DEBUG] Velocímetro: URL cargada", 0, 255, 0)
-                end
-            end, 500, 1)
-        end)
-        
-        -- También escuchar cuando el documento esté listo
-        addEventHandler("onClientBrowserDocumentReady", browser, function()
-            outputChatBox("[DEBUG] Velocímetro: Documento listo", 0, 255, 0)
-            -- Verificar que las funciones estén disponibles
-            setTimer(function()
-                if isElement(browser) then
-                    executeBrowserJavascript(browser, 
-                        "console.log('Verificando funciones...'); " ..
-                        "console.log('window.showSpeedometer:', typeof window.showSpeedometer); " ..
-                        "console.log('window.updateSpeedometer:', typeof window.updateSpeedometer); " ..
-                        "console.log('showSpeedometer (global):', typeof showSpeedometer); " ..
-                        "console.log('updateSpeedometer (global):', typeof updateSpeedometer);"
-                    )
-                    -- Si estamos en un vehículo, intentar mostrar el velocímetro
-                    if isInVehicle and currentVehicle then
-                        setTimer(function()
-                            if isElement(browser) then
-                                executeBrowserJavascript(browser, 
-                                    "try { " ..
-                                    "if(typeof window.showSpeedometer === 'function') { " ..
-                                    "window.showSpeedometer(); " ..
-                                    "console.log('Velocímetro mostrado desde documentReady'); " ..
-                                    "} else if(typeof showSpeedometer === 'function') { " ..
-                                    "showSpeedometer(); " ..
-                                    "console.log('Velocímetro mostrado desde documentReady (sin window)'); " ..
-                                    "} " ..
-                                    "} catch(e) { console.log('Error mostrando velocímetro: ' + e); }"
-                                )
-                            end
-                        end, 500, 1)
-                    end
-                end
-            end, 500, 1)
-        end)
-        
-        -- También intentar cargar después de un delay (fallback)
-        setTimer(function()
-            if isElement(browser) then
-                local currentURL = getBrowserURL(browser)
-                if not currentURL or currentURL == "" then
-                    loadBrowserURL(browser, "http://mta/local/html/speedometer.html")
-                    outputChatBox("[DEBUG] Velocímetro: URL cargada (fallback)", 0, 255, 0)
-                end
-            end
-        end, 1500, 1)
+        -- Registrar eventos en el elemento gui-browser (no en el browser)
+        addEventHandler("onClientBrowserCreated", speedometerBrowser, loadSpeedometerBrowser)
+        addEventHandler("onClientBrowserDocumentReady", speedometerBrowser, whenSpeedometerBrowserReady)
         
         outputChatBox("[DEBUG] Velocímetro: Navegador creado", 0, 255, 0)
     else
