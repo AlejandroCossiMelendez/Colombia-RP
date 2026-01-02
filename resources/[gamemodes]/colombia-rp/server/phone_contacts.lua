@@ -27,6 +27,8 @@ addEventHandler("saveContacts", root, function(contactsJson)
     end
     
     -- Parsear JSON de contactos
+    outputServerLog("[PHONE] Recibiendo JSON de contactos. Longitud: " .. string.len(contactsJson) .. ", Contenido: " .. tostring(contactsJson))
+    
     local contacts = nil
     local success, result = pcall(function()
         if type(fromJSON) == "function" then
@@ -41,13 +43,25 @@ addEventHandler("saveContacts", root, function(contactsJson)
         end
     end)
     
-    if not success or not result or type(result) ~= "table" then
-        outputServerLog("[PHONE] ERROR: No se pudo parsear el JSON de contactos")
+    if not success then
+        outputServerLog("[PHONE] ERROR: Error al parsear JSON. JSON recibido: " .. tostring(contactsJson) .. ", Error: " .. tostring(result))
         outputChatBox("Error: Formato de contactos inválido. Intenta de nuevo.", player, 255, 0, 0)
         return
     end
     
-    contacts = result
+    -- Si result es nil o no es una tabla, verificar si es un array vacío
+    if not result then
+        -- Array vacío es válido, simplemente no hay contactos
+        outputServerLog("[PHONE] JSON parseado es nil, tratando como array vacío")
+        contacts = {}
+    elseif type(result) ~= "table" then
+        outputServerLog("[PHONE] ERROR: JSON parseado no es una tabla. Tipo: " .. type(result) .. ", Valor: " .. tostring(result))
+        outputChatBox("Error: Formato de contactos inválido. Intenta de nuevo.", player, 255, 0, 0)
+        return
+    else
+        outputServerLog("[PHONE] JSON parseado correctamente. Tipo: table, Longitud: " .. #result)
+        contacts = result
+    end
     
     -- Verificar estructura y convertir si es necesario
     local arrayLength = #contacts
@@ -83,12 +97,25 @@ addEventHandler("saveContacts", root, function(contactsJson)
         end
     end
     
+    -- Si después de todo el procesamiento el array está vacío, está bien (no hay contactos)
+    -- No necesitamos hacer nada especial, simplemente continuar con el proceso de eliminación e inserción
+    
     -- Eliminar contactos antiguos del personaje
     local deleteQuery = "DELETE FROM phone_contacts WHERE character_id = ?"
     local deleteSuccess = executeDatabase(deleteQuery, characterId)
     
     if not deleteSuccess then
         outputServerLog("[PHONE] ERROR: No se pudieron eliminar los contactos antiguos")
+        outputChatBox("Error: No se pudieron eliminar contactos antiguos. Intenta de nuevo.", player, 255, 0, 0)
+        return
+    end
+    
+    -- Si el array está vacío, solo eliminar y terminar
+    if #contacts == 0 then
+        outputServerLog("[PHONE] Array de contactos vacío. Todos los contactos eliminados para personaje ID " .. characterId)
+        if isElement(player) and getElementType(player) == "player" then
+            outputChatBox("✓ Contactos eliminados correctamente.", player, 0, 255, 0)
+        end
         return
     end
     
@@ -110,6 +137,16 @@ addEventHandler("saveContacts", root, function(contactsJson)
             end
         else
             errorCount = errorCount + 1
+        end
+    end
+    
+    -- Mostrar mensaje de confirmación al jugador
+    if isElement(player) and getElementType(player) == "player" then
+        if insertCount > 0 then
+            outputChatBox("✓ " .. insertCount .. " contacto(s) guardado(s) correctamente.", player, 0, 255, 0)
+        end
+        if errorCount > 0 then
+            outputChatBox("⚠ Error al guardar " .. errorCount .. " contacto(s).", player, 255, 165, 0)
         end
     end
 end)
