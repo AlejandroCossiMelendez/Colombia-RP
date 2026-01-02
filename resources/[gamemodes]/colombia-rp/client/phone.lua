@@ -239,37 +239,46 @@ local function isPhoneInputActive()
     return phoneVisible
 end
 
--- BindKey para la tecla I - igual que el inventario
--- Si el teléfono está abierto, se cierra con I. Si no está abierto, el inventario se maneja con su propio bindKey
-bindKey("i", "down", function()
-    if not getElementData(localPlayer, "character:selected") then
+-- Usar onClientKey en lugar de bindKey para capturar las teclas antes de que el navegador las capture
+-- Esto es necesario porque cuando el teléfono está abierto, el navegador captura todas las teclas
+addEventHandler("onClientKey", root, function(key, press)
+    -- Solo procesar cuando se presiona la tecla (no cuando se suelta)
+    if not press then
         return
     end
     
-    -- Verificar si el teléfono está abierto usando la variable local (más confiable)
-    if phoneVisible then
-        -- Si el teléfono está abierto, cerrarlo (guardando contactos)
+    -- Solo procesar si el teléfono está abierto
+    if not phoneVisible then
+        return
+    end
+    
+    -- Procesar tecla "i" para cerrar el teléfono
+    if key == "i" then
+        -- Verificar si hay un personaje seleccionado
+        if not getElementData(localPlayer, "character:selected") then
+            return
+        end
+        
         -- Guardar contactos antes de cerrar
         if browserContent and isElement(browserContent) then
             executeBrowserJavascript(browserContent, "saveContactsToMTA();")
         end
         -- Cerrar el teléfono inmediatamente
         closePhone()
-        -- Retornar para evitar que el inventario se abra
+        -- Cancelar el evento para evitar que el navegador lo procese
+        cancelEvent()
         return
     end
-    -- Si el teléfono no está abierto, no hacer nada aquí
-    -- El bindKey del inventario manejará la apertura del inventario
-end)
-
--- Cerrar teléfono con tecla ESC (mantener por compatibilidad)
-bindKey("escape", "down", function()
-    if phoneVisible then
+    
+    -- Procesar tecla ESC para cerrar el teléfono
+    if key == "escape" then
         -- Guardar contactos antes de cerrar
         if browserContent and isElement(browserContent) then
             executeBrowserJavascript(browserContent, "saveContactsToMTA();")
         end
         closePhone()
+        cancelEvent()
+        return
     end
 end)
 
