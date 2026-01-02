@@ -1,0 +1,19 @@
+<meta> 
+	<!-- AUTOR, DESCRIÇÃO, NAME, VERSION, TUPE -->
+	<info author="Hype" name="Hype Hud RPG" version="1.0" description="By Hype Hud RPG"/>
+	<!-- HUD -->
+	<script src="HypeHud.lua" type="client"/>
+	<!-- IMGS -->
+	<file src="imgs/circulo.png"/>
+	<file src="imgs/armor.png"/>
+	<file src="imgs/bank.png"/>
+	<file src="imgs/health.png"/>
+	<file src="imgs/stamina.png"/>
+	<file src="imgs/wallet.png"/>
+	<file src="imgs/0.png"/>
+	<file src="imgs/voiceOn.png"/>
+	<file src="imgs/voiceOff.png"/>
+	<file src="imgs/logo.png"/>
+	<!-- FONT -->
+	<file src="font/fontHype.ttf"/>
+</meta>

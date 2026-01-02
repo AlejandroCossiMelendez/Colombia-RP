@@ -30,4 +30,14 @@ addEvent("moveInventoryItem", true)
 addEvent("dropInventoryItem", true)
 outputServerLog("[EVENTS] Eventos de inventario registrados")
 
+-- Eventos de muerte (para el HUD del cliente)
+addEvent("onClientPlayerDeath", true)
+addEvent("updateDeathTime", true)
+addEvent("onClientPlayerRevived", true)
+outputServerLog("[EVENTS] Eventos de muerte registrados: onClientPlayerDeath, updateDeathTime, onClientPlayerRevived")
+
+-- Eventos del HUD
+addEvent("initializeStamina", true)
+outputServerLog("[EVENTS] Eventos del HUD registrados: initializeStamina")
+
 outputServerLog("[EVENTS] Todos los eventos registrados correctamente")

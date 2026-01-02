@@ -129,6 +129,11 @@ addEventHandler("createCharacter", getRootElement(), function(name, surname, age
                             setElementData(source, "character:hunger", character.hunger)
                             setElementData(source, "character:thirst", character.thirst)
                             setElementData(source, "character:health", character.health)
+                            -- Inicializar banco y empleo (valores por defecto)
+                            setElementData(source, "character:bank", 0)
+                            setElementData(source, "character:job", "Desempleado")
+                            -- Inicializar stamina en el cliente
+                            triggerClientEvent(source, "initializeStamina", resourceRoot)
                             
                             outputServerLog("[CHARACTERS] Spawneando personaje recién creado ID: " .. newCharacterId .. " para " .. getPlayerName(source))
                             
@@ -221,6 +226,15 @@ addEventHandler("selectCharacter", getRootElement(), function(characterId)
         setElementData(source, "character:money", character.money)
         setElementData(source, "character:hunger", character.hunger)
         setElementData(source, "character:thirst", character.thirst)
+        -- Inicializar banco y empleo (valores por defecto si no existen)
+        if not getElementData(source, "character:bank") then
+            setElementData(source, "character:bank", 0)
+        end
+        if not getElementData(source, "character:job") then
+            setElementData(source, "character:job", "Desempleado")
+        end
+        -- Inicializar stamina en el cliente
+        triggerClientEvent(source, "initializeStamina", resourceRoot)
         setElementData(source, "character:health", character.health)
         
         outputServerLog("[CHARACTERS] Spawneando personaje ID: " .. characterId .. " para " .. getPlayerName(source))

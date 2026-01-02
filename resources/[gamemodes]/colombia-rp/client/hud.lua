@@ -1,5 +1,7 @@
--- HUD del juego
+-- HUD del juego (DESACTIVADO - Se usa el nuevo Hype HUD)
+-- Este archivo se mantiene por compatibilidad pero no se renderiza
 local hudVisible = false
+local HUD_DISABLED = true -- Flag para desactivar este HUD
 local hunger = 100
 local thirst = 100
 local health = 100
@@ -59,8 +61,13 @@ setTimer(function()
     end
 end, 1000, 0)
 
--- Renderizar HUD
+-- Renderizar HUD (DESACTIVADO - Se usa el nuevo Hype HUD)
 addEventHandler("onClientRender", root, function()
+    -- No renderizar si está desactivado
+    if HUD_DISABLED then
+        return
+    end
+    
     if not hudVisible then
         return
     end

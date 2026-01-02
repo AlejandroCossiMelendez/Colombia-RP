@@ -26,6 +26,23 @@
     <script src="client/scoreboard.lua" type="client" />
     <script src="client/main.lua" type="client" />
     
+    <!-- HUD Hype (nuevo sistema) -->
+    <script src="client/hype_hud.lua" type="client" />
+    <script src="client/hype_stamina.lua" type="client" />
+    
+    <!-- Archivos del HUD Hype -->
+    <file src="hud-rp/Hype_Hud/font/fontHype.ttf" />
+    <file src="hud-rp/Hype_Hud/imgs/0.png" />
+    <file src="hud-rp/Hype_Hud/imgs/armor.png" />
+    <file src="hud-rp/Hype_Hud/imgs/bank.png" />
+    <file src="hud-rp/Hype_Hud/imgs/circulo.png" />
+    <file src="hud-rp/Hype_Hud/imgs/health.png" />
+    <file src="hud-rp/Hype_Hud/imgs/stamina.png" />
+    <file src="hud-rp/Hype_Hud/imgs/wallet.png" />
+    <file src="hud-rp/Hype_Hud/imgs/voiceOff.png" />
+    <file src="hud-rp/Hype_Hud/imgs/voiceOn.png" />
+    <file src="hud-rp/Hype_Hud/imgs/logo.png" />
+    
     <!-- Archivos (ya no necesarios para login, pero se mantienen para character GUI) -->
     <file src="client/character.html" />
 </meta>
