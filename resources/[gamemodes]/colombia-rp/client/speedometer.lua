@@ -20,6 +20,7 @@ end)
 function createSpeedometerBrowser()
     if speedometerBrowser and isElement(speedometerBrowser) then
         destroyElement(speedometerBrowser)
+        speedometerBrowser = nil
     end
     
     local screenW, screenH = guiGetScreenSize()
@@ -28,11 +29,15 @@ function createSpeedometerBrowser()
     if speedometerBrowser then
         local browser = guiGetBrowser(speedometerBrowser)
         
+        -- Hacer visible el navegador inmediatamente
+        guiSetVisible(speedometerBrowser, true)
+        
         -- Esperar a que el navegador esté listo
         addEventHandler("onClientBrowserCreated", browser, function()
             setTimer(function()
                 if isElement(browser) then
                     loadBrowserURL(browser, "http://mta/local/html/speedometer.html")
+                    outputChatBox("[DEBUG] Velocímetro: URL cargada", 0, 255, 0)
                 end
             end, 500, 1)
         end)
@@ -40,12 +45,15 @@ function createSpeedometerBrowser()
         -- También intentar cargar después de un delay (fallback)
         setTimer(function()
             if isElement(browser) then
-                loadBrowserURL(browser, "http://mta/local/html/speedometer.html")
+                local currentURL = getBrowserURL(browser)
+                if not currentURL or currentURL == "" then
+                    loadBrowserURL(browser, "http://mta/local/html/speedometer.html")
+                    outputChatBox("[DEBUG] Velocímetro: URL cargada (fallback)", 0, 255, 0)
+                end
             end
         end, 1500, 1)
         
-        -- Hacer visible el navegador
-        guiSetVisible(speedometerBrowser, true)
+        outputChatBox("[DEBUG] Velocímetro: Navegador creado", 0, 255, 0)
     else
         outputChatBox("[ERROR] No se pudo crear el navegador del velocímetro", 255, 0, 0)
     end
@@ -107,38 +115,63 @@ function updateSpeedometer()
         triggerServerEvent("speedometer:getFuel", localPlayer, vehicle)
         
         -- Mostrar el velocímetro
-        if speedometerBrowser then
+        if speedometerBrowser and isElement(speedometerBrowser) then
             local browser = guiGetBrowser(speedometerBrowser)
             if browser and isElement(browser) then
-                -- Esperar un poco para asegurar que el HTML esté cargado
-                setTimer(function()
+                -- Asegurar que el navegador sea visible
+                guiSetVisible(speedometerBrowser, true)
+                
+                -- Intentar mostrar el velocímetro con múltiples intentos
+                local attempts = 0
+                local maxAttempts = 10
+                local showTimer = setTimer(function()
+                    attempts = attempts + 1
                     if isElement(browser) then
-                        executeBrowserJavascript(browser, "if(typeof showSpeedometer === 'function') { showSpeedometer(); } else { console.log('showSpeedometer no disponible'); }")
-                    end
-                end, 300, 1)
-            else
-                -- Si el navegador no está listo, recrearlo
-                createSpeedometerBrowser()
-                setTimer(function()
-                    if speedometerBrowser then
-                        local newBrowser = guiGetBrowser(speedometerBrowser)
-                        if newBrowser and isElement(newBrowser) then
-                            executeBrowserJavascript(newBrowser, "if(typeof showSpeedometer === 'function') { showSpeedometer(); }")
+                        local url = getBrowserURL(browser)
+                        if url and url ~= "" then
+                            -- El HTML está cargado, intentar mostrar
+                            executeBrowserJavascript(browser, 
+                                "try { " ..
+                                "if(typeof showSpeedometer === 'function') { " ..
+                                "showSpeedometer(); " ..
+                                "console.log('Velocímetro mostrado'); " ..
+                                "} else { " ..
+                                "console.log('showSpeedometer no disponible'); " ..
+                                "} " ..
+                                "} catch(e) { console.log('Error: ' + e); }"
+                            )
+                            killTimer(showTimer)
+                        elseif attempts >= maxAttempts then
+                            -- Si después de varios intentos no se carga, recargar
+                            loadBrowserURL(browser, "http://mta/local/html/speedometer.html")
+                            killTimer(showTimer)
                         end
+                    else
+                        killTimer(showTimer)
                     end
-                end, 1000, 1)
+                end, 200, maxAttempts)
+            else
+                outputChatBox("[DEBUG] Velocímetro: Navegador no válido, recreando...", 255, 255, 0)
+                createSpeedometerBrowser()
             end
         else
-            -- Si no existe el navegador, crearlo
+            outputChatBox("[DEBUG] Velocímetro: Creando navegador...", 255, 255, 0)
             createSpeedometerBrowser()
             setTimer(function()
-                if speedometerBrowser then
+                if speedometerBrowser and isElement(speedometerBrowser) then
                     local newBrowser = guiGetBrowser(speedometerBrowser)
                     if newBrowser and isElement(newBrowser) then
-                        executeBrowserJavascript(newBrowser, "if(typeof showSpeedometer === 'function') { showSpeedometer(); }")
+                        guiSetVisible(speedometerBrowser, true)
+                        executeBrowserJavascript(newBrowser, 
+                            "try { " ..
+                            "if(typeof showSpeedometer === 'function') { " ..
+                            "showSpeedometer(); " ..
+                            "} " ..
+                            "} catch(e) { console.log('Error: ' + e); }"
+                        )
                     end
                 end
-            end, 1000, 1)
+            end, 2000, 1)
         end
     elseif not vehicle and isInVehicle then
         -- Jugador salió del vehículo
@@ -168,7 +201,13 @@ function updateSpeedometer()
             
             -- Enviar datos al navegador
             local jsCode = string.format(
-                "if(typeof updateSpeedometer === 'function') { updateSpeedometer(%d, %d, %d, %s, %s, '%s'); }",
+                "try { " ..
+                "if(typeof updateSpeedometer === 'function') { " ..
+                "updateSpeedometer(%d, %d, %d, %s, %s, '%s'); " ..
+                "} else { " ..
+                "console.log('updateSpeedometer no disponible'); " ..
+                "} " ..
+                "} catch(e) { console.log('Error actualizando velocímetro: ' + e); }",
                 speed,
                 rpm,
                 vehicleFuel,

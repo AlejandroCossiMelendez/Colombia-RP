@@ -115,6 +115,9 @@ function showSpeedometer() {
     const container = document.getElementById('speedometer-container');
     if (container) {
         container.classList.remove('hidden');
+        console.log('Velocímetro mostrado - clase hidden removida');
+    } else {
+        console.log('ERROR: No se encontró speedometer-container');
     }
 }
 
@@ -123,11 +126,24 @@ function hideSpeedometer() {
     const container = document.getElementById('speedometer-container');
     if (container) {
         container.classList.add('hidden');
+        console.log('Velocímetro ocultado');
     }
 }
 
 // Inicializar: ocultar por defecto
 hideSpeedometer();
+
+// Log cuando el script se carga
+console.log('Speedometer script cargado');
+
+// Verificar que el DOM esté listo
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Speedometer DOM listo');
+    });
+} else {
+    console.log('Speedometer DOM ya estaba listo');
+}
 
 // Función global para ser llamada desde Lua
 window.updateSpeedometer = updateSpeedometer;
