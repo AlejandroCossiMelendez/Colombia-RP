@@ -31,6 +31,9 @@ function whenPhoneBrowserReady()
         if phoneNumber then
             executeBrowserJavascript(browserContent, "setMyPhoneNumber('" .. tostring(phoneNumber) .. "');")
         end
+        
+        -- Cargar contactos desde el servidor
+        triggerServerEvent("loadContacts", resourceRoot)
     end
 end
 
@@ -174,6 +177,14 @@ function closePhone()
         restoreGameControls()
     end, 200, 1)
 end
+
+-- Evento para guardar contactos (desde el navegador)
+addEvent("saveContacts", true)
+addEventHandler("saveContacts", localPlayer, function(contactsJson)
+    if contactsJson and type(contactsJson) == "string" then
+        triggerServerEvent("saveContacts", resourceRoot, contactsJson)
+    end
+end)
 
 -- Evento del servidor para abrir el teléfono
 addEvent("openPhone", true)

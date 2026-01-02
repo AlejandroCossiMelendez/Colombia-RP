@@ -360,7 +360,8 @@ let myPhoneNumber = '';
 // Función para recibir el número de teléfono desde MTA
 function setMyPhoneNumber(number) {
     myPhoneNumber = number;
-    loadContacts();
+    // No cargar contactos aquí, esperar a que lleguen del servidor
+    // Los contactos se cargarán cuando se reciba loadContactsFromServer
 }
 
 // Función para cargar contactos desde el servidor
