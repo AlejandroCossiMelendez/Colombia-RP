@@ -11,6 +11,16 @@ function isPlayerAdmin(player)
     return role == "admin"
 end
 
+-- Función para verificar si un jugador es admin o staff
+function isPlayerAdminOrStaff(player)
+    if not isElement(player) or getElementType(player) ~= "player" then
+        return false
+    end
+    
+    local role = getElementData(player, "account:role")
+    return role == "admin" or role == "staff" or role == "moderator"
+end
+
 -- Función para verificar si un jugador es staff
 function isPlayerStaff(player)
     if not isElement(player) or getElementType(player) ~= "player" then
@@ -28,7 +38,7 @@ addEventHandler("admin:revivePlayer", root, function(characterId)
         return
     end
     
-    if not isPlayerAdmin(source) then
+    if not isPlayerAdminOrStaff(source) then
         triggerClientEvent(source, "admin:reviveResponse", source, false, "No tienes permiso para usar esta función.")
         return
     end
@@ -78,7 +88,7 @@ addEventHandler("admin:teleportToPlayer", root, function(characterId)
         return
     end
     
-    if not isPlayerAdmin(source) then
+    if not isPlayerAdminOrStaff(source) then
         triggerClientEvent(source, "admin:teleportResponse", source, false, "No tienes permiso para usar esta función.")
         return
     end
@@ -159,6 +169,90 @@ addEventHandler("admin:teleportToPlayer", root, function(characterId)
     outputServerLog("[ADMIN] " .. getPlayerName(source) .. " se teleportó a " .. displayName .. " (ID: " .. characterId .. ")")
 end)
 
+-- Evento para traer a un jugador (desde el panel)
+addEvent("admin:bringPlayer", true)
+addEventHandler("admin:bringPlayer", root, function(characterId)
+    if not isElement(source) or getElementType(source) ~= "player" then
+        return
+    end
+    
+    if not isPlayerAdminOrStaff(source) then
+        triggerClientEvent(source, "admin:teleportResponse", source, false, "No tienes permiso para usar esta función.")
+        return
+    end
+    
+    if not characterId or not tonumber(characterId) then
+        triggerClientEvent(source, "admin:teleportResponse", source, false, "ID de personaje inválido.")
+        return
+    end
+    
+    characterId = tonumber(characterId)
+    
+    -- Buscar jugador con ese ID de personaje
+    local target = nil
+    for _, p in ipairs(getElementsByType("player")) do
+        if getElementData(p, "character:selected") then
+            local pCharId = getElementData(p, "character:id")
+            if pCharId and tonumber(pCharId) == characterId then
+                target = p
+                break
+            end
+        end
+    end
+    
+    if not target then
+        triggerClientEvent(source, "admin:teleportResponse", source, false, "No se encontró ningún jugador con el ID de personaje " .. characterId .. ".")
+        return
+    end
+    
+    if target == source then
+        triggerClientEvent(source, "admin:teleportResponse", source, false, "No puedes traerte a ti mismo.")
+        return
+    end
+    
+    -- Obtener posición del admin
+    local adminX, adminY, adminZ = getElementPosition(source)
+    local adminRotation = getPedRotation(source)
+    local adminInterior = getElementInterior(source)
+    local adminDimension = getElementDimension(source)
+    
+    -- Calcular posición delante del admin (2 metros)
+    local rotationRad = math.rad(adminRotation)
+    local distanceFront = 2.0
+    local frontX = adminX - math.sin(rotationRad) * distanceFront
+    local frontY = adminY + math.cos(rotationRad) * distanceFront
+    local frontZ = adminZ
+    
+    -- Teleportar al jugador objetivo delante del admin
+    setElementPosition(target, frontX, frontY, frontZ)
+    setPedRotation(target, adminRotation)
+    setElementInterior(target, adminInterior)
+    setElementDimension(target, adminDimension)
+    
+    -- Ajustar altura para evitar caídas
+    setTimer(function()
+        if isElement(target) then
+            local px, py, pz = getElementPosition(target)
+            local hit, hitX, hitY, hitZ = processLineOfSight(px, py, pz + 50, px, py, pz - 50, true, true, false, true, false, false, false, false, target)
+            if hit then
+                if pz - hitZ < 2.0 or pz < hitZ then
+                    setElementPosition(target, px, py, hitZ + 2.0)
+                end
+            elseif pz < 5.0 then
+                setElementPosition(target, px, py, 15.0)
+            end
+        end
+    end, 100, 1)
+    
+    local charName = getElementData(target, "character:name")
+    local charSurname = getElementData(target, "character:surname")
+    local displayName = (charName and charSurname) and (charName .. " " .. charSurname) or getPlayerName(target)
+    
+    triggerClientEvent(source, "admin:teleportResponse", source, true, "Has traído a " .. displayName .. " (ID: " .. characterId .. ").")
+    outputChatBox("Un administrador te ha traído a su ubicación.", target, 0, 255, 0)
+    outputServerLog("[ADMIN] " .. getPlayerName(source) .. " trajo a " .. displayName .. " (ID: " .. characterId .. ")")
+end)
+
 -- Evento para toggle invisibilidad (desde el panel)
 addEvent("admin:toggleInvisibility", true)
 addEventHandler("admin:toggleInvisibility", root, function()
@@ -166,7 +260,7 @@ addEventHandler("admin:toggleInvisibility", root, function()
         return
     end
     
-    if not isPlayerAdmin(source) then
+    if not isPlayerAdminOrStaff(source) then
         outputChatBox("No tienes permiso para usar esta función.", source, 255, 0, 0)
         return
     end
@@ -197,7 +291,7 @@ addEventHandler("admin:healPlayer", root, function(characterId)
         return
     end
     
-    if not isPlayerAdmin(source) then
+    if not isPlayerAdminOrStaff(source) then
         triggerClientEvent(source, "admin:healResponse", source, false, "No tienes permiso para usar esta función.")
         return
     end
@@ -324,7 +418,7 @@ addEventHandler("admin:getCoords", root, function()
         return
     end
     
-    if not isPlayerAdmin(source) then
+    if not isPlayerAdminOrStaff(source) then
         outputChatBox("No tienes permiso para usar esta función.", source, 255, 0, 0)
         return
     end

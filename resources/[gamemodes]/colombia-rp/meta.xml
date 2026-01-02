@@ -35,6 +35,7 @@
     <script src="client/hype_stamina.lua" type="client" />
     <script src="client/voice.lua" type="client" />
     <script src="client/admin_panel.lua" type="client" />
+    <script src="client/freecam.lua" type="client" />
     
     <!-- Radar HD -->
     <script src="client/radar.lua" type="client" />

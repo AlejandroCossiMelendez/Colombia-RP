@@ -105,12 +105,20 @@ function createAdminPanel()
         table.insert(adminButtons, revivirBtn)
         buttonY = buttonY + buttonSpacing
         
-        -- Botón: Teleportar a Usuario
-        local teleportBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Teleportar a Usuario", false, adminWindow)
-        addEventHandler("onClientGUIClick", teleportBtn, function()
-            showTeleportInput()
+        -- Botón: Ir a Usuario
+        local teleportToBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Ir a Usuario", false, adminWindow)
+        addEventHandler("onClientGUIClick", teleportToBtn, function()
+            showTeleportInput("to")
         end, false)
-        table.insert(adminButtons, teleportBtn)
+        table.insert(adminButtons, teleportToBtn)
+        buttonY = buttonY + buttonSpacing
+        
+        -- Botón: Traer Usuario
+        local teleportBringBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Traer Usuario", false, adminWindow)
+        addEventHandler("onClientGUIClick", teleportBringBtn, function()
+            showTeleportInput("bring")
+        end, false)
+        table.insert(adminButtons, teleportBringBtn)
         buttonY = buttonY + buttonSpacing
         
         -- Botón: Dar Dinero
@@ -151,13 +159,93 @@ function createAdminPanel()
         end, false)
         table.insert(adminButtons, curarBtn)
         buttonY = buttonY + buttonSpacing
-    elseif userType == "staff" then
-        -- Botones para staff (se pueden agregar más adelante)
-        local staffBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Funciones de Staff", false, adminWindow)
-        addEventHandler("onClientGUIClick", staffBtn, function()
-            outputChatBox("Funciones de staff en desarrollo...", 255, 255, 0)
+        
+        -- Botón: Freecam
+        local freecamEnabled = isFreecamEnabled and isFreecamEnabled() or false
+        local freecamBtnText = freecamEnabled and "Desactivar Freecam" or "Activar Freecam"
+        local freecamBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, freecamBtnText, false, adminWindow)
+        addEventHandler("onClientGUIClick", freecamBtn, function()
+            if toggleFreecam then
+                toggleFreecam()
+                -- Cerrar y reabrir el panel para actualizar el texto del botón
+                closeAdminPanel()
+                setTimer(function()
+                    createAdminPanel()
+                end, 100, 1)
+            end
         end, false)
-        table.insert(adminButtons, staffBtn)
+        table.insert(adminButtons, freecamBtn)
+        buttonY = buttonY + buttonSpacing
+    elseif userType == "staff" then
+        -- Botón: Revivir Usuario
+        local revivirBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Revivir Usuario", false, adminWindow)
+        addEventHandler("onClientGUIClick", revivirBtn, function()
+            showReviveInput()
+        end, false)
+        table.insert(adminButtons, revivirBtn)
+        buttonY = buttonY + buttonSpacing
+        
+        -- Botón: Ir a Usuario
+        local teleportToBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Ir a Usuario", false, adminWindow)
+        addEventHandler("onClientGUIClick", teleportToBtn, function()
+            showTeleportInput("to")
+        end, false)
+        table.insert(adminButtons, teleportToBtn)
+        buttonY = buttonY + buttonSpacing
+        
+        -- Botón: Traer Usuario
+        local teleportBringBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Traer Usuario", false, adminWindow)
+        addEventHandler("onClientGUIClick", teleportBringBtn, function()
+            showTeleportInput("bring")
+        end, false)
+        table.insert(adminButtons, teleportBringBtn)
+        buttonY = buttonY + buttonSpacing
+        
+        -- Botón: Ver Coordenadas
+        local coordsBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Ver Coordenadas", false, adminWindow)
+        addEventHandler("onClientGUIClick", coordsBtn, function()
+            triggerServerEvent("admin:getCoords", localPlayer)
+        end, false)
+        table.insert(adminButtons, coordsBtn)
+        buttonY = buttonY + buttonSpacing
+        
+        -- Botón: Invisibilidad
+        local isInvisible = getElementData(localPlayer, "admin:invisible") or false
+        local invisibleBtnText = isInvisible and "Hacerse Visible" or "Hacerse Invisible"
+        local invisibleBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, invisibleBtnText, false, adminWindow)
+        addEventHandler("onClientGUIClick", invisibleBtn, function()
+            triggerServerEvent("admin:toggleInvisibility", localPlayer)
+            closeAdminPanel()
+            setTimer(function()
+                createAdminPanel()
+            end, 100, 1)
+        end, false)
+        table.insert(adminButtons, invisibleBtn)
+        buttonY = buttonY + buttonSpacing
+        
+        -- Botón: Curar Jugador
+        local curarBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Curar Jugador", false, adminWindow)
+        addEventHandler("onClientGUIClick", curarBtn, function()
+            showHealInput()
+        end, false)
+        table.insert(adminButtons, curarBtn)
+        buttonY = buttonY + buttonSpacing
+        
+        -- Botón: Freecam
+        local freecamEnabled = isFreecamEnabled and isFreecamEnabled() or false
+        local freecamBtnText = freecamEnabled and "Desactivar Freecam" or "Activar Freecam"
+        local freecamBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, freecamBtnText, false, adminWindow)
+        addEventHandler("onClientGUIClick", freecamBtn, function()
+            if toggleFreecam then
+                toggleFreecam()
+                closeAdminPanel()
+                setTimer(function()
+                    createAdminPanel()
+                end, 100, 1)
+            end
+        end, false)
+        table.insert(adminButtons, freecamBtn)
+        buttonY = buttonY + buttonSpacing
     elseif userType == "legal" then
         -- Botones para facciones legales
         local legalBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Funciones Legales", false, adminWindow)
@@ -225,33 +313,40 @@ function showReviveInput()
 end
 
 -- Función para mostrar el input de teleportar
-function showTeleportInput()
+function showTeleportInput(mode)
     if inputWindow and isElement(inputWindow) then
         destroyElement(inputWindow)
     end
     
-    currentAction = "teleportar"
+    currentAction = mode == "bring" and "traer" or "teleportar"
     
     local windowWidth = 350
     local windowHeight = 150
     local windowX = (screenW - windowWidth) / 2
     local windowY = (screenH - windowHeight) / 2
     
-    inputWindow = guiCreateWindow(windowX, windowY, windowWidth, windowHeight, "Teleportar a Usuario", false)
+    local title = mode == "bring" and "Traer Usuario" or "Ir a Usuario"
+    local labelText = mode == "bring" and "Ingresa el ID del personaje a traer:" or "Ingresa el ID del personaje al que te quieres teleportar:"
+    
+    inputWindow = guiCreateWindow(windowX, windowY, windowWidth, windowHeight, title, false)
     guiWindowSetSizable(inputWindow, false)
     
-    local label = guiCreateLabel(10, 30, windowWidth - 20, 20, "Ingresa el ID del personaje al que te quieres teleportar:", false, inputWindow)
+    local label = guiCreateLabel(10, 30, windowWidth - 20, 20, labelText, false, inputWindow)
     
     inputEdit = guiCreateEdit(10, 55, windowWidth - 20, 30, "", false, inputWindow)
     guiEditSetMaxLength(inputEdit, 10)
     
-    local acceptBtn = guiCreateButton(10, 95, (windowWidth - 30) / 2, 30, "Teleportar", false, inputWindow)
+    local acceptBtn = guiCreateButton(10, 95, (windowWidth - 30) / 2, 30, mode == "bring" and "Traer" or "Teleportar", false, inputWindow)
     addEventHandler("onClientGUIClick", acceptBtn, function()
         local characterId = guiGetText(inputEdit)
         if characterId and characterId ~= "" then
             local id = tonumber(characterId)
             if id then
-                triggerServerEvent("admin:teleportToPlayer", localPlayer, id)
+                if mode == "bring" then
+                    triggerServerEvent("admin:bringPlayer", localPlayer, id)
+                else
+                    triggerServerEvent("admin:teleportToPlayer", localPlayer, id)
+                end
                 closeInputWindow()
             else
                 outputChatBox("El ID debe ser un número válido.", 255, 0, 0)
