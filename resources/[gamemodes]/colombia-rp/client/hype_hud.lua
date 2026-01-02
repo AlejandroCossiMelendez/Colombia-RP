@@ -98,7 +98,7 @@ function HudHype()
     local imageSourceWidth = 101 -- Ancho original de la imagen
     local imageSourceHeight = 28 -- Alto original de la imagen
     
-    -- Función auxiliar para dibujar barra con bordes redondeados fijos
+    -- Función auxiliar para dibujar barra con bordes redondeados fijos a la izquierda
     local function drawBar(barX, barY, value, color, barName)
         if value <= 0 then
             return
@@ -108,24 +108,38 @@ function HudHype()
         local clampedValue = math.max(0, math.min(100, value))
         local percent = clampedValue / 100
         
-        -- Calcular el ancho de la barra proporcionalmente
-        local finalWidth = maxBarWidth * percent
+        -- Calcular el ancho de la barra proporcionalmente al valor
+        local calculatedWidth = maxBarWidth * percent
         
-        -- Ancho mínimo para mantener el borde redondeado izquierdo visible
-        local minWidthForRounded = x*8 -- Ancho mínimo para que el borde redondeado se vea bien
+        -- Ancho mínimo fijo para mantener el borde redondeado izquierdo siempre visible
+        -- Este ancho mínimo asegura que el borde redondeado izquierdo nunca se pierda o se descuadre
+        local minWidthForRounded = x*12 -- Ancho mínimo fijo para mantener el borde redondeado
         
-        -- Si el valor es muy bajo, usar ancho mínimo pero mantener proporción visual
-        if finalWidth < minWidthForRounded and clampedValue > 0 then
+        -- Si el valor es muy bajo, usar el ancho mínimo fijo para mantener el borde redondeado
+        -- Si el valor es normal, usar el ancho calculado (que será mayor al mínimo)
+        local finalWidth
+        if calculatedWidth < minWidthForRounded and clampedValue > 0 then
+            -- Valor bajo: usar ancho mínimo fijo para mantener el borde redondeado izquierdo
             finalWidth = minWidthForRounded
+        else
+            -- Valor normal: usar ancho proporcional
+            finalWidth = calculatedWidth
         end
         
-        -- Calcular qué sección de la imagen usar (desde el inicio, manteniendo el borde redondeado izquierdo)
-        -- La sección siempre empieza desde 0 (izquierda) para mantener el borde redondeado fijo
-        local sectionWidth = (finalWidth / maxBarWidth) * imageSourceWidth
+        -- Calcular la sección de la imagen a usar
+        -- CRÍTICO: Siempre empezamos desde (0, 0) para mantener el borde redondeado izquierdo fijo
+        -- El ancho de la sección es proporcional al ancho final de la barra
+        local sectionWidth = (finalWidth / (x*101)) * imageSourceWidth
         sectionWidth = math.min(sectionWidth, imageSourceWidth) -- No exceder el ancho original
         
+        -- Asegurar un mínimo en la sección para mantener el borde redondeado visible
+        local minSectionWidth = (minWidthForRounded / (x*101)) * imageSourceWidth
+        if finalWidth == minWidthForRounded then
+            sectionWidth = minSectionWidth -- Usar mínimo cuando el valor es bajo
+        end
+        
         -- Usar dxDrawImageSection para mantener el borde redondeado izquierdo siempre fijo
-        -- Esto asegura que el borde redondeado de la izquierda siempre se vea, sin importar el valor
+        -- La sección SIEMPRE empieza desde (0, 0) - esto mantiene el borde redondeado izquierdo fijo
         dxDrawImageSection(barX, barY, finalWidth, y*28, 0, 0, sectionWidth, imageSourceHeight, 
             "hud-rp/Hype_Hud/imgs/0.png", 0, 0, 0, color, false)
     end
