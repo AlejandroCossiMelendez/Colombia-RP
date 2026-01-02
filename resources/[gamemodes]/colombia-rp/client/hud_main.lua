@@ -5,10 +5,12 @@ local hudVisible = false
 
 function showHUD()
     hudVisible = true
+    outputChatBox("[HUD] HUD activado", 0, 255, 0)
 end
 
 function hideHUD()
     hudVisible = false
+    outputChatBox("[HUD] HUD desactivado", 255, 0, 0)
 end
 
 addEvent("showHUD", true)
@@ -21,14 +23,34 @@ addEventHandler("hideHUD", resourceRoot, function()
     hideHUD()
 end)
 
+-- Mostrar HUD automáticamente cuando el personaje está seleccionado
+setTimer(function()
+    if getElementData(localPlayer, "character:selected") and not hudVisible then
+        showHUD()
+    elseif not getElementData(localPlayer, "character:selected") and hudVisible then
+        hideHUD()
+    end
+end, 1000, 0)
+
 -- Solo mostrar HUD si el personaje está seleccionado
 addEventHandler("onClientRender", root, function()
-    if not hudVisible then
+    -- Verificar que el personaje esté seleccionado
+    if not getElementData(localPlayer, "character:selected") then
         return
     end
     
-    -- Verificar que el personaje esté seleccionado
-    if not getElementData(localPlayer, "character:selected") then
+    -- Verificar que cache y Hyper_Confgs estén cargados
+    if not cache or not Hyper_Confgs then
+        return
+    end
+    
+    -- Verificar que sx y sy estén definidos
+    if not sx or not sy then
+        return
+    end
+    
+    -- Verificar que cache.tabela exista
+    if not cache.tabela then
         return
     end
     
@@ -53,9 +75,24 @@ addEventHandler("onClientRender", root, function()
         dxDrawImageSection( sx*1314, sy*639+10, sx*48, sy*-(35*Sede/100), 0, 35, 47, -(34*Sede/100), cache['Images']['fundo'], 0, 0, 0, tocolor(unpack(Hyper_Confgs.Cores.frentesede)), false)
         dxDrawImageSection( sx*1314, sy*677+10, sx*48, sy*-(35*Vida/100), 0, 35, 47, -(34*Vida/100), cache['Images']['fundo'], 0, 0, 0, tocolor(unpack(Hyper_Confgs.Cores.frentevida)), false)
         dxDrawImageSection( sx*1314, sy*714+10, sx*48, sy*-(35*Colete/100), 0, 35, 47, -(34*Colete/100), cache['Images']['fundo'], 0, 0, 0, tocolor(unpack(Hyper_Confgs.Cores.frentecolete)), false)
+    else
+        -- Fallback: dibujar barras simples si no hay imágenes
+        local barX = sx*1314
+        local barY = sy*600
+        local barW = sx*48
+        local barH = sy*35
+        
+        -- Fondo de las barras
+        dxDrawRectangle(barX, barY, barW, barH * 5, tocolor(0, 0, 0, 150), false)
+        
+        -- Barras de progreso
+        dxDrawRectangle(barX, barY, barW, barH * (Fome/100), tocolor(255, 165, 0, 255), false) -- Hambre
+        dxDrawRectangle(barX, barY + barH, barW, barH * (Sede/100), tocolor(0, 100, 255, 255), false) -- Sed
+        dxDrawRectangle(barX, barY + barH*2, barW, barH * (Vida/100), tocolor(255, 0, 0, 255), false) -- Vida
+        dxDrawRectangle(barX, barY + barH*3, barW, barH * (Colete/100), tocolor(255, 255, 255, 255), false) -- Armadura
     end
     
-    -- Dibujar iconos
+    -- Dibujar iconos (si existen)
     if cache.Images['mic'] then
         cache.Dx.Image(1330, 534+10, 18, 21, cache['Images']['mic'], 0, 0, 0, tocolor(255, 255, 255, 255), false)
     end
@@ -71,6 +108,12 @@ addEventHandler("onClientRender", root, function()
     if cache.Images['colete'] then
         cache.Dx.Image(1330, 686+10, 21, 21, cache['Images']['colete'], 0, 0, 0, tocolor(255, 255, 255, 255), false)
     end
+    
+    -- Texto de valores (siempre visible)
+    cache.Dx.Text("H: " .. math.floor(Fome) .. "%", 1330, 570+10, 200, 30, tocolor(255, 255, 255, 255), 1, cache.Fonts["Fonte Mont Bold 10"], "left", "top", false, false, false, true, false)
+    cache.Dx.Text("S: " .. math.floor(Sede) .. "%", 1330, 613+10, 200, 30, tocolor(255, 255, 255, 255), 1, cache.Fonts["Fonte Mont Bold 10"], "left", "top", false, false, false, true, false)
+    cache.Dx.Text("V: " .. math.floor(Vida) .. "%", 1330, 651+10, 200, 30, tocolor(255, 255, 255, 255), 1, cache.Fonts["Fonte Mont Bold 10"], "left", "top", false, false, false, true, false)
+    cache.Dx.Text("A: " .. math.floor(Colete) .. "%", 1330, 686+10, 200, 30, tocolor(255, 255, 255, 255), 1, cache.Fonts["Fonte Mont Bold 10"], "left", "top", false, false, false, true, false)
     
     -- Reloj
     local hours, minutes  = cache.functions.timerR()

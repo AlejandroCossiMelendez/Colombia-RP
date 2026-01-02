@@ -62,8 +62,10 @@ cache = {
     },
 }
 
--- Cargar fuentes (si existen)
+-- Cargar fuentes e imágenes cuando el recurso inicia
 addEventHandler("onClientResourceStart", resourceRoot, function()
+    outputChatBox("[HUD] Cargando recursos del HUD...", 255, 255, 0)
+    
     -- Intentar cargar fuentes desde ice_hud/nui/, si no existen usar default
     cache.Fonts["Fonte Mont Bold 10"] = dxCreateFont("ice_hud/nui/fonts/Montserrat-Bold.ttf", 10, false, "cleartype_natural" ) or 'default'
     cache.Fonts["Fonte Mont Bold 12"] = dxCreateFont("ice_hud/nui/fonts/Montserrat-Bold.ttf", 12, false, "cleartype_natural" ) or 'default'
@@ -85,6 +87,14 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
     cache.Images["relogio"] = dxCreateTexture( "ice_hud/nui/images/relogio.png", 'dxt5', true, 'clamp') or nil
     cache.Images["freq"] = dxCreateTexture( "ice_hud/nui/images/freq.png", 'dxt5', true, 'clamp') or nil
     cache.Images["muni"] = dxCreateTexture( "ice_hud/nui/images/muni.png", 'dxt5', true, 'clamp') or nil
+    
+    -- Verificar carga
+    local imagesLoaded = 0
+    for k, v in pairs(cache.Images) do
+        if v then imagesLoaded = imagesLoaded + 1 end
+    end
+    outputChatBox("[HUD] Imágenes cargadas: " .. imagesLoaded .. "/13", 255, 255, 0)
+    outputChatBox("[HUD] Fuentes cargadas: " .. (cache.Fonts["Fonte Mont Bold 10"] ~= 'default' and "Sí" or "No"), 255, 255, 0)
 end)
 
 cache.functions.register = function(event, ...)
