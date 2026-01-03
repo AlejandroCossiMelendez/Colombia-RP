@@ -336,6 +336,8 @@
     
     <!-- Sonidos de vehículos -->
     <file src="client/assents/sound/block-desblock.mp3" type="client" />
+    <!-- Si conviertes a WAV, descomenta esta línea y comenta la de arriba -->
+    <file src="client/assents/sound/block-desblock.wav" type="client" />
     <file src="items/images/18.png" type="client" />
     <file src="items/images/19.png" type="client" />
     <file src="items/images/20.png" type="client" />

@@ -22,51 +22,59 @@ end)
 
 -- Control K: Bloquear/Desbloquear puertas
 bindKey("k", "down", function()
-    -- Debug: confirmar que la tecla se presionó
-    outputChatBox("[DEBUG] Tecla K presionada", 255, 255, 0)
-    
     if not vehicleControlsEnabled then 
-        outputChatBox("[DEBUG] Controles deshabilitados", 255, 0, 0)
         return 
     end
     
+    -- Primero verificar si está dentro de un vehículo
     local vehicle = getPedOccupiedVehicle(localPlayer)
-    outputChatBox("[DEBUG] Vehículo ocupado: " .. tostring(vehicle ~= nil), 255, 255, 0)
     
     -- Si no está en un vehículo, buscar el más cercano
     if not vehicle then
         local px, py, pz = getElementPosition(localPlayer)
         local nearbyVehicle = nil
-        local minDistance = 5.0
+        local minDistance = 10.0 -- Aumentado a 10 metros para mejor detección
         
-        outputChatBox("[DEBUG] Buscando vehículo cercano...", 255, 255, 0)
-        
+        -- Buscar todos los vehículos cercanos
         for _, veh in ipairs(getElementsByType("vehicle")) do
-            -- Verificar que sea un vehículo del sistema (tiene matrícula o dueño)
-            local plate = getElementData(veh, "vehicle:plate")
-            local ownerId = getElementData(veh, "vehicle:owner_id")
-            
-            if plate or ownerId then
-                local vx, vy, vz = getElementPosition(veh)
-                local distance = getDistanceBetweenPoints3D(px, py, pz, vx, vy, vz)
-                if distance < minDistance then
-                    nearbyVehicle = veh
-                    minDistance = distance
+            -- Verificar que sea un vehículo válido
+            if isElement(veh) then
+                -- Verificar que sea un vehículo del sistema (tiene matrícula o dueño)
+                local plate = getElementData(veh, "vehicle:plate")
+                local ownerId = getElementData(veh, "vehicle:owner_id")
+                
+                -- También aceptar vehículos que tengan matrícula visible (getVehiclePlateText)
+                -- Esto ayuda con vehículos creados antes del sistema o sin elementData
+                if not plate then
+                    plate = getVehiclePlateText(veh)
+                    -- Si tiene matrícula visible, considerarlo como vehículo del sistema
+                    if plate and plate ~= "" and plate ~= " " then
+                        -- Usar este vehículo aunque no tenga elementData
+                    end
+                end
+                
+                -- Si tiene matrícula (de elementData o visible) o dueño, considerarlo
+                if (plate and plate ~= "" and plate ~= " ") or ownerId then
+                    local vx, vy, vz = getElementPosition(veh)
+                    local distance = getDistanceBetweenPoints3D(px, py, pz, vx, vy, vz)
+                    if distance < minDistance then
+                        nearbyVehicle = veh
+                        minDistance = distance
+                    end
                 end
             end
         end
         
         if nearbyVehicle then
             vehicle = nearbyVehicle
-            outputChatBox("[DEBUG] Vehículo cercano encontrado: " .. (getElementData(vehicle, "vehicle:plate") or "Sin matrícula"), 0, 255, 0)
         else
-            outputChatBox("[DEBUG] No hay vehículo cerca (máx 5m)", 255, 0, 0)
+            -- No hay vehículo cerca, mostrar mensaje de ayuda
+            outputChatBox("No hay ningún vehículo cerca (máximo 10 metros).", 255, 255, 0)
             return
         end
     end
     
     if not vehicle or not isElement(vehicle) then
-        outputChatBox("[DEBUG] Vehículo inválido", 255, 0, 0)
         return
     end
     
@@ -74,12 +82,8 @@ bindKey("k", "down", function()
     local isLocked = getVehicleLocked(vehicle)
     local newState = not isLocked
     
-    local plate = getElementData(vehicle, "vehicle:plate") or "Sin matrícula"
-    outputChatBox("[DEBUG] Enviando evento - Vehículo: " .. plate .. " | Estado actual: " .. tostring(isLocked) .. " | Nuevo estado: " .. tostring(newState), 0, 255, 255)
-    
     -- Enviar al servidor para verificar llaves y cambiar estado
     triggerServerEvent("vehicle:toggleLock", localPlayer, vehicle, newState)
-    outputChatBox("[DEBUG] Evento enviado al servidor", 0, 255, 0)
 end)
 
 -- Control L: Prender/Apagar luces
@@ -127,29 +131,52 @@ addEventHandler("vehicle:playLockSound", root, function(x, y, z)
     playSoundFrontEnd(40)
     
     -- Intentar reproducir el sonido personalizado también
+    -- Probar diferentes formatos y rutas (WAV primero porque es más compatible)
     local sound = nil
-    -- La ruta debe ser relativa al recurso (sin "client/")
-    local soundPath = "assents/sound/block-desblock.mp3"
+    local soundPaths = {
+        "client/assents/sound/block-desblock.wav",  -- WAV con ruta completa (más compatible)
+        "assents/sound/block-desblock.wav",         -- WAV sin client/
+        "client/assents/sound/block-desblock.mp3",  -- MP3 con ruta completa
+        "assents/sound/block-desblock.mp3"          -- MP3 sin client/
+    }
+    
+    local soundPlayed = false
     
     if x and y and z then
-        -- Reproducir sonido 3D en la posición del vehículo
-        sound = playSound3D(soundPath, x, y, z, false)
-        if sound and isElement(sound) then
-            setSoundVolume(sound, 0.7)
-            setSoundMaxDistance(sound, 30)
-            setSoundMinDistance(sound, 5)
-        else
-            -- Si falla el sonido 3D, intentar sonido local
-            sound = playSound(soundPath, false)
+        -- Intentar reproducir sonido 3D en la posición del vehículo
+        for _, soundPath in ipairs(soundPaths) do
+            sound = playSound3D(soundPath, x, y, z, false)
             if sound and isElement(sound) then
                 setSoundVolume(sound, 0.7)
+                setSoundMaxDistance(sound, 30)
+                setSoundMinDistance(sound, 5)
+                soundPlayed = true
+                break
+            end
+        end
+        
+        -- Si falla el sonido 3D, intentar sonido local
+        if not soundPlayed then
+            for _, soundPath in ipairs(soundPaths) do
+                sound = playSound(soundPath, false)
+                if sound and isElement(sound) then
+                    setSoundVolume(sound, 0.7)
+                    soundPlayed = true
+                    break
+                end
             end
         end
     else
         -- Si no hay posición, reproducir sonido local
-        sound = playSound(soundPath, false)
-        if sound and isElement(sound) then
-            setSoundVolume(sound, 0.7)
+        for _, soundPath in ipairs(soundPaths) do
+            sound = playSound(soundPath, false)
+            if sound and isElement(sound) then
+                setSoundVolume(sound, 0.7)
+                soundPlayed = true
+                break
+            end
         end
     end
+    
+    -- Si ningún formato funcionó, solo usar el sonido del juego (ya reproducido arriba)
 end)
