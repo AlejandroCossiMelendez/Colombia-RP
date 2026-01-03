@@ -29,6 +29,9 @@
     <script src="server/phone_contacts.lua" type="server" />
     <script src="server/voice_proximity.lua" type="server" />
     <script src="server/phone_calls.lua" type="server" />
+    <!-- Bone Attach System (debe cargarse antes de jbl_system) -->
+    <script src="jbl/bone_attach/bone_attach.lua" type="server" />
+    <script src="jbl/bone_attach/attach_func.lua" type="server" />
     <script src="server/jbl_system.lua" type="server" />
     <script src="server/fuel_system.lua" type="server" />
     <script src="server/vehicles_system.lua" type="server" />
@@ -45,6 +48,12 @@
     <script src="client/death_hud.lua" type="client" />
     <script src="client/scoreboard.lua" type="client" />
     <script src="client/main.lua" type="client" />
+    <!-- Bone Attach System (debe cargarse antes de jbl_panel) -->
+    <script src="jbl/bone_attach/bone_pos_rot.lua" type="client" />
+    <script src="jbl/bone_attach/attach_rotation.lua" type="client" />
+    <script src="jbl/bone_attach/attach_func.lua" type="client" />
+    <script src="jbl/bone_attach/attach_global.lua" type="client" />
+    <script src="jbl/bone_attach/attach_client.lua" type="client" />
     
     <!-- HUD Hype (nuevo sistema) -->
     <script src="client/hype_hud.lua" type="client" />

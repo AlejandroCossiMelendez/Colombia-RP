@@ -34,26 +34,39 @@ addEventHandler("jbl:activate", root, function()
         return
     end
     
+    -- Configurar el objeto para que siga correctamente al jugador
+    setElementDimension(jblObject, getElementDimension(player))
+    setElementInterior(jblObject, getElementInterior(player))
+    setElementCollisionsEnabled(jblObject, false)
+    
     -- Hacer el parlante más pequeño (70% del tamaño original)
     setObjectScale(jblObject, 0.7)
     
     -- Adjuntar a la mano derecha (bone 12 - right hand según functions.txt)
-    -- Verificar si bone_attach está disponible
-    local boneAttachResource = getResourceFromName("bone_attach")
-    if boneAttachResource and getResourceState(boneAttachResource) == "running" then
-        if exports.bone_attach then
-            -- Ajustar posición para que se vea bien en la mano
-            -- Bone 12 = mano derecha (right hand)
-            -- Offset: x (lateral derecho - más a la derecha), y (adelante), z (arriba/abajo)
-            -- Rotación: rx (pitch), ry (yaw), rz (roll)
-            -- Valores ajustados: más pequeño, rotado en Z, más a la derecha y más abajo (20px más bajo)
-            exports.bone_attach:attachElementToBone(jblObject, player, 12, 0.25, 0.08, -0.40, 0, 0, 90)
+    -- IMPORTANTE: Usar bone_attach para que siga el movimiento de la mano al caminar
+    -- Las funciones de bone_attach están cargadas en el meta.xml antes de este script
+    
+    local attached = false
+    
+    -- Intentar usar la función attachElementToBone directamente (está en attach_func.lua)
+    if attachElementToBone then
+        attached = attachElementToBone(jblObject, player, 12, 0.20, 0.12, -0.15, 0, 0, 90)
+    end
+    
+    -- Si no está disponible directamente, intentar como recurso separado
+    if not attached then
+        local boneAttachResource = getResourceFromName("bone_attach")
+        if boneAttachResource and getResourceState(boneAttachResource) == "running" then
+            if exports.bone_attach and exports.bone_attach.attachElementToBone then
+                attached = exports.bone_attach:attachElementToBone(jblObject, player, 12, 0.20, 0.12, -0.15, 0, 0, 90)
+            end
         end
-    else
-        -- Si bone_attach no está disponible, adjuntar usando attachElements
-        -- Ajustar posición relativa para la mano (lado derecho del jugador)
-        -- Más a la derecha, rotado 90 grados en Z (roll) y más abajo (20px más bajo)
-        attachElements(jblObject, player, 0.25, 0.08, -0.40, 0, 0, 90)
+    end
+    
+    -- Si bone_attach no está disponible, usar attachElements como respaldo
+    if not attached then
+        attachElements(jblObject, player, 0.20, 0.12, -0.15, 0, 0, 90)
+        outputChatBox("Advertencia: bone_attach no disponible. El JBL no seguirá el movimiento de la mano al caminar.", player, 255, 255, 0)
     end
     
     activeJBLs[player] = {
