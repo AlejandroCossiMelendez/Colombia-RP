@@ -123,10 +123,71 @@ bindKey("l", "down", function()
         return
     end
     
-    -- Verificar llaves en el servidor
+    -- Obtener estado actual de las luces
     local lightsState = getVehicleOverrideLights(vehicle)
     local newState = (lightsState == 2) and 0 or 2
+    
+    -- Cambiar las luces inmediatamente en el cliente
+    setVehicleOverrideLights(vehicle, newState)
+    
+    -- Enviar al servidor para verificar llaves y actualizar en BD
     triggerServerEvent("vehicle:toggleLights", localPlayer, vehicle, newState)
+end)
+
+-- Control N: Freno de mano (Handbrake)
+bindKey("n", "down", function()
+    if not vehicleControlsEnabled then return end
+    
+    local vehicle = getPedOccupiedVehicle(localPlayer)
+    if not vehicle or getPedOccupiedVehicleSeat(localPlayer) ~= 0 then
+        return
+    end
+    
+    -- Obtener estado actual del freno de mano
+    local handbrakeOn = getElementData(vehicle, "vehicle:handbrake") or false
+    local newState = not handbrakeOn
+    
+    -- Aplicar freno de mano inmediatamente
+    setElementData(vehicle, "vehicle:handbrake", newState)
+    
+    if newState then
+        -- Activar freno de mano: congelar el vehículo
+        setElementFrozen(vehicle, true)
+        outputChatBox("Freno de mano activado", 0, 255, 0)
+    else
+        -- Desactivar freno de mano
+        setElementFrozen(vehicle, false)
+        outputChatBox("Freno de mano desactivado", 0, 255, 0)
+    end
+    
+    -- Enviar al servidor para actualizar en BD
+    triggerServerEvent("vehicle:toggleHandbrake", localPlayer, vehicle, newState)
+end)
+
+-- Prevenir que los jugadores salgan del vehículo si está bloqueado
+addEventHandler("onClientPlayerVehicleExit", localPlayer, function(vehicle, seat)
+    if vehicle and isElement(vehicle) then
+        local isLocked = getVehicleLocked(vehicle)
+        if isLocked then
+            -- Cancelar la salida
+            cancelEvent()
+            outputChatBox("El vehículo está bloqueado. Desbloquéalo con K para salir.", 255, 0, 0)
+            -- Forzar al jugador a quedarse en el vehículo
+            setTimer(function()
+                if vehicle and isElement(vehicle) then
+                    warpPedIntoVehicle(localPlayer, vehicle, seat)
+                end
+            end, 50, 1)
+        end
+    end
+end)
+
+-- Evento para revertir luces si el servidor rechaza el cambio
+addEvent("vehicle:revertLights", true)
+addEventHandler("vehicle:revertLights", root, function(vehicle, state)
+    if vehicle and isElement(vehicle) then
+        setVehicleOverrideLights(vehicle, state)
+    end
 end)
 
 -- Prevenir que el jugador entre a vehículos bloqueados sin llaves

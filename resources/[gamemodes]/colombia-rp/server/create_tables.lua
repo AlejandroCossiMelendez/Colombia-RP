@@ -161,6 +161,7 @@ function createItemsTables()
             `locked` TINYINT DEFAULT 0,
             `engine` TINYINT DEFAULT 0,
             `lights` TINYINT DEFAULT 0,
+            `handbrake` TINYINT DEFAULT 0,
             `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             INDEX `idx_owner_id` (`owner_id`),
@@ -175,6 +176,10 @@ function createItemsTables()
     else
         outputServerLog("[TABLES] ✗ ERROR al crear tabla 'vehicles'")
     end
+    
+    -- Agregar columna handbrake si no existe (para vehículos creados antes)
+    local alterTableSQL = "ALTER TABLE `vehicles` ADD COLUMN IF NOT EXISTS `handbrake` TINYINT DEFAULT 0"
+    executeDatabase(alterTableSQL)
     
     outputServerLog("[TABLES] Verificación de tablas completada")
 end

@@ -242,16 +242,22 @@ addEventHandler("vehicle:toggleLights", root, function(vehicle, newState)
     -- Verificar si tiene las llaves
     if not playerHasVehicleKey(source, vehicle) then
         outputChatBox("No tienes las llaves de este vehículo.", source, 255, 0, 0)
+        -- Revertir el cambio en el cliente
+        local currentState = getVehicleOverrideLights(vehicle)
+        triggerClientEvent(source, "vehicle:revertLights", source, vehicle, currentState)
         return
     end
     
     -- Verificar que esté en el vehículo como conductor
     if getPedOccupiedVehicle(source) ~= vehicle or getPedOccupiedVehicleSeat(source) ~= 0 then
         outputChatBox("Debes ser el conductor para controlar las luces.", source, 255, 0, 0)
+        -- Revertir el cambio en el cliente
+        local currentState = getVehicleOverrideLights(vehicle)
+        triggerClientEvent(source, "vehicle:revertLights", source, vehicle, currentState)
         return
     end
     
-    -- Cambiar estado de las luces
+    -- Cambiar estado de las luces (ya se cambió en el cliente, pero lo confirmamos aquí)
     setVehicleOverrideLights(vehicle, newState)
     
     -- Actualizar en base de datos
@@ -262,5 +268,40 @@ addEventHandler("vehicle:toggleLights", root, function(vehicle, newState)
     
     local stateText = (newState == 2) and "encendidas" or "apagadas"
     outputChatBox("Luces " .. stateText, source, 0, 255, 0)
+end)
+
+-- Evento: Activar/Desactivar freno de mano
+addEvent("vehicle:toggleHandbrake", true)
+addEventHandler("vehicle:toggleHandbrake", root, function(vehicle, newState)
+    if not isElement(source) or not isElement(vehicle) then
+        return
+    end
+    
+    -- Verificar que esté en el vehículo como conductor
+    if getPedOccupiedVehicle(source) ~= vehicle or getPedOccupiedVehicleSeat(source) ~= 0 then
+        return
+    end
+    
+    -- Aplicar freno de mano en el servidor (congelar el vehículo)
+    setElementFrozen(vehicle, newState)
+    setElementData(vehicle, "vehicle:handbrake", newState)
+    
+    -- Actualizar en base de datos
+    local vehicleDbId = getElementData(vehicle, "vehicle:db_id") or getElementData(vehicle, "vehicle:id")
+    if vehicleDbId then
+        executeDatabase("UPDATE vehicles SET handbrake = ? WHERE id = ?", newState and 1 or 0, vehicleDbId)
+    end
+end)
+
+-- Prevenir que los jugadores salgan del vehículo si está bloqueado (servidor)
+addEventHandler("onPlayerVehicleExit", root, function(vehicle, seat)
+    if vehicle then
+        local isLocked = getElementData(vehicle, "vehicle:locked") or false
+        if isLocked then
+            -- Cancelar la salida
+            cancelEvent()
+            outputChatBox("El vehículo está bloqueado. Desbloquéalo con K para salir.", source, 255, 0, 0)
+        end
+    end
 end)
 

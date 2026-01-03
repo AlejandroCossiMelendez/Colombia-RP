@@ -49,7 +49,7 @@ addEventHandler("garage:requestVehicle", root, function(vehicleId)
         return
     end
     
-    -- Verificar que el vehículo pertenece al jugador
+    -- Verificar que el vehículo pertenece al jugador (incluir handbrake)
     local query = queryDatabase("SELECT * FROM vehicles WHERE id = ? AND owner_id = ?", vehicleId, characterId)
     
     if not query or #query == 0 then
@@ -149,6 +149,16 @@ addEventHandler("garage:requestVehicle", root, function(vehicleId)
                 setElementData(vehicle, "vehicle:plate", vehPlate)
                 setElementData(vehicle, "vehicle:owner_id", playerCharId)
                 setElementData(vehicle, "vehicle:locked", vehLocked == 1)
+                
+                -- Restaurar estado del freno de mano
+                local handbrake = vehicleData.handbrake or 0
+                if handbrake == 1 then
+                    setElementFrozen(vehicle, true)
+                    setElementData(vehicle, "vehicle:handbrake", true)
+                else
+                    setElementFrozen(vehicle, false)
+                    setElementData(vehicle, "vehicle:handbrake", false)
+                end
                 
                 -- Actualizar posición en la base de datos
                 executeDatabase("UPDATE vehicles SET x = ?, y = ?, z = ?, rot_z = ?, interior = ?, dimension = ? WHERE id = ?", 
