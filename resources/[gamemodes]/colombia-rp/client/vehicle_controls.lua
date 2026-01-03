@@ -20,41 +20,49 @@ bindKey("j", "down", function()
     triggerServerEvent("vehicle:toggleEngine", localPlayer, vehicle, not engineState)
 end)
 
--- Control K: Bloquear/Desbloquear puertas
-bindKey("k", "down", function()
-    if not vehicleControlsEnabled then 
-        return 
-    end
+-- Variable para almacenar las llaves del jugador
+local playerVehicleKeys = {}
+local keysRequested = false
+
+-- Evento para recibir las llaves del servidor
+addEvent("vehicle:receiveKeys", true)
+addEventHandler("vehicle:receiveKeys", root, function(keys)
+    playerVehicleKeys = keys or {}
+    keysRequested = true
+end)
+
+-- Función para buscar vehículo cercano con llaves
+local function findNearbyVehicleWithKeys()
+    local px, py, pz = getElementPosition(localPlayer)
+    local nearbyVehicle = nil
+    local minDistance = 10.0 -- Distancia máxima de 10 metros
     
-    -- Primero verificar si está dentro de un vehículo
-    local vehicle = getPedOccupiedVehicle(localPlayer)
-    
-    -- Si no está en un vehículo, buscar el más cercano
-    if not vehicle then
-        local px, py, pz = getElementPosition(localPlayer)
-        local nearbyVehicle = nil
-        local minDistance = 10.0 -- Aumentado a 10 metros para mejor detección
-        
-        -- Buscar todos los vehículos cercanos
-        for _, veh in ipairs(getElementsByType("vehicle")) do
-            -- Verificar que sea un vehículo válido
-            if isElement(veh) then
-                -- Verificar que sea un vehículo del sistema (tiene matrícula o dueño)
-                local plate = getElementData(veh, "vehicle:plate")
-                local ownerId = getElementData(veh, "vehicle:owner_id")
+    -- Buscar vehículos cercanos que coincidan con las llaves
+    for _, veh in ipairs(getElementsByType("vehicle")) do
+        if isElement(veh) then
+            -- Obtener matrícula del vehículo
+            local plate = getElementData(veh, "vehicle:plate")
+            if not plate then
+                plate = getVehiclePlateText(veh)
+            end
+            
+            -- Verificar si tiene matrícula válida
+            if plate and plate ~= "" and plate ~= " " then
+                -- Normalizar la matrícula (quitar espacios y convertir a string)
+                plate = tostring(plate):gsub("%s+", "")
                 
-                -- También aceptar vehículos que tengan matrícula visible (getVehiclePlateText)
-                -- Esto ayuda con vehículos creados antes del sistema o sin elementData
-                if not plate then
-                    plate = getVehiclePlateText(veh)
-                    -- Si tiene matrícula visible, considerarlo como vehículo del sistema
-                    if plate and plate ~= "" and plate ~= " " then
-                        -- Usar este vehículo aunque no tenga elementData
+                -- Verificar si tenemos la llave de este vehículo
+                local hasKey = false
+                for _, keyPlate in ipairs(playerVehicleKeys) do
+                    local normalizedKeyPlate = tostring(keyPlate):gsub("%s+", "")
+                    if plate == normalizedKeyPlate then
+                        hasKey = true
+                        break
                     end
                 end
                 
-                -- Si tiene matrícula (de elementData o visible) o dueño, considerarlo
-                if (plate and plate ~= "" and plate ~= " ") or ownerId then
+                -- Si tenemos la llave, verificar distancia
+                if hasKey then
                     local vx, vy, vz = getElementPosition(veh)
                     local distance = getDistanceBetweenPoints3D(px, py, pz, vx, vy, vz)
                     if distance < minDistance then
@@ -64,12 +72,31 @@ bindKey("k", "down", function()
                 end
             end
         end
+    end
+    
+    return nearbyVehicle
+end
+
+-- Control K: Bloquear/Desbloquear puertas
+bindKey("k", "down", function()
+    if not vehicleControlsEnabled then 
+        return 
+    end
+    
+    -- Primero verificar si está dentro de un vehículo
+    local vehicle = getPedOccupiedVehicle(localPlayer)
+    
+    -- Si no está en un vehículo, buscar el más cercano para el que tenga llaves
+    if not vehicle then
+        -- Solicitar llaves actualizadas al servidor
+        triggerServerEvent("vehicle:requestKeys", localPlayer)
         
-        if nearbyVehicle then
-            vehicle = nearbyVehicle
-        else
-            -- No hay vehículo cerca, mostrar mensaje de ayuda
-            outputChatBox("No hay ningún vehículo cerca (máximo 10 metros).", 255, 255, 0)
+        -- Buscar vehículo cercano con las llaves que tenemos
+        vehicle = findNearbyVehicleWithKeys()
+        
+        if not vehicle then
+            -- No hay vehículo cerca para el que tenga llaves
+            outputChatBox("No hay ningún vehículo cerca (máximo 10 metros) para el que tengas llaves.", 255, 255, 0)
             return
         end
     end
@@ -84,6 +111,22 @@ bindKey("k", "down", function()
     
     -- Enviar al servidor para verificar llaves y cambiar estado
     triggerServerEvent("vehicle:toggleLock", localPlayer, vehicle, newState)
+end)
+
+-- Cargar llaves cuando el jugador entra al juego o cuando se actualiza el inventario
+addEventHandler("onClientResourceStart", resourceRoot, function()
+    -- Solicitar llaves al iniciar
+    setTimer(function()
+        triggerServerEvent("vehicle:requestKeys", localPlayer)
+    end, 2000, 1) -- Esperar 2 segundos para que el personaje esté cargado
+end)
+
+-- Actualizar llaves cuando se actualiza el inventario
+addEventHandler("syncItems", root, function()
+    -- Solicitar llaves actualizadas cuando se sincronizan los items
+    setTimer(function()
+        triggerServerEvent("vehicle:requestKeys", localPlayer)
+    end, 500, 1)
 end)
 
 -- Control L: Prender/Apagar luces

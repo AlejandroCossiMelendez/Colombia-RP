@@ -5,6 +5,35 @@
 -- Nota: playerHasVehicleKey se define en vehicles_system.lua
 -- Si no está disponible, se mostrará un error pero el sistema seguirá funcionando
 
+-- Evento: Solicitar llaves del jugador
+addEvent("vehicle:requestKeys", true)
+addEventHandler("vehicle:requestKeys", root, function()
+    if not isElement(source) or getElementType(source) ~= "player" then
+        return
+    end
+    
+    local characterId = getElementData(source, "character:id")
+    if not characterId then
+        triggerClientEvent(source, "vehicle:receiveKeys", source, {})
+        return
+    end
+    
+    -- Obtener todas las llaves del jugador (item 1 = Llave de Coche)
+    local query = queryDatabase("SELECT value FROM items WHERE owner = ? AND item = 1", characterId)
+    local keys = {}
+    
+    if query and #query > 0 then
+        for _, row in ipairs(query) do
+            if row.value and row.value ~= "" then
+                table.insert(keys, row.value)
+            end
+        end
+    end
+    
+    -- Enviar llaves al cliente
+    triggerClientEvent(source, "vehicle:receiveKeys", source, keys)
+end)
+
 -- Evento: Verificar si el jugador tiene las llaves
 addEvent("vehicle:checkKey", true)
 addEventHandler("vehicle:checkKey", root, function(vehicle)
