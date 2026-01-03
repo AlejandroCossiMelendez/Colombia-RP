@@ -88,8 +88,10 @@ bindKey("k", "down", function()
     
     if vehicle then
         -- Si está dentro de un vehículo, usar ese directamente
-        local isLocked = getVehicleLocked(vehicle)
+        local isLocked = getVehicleLocked(vehicle) or (getElementData(vehicle, "vehicle:locked") == true)
         local newState = not isLocked
+        
+        -- Enviar al servidor para verificar llaves y cambiar estado
         triggerServerEvent("vehicle:toggleLock", localPlayer, vehicle, newState)
     else
         -- Si no está en un vehículo, pedirle al servidor que busque uno cercano con llaves
@@ -143,8 +145,21 @@ bindKey("n", "down", function()
         return
     end
     
+    -- Verificar velocidad del vehículo (solo permitir freno de mano si está quieto o muy lento)
+    local vx, vy, vz = getElementVelocity(vehicle)
+    local speed = math.sqrt(vx*vx + vy*vy + vz*vz) * 180 -- Convertir a km/h aproximado
+    
     -- Obtener estado actual del freno de mano
     local handbrakeOn = getElementData(vehicle, "vehicle:handbrake") or false
+    
+    if not handbrakeOn then
+        -- Solo permitir activar el freno de mano si el vehículo está quieto (menos de 5 km/h)
+        if speed > 5 then
+            outputChatBox("Debes estar detenido para activar el freno de mano.", 255, 255, 0)
+            return
+        end
+    end
+    
     local newState = not handbrakeOn
     
     -- Aplicar freno de mano inmediatamente
@@ -174,25 +189,42 @@ end)
 
 -- Prevenir que los jugadores salgan del vehículo si está bloqueado
 addEventHandler("onClientPlayerVehicleExit", localPlayer, function(vehicle, seat)
-    if vehicle and isElement(vehicle) then
-        -- Verificar que el jugador realmente esté dentro del vehículo antes de cancelar la salida
-        -- Esto evita que se dispare cuando intenta entrar a un vehículo bloqueado
-        local currentVehicle = getPedOccupiedVehicle(localPlayer)
-        if currentVehicle == vehicle then
-            -- Verificar tanto getVehicleLocked como elementData para mayor confiabilidad
-            local isLocked = getVehicleLocked(vehicle) or (getElementData(vehicle, "vehicle:locked") == true)
-            if isLocked then
-                -- Cancelar la salida
-                cancelEvent()
-                outputChatBox("El vehículo está bloqueado. Desbloquéalo con K para salir.", 255, 0, 0)
-                -- Forzar al jugador a quedarse en el vehículo
-                setTimer(function()
-                    if vehicle and isElement(vehicle) and getPedOccupiedVehicle(localPlayer) ~= vehicle then
-                        warpPedIntoVehicle(localPlayer, vehicle, seat)
-                    end
-                end, 50, 1)
+    if not vehicle or not isElement(vehicle) then
+        return
+    end
+    
+    -- Verificar que el jugador realmente esté dentro del vehículo antes de cancelar la salida
+    local currentVehicle = getPedOccupiedVehicle(localPlayer)
+    if currentVehicle ~= vehicle then
+        -- El jugador no está en este vehículo, no hacer nada
+        return
+    end
+    
+    -- Verificar tanto getVehicleLocked como elementData para mayor confiabilidad
+    local isLocked = getVehicleLocked(vehicle) or (getElementData(vehicle, "vehicle:locked") == true) or (getElementData(vehicle, "vehicle:locked") == 1)
+    if isLocked then
+        -- Cancelar la salida
+        cancelEvent()
+        outputChatBox("El vehículo está bloqueado. Desbloquéalo con K para salir.", 255, 0, 0)
+        
+        -- Forzar al jugador a quedarse en el vehículo (múltiples intentos para asegurar)
+        setTimer(function()
+            if isElement(vehicle) and getPedOccupiedVehicle(localPlayer) ~= vehicle then
+                warpPedIntoVehicle(localPlayer, vehicle, seat)
             end
-        end
+        end, 50, 1)
+        
+        setTimer(function()
+            if isElement(vehicle) and getPedOccupiedVehicle(localPlayer) ~= vehicle then
+                warpPedIntoVehicle(localPlayer, vehicle, seat)
+            end
+        end, 100, 1)
+        
+        setTimer(function()
+            if isElement(vehicle) and getPedOccupiedVehicle(localPlayer) ~= vehicle then
+                warpPedIntoVehicle(localPlayer, vehicle, seat)
+            end
+        end, 200, 1)
     end
 end)
 
@@ -201,6 +233,15 @@ addEvent("vehicle:revertLights", true)
 addEventHandler("vehicle:revertLights", root, function(vehicle, state)
     if vehicle and isElement(vehicle) then
         setVehicleOverrideLights(vehicle, state)
+    end
+end)
+
+-- Evento para revertir freno de mano si el servidor rechaza el cambio
+addEvent("vehicle:revertHandbrake", true)
+addEventHandler("vehicle:revertHandbrake", root, function(vehicle, state)
+    if vehicle and isElement(vehicle) then
+        setElementFrozen(vehicle, state)
+        setElementData(vehicle, "vehicle:handbrake", state)
     end
 end)
 

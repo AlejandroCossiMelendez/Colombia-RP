@@ -197,21 +197,27 @@ end)
 addEvent("vehicle:toggleLock", true)
 addEventHandler("vehicle:toggleLock", root, function(vehicle, newState)
     if not isElement(source) or getElementType(source) ~= "player" then
+        outputServerLog("[VEHICLE] ERROR: source inválido en vehicle:toggleLock")
         return
     end
     
     if not isElement(vehicle) or getElementType(vehicle) ~= "vehicle" then
         outputChatBox("Vehículo inválido.", source, 255, 0, 0)
+        outputServerLog("[VEHICLE] ERROR: vehículo inválido en vehicle:toggleLock para " .. getPlayerName(source))
         return
     end
     
     -- Verificar si tiene las llaves
     if not playerHasVehicleKey then
         outputChatBox("Error del sistema: función de llaves no disponible.", source, 255, 0, 0)
+        outputServerLog("[VEHICLE] ERROR: playerHasVehicleKey no está disponible")
         return
     end
     
     local hasKey = playerHasVehicleKey(source, vehicle)
+    local plate = getElementData(vehicle, "vehicle:plate") or "Sin matrícula"
+    outputServerLog("[VEHICLE] " .. getPlayerName(source) .. " intenta bloquear vehículo " .. plate .. " - ¿Tiene llaves? " .. tostring(hasKey))
+    
     if not hasKey then
         outputChatBox("No tienes las llaves de este vehículo.", source, 255, 0, 0)
         return
@@ -228,6 +234,7 @@ addEventHandler("vehicle:toggleLock", root, function(vehicle, newState)
     local vehicleDbId = getElementData(vehicle, "vehicle:db_id") or getElementData(vehicle, "vehicle:id")
     if vehicleDbId then
         executeDatabase("UPDATE vehicles SET locked = ? WHERE id = ?", newState and 1 or 0, vehicleDbId)
+        outputServerLog("[VEHICLE] Estado de bloqueo actualizado en BD para vehículo " .. plate .. ": " .. tostring(newState))
     end
     
     -- Reproducir sonido de bloqueo/desbloqueo
@@ -236,6 +243,7 @@ addEventHandler("vehicle:toggleLock", root, function(vehicle, newState)
     
     local stateText = newState and "bloqueado" or "desbloqueado"
     outputChatBox("Vehículo " .. stateText, source, 0, 255, 0)
+    outputServerLog("[VEHICLE] " .. getPlayerName(source) .. " " .. stateText .. " vehículo " .. plate)
 end)
 
 -- Evento: Prender/Apagar luces
@@ -288,37 +296,70 @@ addEventHandler("vehicle:toggleHandbrake", root, function(vehicle, newState)
         return
     end
     
+    -- Verificar velocidad del vehículo (solo permitir activar si está quieto)
+    if newState then
+        local vx, vy, vz = getElementVelocity(vehicle)
+        local speed = math.sqrt(vx*vx + vy*vy + vz*vz) * 180 -- Convertir a km/h aproximado
+        if speed > 5 then
+            outputChatBox("Debes estar detenido para activar el freno de mano.", source, 255, 255, 0)
+            -- Revertir en el cliente
+            triggerClientEvent(source, "vehicle:revertHandbrake", source, vehicle, false)
+            return
+        end
+    end
+    
     -- Aplicar freno de mano en el servidor (congelar el vehículo)
     setElementFrozen(vehicle, newState)
     setElementData(vehicle, "vehicle:handbrake", newState)
     
-    -- Actualizar en base de datos
+    -- Actualizar en base de datos (solo si la columna existe)
     local vehicleDbId = getElementData(vehicle, "vehicle:db_id") or getElementData(vehicle, "vehicle:id")
     if vehicleDbId then
-        executeDatabase("UPDATE vehicles SET handbrake = ? WHERE id = ?", newState and 1 or 0, vehicleDbId)
+        -- Intentar actualizar, pero no fallar si la columna no existe aún
+        pcall(function()
+            executeDatabase("UPDATE vehicles SET handbrake = ? WHERE id = ?", newState and 1 or 0, vehicleDbId)
+        end)
     end
 end)
 
 -- Prevenir que los jugadores salgan del vehículo si está bloqueado (servidor)
 addEventHandler("onPlayerVehicleExit", root, function(vehicle, seat)
-    if vehicle and isElement(vehicle) then
-        -- Verificar que el jugador realmente esté dentro del vehículo antes de cancelar la salida
-        -- Esto evita que se dispare cuando intenta entrar a un vehículo bloqueado
-        local currentVehicle = getPedOccupiedVehicle(source)
-        if currentVehicle == vehicle then
-            local isLocked = getElementData(vehicle, "vehicle:locked") or false
-            if isLocked then
-                -- Cancelar la salida
-                cancelEvent()
-                outputChatBox("El vehículo está bloqueado. Desbloquéalo con K para salir.", source, 255, 0, 0)
-                -- Forzar al jugador a quedarse en el vehículo
-                setTimer(function()
-                    if vehicle and isElement(vehicle) and getPedOccupiedVehicle(source) ~= vehicle then
-                        warpPedIntoVehicle(source, vehicle, seat)
-                    end
-                end, 50, 1)
+    if not vehicle or not isElement(vehicle) then
+        return
+    end
+    
+    -- Verificar que el jugador realmente esté dentro del vehículo antes de cancelar la salida
+    local currentVehicle = getPedOccupiedVehicle(source)
+    if currentVehicle ~= vehicle then
+        -- El jugador no está en este vehículo, no hacer nada
+        return
+    end
+    
+    -- Verificar si el vehículo está bloqueado
+    local isLocked = getElementData(vehicle, "vehicle:locked")
+    if isLocked == true or isLocked == 1 then
+        -- Cancelar la salida
+        cancelEvent()
+        outputChatBox("El vehículo está bloqueado. Desbloquéalo con K para salir.", source, 255, 0, 0)
+        
+        -- Forzar al jugador a quedarse en el vehículo (múltiples intentos para asegurar)
+        setTimer(function()
+            if isElement(vehicle) and isElement(source) and getPedOccupiedVehicle(source) ~= vehicle then
+                warpPedIntoVehicle(source, vehicle, seat)
             end
-        end
+        end, 50, 1)
+        
+        setTimer(function()
+            if isElement(vehicle) and isElement(source) and getPedOccupiedVehicle(source) ~= vehicle then
+                warpPedIntoVehicle(source, vehicle, seat)
+            end
+        end, 100, 1)
+        
+        setTimer(function()
+            if isElement(vehicle) and isElement(source) and getPedOccupiedVehicle(source) ~= vehicle then
+                warpPedIntoVehicle(source, vehicle, seat)
+            end
+        end, 200, 1)
     end
 end)
 

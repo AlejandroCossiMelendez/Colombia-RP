@@ -178,8 +178,14 @@ function createItemsTables()
     end
     
     -- Agregar columna handbrake si no existe (para vehículos creados antes)
-    local alterTableSQL = "ALTER TABLE `vehicles` ADD COLUMN IF NOT EXISTS `handbrake` TINYINT DEFAULT 0"
-    executeDatabase(alterTableSQL)
+    -- MySQL no soporta IF NOT EXISTS en ALTER TABLE, así que verificamos primero
+    local checkColumnSQL = "SELECT COUNT(*) as count FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'vehicles' AND COLUMN_NAME = 'handbrake'"
+    local checkResult = queryDatabase(checkColumnSQL)
+    if checkResult and (#checkResult == 0 or (checkResult[1] and checkResult[1].count == 0)) then
+        local alterTableSQL = "ALTER TABLE `vehicles` ADD COLUMN `handbrake` TINYINT DEFAULT 0"
+        executeDatabase(alterTableSQL)
+        outputServerLog("[TABLES] Columna 'handbrake' agregada a la tabla 'vehicles'")
+    end
     
     outputServerLog("[TABLES] Verificación de tablas completada")
 end
