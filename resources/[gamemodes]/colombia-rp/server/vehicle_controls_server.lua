@@ -323,6 +323,7 @@ addEventHandler("vehicle:toggleHandbrake", root, function(vehicle, newState)
 end)
 
 -- Prevenir que los jugadores salgan del vehículo si está bloqueado (servidor)
+-- Usar alta prioridad para asegurar que se ejecute antes que otros handlers
 addEventHandler("onPlayerVehicleExit", root, function(vehicle, seat)
     if not vehicle or not isElement(vehicle) then
         return
@@ -335,9 +336,14 @@ addEventHandler("onPlayerVehicleExit", root, function(vehicle, seat)
         return
     end
     
-    -- Verificar si el vehículo está bloqueado
-    local isLocked = getElementData(vehicle, "vehicle:locked")
-    if isLocked == true or isLocked == 1 then
+    -- Verificar si el vehículo está bloqueado (verificar múltiples formas)
+    local isLocked = false
+    local lockedData = getElementData(vehicle, "vehicle:locked")
+    if lockedData == true or lockedData == 1 then
+        isLocked = true
+    end
+    
+    if isLocked then
         -- Cancelar la salida
         cancelEvent()
         outputChatBox("El vehículo está bloqueado. Desbloquéalo con K para salir.", source, 255, 0, 0)
@@ -360,8 +366,14 @@ addEventHandler("onPlayerVehicleExit", root, function(vehicle, seat)
                 warpPedIntoVehicle(source, vehicle, seat)
             end
         end, 200, 1)
+        
+        setTimer(function()
+            if isElement(vehicle) and isElement(source) and getPedOccupiedVehicle(source) ~= vehicle then
+                warpPedIntoVehicle(source, vehicle, seat)
+            end
+        end, 500, 1)
     end
-end)
+end, true, "high") -- Alta prioridad para asegurar que se ejecute primero
 
 -- Prevenir que los jugadores entren a vehículos bloqueados sin llaves (servidor)
 addEventHandler("onPlayerVehicleEnter", root, function(vehicle, seat)

@@ -83,12 +83,18 @@ bindKey("k", "down", function()
         return 
     end
     
+    -- Verificar si hay algún GUI abierto que pueda interferir
+    if showCursor() then
+        -- Si el cursor está visible, probablemente hay un GUI abierto, no hacer nada
+        return
+    end
+    
     -- Primero verificar si está dentro de un vehículo
     local vehicle = getPedOccupiedVehicle(localPlayer)
     
     if vehicle then
         -- Si está dentro de un vehículo, usar ese directamente
-        local isLocked = getVehicleLocked(vehicle) or (getElementData(vehicle, "vehicle:locked") == true)
+        local isLocked = getVehicleLocked(vehicle) or (getElementData(vehicle, "vehicle:locked") == true) or (getElementData(vehicle, "vehicle:locked") == 1)
         local newState = not isLocked
         
         -- Enviar al servidor para verificar llaves y cambiar estado
@@ -184,10 +190,29 @@ addEvent("vehicle:syncLockState", true)
 addEventHandler("vehicle:syncLockState", root, function(vehicle, locked)
     if vehicle and isElement(vehicle) then
         setVehicleLocked(vehicle, locked)
+        setElementData(vehicle, "vehicle:locked", locked)
     end
 end)
 
--- Prevenir que los jugadores salgan del vehículo si está bloqueado
+-- Control F: Salir del vehículo (con validación de bloqueo)
+bindKey("f", "down", function()
+    local vehicle = getPedOccupiedVehicle(localPlayer)
+    if not vehicle then
+        return -- No está en un vehículo, dejar que el juego maneje la tecla F normalmente
+    end
+    
+    -- Verificar si el vehículo está bloqueado
+    local isLocked = getVehicleLocked(vehicle) or (getElementData(vehicle, "vehicle:locked") == true) or (getElementData(vehicle, "vehicle:locked") == 1)
+    if isLocked then
+        -- Cancelar la acción de salir
+        cancelEvent()
+        outputChatBox("El vehículo está bloqueado. Desbloquéalo con K para salir.", 255, 0, 0)
+        return
+    end
+    -- Si no está bloqueado, dejar que el juego maneje la salida normalmente
+end)
+
+-- Prevenir que los jugadores salgan del vehículo si está bloqueado (backup)
 addEventHandler("onClientPlayerVehicleExit", localPlayer, function(vehicle, seat)
     if not vehicle or not isElement(vehicle) then
         return
