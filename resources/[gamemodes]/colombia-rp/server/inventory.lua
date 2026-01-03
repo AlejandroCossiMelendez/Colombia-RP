@@ -370,13 +370,17 @@ addEventHandler("useItem", root, function(slot, itemId, itemIndex)
         local isLocked = getElementData(vehicle, "vehicle:locked") or false
         local newState = not isLocked
         
+        -- Cambiar el bloqueo del vehículo
         setVehicleLocked(vehicle, newState)
+        setElementData(vehicle, "vehicle:locked", newState)
+        
+        -- Sincronizar con todos los clientes para que el bloqueo funcione correctamente
+        triggerClientEvent("vehicle:syncLockState", root, vehicle, newState)
         
         -- Actualizar en base de datos
         local vehicleDbId = getElementData(vehicle, "vehicle:db_id") or getElementData(vehicle, "vehicle:id")
         if vehicleDbId then
             executeDatabase("UPDATE vehicles SET locked = ? WHERE id = ?", newState and 1 or 0, vehicleDbId)
-            setElementData(vehicle, "vehicle:locked", newState)
         end
         
         -- Reproducir sonido y animación

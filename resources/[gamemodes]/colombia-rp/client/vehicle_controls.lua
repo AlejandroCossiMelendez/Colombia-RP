@@ -164,17 +164,26 @@ bindKey("n", "down", function()
     triggerServerEvent("vehicle:toggleHandbrake", localPlayer, vehicle, newState)
 end)
 
+-- Evento para sincronizar el estado de bloqueo desde el servidor
+addEvent("vehicle:syncLockState", true)
+addEventHandler("vehicle:syncLockState", root, function(vehicle, locked)
+    if vehicle and isElement(vehicle) then
+        setVehicleLocked(vehicle, locked)
+    end
+end)
+
 -- Prevenir que los jugadores salgan del vehículo si está bloqueado
 addEventHandler("onClientPlayerVehicleExit", localPlayer, function(vehicle, seat)
     if vehicle and isElement(vehicle) then
-        local isLocked = getVehicleLocked(vehicle)
+        -- Verificar tanto getVehicleLocked como elementData para mayor confiabilidad
+        local isLocked = getVehicleLocked(vehicle) or (getElementData(vehicle, "vehicle:locked") == true)
         if isLocked then
             -- Cancelar la salida
             cancelEvent()
             outputChatBox("El vehículo está bloqueado. Desbloquéalo con K para salir.", 255, 0, 0)
             -- Forzar al jugador a quedarse en el vehículo
             setTimer(function()
-                if vehicle and isElement(vehicle) then
+                if vehicle and isElement(vehicle) and getPedOccupiedVehicle(localPlayer) ~= vehicle then
                     warpPedIntoVehicle(localPlayer, vehicle, seat)
                 end
             end, 50, 1)

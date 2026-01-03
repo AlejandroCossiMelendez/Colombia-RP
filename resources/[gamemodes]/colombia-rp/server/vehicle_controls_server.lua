@@ -172,19 +172,22 @@ addEventHandler("vehicle:toggleLockNearby", root, function()
     local isLocked = getElementData(nearbyVehicle, "vehicle:locked") or false
     local newState = not isLocked
     
-    -- Cambiar estado del bloqueo
-    setVehicleLocked(nearbyVehicle, newState)
-    
-    -- Actualizar en base de datos
-    local vehicleDbId = getElementData(nearbyVehicle, "vehicle:db_id") or getElementData(nearbyVehicle, "vehicle:id")
-    if vehicleDbId then
-        executeDatabase("UPDATE vehicles SET locked = ? WHERE id = ?", newState and 1 or 0, vehicleDbId)
-        setElementData(nearbyVehicle, "vehicle:locked", newState)
-    end
-    
-    -- Reproducir sonido de bloqueo/desbloqueo
-    local vx, vy, vz = getElementPosition(nearbyVehicle)
-    triggerClientEvent("vehicle:playLockSound", root, vx, vy, vz)
+                -- Cambiar estado del bloqueo
+                setVehicleLocked(nearbyVehicle, newState)
+                setElementData(nearbyVehicle, "vehicle:locked", newState)
+                
+                -- Sincronizar con todos los clientes para que el bloqueo funcione correctamente
+                triggerClientEvent("vehicle:syncLockState", root, nearbyVehicle, newState)
+                
+                -- Actualizar en base de datos
+                local vehicleDbId = getElementData(nearbyVehicle, "vehicle:db_id") or getElementData(nearbyVehicle, "vehicle:id")
+                if vehicleDbId then
+                    executeDatabase("UPDATE vehicles SET locked = ? WHERE id = ?", newState and 1 or 0, vehicleDbId)
+                end
+                
+                -- Reproducir sonido de bloqueo/desbloqueo
+                local vx, vy, vz = getElementPosition(nearbyVehicle)
+                triggerClientEvent("vehicle:playLockSound", root, vx, vy, vz)
     
     local stateText = newState and "bloqueado" or "desbloqueado"
     outputChatBox("Vehículo " .. stateText, source, 0, 255, 0)
@@ -216,12 +219,15 @@ addEventHandler("vehicle:toggleLock", root, function(vehicle, newState)
     
     -- Cambiar estado del bloqueo
     setVehicleLocked(vehicle, newState)
+    setElementData(vehicle, "vehicle:locked", newState)
+    
+    -- Sincronizar con todos los clientes para que el bloqueo funcione correctamente
+    triggerClientEvent("vehicle:syncLockState", root, vehicle, newState)
     
     -- Actualizar en base de datos
     local vehicleDbId = getElementData(vehicle, "vehicle:db_id") or getElementData(vehicle, "vehicle:id")
     if vehicleDbId then
         executeDatabase("UPDATE vehicles SET locked = ? WHERE id = ?", newState and 1 or 0, vehicleDbId)
-        setElementData(vehicle, "vehicle:locked", newState)
     end
     
     -- Reproducir sonido de bloqueo/desbloqueo
@@ -295,12 +301,18 @@ end)
 
 -- Prevenir que los jugadores salgan del vehículo si está bloqueado (servidor)
 addEventHandler("onPlayerVehicleExit", root, function(vehicle, seat)
-    if vehicle then
+    if vehicle and isElement(vehicle) then
         local isLocked = getElementData(vehicle, "vehicle:locked") or false
         if isLocked then
             -- Cancelar la salida
             cancelEvent()
             outputChatBox("El vehículo está bloqueado. Desbloquéalo con K para salir.", source, 255, 0, 0)
+            -- Forzar al jugador a quedarse en el vehículo
+            setTimer(function()
+                if vehicle and isElement(vehicle) and getPedOccupiedVehicle(source) ~= vehicle then
+                    warpPedIntoVehicle(source, vehicle, seat)
+                end
+            end, 50, 1)
         end
     end
 end)
