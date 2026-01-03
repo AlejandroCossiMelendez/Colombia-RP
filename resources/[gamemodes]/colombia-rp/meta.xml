@@ -597,6 +597,10 @@
     <file src="html/phone/styles/svgs/delete.svg"/>
     <file src="html/phone/styles/svgs/gallery.svg"/>
     
+    <!-- Archivos del modelo JBL -->
+    <file src="jbl/ModelJBL/jbl.dff" type="client" />
+    <file src="jbl/ModelJBL/jbl.txd" type="client" />
+    
     <!-- Archivos -->
     <file src="colombia-rp-login.png" type="client" />
 </meta>

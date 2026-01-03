@@ -1,5 +1,5 @@
 -- Cargar modelo JBL en el cliente
--- Este script carga el DFF y TXD del JBL antes de usarlo
+-- Este script carga el DFF y TXD del JBL personalizado
 
 local jblModel = 2226
 local jblTXD = nil
@@ -12,19 +12,15 @@ function loadJBLModel()
         return true
     end
     
-    -- Intentar cargar desde diferentes rutas posibles
-    local txdPath = nil
-    local dffPath = nil
+    -- Rutas del modelo JBL personalizado
+    local txdPath = "jbl/ModelJBL/jbl.txd"
+    local dffPath = "jbl/ModelJBL/jbl.dff"
     
-    -- Primero intentar desde el recurso ModelJBL si existe
+    -- Intentar cargar desde el recurso ModelJBL si existe como recurso separado
     local modelJBLResource = getResourceFromName("ModelJBL")
     if modelJBLResource and getResourceState(modelJBLResource) == "running" then
         txdPath = ":ModelJBL/jbl.txd"
         dffPath = ":ModelJBL/jbl.dff"
-    else
-        -- Intentar desde la ruta relativa dentro del gamemode
-        txdPath = "jbl/ModelJBL/jbl.txd"
-        dffPath = "jbl/ModelJBL/jbl.dff"
     end
     
     -- Cargar TXD
@@ -55,20 +51,29 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
     -- Intentar cargar inmediatamente
     loadJBLModel()
     
-    -- También intentar después de un delay por si el recurso ModelJBL se carga después
+    -- También intentar después de un delay por si hay problemas de carga
     setTimer(function()
         if not modelLoaded then
             loadJBLModel()
         end
-    end, 2000, 1)
+    end, 1000, 1)
+    
+    -- Último intento después de más tiempo
+    setTimer(function()
+        if not modelLoaded then
+            loadJBLModel()
+        end
+    end, 3000, 1)
 end)
 
--- También intentar cargar si ModelJBL se inicia después
+-- También intentar cargar si ModelJBL se inicia después como recurso separado
 addEventHandler("onClientResourceStart", root, function(resource)
     local resourceName = getResourceName(resource)
-    if resourceName == "ModelJBL" or string.find(resourceName, "jbl", 1, true) then
+    if resourceName == "ModelJBL" or string.find(string.lower(resourceName), "jbl", 1, true) then
         setTimer(function()
-            loadJBLModel()
+            if not modelLoaded then
+                loadJBLModel()
+            end
         end, 500, 1)
     end
 end)
