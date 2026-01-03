@@ -93,6 +93,103 @@ addEventHandler("vehicle:toggleEngine", root, function(vehicle, newState)
     outputChatBox("Motor " .. stateText, source, 0, 255, 0)
 end)
 
+-- Evento: Bloquear/Desbloquear puertas de un vehículo cercano (buscar automáticamente)
+addEvent("vehicle:toggleLockNearby", true)
+addEventHandler("vehicle:toggleLockNearby", root, function()
+    if not isElement(source) or getElementType(source) ~= "player" then
+        return
+    end
+    
+    local characterId = getElementData(source, "character:id")
+    if not characterId then
+        outputChatBox("Tu personaje no está completamente cargado.", source, 255, 0, 0)
+        return
+    end
+    
+    -- Obtener todas las llaves del jugador (item 1 = Llave de Coche)
+    local query = queryDatabase("SELECT value FROM items WHERE owner = ? AND item = 1", characterId)
+    local keys = {}
+    
+    if query and #query > 0 then
+        for _, row in ipairs(query) do
+            if row.value and row.value ~= "" then
+                table.insert(keys, row.value)
+            end
+        end
+    end
+    
+    if #keys == 0 then
+        outputChatBox("No tienes llaves de vehículos en tu inventario.", source, 255, 255, 0)
+        return
+    end
+    
+    -- Buscar vehículo cercano para el que tenga llaves
+    local px, py, pz = getElementPosition(source)
+    local nearbyVehicle = nil
+    local minDistance = 10.0
+    
+    for _, veh in ipairs(getElementsByType("vehicle")) do
+        if isElement(veh) then
+            -- Obtener matrícula del vehículo
+            local plate = getElementData(veh, "vehicle:plate")
+            if not plate then
+                plate = getVehiclePlateText(veh)
+            end
+            
+            if plate and plate ~= "" and plate ~= " " then
+                -- Normalizar la matrícula
+                plate = tostring(plate):gsub("%s+", "")
+                
+                -- Verificar si tenemos la llave de este vehículo
+                local hasKey = false
+                for _, keyPlate in ipairs(keys) do
+                    local normalizedKeyPlate = tostring(keyPlate):gsub("%s+", "")
+                    if plate == normalizedKeyPlate then
+                        hasKey = true
+                        break
+                    end
+                end
+                
+                -- Si tenemos la llave, verificar distancia
+                if hasKey then
+                    local vx, vy, vz = getElementPosition(veh)
+                    local distance = getDistanceBetweenPoints3D(px, py, pz, vx, vy, vz)
+                    if distance < minDistance then
+                        nearbyVehicle = veh
+                        minDistance = distance
+                    end
+                end
+            end
+        end
+    end
+    
+    if not nearbyVehicle then
+        outputChatBox("No hay ningún vehículo cerca (máximo 10 metros) para el que tengas llaves.", source, 255, 255, 0)
+        return
+    end
+    
+    -- Usar el vehículo encontrado para bloquear/desbloquear
+    local isLocked = getElementData(nearbyVehicle, "vehicle:locked") or false
+    local newState = not isLocked
+    
+    -- Cambiar estado del bloqueo
+    setVehicleLocked(nearbyVehicle, newState)
+    
+    -- Actualizar en base de datos
+    local vehicleDbId = getElementData(nearbyVehicle, "vehicle:db_id") or getElementData(nearbyVehicle, "vehicle:id")
+    if vehicleDbId then
+        executeDatabase("UPDATE vehicles SET locked = ? WHERE id = ?", newState and 1 or 0, vehicleDbId)
+        setElementData(nearbyVehicle, "vehicle:locked", newState)
+    end
+    
+    -- Reproducir sonido de bloqueo/desbloqueo
+    local vx, vy, vz = getElementPosition(nearbyVehicle)
+    triggerClientEvent("vehicle:playLockSound", root, vx, vy, vz)
+    
+    local stateText = newState and "bloqueado" or "desbloqueado"
+    outputChatBox("Vehículo " .. stateText, source, 0, 255, 0)
+end)
+
 -- Evento: Bloquear/Desbloquear puertas
 addEvent("vehicle:toggleLock", true)
 addEventHandler("vehicle:toggleLock", root, function(vehicle, newState)

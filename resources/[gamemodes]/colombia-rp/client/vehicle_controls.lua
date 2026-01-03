@@ -86,31 +86,16 @@ bindKey("k", "down", function()
     -- Primero verificar si está dentro de un vehículo
     local vehicle = getPedOccupiedVehicle(localPlayer)
     
-    -- Si no está en un vehículo, buscar el más cercano para el que tenga llaves
-    if not vehicle then
-        -- Solicitar llaves actualizadas al servidor
-        triggerServerEvent("vehicle:requestKeys", localPlayer)
-        
-        -- Buscar vehículo cercano con las llaves que tenemos
-        vehicle = findNearbyVehicleWithKeys()
-        
-        if not vehicle then
-            -- No hay vehículo cerca para el que tenga llaves
-            outputChatBox("No hay ningún vehículo cerca (máximo 10 metros) para el que tengas llaves.", 255, 255, 0)
-            return
-        end
+    if vehicle then
+        -- Si está dentro de un vehículo, usar ese directamente
+        local isLocked = getVehicleLocked(vehicle)
+        local newState = not isLocked
+        triggerServerEvent("vehicle:toggleLock", localPlayer, vehicle, newState)
+    else
+        -- Si no está en un vehículo, pedirle al servidor que busque uno cercano con llaves
+        -- El servidor hará toda la validación y búsqueda
+        triggerServerEvent("vehicle:toggleLockNearby", localPlayer)
     end
-    
-    if not vehicle or not isElement(vehicle) then
-        return
-    end
-    
-    -- Obtener estado actual del bloqueo
-    local isLocked = getVehicleLocked(vehicle)
-    local newState = not isLocked
-    
-    -- Enviar al servidor para verificar llaves y cambiar estado
-    triggerServerEvent("vehicle:toggleLock", localPlayer, vehicle, newState)
 end)
 
 -- Cargar llaves cuando el jugador entra al juego o cuando se actualiza el inventario
