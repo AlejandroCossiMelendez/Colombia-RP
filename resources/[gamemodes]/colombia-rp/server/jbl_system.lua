@@ -34,6 +34,9 @@ addEventHandler("jbl:activate", root, function()
         return
     end
     
+    -- Hacer el parlante más pequeño (70% del tamaño original)
+    setObjectScale(jblObject, 0.7)
+    
     -- Adjuntar a la mano derecha (bone 12 - right hand según functions.txt)
     -- Verificar si bone_attach está disponible
     local boneAttachResource = getResourceFromName("bone_attach")
@@ -41,15 +44,16 @@ addEventHandler("jbl:activate", root, function()
         if exports.bone_attach then
             -- Ajustar posición para que se vea bien en la mano
             -- Bone 12 = mano derecha (right hand)
-            -- Offset: x (lateral derecho), y (adelante), z (arriba)
+            -- Offset: x (lateral derecho - más a la derecha), y (adelante), z (arriba)
             -- Rotación: rx (pitch), ry (yaw), rz (roll)
-            -- Valores ajustados para que el JBL se vea correctamente en la mano
-            exports.bone_attach:attachElementToBone(jblObject, player, 12, 0.15, 0.1, 0.0, 0, 0, 0)
+            -- Valores ajustados: más pequeño, girado y más a la derecha
+            exports.bone_attach:attachElementToBone(jblObject, player, 12, 0.25, 0.08, 0.0, 0, 45, 0)
         end
     else
         -- Si bone_attach no está disponible, adjuntar usando attachElements
         -- Ajustar posición relativa para la mano (lado derecho del jugador)
-        attachElements(jblObject, player, 0.15, 0.1, 0.0, 0, 0, 0)
+        -- Más a la derecha, girado 45 grados en Y
+        attachElements(jblObject, player, 0.25, 0.08, 0.0, 0, 45, 0)
     end
     
     activeJBLs[player] = {
