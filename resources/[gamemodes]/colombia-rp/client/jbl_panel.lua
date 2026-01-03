@@ -15,14 +15,16 @@ local linkEditBox = nil
 local linkAnimAlpha = 1
 local tituloCancion = "Esperando música..."
 
--- COLORES
+-- COLORES (mejorados para mejor visibilidad)
 local C = {
-    fondo       = tocolor(15, 15, 20, 255),
+    fondo       = tocolor(20, 20, 28, 255),      -- Fondo más opaco
+    fondoOverlay = tocolor(15, 15, 20, 240),     -- Overlay adicional para más opacidad
     primario    = tocolor(0, 191, 255, 255),
     secundario  = tocolor(0, 255, 255, 255),
     blanco      = tocolor(255, 255, 255, 255),
-    inputBg     = tocolor(25, 25, 35, 255),
-    btnBg       = tocolor(10, 10, 15, 255)
+    inputBg     = tocolor(30, 30, 40, 255),      -- Input más visible
+    btnBg       = tocolor(15, 15, 20, 255),
+    btnHover    = tocolor(45, 45, 60, 255)        -- Botón hover más visible
 }
 
 -- Textura circular para bordes redondeados
@@ -172,7 +174,7 @@ end
 
 function drawSimpleBtn(x, y, w, h, text, color, alpha)
     local hover = isMouseInPosition(x, y, w, h)
-    local bg = hover and tocolor(40, 40, 60, math.floor(alpha)) or C.btnBg
+    local bg = hover and tocolor(45, 45, 60, math.floor(alpha)) or tocolor(15, 15, 20, math.floor(alpha))
     dxDrawRounded(x, y, w, h, 4, bg)
     dxDrawText(text, x, y, x + w, y + h, color, 1, "default-bold", "center", "center", false, false, true)
     return hover and isClicked()
@@ -194,9 +196,14 @@ function renderLinkPanel()
     local x, y = (screenW - w) / 2, (screenH - h) / 2
     local alpha = 255 * linkAnimAlpha
 
-    -- Borde de Neón y Fondo Principal
-    dxDrawRounded(x - 2, y - 2, w + 4, h + 4, 6, tocolor(0, 191, 255, 100 * linkAnimAlpha)) 
-    dxDrawRounded(x, y, w, h, 6, tocolor(15, 15, 20, 255 * linkAnimAlpha))
+    -- Fondo oscuro semi-transparente para mejor visibilidad
+    dxDrawRectangle(0, 0, screenW, screenH, tocolor(0, 0, 0, 150 * linkAnimAlpha), true)
+    
+    -- Borde de Neón y Fondo Principal (más opaco)
+    dxDrawRounded(x - 2, y - 2, w + 4, h + 4, 6, tocolor(0, 191, 255, 120 * linkAnimAlpha)) 
+    dxDrawRounded(x, y, w, h, 6, tocolor(20, 20, 28, 255 * linkAnimAlpha))
+    -- Overlay adicional para más opacidad
+    dxDrawRounded(x + 1, y + 1, w - 2, h - 2, 5, tocolor(15, 15, 20, 240 * linkAnimAlpha))
 
     -- Visualizador FFT
     if currentMusic and isElement(currentMusic) and not isSoundPaused(currentMusic) then
@@ -217,13 +224,13 @@ function renderLinkPanel()
         cerrarLinkPanel() 
     end
 
-    -- Título de Canción
-    dxDrawRounded(x + 30*sx, y + 70*sy, w - 60*sx, 40*sy, 4, tocolor(0, 0, 0, 200 * linkAnimAlpha))
+    -- Título de Canción (más visible)
+    dxDrawRounded(x + 30*sx, y + 70*sy, w - 60*sx, 40*sy, 4, tocolor(10, 10, 15, 230 * linkAnimAlpha))
     dxDrawText("♪ " .. tituloCancion, x + 40*sx, y + 70*sy, x + w - 40*sx, y + 110*sy, C.blanco, 1, "default", "center", "center", true, false, true)
 
-    -- INPUT URL
+    -- INPUT URL (más visible)
     local inputY = y + 120*sy
-    dxDrawRounded(x + 30*sx, inputY, w - 60*sx, 40*sy, 4, C.inputBg)
+    dxDrawRounded(x + 30*sx, inputY, w - 60*sx, 40*sy, 4, tocolor(C.inputBg.r, C.inputBg.g, C.inputBg.b, 255 * linkAnimAlpha))
     if isMouseInPosition(x + 30*sx, inputY, w - 60*sx, 40*sy) and getKeyState("mouse1") then
         guiBringToFront(linkEditBox)
         guiSetInputMode("no_binds")
@@ -241,17 +248,23 @@ function renderLinkPanel()
     dxDrawRectangle(x + 30*sx, inputY + 60*sy, w - 60*sx, 4, tocolor(40, 40, 50, alpha), true)
     dxDrawRectangle(x + 30*sx, inputY + 60*sy, (w - 60*sx) * progress, 4, C.secundario, true)
 
+    -- Verificar si está en vehículo
+    local vehicle = getPedOccupiedVehicle(localPlayer)
+    local isInVehicle = vehicle ~= false
+    
     -- BOTONES
     local btnW, btnH = 160*sx, 40*sy
-    if drawSimpleBtn(x + 40*sx, y + 240*sy, btnW, btnH, "▶ REPRODUCIR", C.secundario, alpha) then
+    local btnText = isInVehicle and "▶ REPRODUCIR EN VEHÍCULO" or "▶ REPRODUCIR"
+    if drawSimpleBtn(x + 40*sx, y + 240*sy, btnW, btnH, btnText, C.secundario, alpha) then
         local url = guiGetText(linkEditBox)
         if url ~= "" then 
             triggerServerEvent("jbl:playFromLink", localPlayer, url)
-            tituloCancion = "Cargando música..."
+            tituloCancion = isInVehicle and "Cargando música en vehículo..." or "Cargando música..."
         end
     end
 
-    if drawSimpleBtn(x + w - btnW - 40*sx, y + 240*sy, btnW, btnH, "■ APAGAR", C.blanco, alpha) then
+    local stopText = isInVehicle and "■ APAGAR VEHÍCULO" or "■ APAGAR"
+    if drawSimpleBtn(x + w - btnW - 40*sx, y + 240*sy, btnW, btnH, stopText, C.blanco, alpha) then
         triggerServerEvent("jbl:stopMusic", localPlayer)
         tituloCancion = "Esperando música..."
     end
@@ -295,6 +308,14 @@ end
 
 -- Tecla F6 para abrir panel
 bindKey("f6", "down", function()
+    -- Si está en vehículo, abrir directamente el panel de link
+    local vehicle = getPedOccupiedVehicle(localPlayer)
+    if vehicle then
+        showLinkPanel()
+        return
+    end
+    
+    -- Sistema normal de JBL portátil
     if jblActive or hasJBL() then
         createJBLPanel()
     else
@@ -352,7 +373,7 @@ addEventHandler("jbl:musicStarted", resourceRoot, function(url, x, y, z, entidad
 end)
 
 addEvent("jbl:musicStopped", true)
-addEventHandler("jbl:musicStopped", resourceRoot, function()
+addEventHandler("jbl:musicStopped", resourceRoot, function(entidad)
     if currentMusic then
         stopSound(currentMusic)
         currentMusic = nil

@@ -2,6 +2,7 @@
 -- Maneja la activación del JBL y la reproducción de música
 
 local activeJBLs = {} -- {player = {object = element, x, y, z, music = url, volume = 0.5}}
+local vehicleMusic = {} -- {vehicle = {music = url, volume = 0.5, owner = player}} - Música por vehículo
 local jblModel = 2226 -- ID del modelo JBL
 
 -- Función para obtener el modelo JBL
@@ -115,14 +116,39 @@ addEventHandler("jbl:playFromLink", root, function(url)
         return
     end
     
-    local jblData = activeJBLs[player]
-    if not jblData then
-        outputChatBox("Primero debes activar el JBL.", player, 255, 0, 0)
+    if not url or url == "" then
+        outputChatBox("Por favor ingresa un link válido.", player, 255, 0, 0)
         return
     end
     
-    if not url or url == "" then
-        outputChatBox("Por favor ingresa un link válido.", player, 255, 0, 0)
+    -- Verificar si el jugador está en un vehículo
+    local vehicle = getPedOccupiedVehicle(player)
+    if vehicle then
+        -- Sistema de música en vehículo (cualquier pasajero puede controlar)
+        -- Detener música anterior si existe
+        if vehicleMusic[vehicle] and vehicleMusic[vehicle].music then
+            triggerClientEvent(getRootElement(), "jbl:musicStopped", resourceRoot, vehicle)
+        end
+        
+        -- Almacenar música en el vehículo
+        vehicleMusic[vehicle] = {
+            music = url,
+            volume = 0.5,
+            owner = player
+        }
+        
+        -- Reproducir música en el vehículo
+        triggerClientEvent(getRootElement(), "jbl:ReproducirCliente", root, url, vehicle)
+        
+        outputChatBox("Reproduciendo música en el vehículo...", player, 0, 255, 0)
+        outputServerLog("[JBL] " .. getPlayerName(player) .. " está reproduciendo música en vehículo desde link: " .. url)
+        return
+    end
+    
+    -- Sistema normal de JBL portátil (solo si tiene JBL activo)
+    local jblData = activeJBLs[player]
+    if not jblData then
+        outputChatBox("Primero debes activar el JBL o subirte a un vehículo.", player, 255, 0, 0)
         return
     end
     
@@ -218,6 +244,19 @@ addEventHandler("jbl:stopMusic", root, function()
         return
     end
     
+    -- Verificar si el jugador está en un vehículo
+    local vehicle = getPedOccupiedVehicle(player)
+    if vehicle then
+        -- Detener música del vehículo (cualquier pasajero puede detener)
+        if vehicleMusic[vehicle] and vehicleMusic[vehicle].music then
+            vehicleMusic[vehicle].music = nil
+            triggerClientEvent(getRootElement(), "jbl:musicStopped", resourceRoot, vehicle)
+            outputChatBox("Música del vehículo detenida.", player, 255, 255, 0)
+        end
+        return
+    end
+    
+    -- Sistema normal de JBL portátil
     local jblData = activeJBLs[player]
     if not jblData then
         return
@@ -245,6 +284,38 @@ addEventHandler("onPlayerQuit", root, function()
             destroyElement(jblData.object)
         end
         activeJBLs[player] = nil
+    end
+end)
+
+-- Limpiar música del vehículo cuando se destruye
+addEventHandler("onVehicleDestroy", root, function()
+    if vehicleMusic[source] then
+        if vehicleMusic[source].music then
+            triggerClientEvent(getRootElement(), "jbl:musicStopped", resourceRoot, source)
+        end
+        vehicleMusic[source] = nil
+    end
+end)
+
+-- Limpiar música del vehículo cuando todos los pasajeros se bajan
+addEventHandler("onVehicleExit", root, function(player, seat)
+    local vehicle = source
+    if vehicleMusic[vehicle] then
+        -- Verificar si hay otros pasajeros
+        local hasPassengers = false
+        for seatNum = 0, getVehicleMaxPassengers(vehicle) do
+            if getVehicleOccupant(vehicle, seatNum) then
+                hasPassengers = true
+                break
+            end
+        end
+        -- Si no hay pasajeros, detener música
+        if not hasPassengers then
+            if vehicleMusic[vehicle].music then
+                triggerClientEvent(getRootElement(), "jbl:musicStopped", resourceRoot, vehicle)
+            end
+            vehicleMusic[vehicle] = nil
+        end
     end
 end)
 
