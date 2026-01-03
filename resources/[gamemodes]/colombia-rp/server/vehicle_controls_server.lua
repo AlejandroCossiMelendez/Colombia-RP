@@ -302,17 +302,40 @@ end)
 -- Prevenir que los jugadores salgan del vehículo si está bloqueado (servidor)
 addEventHandler("onPlayerVehicleExit", root, function(vehicle, seat)
     if vehicle and isElement(vehicle) then
+        -- Verificar que el jugador realmente esté dentro del vehículo antes de cancelar la salida
+        -- Esto evita que se dispare cuando intenta entrar a un vehículo bloqueado
+        local currentVehicle = getPedOccupiedVehicle(source)
+        if currentVehicle == vehicle then
+            local isLocked = getElementData(vehicle, "vehicle:locked") or false
+            if isLocked then
+                -- Cancelar la salida
+                cancelEvent()
+                outputChatBox("El vehículo está bloqueado. Desbloquéalo con K para salir.", source, 255, 0, 0)
+                -- Forzar al jugador a quedarse en el vehículo
+                setTimer(function()
+                    if vehicle and isElement(vehicle) and getPedOccupiedVehicle(source) ~= vehicle then
+                        warpPedIntoVehicle(source, vehicle, seat)
+                    end
+                end, 50, 1)
+            end
+        end
+    end
+end)
+
+-- Prevenir que los jugadores entren a vehículos bloqueados sin llaves (servidor)
+addEventHandler("onPlayerVehicleEnter", root, function(vehicle, seat)
+    if vehicle and isElement(vehicle) then
         local isLocked = getElementData(vehicle, "vehicle:locked") or false
         if isLocked then
-            -- Cancelar la salida
-            cancelEvent()
-            outputChatBox("El vehículo está bloqueado. Desbloquéalo con K para salir.", source, 255, 0, 0)
-            -- Forzar al jugador a quedarse en el vehículo
-            setTimer(function()
-                if vehicle and isElement(vehicle) and getPedOccupiedVehicle(source) ~= vehicle then
-                    warpPedIntoVehicle(source, vehicle, seat)
-                end
-            end, 50, 1)
+            -- Verificar si tiene las llaves
+            if playerHasVehicleKey and playerHasVehicleKey(source, vehicle) then
+                -- Tiene llaves, permitir entrada
+                return
+            else
+                -- No tiene llaves, cancelar entrada
+                cancelEvent()
+                outputChatBox("Este vehículo está bloqueado y no tienes las llaves.", source, 255, 0, 0)
+            end
         end
     end
 end)

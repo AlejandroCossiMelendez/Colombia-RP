@@ -175,18 +175,23 @@ end)
 -- Prevenir que los jugadores salgan del vehículo si está bloqueado
 addEventHandler("onClientPlayerVehicleExit", localPlayer, function(vehicle, seat)
     if vehicle and isElement(vehicle) then
-        -- Verificar tanto getVehicleLocked como elementData para mayor confiabilidad
-        local isLocked = getVehicleLocked(vehicle) or (getElementData(vehicle, "vehicle:locked") == true)
-        if isLocked then
-            -- Cancelar la salida
-            cancelEvent()
-            outputChatBox("El vehículo está bloqueado. Desbloquéalo con K para salir.", 255, 0, 0)
-            -- Forzar al jugador a quedarse en el vehículo
-            setTimer(function()
-                if vehicle and isElement(vehicle) and getPedOccupiedVehicle(localPlayer) ~= vehicle then
-                    warpPedIntoVehicle(localPlayer, vehicle, seat)
-                end
-            end, 50, 1)
+        -- Verificar que el jugador realmente esté dentro del vehículo antes de cancelar la salida
+        -- Esto evita que se dispare cuando intenta entrar a un vehículo bloqueado
+        local currentVehicle = getPedOccupiedVehicle(localPlayer)
+        if currentVehicle == vehicle then
+            -- Verificar tanto getVehicleLocked como elementData para mayor confiabilidad
+            local isLocked = getVehicleLocked(vehicle) or (getElementData(vehicle, "vehicle:locked") == true)
+            if isLocked then
+                -- Cancelar la salida
+                cancelEvent()
+                outputChatBox("El vehículo está bloqueado. Desbloquéalo con K para salir.", 255, 0, 0)
+                -- Forzar al jugador a quedarse en el vehículo
+                setTimer(function()
+                    if vehicle and isElement(vehicle) and getPedOccupiedVehicle(localPlayer) ~= vehicle then
+                        warpPedIntoVehicle(localPlayer, vehicle, seat)
+                    end
+                end, 50, 1)
+            end
         end
     end
 end)
