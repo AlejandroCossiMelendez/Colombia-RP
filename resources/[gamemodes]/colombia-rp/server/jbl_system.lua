@@ -47,7 +47,7 @@ addEventHandler("jbl:activate", root, function()
             -- Offset: x (lateral derecho - más a la derecha), y (adelante), z (arriba/abajo)
             -- Rotación: rx (pitch), ry (yaw), rz (roll)
             -- Valores ajustados: más pequeño, rotado en Z, más a la derecha y más abajo (20px más bajo)
-            exports.bone_attach:attachElementToBone(jblObject, player, 12, 0.25, 0.08, -0.30, 0, 0, 90)
+            exports.bone_attach:attachElementToBone(jblObject, player, 12, 0.25, 0.08, -0.35, 0, 0, 90)
         end
     else
         -- Si bone_attach no está disponible, adjuntar usando attachElements
