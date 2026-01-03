@@ -46,14 +46,14 @@ addEventHandler("jbl:activate", root, function()
             -- Bone 12 = mano derecha (right hand)
             -- Offset: x (lateral derecho - más a la derecha), y (adelante), z (arriba)
             -- Rotación: rx (pitch), ry (yaw), rz (roll)
-            -- Valores ajustados: más pequeño, girado y más a la derecha
-            exports.bone_attach:attachElementToBone(jblObject, player, 12, 0.25, 0.08, 0.0, 0, 45, 0)
+            -- Valores ajustados: más pequeño, rotado en Z y más a la derecha
+            exports.bone_attach:attachElementToBone(jblObject, player, 12, 0.25, 0.08, 0.0, 0, 0, 45)
         end
     else
         -- Si bone_attach no está disponible, adjuntar usando attachElements
         -- Ajustar posición relativa para la mano (lado derecho del jugador)
-        -- Más a la derecha, girado 45 grados en Y
-        attachElements(jblObject, player, 0.25, 0.08, 0.0, 0, 45, 0)
+        -- Más a la derecha, rotado 45 grados en Z (roll)
+        attachElements(jblObject, player, 0.25, 0.08, 0.0, 0, 0, 45)
     end
     
     activeJBLs[player] = {
