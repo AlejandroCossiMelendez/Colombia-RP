@@ -174,8 +174,12 @@ end
 
 function drawSimpleBtn(x, y, w, h, text, color, alpha)
     local hover = isMouseInPosition(x, y, w, h)
-    local bg = hover and tocolor(45, 45, 60, math.floor(alpha)) or tocolor(15, 15, 20, math.floor(alpha))
+    local bg = hover and tocolor(50, 50, 70, math.floor(alpha)) or tocolor(20, 20, 30, math.floor(alpha))
     dxDrawRounded(x, y, w, h, 4, bg)
+    -- Borde del botón cuando está en hover
+    if hover then
+        dxDrawRounded(x - 1, y - 1, w + 2, h + 2, 4, tocolor(0, 191, 255, 100 * (alpha/255)))
+    end
     dxDrawText(text, x, y, x + w, y + h, color, 1, "default-bold", "center", "center", false, false, true)
     return hover and isClicked()
 end
@@ -183,27 +187,35 @@ end
 -- Renderizar panel de Link avanzado
 function renderLinkPanel()
     if linkPanelAbierto then
-        if linkAnimAlpha < 1 then linkAnimAlpha = linkAnimAlpha + 0.1 end
+        if linkAnimAlpha < 1 then linkAnimAlpha = math.min(linkAnimAlpha + 0.1, 1) end
     else
-        if linkAnimAlpha > 0 then linkAnimAlpha = linkAnimAlpha - 0.1 else
+        if linkAnimAlpha > 0 then linkAnimAlpha = math.max(linkAnimAlpha - 0.1, 0) else
             removeEventHandler("onClientRender", root, renderLinkPanel)
             if isElement(linkEditBox) then destroyElement(linkEditBox) end
             return
         end
     end
     
+    -- Asegurar que el panel se renderice incluso si alpha es bajo
+    if linkAnimAlpha <= 0 and not linkPanelAbierto then return end
+    
     local w, h = 550 * sx, 380 * sy
     local x, y = (screenW - w) / 2, (screenH - h) / 2
-    local alpha = 255 * linkAnimAlpha
+    -- Cuando el panel está abierto, usar opacidad completa
+    local renderAlpha = linkPanelAbierto and 1.0 or linkAnimAlpha
+    local alpha = 255 * renderAlpha
 
-    -- Fondo oscuro semi-transparente para mejor visibilidad
-    dxDrawRectangle(0, 0, screenW, screenH, tocolor(0, 0, 0, 150 * linkAnimAlpha), true)
+    -- Fondo oscuro semi-transparente para mejor visibilidad (más opaco)
+    dxDrawRectangle(0, 0, screenW, screenH, tocolor(0, 0, 0, 200 * renderAlpha), true)
     
-    -- Borde de Neón y Fondo Principal (más opaco)
-    dxDrawRounded(x - 2, y - 2, w + 4, h + 4, 6, tocolor(0, 191, 255, 120 * linkAnimAlpha)) 
-    dxDrawRounded(x, y, w, h, 6, tocolor(20, 20, 28, 255 * linkAnimAlpha))
+    -- Borde de Neón y Fondo Principal (MUY OPACO - siempre visible cuando abierto)
+    local borderAlpha = 200 * renderAlpha
+    local bgAlpha = 255 * renderAlpha
+    dxDrawRounded(x - 2, y - 2, w + 4, h + 4, 6, tocolor(0, 191, 255, borderAlpha)) 
+    -- Fondo principal sólido y opaco (siempre al 100%)
+    dxDrawRounded(x, y, w, h, 6, tocolor(25, 25, 35, bgAlpha))
     -- Overlay adicional para más opacidad
-    dxDrawRounded(x + 1, y + 1, w - 2, h - 2, 5, tocolor(15, 15, 20, 240 * linkAnimAlpha))
+    dxDrawRounded(x + 1, y + 1, w - 2, h - 2, 5, tocolor(20, 20, 28, bgAlpha))
 
     -- Visualizador FFT
     if currentMusic and isElement(currentMusic) and not isSoundPaused(currentMusic) then
@@ -217,27 +229,32 @@ function renderLinkPanel()
         end
     end
 
-    -- CABECERA
-    dxDrawText("JBL ⚡ LINK", x + 20*sx, y + 20*sy, x + w, 0, C.secundario, 1.5, "default-bold", "left", "top", false, false, true)
+    -- CABECERA (más visible)
+    dxDrawText("JBL ⚡ LINK", x + 20*sx, y + 20*sy, x + w, 0, tocolor(0, 255, 255, alpha), 1.5, "default-bold", "left", "top", false, false, true)
     
     if drawSimpleBtn(x + w - 30*sx, y + 10*sy, 20*sx, 20*sy, "✕", tocolor(200, 50, 50, 255), alpha) then 
         cerrarLinkPanel() 
     end
 
     -- Título de Canción (más visible)
-    dxDrawRounded(x + 30*sx, y + 70*sy, w - 60*sx, 40*sy, 4, tocolor(10, 10, 15, 230 * linkAnimAlpha))
-    dxDrawText("♪ " .. tituloCancion, x + 40*sx, y + 70*sy, x + w - 40*sx, y + 110*sy, C.blanco, 1, "default", "center", "center", true, false, true)
+    dxDrawRounded(x + 30*sx, y + 70*sy, w - 60*sx, 40*sy, 4, tocolor(15, 15, 20, bgAlpha))
+    dxDrawText("♪ " .. tituloCancion, x + 40*sx, y + 70*sy, x + w - 40*sx, y + 110*sy, tocolor(255, 255, 255, alpha), 1, "default-bold", "center", "center", true, false, true)
 
-    -- INPUT URL (más visible)
+    -- INPUT URL (más visible - siempre opaco)
     local inputY = y + 120*sy
-    dxDrawRounded(x + 30*sx, inputY, w - 60*sx, 40*sy, 4, tocolor(C.inputBg.r, C.inputBg.g, C.inputBg.b, 255 * linkAnimAlpha))
+    dxDrawRounded(x + 30*sx, inputY, w - 60*sx, 40*sy, 4, tocolor(40, 40, 50, bgAlpha))
+    -- Borde del input para mejor visibilidad
+    dxDrawRounded(x + 30*sx - 1, inputY - 1, w - 60*sx + 2, 40*sy + 2, 4, tocolor(0, 191, 255, 100 * renderAlpha))
     if isMouseInPosition(x + 30*sx, inputY, w - 60*sx, 40*sy) and getKeyState("mouse1") then
         guiBringToFront(linkEditBox)
         guiSetInputMode("no_binds")
     end
-    local txt = guiGetText(linkEditBox)
-    dxDrawText(txt == "" and "Pega el enlace de la música aquí..." or txt, x + 40*sx, inputY, x + w - 40*sx, inputY + 40*sy, txt == "" and tocolor(80, 80, 90, 255*linkAnimAlpha) or C.blanco, 1, "default", "left", "center", true, false, true)
-    dxDrawRectangle(x + 30*sx, inputY + 38*sy, w - 60*sx, 2, C.primario, true)
+    local txt = guiGetText(linkEditBox) or ""
+    local placeholderColor = tocolor(150, 150, 160, alpha)
+    local textColor = tocolor(255, 255, 255, alpha)
+    dxDrawText(txt == "" and "Pega el enlace de la música aquí..." or txt, x + 40*sx, inputY, x + w - 40*sx, inputY + 40*sy, txt == "" and placeholderColor or textColor, 1, "default", "left", "center", true, false, true)
+    -- Línea inferior del input (más visible)
+    dxDrawRectangle(x + 30*sx, inputY + 38*sy, w - 60*sx, 2, tocolor(0, 191, 255, alpha), true)
 
     -- Barra de progreso
     local progress = 0
@@ -246,7 +263,7 @@ function renderLinkPanel()
         if len and len > 0 then progress = getSoundPosition(currentMusic) / len end
     end
     dxDrawRectangle(x + 30*sx, inputY + 60*sy, w - 60*sx, 4, tocolor(40, 40, 50, alpha), true)
-    dxDrawRectangle(x + 30*sx, inputY + 60*sy, (w - 60*sx) * progress, 4, C.secundario, true)
+    dxDrawRectangle(x + 30*sx, inputY + 60*sy, (w - 60*sx) * progress, 4, tocolor(0, 255, 255, alpha), true)
 
     -- Verificar si está en vehículo
     local vehicle = getPedOccupiedVehicle(localPlayer)
@@ -278,11 +295,16 @@ end
 function showLinkPanel()
     if linkPanelAbierto then return end
     linkPanelAbierto = true
-    linkAnimAlpha = 1
+    linkAnimAlpha = 1  -- Iniciar completamente visible
     showCursor(true)
+    guiSetInputEnabled(true)
     if isElement(linkEditBox) then destroyElement(linkEditBox) end
     linkEditBox = guiCreateEdit(-1000, -1000, 200, 50, "", false)
-    addEventHandler("onClientRender", root, renderLinkPanel)
+    guiSetEnabled(linkEditBox, true)
+    -- Asegurar que el evento se agregue
+    if not getEventHandlers("onClientRender", root, renderLinkPanel) then
+        addEventHandler("onClientRender", root, renderLinkPanel)
+    end
 end
 
 function cerrarLinkPanel()
