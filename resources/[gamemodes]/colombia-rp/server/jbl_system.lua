@@ -106,9 +106,9 @@ addEventHandler("jbl:deactivate", root, function()
     outputServerLog("[JBL] " .. getPlayerName(player) .. " desactivó su JBL")
 end)
 
--- Reproducir música desde link
+-- Reproducir música desde link (sistema mejorado - URLs directas)
 addEvent("jbl:playFromLink", true)
-addEventHandler("jbl:playFromLink", root, function(link)
+addEventHandler("jbl:playFromLink", root, function(url)
     local player = source
     
     if not isElement(player) or getElementType(player) ~= "player" then
@@ -121,55 +121,41 @@ addEventHandler("jbl:playFromLink", root, function(link)
         return
     end
     
-    -- Validar que sea un link de YouTube
-    if not string.find(link, "youtube.com") and not string.find(link, "youtu.be") then
-        outputChatBox("El link debe ser de YouTube.", player, 255, 0, 0)
+    if not url or url == "" then
+        outputChatBox("Por favor ingresa un link válido.", player, 255, 0, 0)
         return
     end
-    
-    -- Obtener posición del JBL
-    local x, y, z = getElementPosition(jblData.object)
-    
-    -- Enviar link a y2mate para convertir (esto se hará en el cliente)
-    triggerClientEvent(player, "jbl:convertAndPlay", resourceRoot, link, x, y, z)
-    outputChatBox("Convirtiendo y reproduciendo música...", player, 0, 255, 0)
-end)
-
--- Convertir YouTube a MP3 usando y2mate
-addEvent("jbl:convertYouTube", true)
-addEventHandler("jbl:convertYouTube", root, function(link, x, y, z)
-    local player = source
-    
-    if not isElement(player) or getElementType(player) ~= "player" then
-        return
-    end
-    
-    local jblData = activeJBLs[player]
-    if not jblData then
-        return
-    end
-    
-    -- Nota: En MTA no podemos hacer requests HTTP directamente
-    -- Por ahora, simularemos la conversión
-    -- En producción, esto requeriría un servidor proxy o usar fetchRemote
-    
-    outputChatBox("Convirtiendo link de YouTube a MP3...", player, 0, 255, 0)
-    
-    -- Simular URL de MP3 convertido (en producción, esto vendría de y2mate)
-    -- Por ahora, usaremos el link directamente como si fuera un MP3
-    local mp3Url = link -- Esto debería ser la URL del MP3 descargado de y2mate
     
     -- Detener música anterior si existe
     if jblData.music then
         triggerClientEvent(getRootElement(), "jbl:musicStopped", resourceRoot)
     end
     
-    -- Reproducir nueva música
-    jblData.music = mp3Url
-    triggerClientEvent(getRootElement(), "jbl:musicStarted", resourceRoot, mp3Url, x, y, z)
+    -- Obtener objeto JBL
+    local jblObject = jblData.object
     
-    outputChatBox("Música reproducida desde YouTube.", player, 0, 255, 0)
-    outputServerLog("[JBL] " .. getPlayerName(player) .. " está reproduciendo música desde YouTube: " .. link)
+    -- Reproducir directamente desde la URL (debe ser una URL de audio válida: .mp3, .ogg, etc.)
+    jblData.music = url
+    triggerClientEvent(getRootElement(), "jbl:ReproducirCliente", root, url, jblObject)
+    
+    outputChatBox("Reproduciendo música desde link...", player, 0, 255, 0)
+    outputServerLog("[JBL] " .. getPlayerName(player) .. " está reproduciendo música desde link: " .. url)
+end)
+
+-- Evento para parar música (compatibilidad con sistema mejorado)
+addEvent("jbl:PararServer", true)
+addEventHandler("jbl:PararServer", root, function(ent)
+    local player = source
+    if not isElement(player) or getElementType(player) ~= "player" then
+        return
+    end
+    
+    local jblData = activeJBLs[player]
+    if jblData and jblData.music then
+        jblData.music = nil
+        triggerClientEvent(getRootElement(), "jbl:musicStopped", resourceRoot)
+        outputChatBox("Música detenida.", player, 255, 255, 0)
+    end
 end)
 
 -- Reproducir música desde Spotify
@@ -197,7 +183,7 @@ addEventHandler("jbl:playFromSpotify", root, function(trackUrl, trackName)
     
     -- Reproducir nueva música
     jblData.music = trackUrl
-    triggerClientEvent(getRootElement(), "jbl:musicStarted", resourceRoot, trackUrl, x, y, z)
+    triggerClientEvent(getRootElement(), "jbl:musicStarted", resourceRoot, trackUrl, x, y, z, jblData.object)
     
     outputChatBox("Reproduciendo: " .. (trackName or "Música"), player, 0, 255, 0)
     outputServerLog("[JBL] " .. getPlayerName(player) .. " está reproduciendo música desde Spotify")
