@@ -1,8 +1,6 @@
-<danilo>
-
-	<info author="DaniloModz"/>
-
+<meta>
+	<info author="DaniloModz" name="Sistema Baul" description="Sistema de maletero para vehículos" type="script"/>
+	
 	<script src="daniloG.lua" type="shared"/>
 	<script src="daniloS.lua" type="server"/>
-	
-</danilo>
+</meta>

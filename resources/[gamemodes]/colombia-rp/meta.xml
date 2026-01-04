@@ -613,8 +613,8 @@
     <!-- Archivos -->
     <file src="colombia-rp-login.png" type="client" />
     
-    <!-- Archivos baul  -->
-    <file src="baul/daniloG.lua" type="server" />
-    <file src="baul/daniloS.lua" type="server" />
+    <!-- Sistema de Maletero (Baul) -->
+    <script src="baul/daniloG.lua" type="shared" />
+    <script src="baul/daniloS.lua" type="server" />
 </meta>
 

@@ -15,8 +15,8 @@
 
 config = {
     ["Gerais"] = {
-        ["Cmd"] = "baul"; -- Comando para entrar no porta malas.
-        ["Dist"] = 5; -- Distancia do player até o veiculo para ta entrando no porta malas.
+        ["Cmd"] = "maletero"; -- Comando para entrar al maletero.
+        ["Dist"] = 5; -- Distancia del jugador hasta el vehículo para entrar al maletero.
     };
     VehiclesID = { -- ID dos veiculos que os players podem estar entrando no porta mala.
         602,429,402,541,415,480,562,587,565,411,559,603,
