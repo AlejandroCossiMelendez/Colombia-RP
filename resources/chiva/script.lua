@@ -18,22 +18,39 @@ local CHIVA_MODEL = 410  -- Modelo de la chiva
 -- offsetX: distancia hacia adelante/atrás (negativo = atrás del centro)
 -- offsetY: distancia hacia izquierda/derecha (negativo = izquierda, positivo = derecha)
 -- offsetZ: altura desde el suelo del vehículo (para estar "arriba")
+-- NOTA: Los offsets Y están reducidos para que queden más cerca del vehículo (multiplicados por 0.5)
 local CHIVA_SEATS_CONFIG = {
     -- Lado Izquierdo - Asientos 2, 3, 4, 5
-    {seat = 2, name = "Izquierda - Asiento 1", side = "left", offsetX = -9.85, offsetY = -6.40, offsetZ = 1.8},  -- Más atrás
-    {seat = 3, name = "Izquierda - Asiento 2", side = "left", offsetX = -8.49, offsetY = -6.20, offsetZ = 1.8},
-    {seat = 4, name = "Izquierda - Asiento 3", side = "left", offsetX = -7.55, offsetY = -6.20, offsetZ = 1.8},
-    {seat = 5, name = "Izquierda - Asiento 4", side = "left", offsetX = -6.74, offsetY = -6.30, offsetZ = 1.8},  -- Más adelante
+    -- offsetY reducido para acercar más al vehículo
+    {seat = 2, name = "Izquierda - Asiento 1", side = "left", offsetX = -9.85, offsetY = -3.20, offsetZ = 1.5},  -- Más atrás
+    {seat = 3, name = "Izquierda - Asiento 2", side = "left", offsetX = -8.49, offsetY = -3.10, offsetZ = 1.5},
+    {seat = 4, name = "Izquierda - Asiento 3", side = "left", offsetX = -7.55, offsetY = -3.10, offsetZ = 1.5},
+    {seat = 5, name = "Izquierda - Asiento 4", side = "left", offsetX = -6.74, offsetY = -3.15, offsetZ = 1.5},  -- Más adelante
     
     -- Lado Derecho - Asientos 6, 7, 8, 9
-    {seat = 6, name = "Derecha - Asiento 1", side = "right", offsetX = -9.36, offsetY = -2.99, offsetZ = 1.8},
-    {seat = 7, name = "Derecha - Asiento 2", side = "right", offsetX = -8.41, offsetY = -2.99, offsetZ = 1.8},
-    {seat = 8, name = "Derecha - Asiento 3", side = "right", offsetX = -7.46, offsetY = -2.99, offsetZ = 1.8},
-    {seat = 9, name = "Derecha - Asiento 4", side = "right", offsetX = -6.51, offsetY = -2.99, offsetZ = 1.8},
+    -- offsetY reducido para acercar más al vehículo
+    {seat = 6, name = "Derecha - Asiento 1", side = "right", offsetX = -9.36, offsetY = -1.50, offsetZ = 1.5},
+    {seat = 7, name = "Derecha - Asiento 2", side = "right", offsetX = -8.41, offsetY = -1.50, offsetZ = 1.5},
+    {seat = 8, name = "Derecha - Asiento 3", side = "right", offsetX = -7.46, offsetY = -1.50, offsetZ = 1.5},
+    {seat = 9, name = "Derecha - Asiento 4", side = "right", offsetX = -6.51, offsetY = -1.50, offsetZ = 1.5},
 }
 
 -- Tabla para rastrear qué jugadores están en qué asientos personalizados
 local chivaPassengers = {}  -- [vehicle] = {[seat] = player}
+
+-- Función para verificar si un jugador está montado en una chiva
+local function isPlayerMountedInChiva(player)
+    for vehicle, seats in pairs(chivaPassengers) do
+        if isElement(vehicle) then
+            for seat, passenger in pairs(seats) do
+                if passenger == player then
+                    return true, vehicle, seat
+                end
+            end
+        end
+    end
+    return false, nil, nil
+end
 
 -- Función para detectar la puerta más cercana y el asiento correspondiente
 local function detectNearestDoorAndSeat(player, vehicle)
@@ -316,15 +333,10 @@ bindKey("g", "down", function()
     end
     
     -- Verificar si ya está en una chiva (asiento personalizado)
-    for vehicle, seats in pairs(chivaPassengers) do
-        if isElement(vehicle) then
-            for seat, passenger in pairs(seats) do
-                if passenger == player then
-                    -- Ya está montado, no hacer nada o permitir bajarse
-                    return
-                end
-            end
-        end
+    local isMounted, mountedVehicle, mountedSeat = isPlayerMountedInChiva(player)
+    if isMounted then
+        -- Ya está montado, no hacer nada
+        return
     end
     
     -- Buscar chiva cercana
@@ -341,15 +353,9 @@ bindKey("f", "down", function()
     local player = localPlayer
     
     -- Buscar si el jugador está en alguna chiva
-    for vehicle, seats in pairs(chivaPassengers) do
-        if isElement(vehicle) then
-            for seat, passenger in pairs(seats) do
-                if passenger == player then
-                    triggerServerEvent("chiva:requestDismount", player, vehicle, seat)
-                    return
-                end
-            end
-        end
+    local isMounted, mountedVehicle, mountedSeat = isPlayerMountedInChiva(player)
+    if isMounted then
+        triggerServerEvent("chiva:requestDismount", player, mountedVehicle, mountedSeat)
     end
 end)
 
@@ -378,25 +384,22 @@ addEventHandler("chiva:dismounted", root, function(vehicle, seat)
     end
 end)
 
--- Evento para reproducir animación de sentarse (llamado desde el servidor)
-addEvent("chiva:playSitAnimation", true)
-addEventHandler("chiva:playSitAnimation", root, function()
-    local player = localPlayer
-    -- Animación de sentarse arriba (puedes ajustar la animación según prefieras)
-    setPedAnimation(player, "ped", "CAR_sit", -1, true, false, false, false)
+-- Evento para sincronizar animación cuando otro jugador se monta
+addEvent("chiva:playerMounted", true)
+addEventHandler("chiva:playerMounted", root, function(player, vehicle, seat)
+    if isElement(player) and isElement(vehicle) then
+        -- Reproducir animación de sentado para todos los clientes
+        setPedAnimation(player, "ped", "CAR_sit", -1, true, false, false, false)
+    end
 end)
 
--- Evento para reproducir animación de bajarse (llamado desde el servidor)
-addEvent("chiva:playDismountAnimation", true)
-addEventHandler("chiva:playDismountAnimation", root, function()
-    local player = localPlayer
-    -- Animación de bajarse
-    setPedAnimation(player, "ped", "CAR_getout_LHS", 2000, false, false, false, false)
-    setTimer(function()
-        if isElement(player) then
-            setPedAnimation(player, nil)
-        end
-    end, 2000, 1)
+-- Evento para sincronizar animación cuando otro jugador se baja
+addEvent("chiva:playerDismounted", true)
+addEventHandler("chiva:playerDismounted", root, function(player, vehicle, seat)
+    if isElement(player) then
+        -- Detener animación de sentado
+        setPedAnimation(player, nil)
+    end
 end)
 
 -- Limpiar tabla cuando el vehículo se destruye
