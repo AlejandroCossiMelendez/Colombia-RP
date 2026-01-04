@@ -855,7 +855,10 @@ function showVehiclesPanel()
             -- Nombre personalizado para vehículos específicos
             if vehicleId == 560 then
                 vehicleName = "Lamborghini Urus"
+            elseif vehicleId == 410 then
+                vehicleName = "Chiva Rumbera"
             end
+
             
             local row = guiGridListAddRow(vehiclesListGrid)
             guiGridListSetItemText(vehiclesListGrid, row, 1, tostring(vehicleId), false, false)
