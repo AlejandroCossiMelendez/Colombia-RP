@@ -52,7 +52,7 @@ addEventHandler("jbl:activate", root, function()
     -- Intentar usar la función attachElementToBone directamente (está en attach_func.lua)
     -- Rotación corregida: rx=0, ry=180 (voltear horizontalmente), rz=-90 (girar para orientación correcta)
     if attachElementToBone then
-        attached = attachElementToBone(jblObject, player, 12, 0.20, 0.12, 0.30, 0, 180, -90)
+        attached = attachElementToBone(jblObject, player, 12, 0.20, 0.12, 0.30, 0, 180, 90)
     end
     
     -- Si no está disponible directamente, intentar como recurso separado
@@ -60,7 +60,7 @@ addEventHandler("jbl:activate", root, function()
         local boneAttachResource = getResourceFromName("bone_attach")
         if boneAttachResource and getResourceState(boneAttachResource) == "running" then
             if exports.bone_attach and exports.bone_attach.attachElementToBone then
-                attached = exports.bone_attach:attachElementToBone(jblObject, player, 12, 0.20, 0.12, 0.30, 0, 180, -90)
+                attached = exports.bone_attach:attachElementToBone(jblObject, player, 12, 0.20, 0.12, 0.30, 0, 180, 90)
             end
         end
     end
