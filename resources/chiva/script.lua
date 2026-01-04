@@ -237,9 +237,144 @@ local function mountPlayerInChiva(player, vehicle, seat)
         return false
     end
     
-    -- Enviar al servidor para montar al jugador (warpPedIntoVehicle es función del servidor)
-    outputChatBox("[CHIVA DEBUG] Enviando evento al servidor...", 255, 255, 0)
-    triggerServerEvent("chiva:requestMount", player, vehicle, seat)
+    -- Obtener la configuración del asiento para ajustar la posición
+    local seatConfig = nil
+    local seatSide = nil
+    for _, config in ipairs(CHIVA_SEATS_CONFIG) do
+        if config.seat == seat then
+            seatConfig = config
+            seatSide = config.side
+            break
+        end
+    end
+    
+    -- Si no encontramos la configuración, detectar el lado
+    if not seatSide then
+        seatSide, _ = detectNearestDoorAndSeat(player, vehicle)
+    end
+    
+    -- Calcular posición ajustada (más hacia adentro)
+    local vx, vy, vz = getElementPosition(vehicle)
+    local vrx, vry, vrz = getElementRotation(vehicle)
+    local angle = math.rad(vrz)
+    local cosAngle = math.cos(angle)
+    local sinAngle = math.sin(angle)
+    
+    -- Ajustar offset para que sea más hacia adentro (reducir offsetY en 0.5-1.0 unidades)
+    local offsetX = seatConfig and seatConfig.offsetX or 0
+    local offsetY = seatConfig and (seatConfig.offsetY * 0.7) or 0  -- Reducir 30% para acercar más
+    
+    -- Rotar el offset según la rotación del vehículo
+    local rotatedX = offsetX * cosAngle - offsetY * sinAngle
+    local rotatedY = offsetX * sinAngle + offsetY * cosAngle
+    
+    -- Calcular posición mundial ajustada
+    local targetX = vx + rotatedX
+    local targetY = vy + rotatedY
+    local targetZ = vz + 0.5  -- Un poco más arriba
+    
+    -- Verificar distancia antes de proceder
+    local px, py, pz = getElementPosition(player)
+    local distance = getDistanceBetweenPoints3D(px, py, pz, targetX, targetY, targetZ)
+    
+    -- Si está muy lejos, moverlo primero
+    if distance > 2.0 then
+        -- Mover al jugador gradualmente hacia la posición
+        setElementPosition(player, targetX, targetY, targetZ)
+    end
+    
+    -- Hacer que el jugador mire hacia el vehículo
+    local lookAtX = vx
+    local lookAtY = vy
+    local lookAngle = math.deg(math.atan2(lookAtY - targetY, lookAtX - targetX))
+    setPedRotation(player, lookAngle)
+    
+    -- Congelar al jugador durante la animación
+    toggleControl(player, "forwards", false)
+    toggleControl(player, "backwards", false)
+    toggleControl(player, "left", false)
+    toggleControl(player, "right", false)
+    toggleControl(player, "sprint", false)
+    toggleControl(player, "jump", false)
+    
+    -- Determinar qué animación usar según el lado
+    local openAnim = "CAR_open_LHS"  -- Por defecto izquierda
+    local sitAnim = "CAR_pullout_LHS"
+    
+    if seatSide == "right" then
+        openAnim = "CAR_open_RHS"
+        sitAnim = "CAR_pullout_RHS"
+    end
+    
+    -- Función para restaurar controles
+    local function restoreControls()
+        if isElement(player) then
+            toggleControl(player, "forwards", true)
+            toggleControl(player, "backwards", true)
+            toggleControl(player, "left", true)
+            toggleControl(player, "right", true)
+            toggleControl(player, "sprint", true)
+            toggleControl(player, "jump", true)
+        end
+    end
+    
+    -- Reproducir animación de abrir puerta y sentarse
+    -- Animación de abrir puerta de vehículo
+    setPedAnimation(player, "ped", openAnim, 1000, false, false, false, false)
+    
+    -- Después de abrir la puerta, animación de sentarse
+    setTimer(function()
+        if not isElement(player) or not isElement(vehicle) then
+            restoreControls()
+            return
+        end
+        
+        -- Verificar que aún esté cerca del vehículo
+        local px, py, pz = getElementPosition(player)
+        local vx, vy, vz = getElementPosition(vehicle)
+        local distance = getDistanceBetweenPoints3D(px, py, pz, vx, vy, vz)
+        
+        if distance > 8.0 then
+            outputChatBox("Te alejaste demasiado de la chiva.", player, 255, 255, 0)
+            restoreControls()
+            setPedAnimation(player, nil)
+            return
+        end
+        
+        -- Animación de sentarse arriba
+        setPedAnimation(player, "ped", sitAnim, 1500, false, false, false, false)
+        
+        -- Después de la animación, montar al jugador
+        setTimer(function()
+            if not isElement(player) or not isElement(vehicle) then
+                restoreControls()
+                return
+            end
+        
+            -- Verificar distancia nuevamente
+            local px2, py2, pz2 = getElementPosition(player)
+            local vx2, vy2, vz2 = getElementPosition(vehicle)
+            local distance2 = getDistanceBetweenPoints3D(px2, py2, pz2, vx2, vy2, vz2)
+            
+            if distance2 > 8.0 then
+                outputChatBox("Te alejaste demasiado de la chiva.", player, 255, 255, 0)
+                restoreControls()
+                setPedAnimation(player, nil)
+                return
+            end
+            
+            -- Detener animación
+            setPedAnimation(player, nil)
+            
+            -- Restaurar controles
+            restoreControls()
+            
+            -- Enviar al servidor para montar al jugador (warpPedIntoVehicle es función del servidor)
+            outputChatBox("[CHIVA DEBUG] Enviando evento al servidor...", 255, 255, 0)
+            triggerServerEvent("chiva:requestMount", player, vehicle, seat)
+        end, 1500, 1)
+    end, 1000, 1)
+    
     return true
 end
 

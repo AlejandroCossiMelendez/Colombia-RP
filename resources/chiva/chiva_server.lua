@@ -83,32 +83,55 @@ function mountPlayerInChiva(player, vehicle, seat)
         return false
     end
     
+    -- Asegurarse de que el jugador no esté en otro vehículo
+    local currentVehicle = getPedOccupiedVehicle(player)
+    if currentVehicle and currentVehicle ~= vehicle then
+        removePedFromVehicle(player)
+    end
+    
     -- Montar al jugador directamente desde el servidor
     local success = warpPedIntoVehicle(player, vehicle, seat)
     
     if success then
-        -- Verificar que realmente se montó
+        outputServerLog("[CHIVA] warpPedIntoVehicle retornó true para " .. getPlayerName(player) .. " en asiento " .. seat)
+        
+        -- Verificar que realmente se montó después de un pequeño delay
         setTimer(function()
             if isElement(player) and isElement(vehicle) then
                 local actualVehicle = getPedOccupiedVehicle(player)
                 local actualSeat = getPedOccupiedVehicleSeat(player)
                 
+                outputServerLog("[CHIVA] Verificación: Vehículo actual=" .. tostring(actualVehicle) .. ", Asiento=" .. tostring(actualSeat))
+                
                 if actualVehicle == vehicle and actualSeat == seat then
                     outputChatBox("Te has montado en la chiva (Asiento " .. seat .. ").", player, 0, 255, 0)
                     outputServerLog("[CHIVA] " .. getPlayerName(player) .. " montado exitosamente en asiento " .. seat)
+                    triggerClientEvent(player, "chiva:mounted", resourceRoot, true, "Te has montado en la chiva.")
                 else
-                    -- Intentar de nuevo
-                    if warpPedIntoVehicle(player, vehicle, seat) then
-                        outputChatBox("Te has montado en la chiva (Asiento " .. seat .. ").", player, 0, 255, 0)
-                    else
-                        outputChatBox("Error al montarte en la chiva. Intenta de nuevo.", player, 255, 0, 0)
-                        outputServerLog("[CHIVA] Error: No se pudo montar a " .. getPlayerName(player) .. " en asiento " .. seat)
-                    end
+                    -- Intentar de nuevo con un pequeño delay
+                    outputServerLog("[CHIVA] Reintentando montar a " .. getPlayerName(player))
+                    setTimer(function()
+                        if isElement(player) and isElement(vehicle) then
+                            -- Asegurarse de que no esté en otro vehículo
+                            if getPedOccupiedVehicle(player) ~= vehicle then
+                                removePedFromVehicle(player)
+                            end
+                            
+                            if warpPedIntoVehicle(player, vehicle, seat) then
+                                outputChatBox("Te has montado en la chiva (Asiento " .. seat .. ").", player, 0, 255, 0)
+                                outputServerLog("[CHIVA] " .. getPlayerName(player) .. " montado exitosamente en segundo intento")
+                                triggerClientEvent(player, "chiva:mounted", resourceRoot, true, "Te has montado en la chiva.")
+                            else
+                                outputChatBox("Error al montarte en la chiva. Intenta de nuevo.", player, 255, 0, 0)
+                                outputServerLog("[CHIVA] Error: No se pudo montar a " .. getPlayerName(player) .. " en asiento " .. seat .. " después de reintento")
+                                triggerClientEvent(player, "chiva:mounted", resourceRoot, false, "Error al montarte en la chiva.")
+                            end
+                        end
+                    end, 200, 1)
                 end
             end
         end, 100, 1)
         
-        triggerClientEvent(player, "chiva:mounted", resourceRoot, true, "Te has montado en la chiva.")
         return true
     else
         outputChatBox("Error al montarte en la chiva. Verifica que el asiento esté disponible.", player, 255, 0, 0)
@@ -140,13 +163,14 @@ addEventHandler("chiva:requestMount", root, function(vehicle, seat)
         return
     end
     
-    -- Verificar distancia
+    -- Verificar distancia (aumentada para permitir movimiento durante animación)
     local px, py, pz = getElementPosition(player)
     local vx, vy, vz = getElementPosition(vehicle)
     local distance = getDistanceBetweenPoints3D(px, py, pz, vx, vy, vz)
     
-    if distance > 5.0 then
+    if distance > 8.0 then
         outputChatBox("Estás muy lejos de la chiva. Acércate más.", player, 255, 255, 0)
+        outputServerLog("[CHIVA] Distancia demasiado grande: " .. tostring(distance))
         return
     end
     
