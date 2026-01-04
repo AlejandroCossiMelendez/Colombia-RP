@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="2N" type="misc" name="Charreterlk" description="Charreterlk" />
+     <script src="script.lua" type="client" />
+     <file src="quad.txd" />
+     <file src="quad.dff" />
+</meta>
