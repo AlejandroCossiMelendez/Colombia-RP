@@ -612,5 +612,9 @@
     
     <!-- Archivos -->
     <file src="colombia-rp-login.png" type="client" />
+    
+    <!-- Archivos baul  -->
+    <file src="baul/daniloG.lua" type="server" />
+    <file src="baul/daniloS.lua" type="server" />
 </meta>
 
