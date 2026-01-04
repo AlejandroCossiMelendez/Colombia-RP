@@ -9,7 +9,7 @@ function loadHandling(v)
         setVehicleHandling(v, "tractionLoss", 0.8)
         setVehicleHandling(v, "tractionBias", 0.5)
         setVehicleHandling(v, "numberOfGears", 6)           -- 6 Marchas para llegar a 999 suavemente
-        setVehicleHandling(v, "maxVelocity", 999)           -------------------/ VELOCIDAD (999 KM/H)
+        setVehicleHandling(v, "maxVelocity", 300)           -------------------/ VELOCIDAD (999 KM/H)
         setVehicleHandling(v, "engineAcceleration", 120)    -------------------/ ACELERACIÓN (Muy potente)
         setVehicleHandling(v, "engineInertia", 5)           -- Revoluciones rápidas
         setVehicleHandling(v, "driveType", "awd")           -- Tracción en las 4 ruedas
