@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="Xeyz77" type="misc" name="wayfarer" description="Xz Store" />
+     <script src="script.lua" type="client" />
+     <file src="wayfarer.txd" />
+     <file src="wayfarer.dff" />
+</meta>

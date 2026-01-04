@@ -1,0 +1,7 @@
+<meta>
+<info author="*" description="*" version="1.3" type="script" />
+
+<script src="client.lua" type="client"/>
+<file src="sanchez.txd" type="client"/>
+<file src="sanchez.dff" type="client"/>
+</meta> 
