@@ -28,7 +28,7 @@ local CHIVA_SEATS_CONFIG = {
     
     -- Lado Derecho - Asientos 6, 7, 8, 9
     {seat = 6, name = "Derecha - Asiento 1", side = "right", offsetX = 1.0, offsetY = 1.4, offsetZ = 0.6},
-    {seat = 7, name = "Derecha - Asiento 2", side = "right", offsetX = 1.9, offsetY = 1.4, offsetZ = 0.6},
+    {seat = 7, name = "Derecha - Asiento 2", side = "right", offsetX = 0.5, offsetY = 1.4, offsetZ = 0.6},  -- Movido hacia atrás
     {seat = 8, name = "Derecha - Asiento 3", side = "right", offsetX = 2.8, offsetY = 1.4, offsetZ = 0.6},
     {seat = 9, name = "Derecha - Asiento 4", side = "right", offsetX = 3.7, offsetY = 1.4, offsetZ = 0.6},
 }
