@@ -209,18 +209,25 @@ end
 -- Función para montar al jugador en la chiva
 local function mountPlayerInChiva(player, vehicle, seat)
     if not vehicle or not isElement(vehicle) then
+        outputChatBox("[CHIVA DEBUG] Vehículo inválido", 255, 0, 0)
         return false
     end
+    
+    outputChatBox("[CHIVA DEBUG] Intentando montar en chiva...", 255, 255, 0)
     
     -- Si no se especifica asiento, detectar la puerta más cercana y asignar asiento correspondiente
     if not seat then
         local playerSide, preferredSeat = detectNearestDoorAndSeat(player, vehicle)
+        outputChatBox("[CHIVA DEBUG] Lado detectado: " .. tostring(playerSide) .. ", Asiento preferido: " .. tostring(preferredSeat), 255, 255, 0)
+        
         seat = getNextAvailableSeat(vehicle, playerSide, preferredSeat)
         
         if not seat then
             outputChatBox("La chiva está llena. No hay asientos disponibles.", player, 255, 255, 0)
             return false
         end
+        
+        outputChatBox("[CHIVA DEBUG] Asiento asignado: " .. tostring(seat), 0, 255, 0)
     end
     
     -- Verificar que el asiento esté disponible
@@ -231,6 +238,7 @@ local function mountPlayerInChiva(player, vehicle, seat)
     end
     
     -- Enviar al servidor para montar al jugador (warpPedIntoVehicle es función del servidor)
+    outputChatBox("[CHIVA DEBUG] Enviando evento al servidor...", 255, 255, 0)
     triggerServerEvent("chiva:requestMount", player, vehicle, seat)
     return true
 end
@@ -239,19 +247,25 @@ end
 bindKey("g", "down", function()
     local player = localPlayer
     
+    -- Debug
+    outputChatBox("[DEBUG] Tecla G presionada", 255, 255, 0)
+    
     -- Verificar si ya está en un vehículo
     if getPedOccupiedVehicle(player) then
+        outputChatBox("[DEBUG] Ya estás en un vehículo", 255, 255, 0)
         return
     end
     
-    -- Buscar chiva cercana (especialmente de atrás)
+    -- Buscar chiva cercana
     local chiva = getNearbyChiva(player, 3.5)
     if chiva then
+        outputChatBox("[DEBUG] Chiva encontrada, intentando montar...", 0, 255, 0)
         -- Montar al jugador en el siguiente asiento disponible
         mountPlayerInChiva(player, chiva)
     else
         -- Mostrar mensaje si no hay chiva cerca
-        outputChatBox("Acércate a la parte trasera de una chiva y presiona G para montarte.", player, 255, 255, 0)
+        outputChatBox("Acércate a una chiva y presiona G para montarte.", 255, 255, 0)
+        outputChatBox("[DEBUG] No se encontró chiva cercana", 255, 0, 0)
     end
 end)
 
