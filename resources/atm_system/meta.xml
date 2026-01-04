@@ -1,0 +1,33 @@
+<meta>
+
+	<oop>true</oop>
+
+	<script src="utils/editbox.lua" type="client" cache="false" />
+	<script src="utils/utils.lua" type="client" cache="false" />
+
+	<script src="client.lua" type="client" cache="false" />
+	<script src="server.lua" type="server" cache="false" />
+
+	<file src="assets/fonts/bold.ttf" />
+	<file src="assets/fonts/medium.ttf" />
+	<file src="assets/fonts/extra_bold.ttf" />
+	<file src="assets/fonts/ligth.ttf" />
+	<file src="assets/fonts/italic.ttf" />
+	<file src="assets/fonts/semi_bold.ttf" />
+	<file src="assets/fonts/regular.ttf" />
+	<file src="assets/fonts/AbFont.ttf" />
+
+	<file src="assets/icons/avatars/0.png" />
+
+	<file src="assets/images/ATM/credit-card.png" />
+	<file src="assets/images/ATM/deposit.png" />
+	<file src="assets/images/ATM/logout.png" />
+	<file src="assets/images/ATM/overview.png" />
+	<file src="assets/images/ATM/settings.png" />
+	<file src="assets/images/ATM/bk.png" />
+	<file src="assets/images/ATM/transaction.png" />
+	<file src="assets/images/ATM/withdraw.png" />
+	<file src="assets/images/ATM/sus-logo.png" />
+        <file src="assets/images/ATM/transaction.png" />-------transaction
+
+</meta>
