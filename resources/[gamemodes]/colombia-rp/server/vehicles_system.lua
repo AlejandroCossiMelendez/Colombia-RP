@@ -324,31 +324,74 @@ function configureUrusVehicle(vehicle)
         return false
     end
     
-    -- Configurar velocidad máxima a 300 km/h (aproximadamente 83.33 m/s)
-    setVehicleHandling(vehicle, "maxVelocity", 83.33)
+    -- Configurar velocidad máxima a 250 km/h (aproximadamente 69.44 m/s)
+    -- Nota: En MTA, maxVelocity está en m/s. 250 km/h = 69.44 m/s
+    setVehicleHandling(vehicle, "maxVelocity", 69.44)
+    
+    -- Configurar número de marchas (5 marchas para mejor rendimiento)
+    setVehicleHandling(vehicle, "numberOfGears", 5)
+    
+    -- Configurar relación de transmisión para mejor aceleración y velocidad
+    setVehicleHandling(vehicle, "driveType", "awd")  -- Tracción total
+    setVehicleHandling(vehicle, "engineType", "petrol")
+    
+    -- Configurar handling para mejor rendimiento
+    setVehicleHandling(vehicle, "engineAcceleration", 45.0)  -- Aceleración mejorada
+    setVehicleHandling(vehicle, "engineInertia", 100.0)     -- Inercia del motor (mayor = más potencia)
+    setVehicleHandling(vehicle, "brakeDeceleration", 12.0)  -- Freno mejorado
+    setVehicleHandling(vehicle, "tractionMultiplier", 1.3)   -- Tracción mejorada
+    setVehicleHandling(vehicle, "tractionLoss", 0.8)         -- Menos pérdida de tracción
+    setVehicleHandling(vehicle, "tractionBias", 0.5)         -- Distribución de tracción
+    
+    -- Configurar masa y centro de masa para mejor estabilidad
+    setVehicleHandling(vehicle, "mass", 2200.0)              -- Masa del vehículo
+    setVehicleHandling(vehicle, "centerOfMass", {0.0, 0.0, -0.3})  -- Centro de masa más bajo
+    
+    -- Configurar suspensión para mejor manejo
+    setVehicleHandling(vehicle, "suspensionForceLevel", 1.2)
+    setVehicleHandling(vehicle, "suspensionDamping", 0.3)
+    setVehicleHandling(vehicle, "suspensionHighSpeedDamping", 0.0)
+    setVehicleHandling(vehicle, "suspensionUpperLimit", 0.35)
+    setVehicleHandling(vehicle, "suspensionLowerLimit", -0.15)
+    setVehicleHandling(vehicle, "suspensionFrontRearBias", 0.5)
+    setVehicleHandling(vehicle, "suspensionAntiDiveMultiplier", 0.3)
+    
+    -- Configurar dirección
+    setVehicleHandling(vehicle, "steeringLock", 35.0)        -- Ángulo máximo de giro
     
     -- Habilitar daño visual (puertas, paneles, etc.)
     setVehicleDamageProof(vehicle, false)
     
-    -- Configurar handling para mejor rendimiento y daño visual
-    setVehicleHandling(vehicle, "engineAcceleration", 50.0)  -- Aceleración mejorada
-    setVehicleHandling(vehicle, "engineInertia", 50.0)      -- Inercia del motor
-    setVehicleHandling(vehicle, "brakeDeceleration", 10.0)   -- Freno mejorado
-    setVehicleHandling(vehicle, "tractionMultiplier", 1.2)    -- Tracción mejorada
-    
     -- Asegurar que el daño visual funcione
     setVehicleWheelStates(vehicle, 0, 0, 0, 0)  -- Ruedas en buen estado inicialmente
     
-    -- Forzar actualización del daño visual después de un pequeño delay
+    -- Forzar actualización del handling después de delays múltiples
+    -- Esto asegura que el modelo personalizado se haya cargado completamente
     setTimer(function()
         if isElement(vehicle) then
+            -- Reforzar configuración de velocidad y marchas
+            setVehicleHandling(vehicle, "maxVelocity", 69.44)
+            setVehicleHandling(vehicle, "numberOfGears", 5)
+            setVehicleHandling(vehicle, "engineAcceleration", 45.0)
+            setVehicleHandling(vehicle, "engineInertia", 100.0)
+            setVehicleHandling(vehicle, "tractionMultiplier", 1.3)
+        end
+    end, 500, 1)
+    
+    setTimer(function()
+        if isElement(vehicle) then
+            -- Segunda verificación para asegurar que todo esté aplicado
+            setVehicleHandling(vehicle, "maxVelocity", 69.44)
+            setVehicleHandling(vehicle, "numberOfGears", 5)
             -- Asegurar que el daño visual esté habilitado
             setVehicleDamageProof(vehicle, false)
             -- Forzar actualización del daño
             local health = getElementHealth(vehicle)
             setElementHealth(vehicle, health)  -- Esto fuerza la actualización visual
         end
-    end, 100, 1)
+    end, 1000, 1)
+    
+    outputServerLog("[VEHICLES] Urus configurado correctamente: Velocidad máxima 250 km/h, 5 marchas")
     
     return true
 end
