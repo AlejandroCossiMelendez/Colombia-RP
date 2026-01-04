@@ -53,7 +53,7 @@ addEventHandler("jbl:activate", root, function()
     -- Rotación corregida: rx=0, ry=180 (voltear horizontalmente), rz=-180 (girar para orientación correcta)
     -- Posición: X (más a la derecha), Y (más adelante), Z (altura)
     if attachElementToBone then
-        attached = attachElementToBone(jblObject, player, 12, 0.30, 0.18, 0.30, 0, 180, -180)
+        attached = attachElementToBone(jblObject, player, 12, 0.30, 0.7, 0.20, 0, 180, -180)
     end
     
     -- Si no está disponible directamente, intentar como recurso separado
@@ -61,7 +61,7 @@ addEventHandler("jbl:activate", root, function()
         local boneAttachResource = getResourceFromName("bone_attach")
         if boneAttachResource and getResourceState(boneAttachResource) == "running" then
             if exports.bone_attach and exports.bone_attach.attachElementToBone then
-                attached = exports.bone_attach:attachElementToBone(jblObject, player, 12, 0.30, 0.18, 0.30, 0, 180, -180)
+                attached = exports.bone_attach:attachElementToBone(jblObject, player, 12, 0.30, 0.7, 0.20, 0, 180, -180)
             end
         end
     end
