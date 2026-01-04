@@ -57,6 +57,9 @@
                     <button class="app" type="button">
                         <img src="./phone/styles/svgs/spotify.svg" alt="">
                     </button>
+                    <button class="app" type="button">
+                        <img src="./phone/styles/svgs/smartphone.svg" alt="">
+                    </button>
                 </div>
             </section>
 
@@ -211,6 +214,30 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="app-interface" style="display: none;" data-app-id="9"> <!-- Browser App -->
+                    <div class="browser-app">
+                        <div class="browser-header">
+                            <button class="browser-back-btn" id="browserBackBtn" title="Atrás">←</button>
+                            <button class="browser-forward-btn" id="browserForwardBtn" title="Adelante">→</button>
+                            <button class="browser-refresh-btn" id="browserRefreshBtn" title="Recargar">⟳</button>
+                            <input type="text" class="browser-url-bar" id="browserUrlBar" placeholder="Ingresa una URL (ej: https://google.com)" />
+                            <button class="browser-go-btn" id="browserGoBtn">Ir</button>
+                        </div>
+                        <div class="browser-content">
+                            <iframe id="browserFrame" src="about:blank" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                        <div class="browser-home-screen" id="browserHomeScreen">
+                            <div class="browser-logo">🌐</div>
+                            <h3>Navegador Web</h3>
+                            <p>Ingresa una URL en la barra de direcciones para comenzar</p>
+                            <div class="browser-shortcuts">
+                                <button class="browser-shortcut" data-url="https://www.google.com">Google</button>
+                                <button class="browser-shortcut" data-url="https://www.youtube.com">YouTube</button>
+                                <button class="browser-shortcut" data-url="https://www.wikipedia.org">Wikipedia</button>
                             </div>
                         </div>
                     </div>

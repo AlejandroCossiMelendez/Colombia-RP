@@ -244,6 +244,11 @@ function openApp(appId) {
     if (appId === 8) {
         initSpotifyApp();
     }
+    
+    // Si es la app de navegador (appId 9), inicializar navegador
+    if (appId === 9) {
+        initBrowserApp();
+    }
 }
 
 let isInHomeScreen = true; // Variable para rastrear si estamos en el home
@@ -1389,5 +1394,147 @@ function startProgressTimer() {
             }
         }
     }, 1000);
+}
+
+/* Browser App */
+let browserHistory = [];
+let browserHistoryIndex = -1;
+
+function initBrowserApp() {
+    const browserFrame = get('#browserFrame');
+    const browserUrlBar = get('#browserUrlBar');
+    const browserGoBtn = get('#browserGoBtn');
+    const browserBackBtn = get('#browserBackBtn');
+    const browserForwardBtn = get('#browserForwardBtn');
+    const browserRefreshBtn = get('#browserRefreshBtn');
+    const browserHomeScreen = get('#browserHomeScreen');
+    const browserShortcuts = getAll('.browser-shortcut');
+    
+    if (!browserFrame || !browserUrlBar) return;
+    
+    // Función para navegar a una URL
+    function navigateToUrl(url) {
+        if (!url) return;
+        
+        // Validar y formatear URL
+        let formattedUrl = url.trim();
+        
+        // Si no tiene protocolo, agregar https://
+        if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+            formattedUrl = 'https://' + formattedUrl;
+        }
+        
+        // Validar formato básico de URL
+        try {
+            new URL(formattedUrl);
+        } catch (e) {
+            alert('URL inválida. Por favor ingresa una URL válida (ej: google.com)');
+            return;
+        }
+        
+        // Agregar a historial
+        browserHistory = browserHistory.slice(0, browserHistoryIndex + 1);
+        browserHistory.push(formattedUrl);
+        browserHistoryIndex = browserHistory.length - 1;
+        
+        // Limitar historial a 50 entradas
+        if (browserHistory.length > 50) {
+            browserHistory.shift();
+            browserHistoryIndex--;
+        }
+        
+        // Cargar URL en el iframe
+        browserFrame.src = formattedUrl;
+        browserUrlBar.value = formattedUrl;
+        
+        // Ocultar pantalla de inicio
+        if (browserHomeScreen) {
+            browserHomeScreen.style.display = 'none';
+        }
+        
+        // Actualizar botones de navegación
+        updateBrowserButtons();
+    }
+    
+    // Función para actualizar estado de botones de navegación
+    function updateBrowserButtons() {
+        if (browserBackBtn) {
+            browserBackBtn.disabled = browserHistoryIndex <= 0;
+            browserBackBtn.style.opacity = browserHistoryIndex <= 0 ? '0.5' : '1';
+        }
+        if (browserForwardBtn) {
+            browserForwardBtn.disabled = browserHistoryIndex >= browserHistory.length - 1;
+            browserForwardBtn.style.opacity = browserHistoryIndex >= browserHistory.length - 1 ? '0.5' : '1';
+        }
+    }
+    
+    // Event listener para el botón "Ir"
+    if (browserGoBtn) {
+        browserGoBtn.addEventListener('click', function() {
+            const url = browserUrlBar.value;
+            navigateToUrl(url);
+        });
+    }
+    
+    // Event listener para Enter en la barra de URL
+    if (browserUrlBar) {
+        browserUrlBar.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const url = browserUrlBar.value;
+                navigateToUrl(url);
+            }
+        });
+    }
+    
+    // Event listener para botón Atrás
+    if (browserBackBtn) {
+        browserBackBtn.addEventListener('click', function() {
+            if (browserHistoryIndex > 0) {
+                browserHistoryIndex--;
+                const url = browserHistory[browserHistoryIndex];
+                browserFrame.src = url;
+                browserUrlBar.value = url;
+                updateBrowserButtons();
+            }
+        });
+    }
+    
+    // Event listener para botón Adelante
+    if (browserForwardBtn) {
+        browserForwardBtn.addEventListener('click', function() {
+            if (browserHistoryIndex < browserHistory.length - 1) {
+                browserHistoryIndex++;
+                const url = browserHistory[browserHistoryIndex];
+                browserFrame.src = url;
+                browserUrlBar.value = url;
+                updateBrowserButtons();
+            }
+        });
+    }
+    
+    // Event listener para botón Recargar
+    if (browserRefreshBtn) {
+        browserRefreshBtn.addEventListener('click', function() {
+            if (browserFrame.src && browserFrame.src !== 'about:blank') {
+                browserFrame.src = browserFrame.src;
+            }
+        });
+    }
+    
+    // Event listeners para atajos
+    browserShortcuts.forEach(shortcut => {
+        shortcut.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            navigateToUrl(url);
+        });
+    });
+    
+    // Mostrar pantalla de inicio si no hay URL cargada
+    if (browserFrame.src === 'about:blank' && browserHomeScreen) {
+        browserHomeScreen.style.display = 'block';
+    }
+    
+    // Inicializar botones
+    updateBrowserButtons();
 }
 
