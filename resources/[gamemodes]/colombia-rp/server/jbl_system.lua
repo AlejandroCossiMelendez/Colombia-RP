@@ -25,6 +25,9 @@ addEventHandler("jbl:activate", root, function()
         return
     end
     
+    -- Asegurar que el modelo esté cargado en el cliente antes de crear el objeto
+    triggerClientEvent(player, "jbl:ensureModelLoaded", resourceRoot)
+    
     -- Crear objeto JBL y adjuntarlo a la mano del jugador
     local x, y, z = getElementPosition(player)
     local jblObject = createObject(jblModel, x, y, z)
@@ -41,6 +44,13 @@ addEventHandler("jbl:activate", root, function()
     
     -- Hacer el parlante más pequeño (70% del tamaño original)
     setObjectScale(jblObject, 0.7)
+    
+    -- Forzar actualización del modelo en el cliente
+    setTimer(function()
+        if isElement(jblObject) then
+            triggerClientEvent(player, "jbl:refreshModel", resourceRoot, jblObject)
+        end
+    end, 500, 1)
     
     -- Adjuntar a la mano derecha (bone 12 - right hand según functions.txt)
     -- IMPORTANTE: Usar bone_attach para que siga el movimiento de la mano al caminar
