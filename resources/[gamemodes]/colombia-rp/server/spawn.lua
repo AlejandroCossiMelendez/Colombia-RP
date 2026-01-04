@@ -112,15 +112,33 @@ function respawnAtHospital(player)
         return false
     end
     
+    -- Cargar skin desde la base de datos
+    local query = "SELECT skin FROM characters WHERE id = ? LIMIT 1"
+    local result = queryDatabase(query, characterId)
+    local skin = 0  -- Skin por defecto
+    
+    if result and #result > 0 then
+        skin = tonumber(result[1].skin) or 0
+    end
+    
     -- Revivir al jugador
     spawnPlayer(player, Config.Death.hospitalX, Config.Death.hospitalY, Config.Death.hospitalZ, 
-                Config.Death.hospitalRotation, 0, Config.Death.hospitalInterior, Config.Death.hospitalDimension)
+                Config.Death.hospitalRotation, skin, Config.Death.hospitalInterior, Config.Death.hospitalDimension)
     
-    -- Restaurar salud y modelo
-    local skin = getElementModel(player)
+    -- Asegurar que la skin esté correcta
     setElementModel(player, skin)
     setElementHealth(player, 100)
     setElementData(player, "character:health", 100)
+    
+    -- Asegurar que la skin se mantenga después del spawn (a veces el spawn puede cambiarla temporalmente)
+    setTimer(function()
+        if isElement(player) then
+            local currentSkin = getElementModel(player)
+            if currentSkin ~= skin then
+                setElementModel(player, skin)
+            end
+        end
+    end, 500, 1)
     
     -- Actualizar nombre del jugador para mostrar personaje + ID
     local charName = getElementData(player, "character:name")
@@ -176,17 +194,35 @@ function respawnAtDeathLocation(player)
         return false
     end
     
+    -- Cargar skin desde la base de datos
+    local query = "SELECT skin FROM characters WHERE id = ? LIMIT 1"
+    local result = queryDatabase(query, characterId)
+    local skin = 0  -- Skin por defecto
+    
+    if result and #result > 0 then
+        skin = tonumber(result[1].skin) or 0
+    end
+    
     local deathPos = deathPositions[player]
     
     -- Revivir al jugador en el lugar donde murió
     spawnPlayer(player, deathPos.x, deathPos.y, deathPos.z, 
-                deathPos.rotation, 0, deathPos.interior, deathPos.dimension)
+                deathPos.rotation, skin, deathPos.interior, deathPos.dimension)
     
-    -- Restaurar salud y modelo
-    local skin = getElementModel(player)
+    -- Asegurar que la skin esté correcta
     setElementModel(player, skin)
     setElementHealth(player, 100)
     setElementData(player, "character:health", 100)
+    
+    -- Asegurar que la skin se mantenga después del spawn (a veces el spawn puede cambiarla temporalmente)
+    setTimer(function()
+        if isElement(player) then
+            local currentSkin = getElementModel(player)
+            if currentSkin ~= skin then
+                setElementModel(player, skin)
+            end
+        end
+    end, 500, 1)
     
     -- Actualizar nombre del jugador para mostrar personaje + ID
     local charName = getElementData(player, "character:name")
