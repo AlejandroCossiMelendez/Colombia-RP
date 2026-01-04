@@ -1,0 +1,4 @@
+<meta>
+    <info author="Porki" type="script" name="Infernus 500kmh" version="1.0" />
+    <script src="infernus.lua" type="server" />
+</meta>
