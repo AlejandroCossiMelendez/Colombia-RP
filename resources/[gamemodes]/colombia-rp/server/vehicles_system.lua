@@ -324,24 +324,29 @@ function configureUrusVehicle(vehicle)
         return false
     end
     
-    -- Configurar velocidad máxima a 250 km/h (aproximadamente 69.44 m/s)
-    -- Nota: En MTA, maxVelocity está en m/s. 250 km/h = 69.44 m/s
-    setVehicleHandling(vehicle, "maxVelocity", 69.44)
+    -- Configurar velocidad máxima a 300 km/h (aproximadamente 83.33 m/s)
+    -- Nota: En MTA, maxVelocity está en m/s. 300 km/h = 83.33 m/s
+    -- Aumentamos significativamente para contrarrestar cualquier limitación del modelo
+    setVehicleHandling(vehicle, "maxVelocity", 83.33)
     
-    -- Configurar número de marchas (5 marchas para mejor rendimiento)
-    setVehicleHandling(vehicle, "numberOfGears", 5)
+    -- Configurar número de marchas (6 marchas para mejor rendimiento)
+    setVehicleHandling(vehicle, "numberOfGears", 6)
     
     -- Configurar relación de transmisión para mejor aceleración y velocidad
     setVehicleHandling(vehicle, "driveType", "awd")  -- Tracción total
     setVehicleHandling(vehicle, "engineType", "petrol")
     
-    -- Configurar handling para mejor rendimiento
-    setVehicleHandling(vehicle, "engineAcceleration", 45.0)  -- Aceleración mejorada
-    setVehicleHandling(vehicle, "engineInertia", 100.0)     -- Inercia del motor (mayor = más potencia)
-    setVehicleHandling(vehicle, "brakeDeceleration", 12.0)  -- Freno mejorado
-    setVehicleHandling(vehicle, "tractionMultiplier", 1.3)   -- Tracción mejorada
-    setVehicleHandling(vehicle, "tractionLoss", 0.8)         -- Menos pérdida de tracción
+    -- Configurar handling para mejor rendimiento (valores aumentados)
+    setVehicleHandling(vehicle, "engineAcceleration", 60.0)  -- Aceleración muy mejorada
+    setVehicleHandling(vehicle, "engineInertia", 150.0)     -- Inercia del motor (mucho mayor = más potencia)
+    setVehicleHandling(vehicle, "brakeDeceleration", 15.0)  -- Freno mejorado
+    setVehicleHandling(vehicle, "tractionMultiplier", 1.5)   -- Tracción muy mejorada
+    setVehicleHandling(vehicle, "tractionLoss", 0.7)         -- Menos pérdida de tracción
     setVehicleHandling(vehicle, "tractionBias", 0.5)         -- Distribución de tracción
+    
+    -- Configurar relación de transmisión (gear ratios) para mejor velocidad
+    -- Esto es crítico para alcanzar velocidades altas
+    setVehicleHandling(vehicle, "driveBiasFront", 0.5)       -- Tracción equilibrada
     
     -- Configurar masa y centro de masa para mejor estabilidad
     setVehicleHandling(vehicle, "mass", 2200.0)              -- Masa del vehículo
@@ -367,31 +372,43 @@ function configureUrusVehicle(vehicle)
     
     -- Forzar actualización del handling después de delays múltiples
     -- Esto asegura que el modelo personalizado se haya cargado completamente
-    setTimer(function()
-        if isElement(vehicle) then
-            -- Reforzar configuración de velocidad y marchas
-            setVehicleHandling(vehicle, "maxVelocity", 69.44)
-            setVehicleHandling(vehicle, "numberOfGears", 5)
-            setVehicleHandling(vehicle, "engineAcceleration", 45.0)
-            setVehicleHandling(vehicle, "engineInertia", 100.0)
-            setVehicleHandling(vehicle, "tractionMultiplier", 1.3)
-        end
-    end, 500, 1)
+    -- Aplicar múltiples veces para asegurar que se sobrescriba cualquier handling del modelo
+    for i = 1, 5 do
+        setTimer(function()
+            if isElement(vehicle) then
+                -- Reforzar TODA la configuración de velocidad y rendimiento
+                setVehicleHandling(vehicle, "maxVelocity", 83.33)
+                setVehicleHandling(vehicle, "numberOfGears", 6)
+                setVehicleHandling(vehicle, "engineAcceleration", 60.0)
+                setVehicleHandling(vehicle, "engineInertia", 150.0)
+                setVehicleHandling(vehicle, "tractionMultiplier", 1.5)
+                setVehicleHandling(vehicle, "tractionLoss", 0.7)
+                setVehicleHandling(vehicle, "driveType", "awd")
+                setVehicleHandling(vehicle, "engineType", "petrol")
+                setVehicleHandling(vehicle, "driveBiasFront", 0.5)
+            end
+        end, i * 200, 1)
+    end
     
     setTimer(function()
         if isElement(vehicle) then
-            -- Segunda verificación para asegurar que todo esté aplicado
-            setVehicleHandling(vehicle, "maxVelocity", 69.44)
-            setVehicleHandling(vehicle, "numberOfGears", 5)
+            -- Verificación final para asegurar que todo esté aplicado
+            setVehicleHandling(vehicle, "maxVelocity", 83.33)
+            setVehicleHandling(vehicle, "numberOfGears", 6)
             -- Asegurar que el daño visual esté habilitado
             setVehicleDamageProof(vehicle, false)
             -- Forzar actualización del daño
             local health = getElementHealth(vehicle)
             setElementHealth(vehicle, health)  -- Esto fuerza la actualización visual
+            
+            -- Log para verificar
+            local currentMaxVel = getVehicleHandling(vehicle, "maxVelocity")
+            local currentGears = getVehicleHandling(vehicle, "numberOfGears")
+            outputServerLog("[VEHICLES] Urus verificado - maxVelocity: " .. tostring(currentMaxVel) .. ", gears: " .. tostring(currentGears))
         end
-    end, 1000, 1)
+    end, 2000, 1)
     
-    outputServerLog("[VEHICLES] Urus configurado correctamente: Velocidad máxima 250 km/h, 5 marchas")
+    outputServerLog("[VEHICLES] Urus configurado correctamente: Velocidad máxima 300 km/h, 6 marchas")
     
     return true
 end
@@ -404,18 +421,66 @@ addEventHandler("onVehicleCreate", root, function()
     end
 end)
 
+-- Tabla para almacenar timers de verificación de Urus
+local urusVerificationTimers = {}
+
 -- Evento para reconfigurar Urus cuando un jugador entra al vehículo
 -- Esto asegura que el handling se aplique incluso si el modelo se carga después
 addEventHandler("onPlayerVehicleEnter", root, function(vehicle, seat)
     if seat == 0 then  -- Solo si es el conductor
         local vehicleId = getElementModel(vehicle)
         if vehicleId == 560 then
-            -- Aplicar configuración con un pequeño delay para asegurar que el modelo esté cargado
-            setTimer(function()
-                if isElement(vehicle) and isElement(source) then
-                    configureUrusVehicle(vehicle)
+            -- Aplicar configuración inmediatamente
+            configureUrusVehicle(vehicle)
+            
+            -- Crear un timer periódico para verificar y corregir el handling mientras se conduce
+            if urusVerificationTimers[vehicle] and isTimer(urusVerificationTimers[vehicle]) then
+                killTimer(urusVerificationTimers[vehicle])
+            end
+            
+            urusVerificationTimers[vehicle] = setTimer(function()
+                if isElement(vehicle) then
+                    local currentMaxVel = getVehicleHandling(vehicle, "maxVelocity")
+                    local currentGears = getVehicleHandling(vehicle, "numberOfGears")
+                    
+                    -- Si el handling no es correcto, corregirlo
+                    if currentMaxVel < 80 or currentGears < 6 then
+                        setVehicleHandling(vehicle, "maxVelocity", 83.33)
+                        setVehicleHandling(vehicle, "numberOfGears", 6)
+                        setVehicleHandling(vehicle, "engineAcceleration", 60.0)
+                        setVehicleHandling(vehicle, "engineInertia", 150.0)
+                        setVehicleHandling(vehicle, "tractionMultiplier", 1.5)
+                    end
+                else
+                    -- Si el vehículo ya no existe, limpiar el timer
+                    if urusVerificationTimers[vehicle] then
+                        urusVerificationTimers[vehicle] = nil
+                    end
                 end
-            end, 100, 1)
+            end, 1000, 0)  -- Verificar cada segundo mientras se conduce
+        end
+    end
+end)
+
+-- Limpiar timer cuando el jugador sale del vehículo
+addEventHandler("onPlayerVehicleExit", root, function(vehicle, seat)
+    if seat == 0 then  -- Solo si era el conductor
+        local vehicleId = getElementModel(vehicle)
+        if vehicleId == 560 then
+            if urusVerificationTimers[vehicle] and isTimer(urusVerificationTimers[vehicle]) then
+                killTimer(urusVerificationTimers[vehicle])
+                urusVerificationTimers[vehicle] = nil
+            end
+        end
+    end
+end)
+
+-- Limpiar timers cuando el vehículo se destruye
+addEventHandler("onElementDestroy", root, function()
+    if getElementType(source) == "vehicle" then
+        if urusVerificationTimers[source] and isTimer(urusVerificationTimers[source]) then
+            killTimer(urusVerificationTimers[source])
+            urusVerificationTimers[source] = nil
         end
     end
 end)
