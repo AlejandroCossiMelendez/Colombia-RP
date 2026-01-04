@@ -15,8 +15,8 @@ function mountPlayerInChiva(player, vehicle, seat, offsetX, offsetY, offsetZ)
     end
     
     local model = getElementModel(vehicle)
-    if model ~= 437 then  -- Coach (437)
-        outputServerLog("[CHIVA] Error: Vehículo no es modelo 437 (Coach), es modelo " .. tostring(model))
+    if model ~= 410 then
+        outputServerLog("[CHIVA] Error: Vehículo no es modelo 410, es modelo " .. tostring(model))
         return false
     end
     
@@ -222,7 +222,7 @@ end)
 
 -- Limpiar cuando el vehículo se destruye
 addEventHandler("onElementDestroy", root, function()
-    if getElementType(source) == "vehicle" and getElementModel(source) == 437 then  -- Coach (437)
+    if getElementType(source) == "vehicle" and getElementModel(source) == 410 then
         if chivaPassengers[source] then
             -- Bajar a todos los pasajeros
             for seat, seatData in pairs(chivaPassengers[source]) do
@@ -268,7 +268,7 @@ function getChivaSeatsInfo(vehicle)
     end
     
     local model = getElementModel(vehicle)
-    if model ~= 437 then  -- Coach (437)
+    if model ~= 410 then
         return nil
     end
     
@@ -299,7 +299,7 @@ function getAvailableSeatsCount(vehicle)
     end
     
     local model = getElementModel(vehicle)
-    if model ~= 437 then  -- Coach (437)
+    if model ~= 410 then
         return 0
     end
     
