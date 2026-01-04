@@ -8,41 +8,32 @@ engineReplaceModel( dff, 410 )
 end)
 
 -- ============================================
--- SISTEMA DE ASIENTOS PARA CHIVA RUMBERA
+-- SISTEMA DE ASIENTOS PERSONALIZADOS PARA CHIVA RUMBERA
+-- Usa attachElements en lugar de asientos nativos del vehículo
 -- ============================================
 
 local CHIVA_MODEL = 410  -- Modelo de la chiva
 
--- Configuración de asientos basada en offsets relativos al vehículo
--- Seat 0 = Conductor, Seat 1 = Copiloto
--- Seats 2-9 = Pasajeros
--- LADO IZQUIERDO: Asientos 2, 3, 4, 5 (fila izquierda)
--- LADO DERECHO: Asientos 6, 7, 8, 9 (fila derecha)
-
--- Separación promedio entre puertas: ~0.95 unidades GTA
--- Offsets calculados desde el centro del vehículo (basados en coordenadas de referencia)
--- Vehículo de referencia estaba en: X: 1230.75, Y: -1709.25
-
--- Posiciones relativas de las puertas desde el centro del vehículo
+-- Configuración de asientos personalizados con offsets relativos al vehículo
 -- offsetX: distancia hacia adelante/atrás (negativo = atrás del centro)
 -- offsetY: distancia hacia izquierda/derecha (negativo = izquierda, positivo = derecha)
+-- offsetZ: altura desde el suelo del vehículo (para estar "arriba")
 local CHIVA_SEATS_CONFIG = {
     -- Lado Izquierdo - Asientos 2, 3, 4, 5
-    -- Separación: ~0.95 unidades entre cada puerta
-    {seat = 2, name = "Izquierda - Asiento 1", side = "left", offsetX = -9.85, offsetY = -6.40},  -- Más atrás
-    {seat = 3, name = "Izquierda - Asiento 2", side = "left", offsetX = -8.49, offsetY = -6.20},
-    {seat = 4, name = "Izquierda - Asiento 3", side = "left", offsetX = -7.55, offsetY = -6.20},
-    {seat = 5, name = "Izquierda - Asiento 4", side = "left", offsetX = -6.74, offsetY = -6.30},  -- Más adelante
+    {seat = 2, name = "Izquierda - Asiento 1", side = "left", offsetX = -9.85, offsetY = -6.40, offsetZ = 1.8},  -- Más atrás
+    {seat = 3, name = "Izquierda - Asiento 2", side = "left", offsetX = -8.49, offsetY = -6.20, offsetZ = 1.8},
+    {seat = 4, name = "Izquierda - Asiento 3", side = "left", offsetX = -7.55, offsetY = -6.20, offsetZ = 1.8},
+    {seat = 5, name = "Izquierda - Asiento 4", side = "left", offsetX = -6.74, offsetY = -6.30, offsetZ = 1.8},  -- Más adelante
     
     -- Lado Derecho - Asientos 6, 7, 8, 9
-    -- Separación: ~0.95 unidades entre cada puerta
-    -- Copiloto referencia: offsetX = -9.36, offsetY = -2.99 (calculado desde coordenadas)
-    -- Nota: offsetY positivo = derecha, negativo = izquierda (desde el centro del vehículo)
-    {seat = 6, name = "Derecha - Asiento 1", side = "right", offsetX = -9.36, offsetY = -2.99},  -- Copiloto referencia
-    {seat = 7, name = "Derecha - Asiento 2", side = "right", offsetX = -8.41, offsetY = -2.99},  -- +0.95 en X (más adelante)
-    {seat = 8, name = "Derecha - Asiento 3", side = "right", offsetX = -7.46, offsetY = -2.99},  -- +0.95 en X
-    {seat = 9, name = "Derecha - Asiento 4", side = "right", offsetX = -6.51, offsetY = -2.99},  -- +0.95 en X
+    {seat = 6, name = "Derecha - Asiento 1", side = "right", offsetX = -9.36, offsetY = -2.99, offsetZ = 1.8},
+    {seat = 7, name = "Derecha - Asiento 2", side = "right", offsetX = -8.41, offsetY = -2.99, offsetZ = 1.8},
+    {seat = 8, name = "Derecha - Asiento 3", side = "right", offsetX = -7.46, offsetY = -2.99, offsetZ = 1.8},
+    {seat = 9, name = "Derecha - Asiento 4", side = "right", offsetX = -6.51, offsetY = -2.99, offsetZ = 1.8},
 }
+
+-- Tabla para rastrear qué jugadores están en qué asientos personalizados
+local chivaPassengers = {}  -- [vehicle] = {[seat] = player}
 
 -- Función para detectar la puerta más cercana y el asiento correspondiente
 local function detectNearestDoorAndSeat(player, vehicle)
@@ -54,31 +45,24 @@ local function detectNearestDoorAndSeat(player, vehicle)
     local vx, vy, vz = getElementPosition(vehicle)
     local vrx, vry, vrz = getElementRotation(vehicle)
     
-    -- Calcular las posiciones de las puertas transformadas según la posición y rotación del vehículo
     local minDistance = math.huge
     local nearestSeat = nil
     local nearestSide = nil
     
-    -- Ángulo de rotación en radianes
     local angle = math.rad(vrz)
     local cosAngle = math.cos(angle)
     local sinAngle = math.sin(angle)
     
-    -- Buscar la puerta más cercana
     for _, seatConfig in ipairs(CHIVA_SEATS_CONFIG) do
-        -- Transformar offset relativo a coordenadas del mundo según la rotación del vehículo
         local offsetX = seatConfig.offsetX
         local offsetY = seatConfig.offsetY
         
-        -- Rotar el offset según la rotación del vehículo
         local rotatedX = offsetX * cosAngle - offsetY * sinAngle
         local rotatedY = offsetX * sinAngle + offsetY * cosAngle
         
-        -- Calcular posición mundial de la puerta
         local doorWorldX = vx + rotatedX
         local doorWorldY = vy + rotatedY
         
-        -- Calcular distancia desde el jugador a la puerta (solo X e Y, Z es similar)
         local distance = math.sqrt((px - doorWorldX)^2 + (py - doorWorldY)^2)
         
         if distance < minDistance then
@@ -88,23 +72,18 @@ local function detectNearestDoorAndSeat(player, vehicle)
         end
     end
     
-    -- Si la distancia es muy grande, usar método alternativo basado en posición relativa
     if minDistance > 5.0 then
-        -- Método alternativo: usar posición relativa al vehículo
         local dx = px - vx
         local dy = py - vy
-        
-        -- Rotar el vector para que esté en el sistema de coordenadas del vehículo
         local playerAngle = math.rad(-vrz)
         local rotatedX = dx * math.cos(playerAngle) - dy * math.sin(playerAngle)
         
-        -- Si rotatedX es positivo, está a la derecha del vehículo
         if rotatedX > 0 then
             nearestSide = "right"
         else
             nearestSide = "left"
         end
-        nearestSeat = nil  -- Se asignará automáticamente
+        nearestSeat = nil
     end
     
     return nearestSide, nearestSeat
@@ -113,57 +92,43 @@ end
 -- Función para obtener el siguiente asiento disponible en un lado específico
 local function getNextAvailableSeat(vehicle, preferredSide, preferredSeat)
     if not vehicle or not isElement(vehicle) or getElementModel(vehicle) ~= CHIVA_MODEL then
-        outputChatBox("[CHIVA DEBUG] Vehículo inválido en getNextAvailableSeat", 255, 0, 0)
         return nil
     end
     
-    -- Para la chiva personalizada, usamos asientos 2-9 sin validar maxPassengers
-    -- porque el modelo personalizado tiene más asientos de los que MTA reconoce
+    -- Inicializar tabla de pasajeros si no existe
+    if not chivaPassengers[vehicle] then
+        chivaPassengers[vehicle] = {}
+    end
     
     -- Si hay un asiento preferido específico, intentar usarlo primero
     if preferredSeat and preferredSeat >= 2 and preferredSeat <= 9 then
-        outputChatBox("[CHIVA DEBUG] Intentando asiento preferido: " .. tostring(preferredSeat), 255, 255, 0)
-        local occupant = getVehicleOccupant(vehicle, preferredSeat)
-        if not occupant or occupant == false then
-            outputChatBox("[CHIVA DEBUG] Asiento preferido disponible: " .. tostring(preferredSeat), 0, 255, 0)
+        if not chivaPassengers[vehicle][preferredSeat] then
             return preferredSeat
-        else
-            outputChatBox("[CHIVA DEBUG] Asiento preferido ocupado: " .. tostring(preferredSeat), 255, 255, 0)
         end
     end
     
     -- Primero buscar en el lado preferido
     if preferredSide then
-        outputChatBox("[CHIVA DEBUG] Buscando en lado: " .. tostring(preferredSide), 255, 255, 0)
         for _, seatConfig in ipairs(CHIVA_SEATS_CONFIG) do
             local seat = seatConfig.seat
-            if seatConfig.side == preferredSide then
-                local occupant = getVehicleOccupant(vehicle, seat)
-                outputChatBox("[CHIVA DEBUG] Asiento " .. seat .. " ocupado: " .. tostring(occupant ~= false and occupant ~= nil), 255, 255, 0)
-                if not occupant or occupant == false then
-                    outputChatBox("[CHIVA DEBUG] Asiento disponible encontrado: " .. seat, 0, 255, 0)
-                    return seat
-                end
+            if seatConfig.side == preferredSide and not chivaPassengers[vehicle][seat] then
+                return seat
             end
         end
     end
     
     -- Si no hay disponibles en el lado preferido, buscar en cualquier lado
-    outputChatBox("[CHIVA DEBUG] Buscando en cualquier lado...", 255, 255, 0)
     for _, seatConfig in ipairs(CHIVA_SEATS_CONFIG) do
         local seat = seatConfig.seat
-        local occupant = getVehicleOccupant(vehicle, seat)
-        if not occupant or occupant == false then
-            outputChatBox("[CHIVA DEBUG] Asiento disponible encontrado: " .. seat, 0, 255, 0)
+        if not chivaPassengers[vehicle][seat] then
             return seat
         end
     end
     
-    outputChatBox("[CHIVA DEBUG] No se encontraron asientos disponibles", 255, 0, 0)
-    return nil  -- No hay asientos disponibles
+    return nil
 end
 
--- Función para verificar si el jugador está cerca de una chiva (usando coordenadas de puertas transformadas)
+-- Función para verificar si el jugador está cerca de una chiva
 local function getNearbyChiva(player, maxDistance)
     maxDistance = maxDistance or 3.5
     local px, py, pz = getElementPosition(player)
@@ -173,26 +138,20 @@ local function getNearbyChiva(player, maxDistance)
             local vx, vy, vz = getElementPosition(vehicle)
             local vrx, vry, vrz = getElementRotation(vehicle)
             
-            -- Ángulo de rotación en radianes
             local angle = math.rad(vrz)
             local cosAngle = math.cos(angle)
             local sinAngle = math.sin(angle)
             
-            -- Verificar distancia a las puertas transformadas
             for _, seatConfig in ipairs(CHIVA_SEATS_CONFIG) do
-                -- Transformar offset relativo a coordenadas del mundo
                 local offsetX = seatConfig.offsetX
                 local offsetY = seatConfig.offsetY
                 
-                -- Rotar el offset según la rotación del vehículo
                 local rotatedX = offsetX * cosAngle - offsetY * sinAngle
                 local rotatedY = offsetX * sinAngle + offsetY * cosAngle
                 
-                -- Calcular posición mundial de la puerta
                 local doorWorldX = vx + rotatedX
                 local doorWorldY = vy + rotatedY
                 
-                -- Calcular distancia desde el jugador a la puerta (solo X e Y)
                 local distance = math.sqrt((px - doorWorldX)^2 + (py - doorWorldY)^2)
                 
                 if distance <= maxDistance then
@@ -200,7 +159,6 @@ local function getNearbyChiva(player, maxDistance)
                 end
             end
             
-            -- Fallback: verificar distancia general al vehículo
             local distance = getDistanceBetweenPoints3D(px, py, pz, vx, vy, vz)
             if distance <= maxDistance + 2.0 then
                 return vehicle
@@ -211,118 +169,58 @@ local function getNearbyChiva(player, maxDistance)
     return nil
 end
 
--- Función para montar al jugador en la chiva
+-- Función para montar al jugador en la chiva usando asientos personalizados
 local function mountPlayerInChiva(player, vehicle, seat)
     if not vehicle or not isElement(vehicle) then
-        outputChatBox("[CHIVA DEBUG] Vehículo inválido", 255, 0, 0)
         return false
     end
     
-    outputChatBox("[CHIVA DEBUG] Intentando montar en chiva...", 255, 255, 0)
+    -- Verificar que el jugador no esté ya en un vehículo
+    if getPedOccupiedVehicle(player) then
+        outputChatBox("Ya estás en un vehículo. Bájate primero.", 255, 255, 0)
+        return false
+    end
     
-    -- Si no se especifica asiento, detectar la puerta más cercana y asignar asiento correspondiente
+    -- Inicializar tabla de pasajeros si no existe
+    if not chivaPassengers[vehicle] then
+        chivaPassengers[vehicle] = {}
+    end
+    
+    -- Si no se especifica asiento, detectar la puerta más cercana
     if not seat then
         local playerSide, preferredSeat = detectNearestDoorAndSeat(player, vehicle)
-        outputChatBox("[CHIVA DEBUG] Lado detectado: " .. tostring(playerSide) .. ", Asiento preferido: " .. tostring(preferredSeat), 255, 255, 0)
-        
         seat = getNextAvailableSeat(vehicle, playerSide, preferredSeat)
         
         if not seat then
-            outputChatBox("[CHIVA DEBUG] getNextAvailableSeat retornó nil", 255, 0, 0)
-            outputChatBox("La chiva está llena. No hay asientos disponibles.", player, 255, 255, 0)
+            outputChatBox("La chiva está llena. No hay asientos disponibles.", 255, 255, 0)
             return false
         end
-        
-        outputChatBox("[CHIVA DEBUG] Asiento asignado: " .. tostring(seat), 0, 255, 0)
-    else
-        outputChatBox("[CHIVA DEBUG] Usando asiento proporcionado: " .. tostring(seat), 0, 255, 0)
     end
     
     -- Verificar que el asiento esté disponible
-    local occupant = getVehicleOccupant(vehicle, seat)
-    outputChatBox("[CHIVA DEBUG] Verificando asiento " .. seat .. ", ocupante: " .. tostring(occupant), 255, 255, 0)
-    if occupant and occupant ~= false then
-        outputChatBox("Este asiento está ocupado.", player, 255, 0, 0)
+    if chivaPassengers[vehicle][seat] then
+        outputChatBox("Este asiento está ocupado.", 255, 0, 0)
         return false
     end
     
-    outputChatBox("[CHIVA DEBUG] Verificando configuración del asiento " .. tostring(seat), 255, 255, 0)
-    
-    -- Obtener la configuración del asiento para ajustar la posición
+    -- Obtener la configuración del asiento
     local seatConfig = nil
     local seatSide = nil
     for _, config in ipairs(CHIVA_SEATS_CONFIG) do
         if config.seat == seat then
             seatConfig = config
             seatSide = config.side
-            outputChatBox("[CHIVA DEBUG] Configuración encontrada para asiento " .. seat .. ", lado: " .. tostring(seatSide), 0, 255, 0)
             break
         end
     end
     
-    -- Si no encontramos la configuración, detectar el lado
-    if not seatSide then
-        outputChatBox("[CHIVA DEBUG] No se encontró configuración, detectando lado...", 255, 255, 0)
-        seatSide, _ = detectNearestDoorAndSeat(player, vehicle)
-        outputChatBox("[CHIVA DEBUG] Lado detectado: " .. tostring(seatSide), 255, 255, 0)
+    if not seatConfig then
+        outputChatBox("Error: Configuración de asiento no encontrada.", 255, 0, 0)
+        return false
     end
-    
-    outputChatBox("[CHIVA DEBUG] Calculando posición ajustada...", 255, 255, 0)
-    
-    -- Calcular posición ajustada (más hacia adentro)
-    local vx, vy, vz = getElementPosition(vehicle)
-    local vrx, vry, vrz = getElementRotation(vehicle)
-    local angle = math.rad(vrz)
-    local cosAngle = math.cos(angle)
-    local sinAngle = math.sin(angle)
-    
-    -- Ajustar offset para que sea más hacia adentro (reducir offsetY en 0.5-1.0 unidades)
-    local offsetX = seatConfig and seatConfig.offsetX or 0
-    local offsetY = seatConfig and (seatConfig.offsetY * 0.7) or 0  -- Reducir 30% para acercar más
-    
-    outputChatBox("[CHIVA DEBUG] Offset X: " .. tostring(offsetX) .. ", Y: " .. tostring(offsetY), 255, 255, 0)
-    
-    -- Rotar el offset según la rotación del vehículo
-    local rotatedX = offsetX * cosAngle - offsetY * sinAngle
-    local rotatedY = offsetX * sinAngle + offsetY * cosAngle
-    
-    -- Calcular posición mundial ajustada
-    local targetX = vx + rotatedX
-    local targetY = vy + rotatedY
-    local targetZ = vz + 0.5  -- Un poco más arriba
-    
-    -- Verificar distancia antes de proceder
-    local px, py, pz = getElementPosition(player)
-    local distance = getDistanceBetweenPoints3D(px, py, pz, targetX, targetY, targetZ)
-    
-    -- Solo ajustar posición si está muy lejos (más de 1.5 unidades)
-    -- Asegurarse de que el jugador no esté dentro de un vehículo antes de moverlo
-    if distance > 1.5 and not getPedOccupiedVehicle(player) then
-        -- Mover al jugador hacia la posición
-        setElementPosition(player, targetX, targetY, targetZ)
-        outputChatBox("[CHIVA DEBUG] Posición ajustada, distancia: " .. string.format("%.2f", distance), 255, 255, 0)
-    else
-        outputChatBox("[CHIVA DEBUG] Jugador ya está cerca o en vehículo, distancia: " .. string.format("%.2f", distance), 255, 255, 0)
-    end
-    
-    -- Hacer que el jugador mire hacia el vehículo (solo si no está en un vehículo)
-    if not getPedOccupiedVehicle(player) then
-        local lookAtX = vx
-        local lookAtY = vy
-        local lookAngle = math.deg(math.atan2(lookAtY - targetY, lookAtX - targetX))
-        setPedRotation(player, lookAngle)
-    end
-    
-    -- Congelar al jugador durante la animación
-    toggleControl(player, "forwards", false)
-    toggleControl(player, "backwards", false)
-    toggleControl(player, "left", false)
-    toggleControl(player, "right", false)
-    toggleControl(player, "sprint", false)
-    toggleControl(player, "jump", false)
     
     -- Determinar qué animación usar según el lado
-    local openAnim = "CAR_open_LHS"  -- Por defecto izquierda
+    local openAnim = "CAR_open_LHS"
     local sitAnim = "CAR_pullout_LHS"
     
     if seatSide == "right" then
@@ -330,7 +228,13 @@ local function mountPlayerInChiva(player, vehicle, seat)
         sitAnim = "CAR_pullout_RHS"
     end
     
-    outputChatBox("[CHIVA DEBUG] Animación seleccionada: " .. openAnim, 255, 255, 0)
+    -- Congelar controles durante la animación
+    toggleControl(player, "forwards", false)
+    toggleControl(player, "backwards", false)
+    toggleControl(player, "left", false)
+    toggleControl(player, "right", false)
+    toggleControl(player, "sprint", false)
+    toggleControl(player, "jump", false)
     
     -- Función para restaurar controles
     local function restoreControls()
@@ -344,10 +248,7 @@ local function mountPlayerInChiva(player, vehicle, seat)
         end
     end
     
-    outputChatBox("[CHIVA DEBUG] Iniciando animación...", 0, 255, 0)
-    
-    -- Reproducir animación de abrir puerta y sentarse
-    -- Animación de abrir puerta de vehículo
+    -- Reproducir animación de abrir puerta
     setPedAnimation(player, "ped", openAnim, 1000, false, false, false, false)
     
     -- Después de abrir la puerta, animación de sentarse
@@ -357,19 +258,19 @@ local function mountPlayerInChiva(player, vehicle, seat)
             return
         end
         
-        -- Verificar que aún esté cerca del vehículo
+        -- Verificar distancia
         local px, py, pz = getElementPosition(player)
         local vx, vy, vz = getElementPosition(vehicle)
         local distance = getDistanceBetweenPoints3D(px, py, pz, vx, vy, vz)
         
         if distance > 8.0 then
-            outputChatBox("Te alejaste demasiado de la chiva.", player, 255, 255, 0)
+            outputChatBox("Te alejaste demasiado de la chiva.", 255, 255, 0)
             restoreControls()
             setPedAnimation(player, nil)
             return
         end
         
-        -- Animación de sentarse arriba
+        -- Animación de sentarse
         setPedAnimation(player, "ped", sitAnim, 1500, false, false, false, false)
         
         -- Después de la animación, montar al jugador
@@ -378,14 +279,14 @@ local function mountPlayerInChiva(player, vehicle, seat)
                 restoreControls()
                 return
             end
-        
+            
             -- Verificar distancia nuevamente
             local px2, py2, pz2 = getElementPosition(player)
             local vx2, vy2, vz2 = getElementPosition(vehicle)
             local distance2 = getDistanceBetweenPoints3D(px2, py2, pz2, vx2, vy2, vz2)
             
             if distance2 > 8.0 then
-                outputChatBox("Te alejaste demasiado de la chiva.", player, 255, 255, 0)
+                outputChatBox("Te alejaste demasiado de la chiva.", 255, 255, 0)
                 restoreControls()
                 setPedAnimation(player, nil)
                 return
@@ -397,9 +298,8 @@ local function mountPlayerInChiva(player, vehicle, seat)
             -- Restaurar controles
             restoreControls()
             
-            -- Enviar al servidor para montar al jugador (warpPedIntoVehicle es función del servidor)
-            outputChatBox("[CHIVA DEBUG] Enviando evento al servidor...", 255, 255, 0)
-            triggerServerEvent("chiva:requestMount", player, vehicle, seat)
+            -- Enviar al servidor para montar usando attachElements
+            triggerServerEvent("chiva:requestMount", player, vehicle, seat, seatConfig.offsetX, seatConfig.offsetY, seatConfig.offsetZ)
         end, 1500, 1)
     end, 1000, 1)
     
@@ -410,29 +310,103 @@ end
 bindKey("g", "down", function()
     local player = localPlayer
     
-    -- Debug
-    outputChatBox("[DEBUG] Tecla G presionada", 255, 255, 0)
-    
     -- Verificar si ya está en un vehículo
     if getPedOccupiedVehicle(player) then
-        outputChatBox("[DEBUG] Ya estás en un vehículo", 255, 255, 0)
         return
+    end
+    
+    -- Verificar si ya está en una chiva (asiento personalizado)
+    for vehicle, seats in pairs(chivaPassengers) do
+        if isElement(vehicle) then
+            for seat, passenger in pairs(seats) do
+                if passenger == player then
+                    -- Ya está montado, no hacer nada o permitir bajarse
+                    return
+                end
+            end
+        end
     end
     
     -- Buscar chiva cercana
     local chiva = getNearbyChiva(player, 3.5)
     if chiva then
-        outputChatBox("[DEBUG] Chiva encontrada, intentando montar...", 0, 255, 0)
-        -- Montar al jugador en el siguiente asiento disponible
         mountPlayerInChiva(player, chiva)
     else
-        -- Mostrar mensaje si no hay chiva cerca
         outputChatBox("Acércate a una chiva y presiona G para montarte.", 255, 255, 0)
-        outputChatBox("[DEBUG] No se encontró chiva cercana", 255, 0, 0)
     end
 end)
 
--- Función exportable para montar pasajeros mediante código (solo para uso interno)
+-- BindKey para bajarse (F por ejemplo)
+bindKey("f", "down", function()
+    local player = localPlayer
+    
+    -- Buscar si el jugador está en alguna chiva
+    for vehicle, seats in pairs(chivaPassengers) do
+        if isElement(vehicle) then
+            for seat, passenger in pairs(seats) do
+                if passenger == player then
+                    triggerServerEvent("chiva:requestDismount", player, vehicle, seat)
+                    return
+                end
+            end
+        end
+    end
+end)
+
+-- Evento para recibir confirmación del servidor después de montar
+addEvent("chiva:mounted", true)
+addEventHandler("chiva:mounted", root, function(vehicle, seat, success)
+    if success then
+        local player = localPlayer
+        if not chivaPassengers[vehicle] then
+            chivaPassengers[vehicle] = {}
+        end
+        chivaPassengers[vehicle][seat] = player
+        outputChatBox("Te has montado en la chiva (Asiento " .. seat .. "). Presiona F para bajarte.", 0, 255, 0)
+    else
+        outputChatBox("Error al montarte en la chiva.", 255, 0, 0)
+    end
+end)
+
+-- Evento para recibir confirmación del servidor después de bajarse
+addEvent("chiva:dismounted", true)
+addEventHandler("chiva:dismounted", root, function(vehicle, seat)
+    local player = localPlayer
+    if chivaPassengers[vehicle] and chivaPassengers[vehicle][seat] == player then
+        chivaPassengers[vehicle][seat] = nil
+        outputChatBox("Te has bajado de la chiva.", 0, 255, 0)
+    end
+end)
+
+-- Evento para reproducir animación de sentarse (llamado desde el servidor)
+addEvent("chiva:playSitAnimation", true)
+addEventHandler("chiva:playSitAnimation", root, function()
+    local player = localPlayer
+    -- Animación de sentarse arriba (puedes ajustar la animación según prefieras)
+    setPedAnimation(player, "ped", "CAR_sit", -1, true, false, false, false)
+end)
+
+-- Evento para reproducir animación de bajarse (llamado desde el servidor)
+addEvent("chiva:playDismountAnimation", true)
+addEventHandler("chiva:playDismountAnimation", root, function()
+    local player = localPlayer
+    -- Animación de bajarse
+    setPedAnimation(player, "ped", "CAR_getout_LHS", 2000, false, false, false, false)
+    setTimer(function()
+        if isElement(player) then
+            setPedAnimation(player, nil)
+        end
+    end, 2000, 1)
+end)
+
+-- Limpiar tabla cuando el vehículo se destruye
+addEventHandler("onClientElementDestroy", root, function()
+    if getElementType(source) == "vehicle" and getElementModel(source) == CHIVA_MODEL then
+        chivaPassengers[source] = nil
+    end
+end)
+
+-- Función exportable para montar pasajeros mediante código
 function mountPassenger(player, vehicle, seat)
     if not player or not isElement(player) then
         return false
@@ -442,37 +416,21 @@ function mountPassenger(player, vehicle, seat)
         return false
     end
     
-    -- Si no se especifica asiento, detectar la puerta más cercana y asignar asiento correspondiente
-    if not seat then
-        local playerSide, preferredSeat = detectNearestDoorAndSeat(player, vehicle)
-        seat = getNextAvailableSeat(vehicle, playerSide, preferredSeat)
-        if not seat then
-            return false
+    local seatConfig = nil
+    for _, config in ipairs(CHIVA_SEATS_CONFIG) do
+        if config.seat == seat then
+            seatConfig = config
+            break
         end
     end
     
-    -- Verificar que el asiento esté disponible
-    local occupant = getVehicleOccupant(vehicle, seat)
-    if occupant then
+    if not seatConfig then
         return false
     end
     
-    -- Enviar al servidor para montar (warpPedIntoVehicle es función del servidor)
-    triggerServerEvent("chiva:requestMount", player, vehicle, seat)
+    triggerServerEvent("chiva:requestMount", player, vehicle, seat, seatConfig.offsetX, seatConfig.offsetY, seatConfig.offsetZ)
     return true
 end
-
--- Evento para recibir confirmación del servidor después de montar
-addEvent("chiva:mounted", true)
-addEventHandler("chiva:mounted", root, function(success, message)
-    if message then
-        if success then
-            outputChatBox(message, 0, 255, 0)
-        else
-            outputChatBox(message, 255, 0, 0)
-        end
-    end
-end)
 
 -- Función para obtener información de los asientos
 function getChivaSeatsInfo(vehicle)
@@ -481,12 +439,16 @@ function getChivaSeatsInfo(vehicle)
     end
     
     local seatsInfo = {}
+    if not chivaPassengers[vehicle] then
+        chivaPassengers[vehicle] = {}
+    end
+    
     for _, seatConfig in ipairs(CHIVA_SEATS_CONFIG) do
-        local occupant = getVehicleOccupant(vehicle, seatConfig.seat)
+        local occupant = chivaPassengers[vehicle][seatConfig.seat]
         table.insert(seatsInfo, {
             seat = seatConfig.seat,
             name = seatConfig.name,
-            occupied = occupant ~= false,
+            occupied = occupant ~= nil,
             occupant = occupant
         })
     end
@@ -500,10 +462,13 @@ function getAvailableSeatsCount(vehicle)
         return 0
     end
     
+    if not chivaPassengers[vehicle] then
+        chivaPassengers[vehicle] = {}
+    end
+    
     local count = 0
     for _, seatConfig in ipairs(CHIVA_SEATS_CONFIG) do
-        local occupant = getVehicleOccupant(vehicle, seatConfig.seat)
-        if not occupant then
+        if not chivaPassengers[vehicle][seatConfig.seat] then
             count = count + 1
         end
     end
