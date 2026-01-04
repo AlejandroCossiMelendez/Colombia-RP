@@ -339,10 +339,10 @@ function configureUrusVehicle(vehicle)
     -- Configurar handling para MUCHO mejor rendimiento (valores EXTREMADAMENTE aumentados)
     setVehicleHandling(vehicle, "engineAcceleration", 300.0)  -- Aceleración EXTREMADAMENTE mejorada
     setVehicleHandling(vehicle, "engineInertia", 300.0)     -- Inercia del motor EXTREMADAMENTE alta (máxima potencia)
-    setVehicleHandling(vehicle, "brakeDeceleration", 25.0)  -- Freno mejorado
-    setVehicleHandling(vehicle, "tractionMultiplier", 2.5)   -- Tracción EXTREMADAMENTE mejorada
-    setVehicleHandling(vehicle, "tractionLoss", 0.3)         -- Mínima pérdida de tracción
-    setVehicleHandling(vehicle, "tractionBias", 0.5)         -- Distribución de tracción
+    setVehicleHandling(vehicle, "brakeDeceleration", 30.0)  -- Freno mejorado para alta velocidad
+    setVehicleHandling(vehicle, "tractionMultiplier", 2.0)   -- Tracción mejorada (reducida ligeramente para estabilidad)
+    setVehicleHandling(vehicle, "tractionLoss", 0.4)         -- Pérdida de tracción controlada (aumentada para estabilidad)
+    setVehicleHandling(vehicle, "tractionBias", 0.5)         -- Distribución de tracción equilibrada
     
     -- Configurar relación de transmisión (gear ratios) para mejor velocidad
     -- Esto es crítico para alcanzar velocidades altas
@@ -353,21 +353,26 @@ function configureUrusVehicle(vehicle)
     setVehicleHandling(vehicle, "initialDriveGears", 6)     -- 6 marchas iniciales
     setVehicleHandling(vehicle, "initialDriveForce", 0.35)   -- Fuerza de tracción inicial
     
-    -- Configurar masa y centro de masa para mejor estabilidad
-    setVehicleHandling(vehicle, "mass", 2200.0)              -- Masa del vehículo
-    setVehicleHandling(vehicle, "centerOfMass", {0.0, 0.0, -0.3})  -- Centro de masa más bajo
+    -- Configurar masa y centro de masa para MEJOR ESTABILIDAD
+    setVehicleHandling(vehicle, "mass", 2500.0)              -- Masa aumentada para más estabilidad
+    setVehicleHandling(vehicle, "centerOfMass", {0.0, 0.0, -0.5})  -- Centro de masa MÁS BAJO para mejor estabilidad
     
-    -- Configurar suspensión para mejor manejo
-    setVehicleHandling(vehicle, "suspensionForceLevel", 1.2)
-    setVehicleHandling(vehicle, "suspensionDamping", 0.3)
-    setVehicleHandling(vehicle, "suspensionHighSpeedDamping", 0.0)
-    setVehicleHandling(vehicle, "suspensionUpperLimit", 0.35)
-    setVehicleHandling(vehicle, "suspensionLowerLimit", -0.15)
-    setVehicleHandling(vehicle, "suspensionFrontRearBias", 0.5)
-    setVehicleHandling(vehicle, "suspensionAntiDiveMultiplier", 0.3)
+    -- Configurar suspensión para MUCHA MEJOR ESTABILIDAD
+    setVehicleHandling(vehicle, "suspensionForceLevel", 1.5)  -- Fuerza de suspensión aumentada
+    setVehicleHandling(vehicle, "suspensionDamping", 0.5)     -- Amortiguación mejorada
+    setVehicleHandling(vehicle, "suspensionHighSpeedDamping", 0.3)  -- Amortiguación a alta velocidad
+    setVehicleHandling(vehicle, "suspensionUpperLimit", 0.30)  -- Límite superior ajustado
+    setVehicleHandling(vehicle, "suspensionLowerLimit", -0.20)  -- Límite inferior ajustado
+    setVehicleHandling(vehicle, "suspensionFrontRearBias", 0.5)  -- Sesgo equilibrado
+    setVehicleHandling(vehicle, "suspensionAntiDiveMultiplier", 0.5)  -- Anti-dive mejorado
     
-    -- Configurar dirección
-    setVehicleHandling(vehicle, "steeringLock", 35.0)        -- Ángulo máximo de giro
+    -- Configurar dirección para mejor control
+    setVehicleHandling(vehicle, "steeringLock", 30.0)        -- Ángulo de giro reducido para más estabilidad
+    
+    -- Configuraciones adicionales para estabilidad
+    setVehicleHandling(vehicle, "downforce", 0.0)             -- Downforce (si está disponible)
+    setVehicleHandling(vehicle, "collisionDamageMultiplier", 0.5)  -- Menos daño por colisión
+    setVehicleHandling(vehicle, "monetary", 25000)            -- Valor monetario
     
     -- Habilitar daño visual (puertas, paneles, etc.)
     setVehicleDamageProof(vehicle, false)
@@ -386,13 +391,20 @@ function configureUrusVehicle(vehicle)
                 setVehicleHandling(vehicle, "numberOfGears", 6)
                 setVehicleHandling(vehicle, "engineAcceleration", 300.0)
                 setVehicleHandling(vehicle, "engineInertia", 300.0)
-                setVehicleHandling(vehicle, "tractionMultiplier", 2.5)
-                setVehicleHandling(vehicle, "tractionLoss", 0.5)
+                setVehicleHandling(vehicle, "tractionMultiplier", 2.0)
+                setVehicleHandling(vehicle, "tractionLoss", 0.4)
                 setVehicleHandling(vehicle, "driveType", "awd")
                 setVehicleHandling(vehicle, "engineType", "petrol")
                 setVehicleHandling(vehicle, "driveBiasFront", 0.5)
                 setVehicleHandling(vehicle, "initialDriveGears", 6)
                 setVehicleHandling(vehicle, "initialDriveForce", 0.35)
+                -- Reforzar estabilidad
+                setVehicleHandling(vehicle, "mass", 2500.0)
+                setVehicleHandling(vehicle, "centerOfMass", {0.0, 0.0, -0.5})
+                setVehicleHandling(vehicle, "suspensionForceLevel", 1.5)
+                setVehicleHandling(vehicle, "suspensionDamping", 0.5)
+                setVehicleHandling(vehicle, "suspensionHighSpeedDamping", 0.3)
+                setVehicleHandling(vehicle, "steeringLock", 30.0)
             end
         end, i * 150, 1)
     end
@@ -404,6 +416,15 @@ function configureUrusVehicle(vehicle)
             setVehicleHandling(vehicle, "numberOfGears", 6)
             setVehicleHandling(vehicle, "engineAcceleration", 300.0)
             setVehicleHandling(vehicle, "engineInertia", 300.0)
+            -- Reforzar estabilidad en verificación final
+            setVehicleHandling(vehicle, "mass", 2500.0)
+            setVehicleHandling(vehicle, "centerOfMass", {0.0, 0.0, -0.5})
+            setVehicleHandling(vehicle, "suspensionForceLevel", 1.5)
+            setVehicleHandling(vehicle, "suspensionDamping", 0.5)
+            setVehicleHandling(vehicle, "suspensionHighSpeedDamping", 0.3)
+            setVehicleHandling(vehicle, "steeringLock", 30.0)
+            setVehicleHandling(vehicle, "tractionMultiplier", 2.0)
+            setVehicleHandling(vehicle, "tractionLoss", 0.4)
             -- Asegurar que el daño visual esté habilitado
             setVehicleDamageProof(vehicle, false)
             -- Forzar actualización del daño
@@ -460,8 +481,15 @@ addEventHandler("onPlayerVehicleEnter", root, function(vehicle, seat)
                         setVehicleHandling(vehicle, "numberOfGears", 6)
                         setVehicleHandling(vehicle, "engineAcceleration", 300.0)
                         setVehicleHandling(vehicle, "engineInertia", 300.0)
-                        setVehicleHandling(vehicle, "tractionMultiplier", 2.5)
-                        setVehicleHandling(vehicle, "tractionLoss", 0.3)
+                        setVehicleHandling(vehicle, "tractionMultiplier", 2.0)
+                        setVehicleHandling(vehicle, "tractionLoss", 0.4)
+                        -- Reforzar estabilidad
+                        setVehicleHandling(vehicle, "mass", 2500.0)
+                        setVehicleHandling(vehicle, "centerOfMass", {0.0, 0.0, -0.5})
+                        setVehicleHandling(vehicle, "suspensionForceLevel", 1.5)
+                        setVehicleHandling(vehicle, "suspensionDamping", 0.5)
+                        setVehicleHandling(vehicle, "suspensionHighSpeedDamping", 0.3)
+                        setVehicleHandling(vehicle, "steeringLock", 30.0)
                         setVehicleHandling(vehicle, "initialDriveGears", 6)
                         setVehicleHandling(vehicle, "initialDriveForce", 0.35)
                     end
