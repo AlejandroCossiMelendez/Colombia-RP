@@ -13,65 +13,116 @@ end)
 
 local CHIVA_MODEL = 410  -- Modelo de la chiva
 
--- Configuración de asientos (8 pasajeros en 2 filas de 4)
+-- Configuración de asientos basada en las coordenadas reales de las puertas
 -- Seat 0 = Conductor, Seat 1 = Copiloto
--- Seats 2-9 = Pasajeros (configurables)
--- LADO IZQUIERDO: Asientos 2, 3, 6, 7 (2 filas, lado izquierdo)
--- LADO DERECHO: Asientos 4, 5, 8, 9 (2 filas, lado derecho)
+-- Seats 2-9 = Pasajeros
+-- LADO IZQUIERDO: Asientos 2, 3, 4, 5 (fila izquierda)
+-- LADO DERECHO: Asientos 6, 7, 8, 9 (fila derecha)
+
+-- Coordenadas de referencia cuando el vehículo está en posición base (X: 1230.75, Y: -1709.25, Rot: 0)
+local REFERENCE_VEHICLE_X = 1230.75
+local REFERENCE_VEHICLE_Y = -1709.25
+local REFERENCE_VEHICLE_Z = 12.88
+
+-- Posiciones relativas de las puertas desde el centro del vehículo
 local CHIVA_SEATS_CONFIG = {
-    -- Lado Izquierdo - Fila 1 (atrás)
-    {seat = 2, name = "Izquierda - Fila 1 - Asiento 1", side = "left"},
-    {seat = 3, name = "Izquierda - Fila 1 - Asiento 2", side = "left"},
+    -- Lado Izquierdo - Asientos 2, 3, 4, 5
+    {seat = 2, name = "Izquierda - Asiento 1", side = "left", offsetX = 1220.90 - REFERENCE_VEHICLE_X, offsetY = -1715.65 - REFERENCE_VEHICLE_Y},
+    {seat = 3, name = "Izquierda - Asiento 2", side = "left", offsetX = 1222.26 - REFERENCE_VEHICLE_X, offsetY = -1715.45 - REFERENCE_VEHICLE_Y},
+    {seat = 4, name = "Izquierda - Asiento 3", side = "left", offsetX = 1223.20 - REFERENCE_VEHICLE_X, offsetY = -1715.45 - REFERENCE_VEHICLE_Y},
+    {seat = 5, name = "Izquierda - Asiento 4", side = "left", offsetX = 1224.01 - REFERENCE_VEHICLE_X, offsetY = -1715.55 - REFERENCE_VEHICLE_Y},
     
-    -- Lado Derecho - Fila 1 (atrás)
-    {seat = 4, name = "Derecha - Fila 1 - Asiento 1", side = "right"},
-    {seat = 5, name = "Derecha - Fila 1 - Asiento 2", side = "right"},
-    
-    -- Lado Izquierdo - Fila 2 (delante de atrás)
-    {seat = 6, name = "Izquierda - Fila 2 - Asiento 1", side = "left"},
-    {seat = 7, name = "Izquierda - Fila 2 - Asiento 2", side = "left"},
-    
-    -- Lado Derecho - Fila 2 (delante de atrás)
-    {seat = 8, name = "Derecha - Fila 2 - Asiento 1", side = "right"},
-    {seat = 9, name = "Derecha - Fila 2 - Asiento 2", side = "right"},
+    -- Lado Derecho - Asientos 6, 7, 8, 9
+    {seat = 6, name = "Derecha - Asiento 1", side = "right", offsetX = 1221.39 - REFERENCE_VEHICLE_X, offsetY = -1712.24 - REFERENCE_VEHICLE_Y},
+    {seat = 7, name = "Derecha - Asiento 2", side = "right", offsetX = 1222.39 - REFERENCE_VEHICLE_X, offsetY = -1712.24 - REFERENCE_VEHICLE_Y},  -- Estimado
+    {seat = 8, name = "Derecha - Asiento 3", side = "right", offsetX = 1223.39 - REFERENCE_VEHICLE_X, offsetY = -1712.24 - REFERENCE_VEHICLE_Y},  -- Estimado
+    {seat = 9, name = "Derecha - Asiento 4", side = "right", offsetX = 1224.39 - REFERENCE_VEHICLE_X, offsetY = -1712.24 - REFERENCE_VEHICLE_Y},  -- Estimado
 }
 
--- Función para detectar en qué lado de la chiva está el jugador
-local function detectPlayerSide(player, vehicle)
+-- Función para detectar la puerta más cercana y el asiento correspondiente
+local function detectNearestDoorAndSeat(player, vehicle)
     if not player or not vehicle or not isElement(player) or not isElement(vehicle) then
-        return nil
+        return nil, nil
     end
     
     local px, py, pz = getElementPosition(player)
     local vx, vy, vz = getElementPosition(vehicle)
     local vrx, vry, vrz = getElementRotation(vehicle)
     
-    -- Calcular vector desde el vehículo al jugador
-    local dx = px - vx
-    local dy = py - vy
+    -- Calcular las posiciones de las puertas transformadas según la posición y rotación del vehículo
+    local minDistance = math.huge
+    local nearestSeat = nil
+    local nearestSide = nil
     
-    -- Rotar el vector para que esté en el sistema de coordenadas del vehículo
-    local angle = math.rad(-vrz)
-    local rotatedX = dx * math.cos(angle) - dy * math.sin(angle)
-    local rotatedY = dx * math.sin(angle) + dy * math.cos(angle)
+    -- Ángulo de rotación en radianes
+    local angle = math.rad(vrz)
+    local cosAngle = math.cos(angle)
+    local sinAngle = math.sin(angle)
     
-    -- Si rotatedX es positivo, está a la derecha del vehículo (visto desde atrás)
-    -- Si rotatedX es negativo, está a la izquierda del vehículo
-    if rotatedX > 0 then
-        return "right"  -- Lado derecho
-    else
-        return "left"   -- Lado izquierdo
+    -- Buscar la puerta más cercana
+    for _, seatConfig in ipairs(CHIVA_SEATS_CONFIG) do
+        -- Transformar offset relativo a coordenadas del mundo según la rotación del vehículo
+        local offsetX = seatConfig.offsetX
+        local offsetY = seatConfig.offsetY
+        
+        -- Rotar el offset según la rotación del vehículo
+        local rotatedX = offsetX * cosAngle - offsetY * sinAngle
+        local rotatedY = offsetX * sinAngle + offsetY * cosAngle
+        
+        -- Calcular posición mundial de la puerta
+        local doorWorldX = vx + rotatedX
+        local doorWorldY = vy + rotatedY
+        
+        -- Calcular distancia desde el jugador a la puerta
+        local distance = getDistanceBetweenPoints3D(px, py, pz, doorWorldX, doorWorldY, pz)
+        
+        if distance < minDistance then
+            minDistance = distance
+            nearestSeat = seatConfig.seat
+            nearestSide = seatConfig.side
+        end
     end
+    
+    -- Si la distancia es muy grande, usar método alternativo basado en posición relativa
+    if minDistance > 5.0 then
+        -- Método alternativo: usar posición relativa al vehículo
+        local dx = px - vx
+        local dy = py - vy
+        
+        -- Rotar el vector para que esté en el sistema de coordenadas del vehículo
+        local playerAngle = math.rad(-vrz)
+        local rotatedX = dx * math.cos(playerAngle) - dy * math.sin(playerAngle)
+        
+        -- Si rotatedX es positivo, está a la derecha del vehículo
+        if rotatedX > 0 then
+            nearestSide = "right"
+        else
+            nearestSide = "left"
+        end
+        nearestSeat = nil  -- Se asignará automáticamente
+    end
+    
+    return nearestSide, nearestSeat
 end
 
 -- Función para obtener el siguiente asiento disponible en un lado específico
-local function getNextAvailableSeat(vehicle, preferredSide)
+local function getNextAvailableSeat(vehicle, preferredSide, preferredSeat)
     if not vehicle or not isElement(vehicle) or getElementModel(vehicle) ~= CHIVA_MODEL then
         return nil
     end
     
     -- Obtener número máximo de pasajeros del vehículo
     local maxPassengers = getVehicleMaxPassengers(vehicle)
+    
+    -- Si hay un asiento preferido específico, intentar usarlo primero
+    if preferredSeat then
+        if preferredSeat <= maxPassengers then
+            local occupant = getVehicleOccupant(vehicle, preferredSeat)
+            if not occupant then
+                return preferredSeat
+            end
+        end
+    end
     
     -- Primero buscar en el lado preferido
     if preferredSide then
@@ -102,7 +153,7 @@ local function getNextAvailableSeat(vehicle, preferredSide)
     return nil  -- No hay asientos disponibles
 end
 
--- Función para verificar si el jugador está cerca de una chiva (lados o atrás)
+-- Función para verificar si el jugador está cerca de una chiva (usando coordenadas de puertas transformadas)
 local function getNearbyChiva(player, maxDistance)
     maxDistance = maxDistance or 3.5
     local px, py, pz = getElementPosition(player)
@@ -112,38 +163,37 @@ local function getNearbyChiva(player, maxDistance)
             local vx, vy, vz = getElementPosition(vehicle)
             local vrx, vry, vrz = getElementRotation(vehicle)
             
-            -- Calcular posición de los lados y atrás del vehículo
-            local matrix = getElementMatrix(vehicle)
-            if matrix then
-                -- Verificar distancia a los lados (izquierda y derecha)
-                -- Lado izquierdo (offset negativo en X)
-                local leftX = vx - math.cos(math.rad(vrz)) * 1.5
-                local leftY = vy - math.sin(math.rad(vrz)) * 1.5
-                local leftZ = vz
-                local leftDist = getDistanceBetweenPoints3D(px, py, pz, leftX, leftY, leftZ)
+            -- Ángulo de rotación en radianes
+            local angle = math.rad(vrz)
+            local cosAngle = math.cos(angle)
+            local sinAngle = math.sin(angle)
+            
+            -- Verificar distancia a las puertas transformadas
+            for _, seatConfig in ipairs(CHIVA_SEATS_CONFIG) do
+                -- Transformar offset relativo a coordenadas del mundo
+                local offsetX = seatConfig.offsetX
+                local offsetY = seatConfig.offsetY
                 
-                -- Lado derecho (offset positivo en X)
-                local rightX = vx + math.cos(math.rad(vrz)) * 1.5
-                local rightY = vy + math.sin(math.rad(vrz)) * 1.5
-                local rightZ = vz
-                local rightDist = getDistanceBetweenPoints3D(px, py, pz, rightX, rightY, rightZ)
+                -- Rotar el offset según la rotación del vehículo
+                local rotatedX = offsetX * cosAngle - offsetY * sinAngle
+                local rotatedY = offsetX * sinAngle + offsetY * cosAngle
                 
-                -- Parte trasera
-                local rearX = vx - math.sin(math.rad(vrz)) * 2.5
-                local rearY = vy + math.cos(math.rad(vrz)) * 2.5
-                local rearZ = vz
-                local rearDist = getDistanceBetweenPoints3D(px, py, pz, rearX, rearY, rearZ)
+                -- Calcular posición mundial de la puerta
+                local doorWorldX = vx + rotatedX
+                local doorWorldY = vy + rotatedY
                 
-                -- Si está cerca de cualquier lado o atrás
-                if leftDist <= maxDistance or rightDist <= maxDistance or rearDist <= maxDistance then
-                    return vehicle
-                end
-            else
-                -- Fallback: verificar distancia general
-                local distance = getDistanceBetweenPoints3D(px, py, pz, vx, vy, vz)
+                -- Calcular distancia desde el jugador a la puerta
+                local distance = getDistanceBetweenPoints3D(px, py, pz, doorWorldX, doorWorldY, pz)
+                
                 if distance <= maxDistance then
                     return vehicle
                 end
+            end
+            
+            -- Fallback: verificar distancia general al vehículo
+            local distance = getDistanceBetweenPoints3D(px, py, pz, vx, vy, vz)
+            if distance <= maxDistance + 2.0 then
+                return vehicle
             end
         end
     end
@@ -157,10 +207,10 @@ local function mountPlayerInChiva(player, vehicle, seat)
         return false
     end
     
-    -- Si no se especifica asiento, detectar el lado del jugador y asignar asiento del mismo lado
+    -- Si no se especifica asiento, detectar la puerta más cercana y asignar asiento correspondiente
     if not seat then
-        local playerSide = detectPlayerSide(player, vehicle)
-        seat = getNextAvailableSeat(vehicle, playerSide)
+        local playerSide, preferredSeat = detectNearestDoorAndSeat(player, vehicle)
+        seat = getNextAvailableSeat(vehicle, playerSide, preferredSeat)
         
         if not seat then
             outputChatBox("La chiva está llena. No hay asientos disponibles.", player, 255, 255, 0)
@@ -210,10 +260,10 @@ function mountPassenger(player, vehicle, seat)
         return false
     end
     
-    -- Si no se especifica asiento, detectar el lado del jugador y asignar asiento del mismo lado
+    -- Si no se especifica asiento, detectar la puerta más cercana y asignar asiento correspondiente
     if not seat then
-        local playerSide = detectPlayerSide(player, vehicle)
-        seat = getNextAvailableSeat(vehicle, playerSide)
+        local playerSide, preferredSeat = detectNearestDoorAndSeat(player, vehicle)
+        seat = getNextAvailableSeat(vehicle, playerSide, preferredSeat)
         if not seat then
             return false
         end
