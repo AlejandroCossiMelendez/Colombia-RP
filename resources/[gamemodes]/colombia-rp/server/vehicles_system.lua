@@ -327,7 +327,7 @@ function configureUrusVehicle(vehicle)
     -- Configurar velocidad máxima a 300 km/h (aproximadamente 83.33 m/s)
     -- Nota: En MTA, maxVelocity está en m/s. 300 km/h = 83.33 m/s
     -- Aumentamos significativamente para contrarrestar cualquier limitación del modelo
-    setVehicleHandling(vehicle, "maxVelocity", 83.33)
+    setVehicleHandling(vehicle, "maxVelocity", 300)
     
     -- Configurar número de marchas (6 marchas para mejor rendimiento)
     setVehicleHandling(vehicle, "numberOfGears", 6)
