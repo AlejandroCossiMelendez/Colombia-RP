@@ -165,6 +165,10 @@ function answerCall(callId)
     
     -- Marcar como en llamada
     isInCall = true
+    setElementData(localPlayer, "phone:inCall", true)
+    
+    -- Animación: Hablar por teléfono (PHONE_TALK) - loop
+    setPedAnimation(localPlayer, "PED", "PHONE_TALK", -1, true, false, false, false)
 end
 
 -- Rechazar llamada
@@ -177,8 +181,12 @@ end
 addEvent("phone:callAnswered", true)
 addEventHandler("phone:callAnswered", root, function(callId)
     isInCall = true
+    setElementData(localPlayer, "phone:inCall", true)
     
     outputChatBox("Llamada contestada. Presiona C para colgar.", 0, 255, 0)
+    
+    -- Animación: Hablar por teléfono (PHONE_TALK) - loop
+    setPedAnimation(localPlayer, "PED", "PHONE_TALK", -1, true, false, false, false)
     
     -- Configurar chat de voz
     setupCallVoiceChat()
@@ -194,11 +202,15 @@ end)
 addEvent("phone:callStarted", true)
 addEventHandler("phone:callStarted", root, function(callId, partnerName, partnerNumber)
     isInCall = true
+    setElementData(localPlayer, "phone:inCall", true)
     
     -- Guardar información de la llamada
     currentCallId = callId
     currentCallPartner = partnerName
     currentCallNumber = partnerNumber
+    
+    -- Animación: Hablar por teléfono (PHONE_TALK) - loop
+    setPedAnimation(localPlayer, "PED", "PHONE_TALK", -1, true, false, false, false)
     
     -- Obtener información del navegador del teléfono
     local browser = getElementData(localPlayer, "phone:browserContent")
@@ -212,9 +224,13 @@ addEvent("phone:callStatus", true)
 addEventHandler("phone:callStatus", root, function(callData)
     if callData then
         isInCall = true
+        setElementData(localPlayer, "phone:inCall", true)
         currentCallId = callData.callId
         currentCallPartner = callData.partnerName
         currentCallNumber = callData.partnerNumber
+        
+        -- Animación: Hablar por teléfono (PHONE_TALK) - loop
+        setPedAnimation(localPlayer, "PED", "PHONE_TALK", -1, true, false, false, false)
         
         -- Obtener información del navegador del teléfono
         local browser = getElementData(localPlayer, "phone:browserContent")
@@ -226,6 +242,7 @@ addEventHandler("phone:callStatus", root, function(callData)
         end
     else
         isInCall = false
+        setElementData(localPlayer, "phone:inCall", false)
         currentCallId = nil
         currentCallPartner = nil
         currentCallNumber = nil
@@ -240,6 +257,19 @@ addEventHandler("phone:callEnded", root, function(reason)
     callSpeakerEnabled = false
     
     outputChatBox("Llamada finalizada. Voz de proximidad restaurada.", 255, 255, 0)
+    
+    -- Limpiar animación de llamada
+    setPedAnimation(localPlayer, false)
+    
+    -- Si el teléfono sigue abierto, volver a animación de usar apps
+    local phoneVisible = getElementData(localPlayer, "phone:visible")
+    if phoneVisible then
+        setTimer(function()
+            if getElementData(localPlayer, "phone:visible") and not getElementData(localPlayer, "phone:inCall") then
+                setPedAnimation(localPlayer, "COP_AMBIENT", "COPLOOK_THINK", -1, true, false, false, false)
+            end
+        end, 500, 1)
+    end
     
     -- Terminar chat de voz
     endCallVoiceChat()

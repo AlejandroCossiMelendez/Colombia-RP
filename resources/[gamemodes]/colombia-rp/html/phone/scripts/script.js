@@ -1501,23 +1501,57 @@ function initBrowserApp() {
     
     // Función para abrir URL en navegador secundario
     function openInSecondaryBrowser(url) {
-        if (window.mta && window.mta.triggerEvent) {
-            window.mta.triggerEvent('phone:browserNavigate', url);
-            // Mostrar mensaje al usuario
-            const homeScreen = get('#browserHomeScreen');
-            if (homeScreen) {
-                homeScreen.style.display = 'flex';
-                homeScreen.innerHTML = `
-                    <div class="browser-logo">🌐</div>
-                    <h3>Abriendo en navegador...</h3>
-                    <p>La página se abrirá en una ventana separada</p>
-                `;
+        console.log('[BROWSER] Intentando abrir navegador secundario con URL:', url);
+        console.log('[BROWSER] window.mta disponible:', !!window.mta);
+        console.log('[BROWSER] window.mta.triggerEvent disponible:', !!(window.mta && window.mta.triggerEvent));
+        console.log('[BROWSER] window.openMTAWebBrowser disponible:', typeof window.openMTAWebBrowser);
+        
+        // Intentar usar la función global primero
+        if (typeof window.openMTAWebBrowser === 'function') {
+            try {
+                window.openMTAWebBrowser(url);
+                console.log('[BROWSER] openMTAWebBrowser llamado exitosamente');
+                // Mostrar mensaje al usuario
+                const homeScreen = get('#browserHomeScreen');
+                if (homeScreen) {
+                    homeScreen.style.display = 'flex';
+                    homeScreen.innerHTML = `
+                        <div class="browser-logo">🌐</div>
+                        <h3>Abriendo en navegador...</h3>
+                        <p>La página se abrirá en una ventana separada</p>
+                    `;
+                }
+                return;
+            } catch (e) {
+                console.error('[BROWSER] Error al llamar openMTAWebBrowser:', e);
             }
-        } else {
-            // Fallback: usar proxy de Google Translate
-            const proxyUrl = 'https://translate.google.com/translate?sl=auto&tl=es&u=' + encodeURIComponent(url);
-            browserFrame.src = proxyUrl;
         }
+        
+        // Fallback: usar triggerEvent directamente
+        if (window.mta && window.mta.triggerEvent) {
+            try {
+                window.mta.triggerEvent('phone:browserNavigate', url);
+                console.log('[BROWSER] Evento triggerEvent llamado exitosamente');
+                // Mostrar mensaje al usuario
+                const homeScreen = get('#browserHomeScreen');
+                if (homeScreen) {
+                    homeScreen.style.display = 'flex';
+                    homeScreen.innerHTML = `
+                        <div class="browser-logo">🌐</div>
+                        <h3>Abriendo en navegador...</h3>
+                        <p>La página se abrirá en una ventana separada</p>
+                    `;
+                }
+                return;
+            } catch (e) {
+                console.error('[BROWSER] Error al llamar triggerEvent:', e);
+            }
+        }
+        
+        // Último fallback: usar proxy de Google Translate
+        console.warn('[BROWSER] Usando proxy de Google Translate como último recurso');
+        const proxyUrl = 'https://translate.google.com/translate?sl=auto&tl=es&u=' + encodeURIComponent(url);
+        browserFrame.src = proxyUrl;
     }
     
     // Función para actualizar estado de botones de navegación

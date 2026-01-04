@@ -29,6 +29,17 @@ function whenPhoneBrowserReady()
             }
         ]])
         
+        -- Exponer función global para abrir navegador web desde JavaScript
+        executeBrowserJavascript(browserContent, [[
+            window.openMTAWebBrowser = function(url) {
+                if (window.mta && window.mta.triggerEvent) {
+                    window.mta.triggerEvent('phone:browserNavigate', url);
+                } else {
+                    console.error('MTA no disponible');
+                }
+            };
+        ]])
+        
         -- Enviar el número de teléfono al navegador
         local phoneNumber = getElementData(localPlayer, "phone:number")
         if phoneNumber then
@@ -83,6 +94,9 @@ function openPhone()
     -- Cerrar inventario si está abierto (usar evento para evitar dependencias)
     triggerEvent("closeInventoryForPhone", localPlayer)
     
+    -- Animación: Sacar teléfono (PHONE_OUT)
+    setPedAnimation(localPlayer, "PED", "PHONE_OUT", -1, false, false, false, false)
+    
     phoneVisible = true
     -- Guardar estado del teléfono en elementData para que otros scripts puedan verificar
     setElementData(localPlayer, "phone:visible", true)
@@ -95,6 +109,8 @@ function openPhone()
     if not phoneBrowser or not browserContent then
         outputChatBox("Error: No se pudo crear el navegador del teléfono", 255, 0, 0)
         phoneVisible = false
+        -- Limpiar animación si falla
+        setPedAnimation(localPlayer, false)
         return
     end
     
@@ -106,6 +122,14 @@ function openPhone()
     addEventHandler("onClientBrowserDocumentReady", phoneBrowser, whenPhoneBrowserReady)
     
     renderTime(true)
+    
+    -- Después de la animación de sacar teléfono, cambiar a animación de usar apps (si no está en llamada)
+    setTimer(function()
+        if phoneVisible and not getElementData(localPlayer, "phone:inCall") then
+            -- Animación para usar apps/mensajes (COPLOOK_THINK)
+            setPedAnimation(localPlayer, "COP_AMBIENT", "COPLOOK_THINK", -1, true, false, false, false)
+        end
+    end, 1500, 1) -- Esperar 1.5 segundos para que termine PHONE_OUT
 end
 
 -- Función auxiliar para restaurar controles del juego
@@ -142,6 +166,9 @@ function closePhone()
     -- Actualizar estado del teléfono en elementData
     setElementData(localPlayer, "phone:visible", false)
     
+    -- Animación: Guardar teléfono (PHONE_IN)
+    setPedAnimation(localPlayer, "PED", "PHONE_IN", -1, false, false, false, false)
+    
     -- PRIMERO: Ocultar el navegador INMEDIATAMENTE para que desaparezca visualmente
     if phoneBrowser and isElement(phoneBrowser) then
         guiSetVisible(phoneBrowser, false)
@@ -171,12 +198,15 @@ function closePhone()
             browserContent = nil
         end
         
+        -- Limpiar animación después de que termine PHONE_IN
+        setPedAnimation(localPlayer, false)
+        
         -- Restaurar controles nuevamente después de destruir el navegador
         restoreGameControls()
         
         -- Notificar que el teléfono se cerró
         triggerEvent("phoneClosed", localPlayer)
-    end, 50, 1)
+    end, 1500, 1) -- Esperar 1.5 segundos para que termine la animación PHONE_IN
     
     -- SÉPTIMO: Restaurar controles múltiples veces con diferentes delays para asegurar
     setTimer(function()
@@ -393,29 +423,38 @@ end)
 local webBrowser = nil
 local webBrowserContent = nil
 local webBrowserVisible = false
+local webBrowserUrl = nil
 
-function loadWebBrowser(url)
-    if source and isElement(source) and url then
-        loadBrowserURL(source, url)
+function loadWebBrowser()
+    if source and isElement(source) and webBrowserUrl then
+        outputChatBox("[DEBUG] Cargando URL en navegador: " .. tostring(webBrowserUrl), 0, 255, 255)
+        loadBrowserURL(source, webBrowserUrl)
     end
 end
 
 function whenWebBrowserReady()
     -- El navegador web está listo
     if webBrowserContent and isElement(webBrowserContent) then
-        -- Navegador listo para usar
+        outputChatBox("[DEBUG] Navegador web listo", 0, 255, 0)
     end
 end
 
 function openWebBrowser(url)
     if not url or url == "" then
+        outputChatBox("[DEBUG] URL vacía o inválida", 255, 0, 0)
         return
     end
+    
+    outputChatBox("[DEBUG] Abriendo navegador web con URL: " .. tostring(url), 0, 255, 255)
+    
+    -- Guardar la URL
+    webBrowserUrl = url
     
     -- Si ya existe, solo cambiar la URL
     if webBrowser and isElement(webBrowser) then
         if webBrowserContent and isElement(webBrowserContent) then
             loadBrowserURL(webBrowserContent, url)
+            outputChatBox("[DEBUG] Navegador existente, cambiando URL", 0, 255, 255)
         end
         guiSetVisible(webBrowser, true)
         webBrowserVisible = true
@@ -429,6 +468,7 @@ function openWebBrowser(url)
     local browserX = (sw - browserWidth) / 2
     local browserY = (sh - browserHeight) / 2
     
+    outputChatBox("[DEBUG] Creando nuevo navegador web...", 0, 255, 255)
     webBrowser = guiCreateBrowser(browserX, browserY, browserWidth, browserHeight, true, true, false)
     webBrowserContent = guiGetBrowser(webBrowser)
     
@@ -437,12 +477,13 @@ function openWebBrowser(url)
         return
     end
     
+    outputChatBox("[DEBUG] Navegador creado exitosamente", 0, 255, 0)
     webBrowserVisible = true
     guiSetInputMode("no_binds_when_editing")
     showCursor(true)
     guiSetInputEnabled(true)
     
-    addEventHandler("onClientBrowserCreated", webBrowser, function() loadWebBrowser(url) end)
+    addEventHandler("onClientBrowserCreated", webBrowser, loadWebBrowser)
     addEventHandler("onClientBrowserDocumentReady", webBrowser, whenWebBrowserReady)
 end
 
@@ -475,8 +516,12 @@ end
 -- Evento desde el navegador del teléfono para abrir navegador web
 addEvent("phone:browserNavigate", true)
 addEventHandler("phone:browserNavigate", resourceRoot, function(url)
-    if url and type(url) == "string" then
+    outputChatBox("[DEBUG] Evento phone:browserNavigate recibido. URL: " .. tostring(url), 255, 255, 0)
+    if url and type(url) == "string" and url ~= "" then
+        outputChatBox("[DEBUG] Llamando a openWebBrowser con: " .. url, 255, 255, 0)
         openWebBrowser(url)
+    else
+        outputChatBox("[DEBUG] URL inválida o vacía", 255, 0, 0)
     end
 end)
 
