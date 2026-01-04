@@ -18,22 +18,21 @@ local CHIVA_MODEL = 410  -- Modelo de la chiva
 -- offsetX: distancia hacia adelante/atrás (negativo = atrás del centro)
 -- offsetY: distancia hacia izquierda/derecha (negativo = izquierda, positivo = derecha)
 -- offsetZ: altura desde el suelo del vehículo (para estar "arriba")
--- NOTA: Aumentar offsetY mueve hacia la derecha, disminuir hacia la izquierda
+-- NOTA: Los offsets Y están reducidos para que queden más cerca del vehículo (multiplicados por 0.5)
 local CHIVA_SEATS_CONFIG = {
-    -- Lado Izquierdo - Asientos 2, 3, 4, 5
-    -- offsetY ajustado para mover más hacia la derecha (menos negativo = más a la derecha)
-    {seat = 2, name = "Izquierda - Asiento 1", side = "left", offsetX = -9.85, offsetY = 1.00, offsetZ = 1.5},  -- Más atrás
-    {seat = 3, name = "Izquierda - Asiento 2", side = "left", offsetX = -8.49, offsetY = -20.40, offsetZ = 1.5},
-    {seat = 4, name = "Izquierda - Asiento 3", side = "left", offsetX = -7.55, offsetY = -20.40, offsetZ = 1.5},
-    {seat = 5, name = "Izquierda - Asiento 4", side = "left", offsetX = -6.74, offsetY = -20.45, offsetZ = 1.5},  -- Más adelante
-    
-    -- Lado Derecho - Asientos 6, 7, 8, 9
-    -- offsetY ajustado para mover más hacia la derecha (menos negativo o positivo)
-    {seat = 6, name = "Derecha - Asiento 1", side = "right", offsetX = -9.36, offsetY = 0.50, offsetZ = 1.5},
-    {seat = 7, name = "Derecha - Asiento 2", side = "right", offsetX = -8.41, offsetY = 0.50, offsetZ = 1.5},
-    {seat = 8, name = "Derecha - Asiento 3", side = "right", offsetX = -7.46, offsetY = 0.50, offsetZ = 1.5},
-    {seat = 9, name = "Derecha - Asiento 4", side = "right", offsetX = -6.51, offsetY = 0.50, offsetZ = 1.5},
+    -- IZQUIERDA
+    { seat=2, side="left",  offsetX= 1.0, offsetY=-1.4, offsetZ=0.9 },
+    { seat=3, side="left",  offsetX= 1.9, offsetY=-1.4, offsetZ=0.9 },
+    { seat=4, side="left",  offsetX= 2.8, offsetY=-1.4, offsetZ=0.9 },
+    { seat=5, side="left",  offsetX= 3.7, offsetY=-1.4, offsetZ=0.9 },
+
+    -- DERECHA
+    { seat=6, side="right", offsetX= 1.0, offsetY= 1.4, offsetZ=0.9 },
+    { seat=7, side="right", offsetX= 1.9, offsetY= 1.4, offsetZ=0.9 },
+    { seat=8, side="right", offsetX= 2.8, offsetY= 1.4, offsetZ=0.9 },
+    { seat=9, side="right", offsetX= 3.7, offsetY= 1.4, offsetZ=0.9 },
 }
+
 
 -- Tabla para rastrear qué jugadores están en qué asientos personalizados
 local chivaPassengers = {}  -- [vehicle] = {[seat] = player}
