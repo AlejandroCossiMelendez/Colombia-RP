@@ -989,10 +989,10 @@ function showVehiclesPanel()
                 vehicleName = "Lamborghini Urus"
             elseif vehicleId == 410 then
                 vehicleName = "Chiva Rumbera"
-            elseif velehicleId == 508 then
+            elseif vehicleId == 508 then
                 vehicleName = "Turbo Juan Valdez"
-            elseif velehicleId == 561 then
-                vehicleName = "Infiniti"
+            elseif vehicleId == 561 then
+                vehicleName = "Infiniti FX50"
             end
 
             

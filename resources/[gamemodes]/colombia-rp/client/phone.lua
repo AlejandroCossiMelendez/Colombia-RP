@@ -426,16 +426,16 @@ local webBrowserVisible = false
 local webBrowserUrl = nil
 
 function loadWebBrowser()
-    -- source es el elemento GUI del navegador, necesitamos el browserContent
-    if source and isElement(source) and webBrowserContent and isElement(webBrowserContent) and webBrowserUrl then
-        outputChatBox("[DEBUG] Cargando URL en navegador: " .. tostring(webBrowserUrl), 0, 255, 255)
+    -- Cuando el navegador se crea, cargar la URL guardada
+    if webBrowserContent and isElement(webBrowserContent) and webBrowserUrl then
+        outputChatBox("[DEBUG] Cargando URL en navegador (evento): " .. tostring(webBrowserUrl), 0, 255, 255)
+        -- Usar múltiples intentos para asegurar que se cargue
         loadBrowserURL(webBrowserContent, webBrowserUrl)
-    elseif webBrowserContent and isElement(webBrowserContent) and webBrowserUrl then
-        -- Si source no está disponible, intentar directamente
-        outputChatBox("[DEBUG] Cargando URL directamente: " .. tostring(webBrowserUrl), 0, 255, 255)
-        loadBrowserURL(webBrowserContent, webBrowserUrl)
-    else
-        outputChatBox("[DEBUG] Error: No se puede cargar URL. webBrowserContent: " .. tostring(webBrowserContent) .. ", webBrowserUrl: " .. tostring(webBrowserUrl), 255, 0, 0)
+        setTimer(function()
+            if webBrowserContent and isElement(webBrowserContent) and webBrowserUrl then
+                loadBrowserURL(webBrowserContent, webBrowserUrl)
+            end
+        end, 200, 1)
     end
 end
 
@@ -514,13 +514,27 @@ function openWebBrowser(url)
     addEventHandler("onClientBrowserCreated", webBrowser, loadWebBrowser)
     addEventHandler("onClientBrowserDocumentReady", webBrowser, whenWebBrowserReady)
     
-    -- Intentar cargar la URL inmediatamente si el navegador ya está listo
+    -- Intentar cargar la URL con múltiples intentos para asegurar que funcione
     setTimer(function()
         if webBrowserContent and isElement(webBrowserContent) and webBrowserUrl then
-            outputChatBox("[DEBUG] Cargando URL en timer: " .. tostring(webBrowserUrl), 0, 255, 255)
+            outputChatBox("[DEBUG] Intento 1 - Cargando URL: " .. tostring(webBrowserUrl), 0, 255, 255)
             loadBrowserURL(webBrowserContent, webBrowserUrl)
         end
     end, 100, 1)
+    
+    setTimer(function()
+        if webBrowserContent and isElement(webBrowserContent) and webBrowserUrl then
+            outputChatBox("[DEBUG] Intento 2 - Cargando URL: " .. tostring(webBrowserUrl), 0, 255, 255)
+            loadBrowserURL(webBrowserContent, webBrowserUrl)
+        end
+    end, 300, 1)
+    
+    setTimer(function()
+        if webBrowserContent and isElement(webBrowserContent) and webBrowserUrl then
+            outputChatBox("[DEBUG] Intento 3 - Cargando URL: " .. tostring(webBrowserUrl), 0, 255, 255)
+            loadBrowserURL(webBrowserContent, webBrowserUrl)
+        end
+    end, 600, 1)
     
     -- Notificar inmediatamente al navegador del teléfono que se está abriendo
     if browserContent and isElement(browserContent) then
