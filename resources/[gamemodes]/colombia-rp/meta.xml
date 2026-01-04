@@ -610,11 +610,6 @@
     <file src="jbl/ModelJBL/jbl.dff" type="client" />
     <file src="jbl/ModelJBL/jbl.txd" type="client" />
     
-    <!-- Archivos del Lamborghini Urus (Modelo 560) -->
-    <script src="Lamborghini_Urus/script.lua" type="client" />
-    <file src="Lamborghini_Urus/washing.txd" type="client" />
-    <file src="Lamborghini_Urus/washing.dff" type="client" />
-    
     <!-- Archivos -->
     <file src="colombia-rp-login.png" type="client" />
     
