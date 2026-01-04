@@ -857,6 +857,8 @@ function showVehiclesPanel()
                 vehicleName = "Lamborghini Urus"
             elseif vehicleId == 410 then
                 vehicleName = "Chiva Rumbera"
+            elseif vehicleId == 508 then
+                vehicleName = "Turbo Juan Valdez"
             end
 
             
