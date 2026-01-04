@@ -22,7 +22,7 @@ local CHIVA_MODEL = 410  -- Modelo de la chiva
 local CHIVA_SEATS_CONFIG = {
     -- Lado Izquierdo - Asientos 2, 3, 4, 5
     -- offsetY ajustado para mover más hacia la derecha (menos negativo = más a la derecha)
-    {seat = 2, name = "Izquierda - Asiento 1", side = "left", offsetX = -9.85, offsetY = 1.50, offsetZ = 1.5},  -- Más atrás
+    {seat = 2, name = "Izquierda - Asiento 1", side = "left", offsetX = -9.85, offsetY = 1.00, offsetZ = 1.5},  -- Más atrás
     {seat = 3, name = "Izquierda - Asiento 2", side = "left", offsetX = -8.49, offsetY = -20.40, offsetZ = 1.5},
     {seat = 4, name = "Izquierda - Asiento 3", side = "left", offsetX = -7.55, offsetY = -20.40, offsetZ = 1.5},
     {seat = 5, name = "Izquierda - Asiento 4", side = "left", offsetX = -6.74, offsetY = -20.45, offsetZ = 1.5},  -- Más adelante
