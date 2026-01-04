@@ -36,6 +36,8 @@ local CHIVA_SEATS_CONFIG = {
 
 -- Tabla para rastrear qué jugadores están en qué asientos personalizados
 local chivaPassengers = {}  -- [vehicle] = {[seat] = player}
+-- Tabla para almacenar offsets de pasajeros montados (para actualización continua)
+local chivaPassengerOffsets = {}  -- [player] = {vehicle = vehicle, seat = seat, offsetX = x, offsetY = y, offsetZ = z}
 
 -- Función para verificar si un jugador está montado en una chiva
 local function isPlayerMountedInChiva(player)
@@ -385,10 +387,19 @@ end)
 
 -- Evento para sincronizar animación cuando otro jugador se monta
 addEvent("chiva:playerMounted", true)
-addEventHandler("chiva:playerMounted", root, function(player, vehicle, seat)
+addEventHandler("chiva:playerMounted", root, function(player, vehicle, seat, offsetX, offsetY, offsetZ)
     if isElement(player) and isElement(vehicle) then
         -- Reproducir animación de sentado para todos los clientes
         setPedAnimation(player, "ped", "CAR_sit", -1, true, false, false, false)
+        
+        -- Registrar offsets para actualización continua
+        chivaPassengerOffsets[player] = {
+            vehicle = vehicle,
+            seat = seat,
+            offsetX = offsetX,
+            offsetY = offsetY,
+            offsetZ = offsetZ
+        }
     end
 end)
 
@@ -398,7 +409,67 @@ addEventHandler("chiva:playerDismounted", root, function(player, vehicle, seat)
     if isElement(player) then
         -- Detener animación de sentado
         setPedAnimation(player, nil)
+        
+        -- Remover de la tabla de offsets
+        chivaPassengerOffsets[player] = nil
     end
+end)
+
+-- 🔥 SISTEMA DE ACTUALIZACIÓN CONTINUA (similar a bone_attach)
+-- Actualiza la posición de los jugadores montados en cada frame
+function updateChivaPassengersPosition()
+    for player, data in pairs(chivaPassengerOffsets) do
+        if isElement(player) and isElement(data.vehicle) then
+            -- Obtener posición y rotación del vehículo
+            local vx, vy, vz = getElementPosition(data.vehicle)
+            local vrx, vry, vrz = getElementRotation(data.vehicle)
+            
+            -- Convertir rotación a radianes
+            local angle = math.rad(vrz)
+            local cosAngle = math.cos(angle)
+            local sinAngle = math.sin(angle)
+            
+            -- Rotar los offsets según la rotación del vehículo
+            -- offsetX es hacia adelante/atrás, offsetY es hacia izquierda/derecha
+            local rotatedX = data.offsetX * cosAngle - data.offsetY * sinAngle
+            local rotatedY = data.offsetX * sinAngle + data.offsetY * cosAngle
+            
+            -- Calcular posición mundial del asiento
+            local seatX = vx + rotatedX
+            local seatY = vy + rotatedY
+            local seatZ = vz + data.offsetZ
+            
+            -- Actualizar posición del jugador
+            setElementPosition(player, seatX, seatY, seatZ)
+            
+            -- Hacer que el jugador mire en la dirección del vehículo
+            setPedRotation(player, vrz)
+            
+            -- Sincronizar interior y dimensión
+            local vehicleInt = getElementInterior(data.vehicle)
+            if vehicleInt ~= getElementInterior(player) then
+                setElementInterior(player, vehicleInt)
+            end
+            
+            local vehicleDim = getElementDimension(data.vehicle)
+            if vehicleDim ~= getElementDimension(player) then
+                setElementDimension(player, vehicleDim)
+            end
+        else
+            -- Limpiar si el elemento ya no existe
+            chivaPassengerOffsets[player] = nil
+        end
+    end
+end
+
+-- Iniciar el sistema de actualización continua
+addEventHandler("onClientResourceStart", resourceRoot, function()
+    addEventHandler("onClientPreRender", root, updateChivaPassengersPosition)
+end)
+
+-- Limpiar cuando el recurso se detiene
+addEventHandler("onClientResourceStop", resourceRoot, function()
+    removeEventHandler("onClientPreRender", root, updateChivaPassengersPosition)
 end)
 
 -- Limpiar tabla cuando el vehículo se destruye
