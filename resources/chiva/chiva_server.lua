@@ -64,7 +64,30 @@ function mountPlayerInChiva(player, vehicle, seat, offsetX, offsetY, offsetZ)
         return false
     end
     
-    -- Registrar al jugador en el asiento con sus offsets
+    -- Debug: mostrar offsets usados
+    outputChatBox(
+        string.format(
+            "Offset usado: X %.2f | Y %.2f | Z %.2f",
+            offsetX,
+            offsetY,
+            offsetZ
+        ),
+        player,
+        255, 255, 0
+    )
+    
+    -- Usar attachElements con offsets LOCALES (no coordenadas del mundo)
+    -- attachElements maneja automáticamente la rotación del vehículo
+    local success = attachElements(player, vehicle, offsetX, offsetY, offsetZ, 0, 0, 0)
+    
+    if not success then
+        outputChatBox("Error al montarte en la chiva.", player, 255, 0, 0)
+        outputServerLog("[CHIVA] Error: attachElements falló para " .. getPlayerName(player))
+        triggerClientEvent(player, "chiva:mounted", resourceRoot, vehicle, seat, false)
+        return false
+    end
+    
+    -- Registrar al jugador en el asiento
     chivaPassengers[vehicle][seat] = {
         player = player,
         offsetX = offsetX,
@@ -74,45 +97,6 @@ function mountPlayerInChiva(player, vehicle, seat, offsetX, offsetY, offsetZ)
     
     -- Congelar al jugador para que no se mueva manualmente
     setElementFrozen(player, true)
-    
-    -- Función para actualizar la posición del jugador continuamente
-    local function updatePlayerPosition()
-        if not isElement(player) or not isElement(vehicle) then
-            return false
-        end
-        
-        if not chivaPassengers[vehicle] or not chivaPassengers[vehicle][seat] or chivaPassengers[vehicle][seat].player ~= player then
-            return false
-        end
-        
-        -- Obtener posición y rotación del vehículo
-        local vx, vy, vz = getElementPosition(vehicle)
-        local vrx, vry, vrz = getElementRotation(vehicle)
-        local angle = math.rad(vrz)
-        local cosAngle = math.cos(angle)
-        local sinAngle = math.sin(angle)
-        
-        -- Rotar los offsets según la rotación del vehículo
-        local rotatedX = offsetX * cosAngle - offsetY * sinAngle
-        local rotatedY = offsetX * sinAngle + offsetY * cosAngle
-        
-        -- Calcular posición mundial del asiento
-        local seatX = vx + rotatedX
-        local seatY = vy + rotatedY
-        local seatZ = vz + offsetZ
-        
-        -- Actualizar posición del jugador
-        setElementPosition(player, seatX, seatY, seatZ)
-        
-        -- Hacer que el jugador mire en la dirección del vehículo
-        setPedRotation(player, vrz)
-        
-        return true
-    end
-    
-    -- Crear timer para actualizar posición cada 50ms (20 veces por segundo)
-    local updateTimer = setTimer(updatePlayerPosition, 50, 0)
-    chivaPassengers[vehicle][seat].timer = updateTimer
     
     -- Reproducir animación de sentado arriba (sincronizada para todos)
     setPedAnimation(player, "ped", "CAR_sit", -1, true, false, false, false)
@@ -141,11 +125,8 @@ function dismountPlayerFromChiva(player, vehicle, seat)
         return false
     end
     
-    -- Detener el timer de actualización de posición
-    local seatData = chivaPassengers[vehicle][seat]
-    if seatData.timer and isTimer(seatData.timer) then
-        killTimer(seatData.timer)
-    end
+    -- Desconectar el elemento del vehículo
+    detachElements(player, vehicle)
     
     -- Detener animación
     setPedAnimation(player, nil)
@@ -227,10 +208,8 @@ addEventHandler("onElementDestroy", root, function()
             -- Bajar a todos los pasajeros
             for seat, seatData in pairs(chivaPassengers[source]) do
                 if seatData and seatData.player and isElement(seatData.player) then
-                    -- Detener timer
-                    if seatData.timer and isTimer(seatData.timer) then
-                        killTimer(seatData.timer)
-                    end
+                    -- Desconectar del vehículo
+                    detachElements(seatData.player, source)
                     -- Descongelar y colocar cerca
                     setElementFrozen(seatData.player, false)
                     setPedAnimation(seatData.player, nil)
@@ -249,9 +228,9 @@ addEventHandler("onPlayerQuit", root, function()
         if isElement(vehicle) then
             for seat, seatData in pairs(seats) do
                 if seatData and seatData.player == source then
-                    -- Detener timer
-                    if seatData.timer and isTimer(seatData.timer) then
-                        killTimer(seatData.timer)
+                    -- Desconectar del vehículo
+                    if isElement(vehicle) then
+                        detachElements(source, vehicle)
                     end
                     chivaPassengers[vehicle][seat] = nil
                     break

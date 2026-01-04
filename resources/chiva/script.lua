@@ -14,23 +14,23 @@ end)
 
 local CHIVA_MODEL = 410  -- Modelo de la chiva
 
--- Configuración de asientos personalizados con offsets relativos al vehículo
--- offsetX: distancia hacia adelante/atrás (negativo = atrás del centro)
--- offsetY: distancia hacia izquierda/derecha (negativo = izquierda, positivo = derecha)
+-- Configuración de asientos personalizados con offsets LOCALES del vehículo
+-- offsetX: distancia hacia adelante/atrás desde el centro (positivo = adelante, negativo = atrás)
+-- offsetY: distancia hacia izquierda/derecha desde el centro (negativo = izquierda, positivo = derecha)
 -- offsetZ: altura desde el suelo del vehículo (para estar "arriba")
--- NOTA: Los offsets Y están reducidos para que queden más cerca del vehículo (multiplicados por 0.5)
+-- IMPORTANTE: Estos son offsets LOCALES, no coordenadas del mundo. attachElements los maneja automáticamente.
 local CHIVA_SEATS_CONFIG = {
-    -- IZQUIERDA
-    { seat=2, side="left",  offsetX= 1.0, offsetY=-1.4, offsetZ=0.9 },
-    { seat=3, side="left",  offsetX= 1.9, offsetY=-1.4, offsetZ=0.9 },
-    { seat=4, side="left",  offsetX= 2.8, offsetY=-1.4, offsetZ=0.9 },
-    { seat=5, side="left",  offsetX= 3.7, offsetY=-1.4, offsetZ=0.9 },
-
-    -- DERECHA
-    { seat=6, side="right", offsetX= 1.0, offsetY= 1.4, offsetZ=0.9 },
-    { seat=7, side="right", offsetX= 1.9, offsetY= 1.4, offsetZ=0.9 },
-    { seat=8, side="right", offsetX= 2.8, offsetY= 1.4, offsetZ=0.9 },
-    { seat=9, side="right", offsetX= 3.7, offsetY= 1.4, offsetZ=0.9 },
+    -- Lado Izquierdo - Asientos 2, 3, 4, 5
+    {seat = 2, name = "Izquierda - Asiento 1", side = "left", offsetX = 1.0, offsetY = -1.4, offsetZ = 0.9},
+    {seat = 3, name = "Izquierda - Asiento 2", side = "left", offsetX = 1.9, offsetY = -1.4, offsetZ = 0.9},
+    {seat = 4, name = "Izquierda - Asiento 3", side = "left", offsetX = 2.8, offsetY = -1.4, offsetZ = 0.9},
+    {seat = 5, name = "Izquierda - Asiento 4", side = "left", offsetX = 3.7, offsetY = -1.4, offsetZ = 0.9},
+    
+    -- Lado Derecho - Asientos 6, 7, 8, 9
+    {seat = 6, name = "Derecha - Asiento 1", side = "right", offsetX = 1.0, offsetY = 1.4, offsetZ = 0.9},
+    {seat = 7, name = "Derecha - Asiento 2", side = "right", offsetX = 1.9, offsetY = 1.4, offsetZ = 0.9},
+    {seat = 8, name = "Derecha - Asiento 3", side = "right", offsetX = 2.8, offsetY = 1.4, offsetZ = 0.9},
+    {seat = 9, name = "Derecha - Asiento 4", side = "right", offsetX = 3.7, offsetY = 1.4, offsetZ = 0.9},
 }
 
 
