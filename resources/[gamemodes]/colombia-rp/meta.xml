@@ -69,7 +69,12 @@
     <script src="client/phone_calls.lua" type="client" />
     <script src="client/jbl_panel.lua" type="client" />
     <script src="client/jbl_model.lua" type="client" />
-    <script src="client/speedometer.lua" type="client" />
+    <!-- Velocímetro 3D (modelo AK47) -->
+    <script src="client/speedometer_3d.lua" type="client" />
+    <file src="ByAngelAK47fire/ak47.dff" type="client" />
+    <file src="ByAngelAK47fire/Ak47.txd" type="client" />
+    <!-- Velocímetro original desactivado temporalmente -->
+    <!-- <script src="client/speedometer.lua" type="client" /> -->
     <script src="client/vehicle_controls.lua" type="client" />
     <script src="client/garage.lua" type="client" />
     <script src="sistema_polvora/client.lua" type="client" />
