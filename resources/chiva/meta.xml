@@ -1,7 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <meta>
-     <info author="Créditos: RealModsMTA" type="misc" name="MTL_Pounder" description="MTL_Pounder" />
+     <info author="Créditos: RealModsMTA" type="misc" name="Chiva Rumbera" description="Chiva Rumbera con sistema de asientos" />
      <script src="script.lua" type="client" />
+     <script src="chiva_server.lua" type="server" />
      <file src="carro.txd" />
      <file src="carro.dff" />
+     <export function="mountPassenger" type="client" />
+     <export function="mountPlayerInChiva" type="server" />
+     <export function="getChivaSeatsInfo" type="server" />
+     <export function="getAvailableSeatsCount" type="server" />
 </meta>
