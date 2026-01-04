@@ -2,8 +2,7 @@
 -- Sistema de asientos personalizados usando actualización continua de posición
 
 -- Tabla para rastrear qué jugadores están en qué asientos personalizados
--- Estructura: chivaPassengers[vehicle][seat] = player
-local chivaPassengers = {}
+local chivaPassengers = {}  -- [vehicle] = {[seat] = player}
 
 -- Función para montar un jugador en la chiva usando attachElements
 function mountPlayerInChiva(player, vehicle, seat, offsetX, offsetY, offsetZ)
@@ -33,8 +32,7 @@ function mountPlayerInChiva(player, vehicle, seat, offsetX, offsetY, offsetZ)
     end
     
     -- Verificar que el asiento esté disponible
-    local existingPlayer = chivaPassengers[vehicle][seat]
-    if existingPlayer and isElement(existingPlayer) then
+    if chivaPassengers[vehicle][seat] then
         outputChatBox("Este asiento está ocupado.", player, 255, 0, 0)
         return false
     end
@@ -65,26 +63,27 @@ function mountPlayerInChiva(player, vehicle, seat, offsetX, offsetY, offsetZ)
         return false
     end
     
-    -- Desactivar colisiones para evitar empujes raros
-    setElementCollisionsEnabled(player, false)
-    -- Opcional: congelar al jugador para evitar deslizamientos
-    setElementFrozen(player, true)
-    
-    -- Adjuntar al vehículo con offsets locales
+    -- 🔥 USAR attachElements - MTA maneja todo automáticamente
     local success = attachElements(player, vehicle, offsetX, offsetY, offsetZ, 0, 0, 0)
+    
     if not success then
         outputChatBox("Error al montarte en la chiva.", player, 255, 0, 0)
         outputServerLog("[CHIVA] Error: attachElements falló para " .. getPlayerName(player))
-        setElementCollisionsEnabled(player, true)
-        setElementFrozen(player, false)
         triggerClientEvent(player, "chiva:mounted", resourceRoot, vehicle, seat, false)
         return false
     end
     
+    -- ⚠️ DETALLES IMPORTANTES para evitar bugs:
+    -- 1. Desactivar colisiones para evitar que empuje el vehículo o salga disparado
+    setElementCollisionsEnabled(player, false)
+    
+    -- 2. Congelar al jugador para evitar deslizamientos, desync y caídas
+    setElementFrozen(player, true)
+    
     -- Registrar al jugador en el asiento
     chivaPassengers[vehicle][seat] = player
     
-    -- Reproducir animación de sentado
+    -- Reproducir animación de sentado arriba (sincronizada para todos)
     setPedAnimation(player, "ped", "CAR_sit", -1, true, false, false, false)
     
     -- Notificar a todos los clientes sobre el montaje
@@ -107,8 +106,7 @@ function dismountPlayerFromChiva(player, vehicle, seat)
         return false
     end
     
-    local attachedPlayer = chivaPassengers[vehicle] and chivaPassengers[vehicle][seat]
-    if attachedPlayer ~= player then
+    if not chivaPassengers[vehicle] or not chivaPassengers[vehicle][seat] or chivaPassengers[vehicle][seat] ~= player then
         return false
     end
     
@@ -125,25 +123,8 @@ function dismountPlayerFromChiva(player, vehicle, seat)
     setPedAnimation(player, nil)
     
     -- Colocar al jugador cerca del vehículo al bajarse
-    local vx, vy, vz = getElementPosition(vehicle)
-    local vrx, vry, vrz = getElementRotation(vehicle)
-    local angle = math.rad(vrz)
-    
-    -- Calcular posición de bajada (al lado del vehículo)
-    local offsetX = 2.0
-    local offsetY = 0.0
-    local rotatedX = offsetX * math.cos(angle) - offsetY * math.sin(angle)
-    local rotatedY = offsetX * math.sin(angle) + offsetY * math.cos(angle)
-    
-    setElementPosition(player, vx + rotatedX, vy + rotatedY, vz + 0.5)
-    
-    -- Reproducir animación de bajarse
-    setPedAnimation(player, "ped", "CAR_getout_LHS", 2000, false, false, false, false)
-    setTimer(function()
-        if isElement(player) then
-            setPedAnimation(player, nil)
-        end
-    end, 2000, 1)
+    local x, y, z = getElementPosition(vehicle)
+    setElementPosition(player, x + 1.5, y, z)
     
     -- Notificar a todos los clientes sobre el desmontaje
     triggerClientEvent("chiva:playerDismounted", resourceRoot, player, vehicle, seat)
@@ -212,6 +193,8 @@ addEventHandler("onElementDestroy", root, function()
             -- Bajar a todos los pasajeros
             for seat, passenger in pairs(chivaPassengers[source]) do
                 if passenger and isElement(passenger) then
+                    -- Desconectar del vehículo
+                    detachElements(passenger, source)
                     -- Restaurar colisiones
                     setElementCollisionsEnabled(passenger, true)
                     -- Descongelar y colocar cerca
@@ -234,8 +217,9 @@ addEventHandler("onPlayerQuit", root, function()
         if isElement(vehicle) then
             for seat, passenger in pairs(seats) do
                 if passenger == source then
-                    -- Restaurar estado
+                    -- Desconectar del vehículo
                     if isElement(vehicle) then
+                        detachElements(source, vehicle)
                         setElementCollisionsEnabled(source, true)
                         setElementFrozen(source, false)
                         triggerClientEvent("chiva:playerDismounted", resourceRoot, source, vehicle, seat)
@@ -297,8 +281,7 @@ function getAvailableSeatsCount(vehicle)
     local seats = {2, 3, 4, 5, 6, 7, 8, 9}
     
     for _, seat in ipairs(seats) do
-        local occupant = chivaPassengers[vehicle][seat]
-        if not occupant then
+        if not chivaPassengers[vehicle][seat] then
             count = count + 1
         end
     end
