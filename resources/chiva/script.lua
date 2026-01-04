@@ -117,16 +117,11 @@ local function getNextAvailableSeat(vehicle, preferredSide, preferredSeat)
         return nil
     end
     
-    -- Obtener número máximo de pasajeros del vehículo
-    local maxPassengers = getVehicleMaxPassengers(vehicle)
-    outputChatBox("[CHIVA DEBUG] Máximo de pasajeros: " .. tostring(maxPassengers), 255, 255, 0)
-    
-    -- En MTA, los asientos van de 0 (conductor) a maxPassengers
-    -- Para la chiva, usaremos asientos 2-9 sin importar maxPassengers
-    -- porque el modelo personalizado puede tener más asientos
+    -- Para la chiva personalizada, usamos asientos 2-9 sin validar maxPassengers
+    -- porque el modelo personalizado tiene más asientos de los que MTA reconoce
     
     -- Si hay un asiento preferido específico, intentar usarlo primero
-    if preferredSeat then
+    if preferredSeat and preferredSeat >= 2 and preferredSeat <= 9 then
         outputChatBox("[CHIVA DEBUG] Intentando asiento preferido: " .. tostring(preferredSeat), 255, 255, 0)
         local occupant = getVehicleOccupant(vehicle, preferredSeat)
         if not occupant or occupant == false then
@@ -300,17 +295,23 @@ local function mountPlayerInChiva(player, vehicle, seat)
     local px, py, pz = getElementPosition(player)
     local distance = getDistanceBetweenPoints3D(px, py, pz, targetX, targetY, targetZ)
     
-    -- Si está muy lejos, moverlo primero
-    if distance > 2.0 then
-        -- Mover al jugador gradualmente hacia la posición
+    -- Solo ajustar posición si está muy lejos (más de 1.5 unidades)
+    -- Asegurarse de que el jugador no esté dentro de un vehículo antes de moverlo
+    if distance > 1.5 and not getPedOccupiedVehicle(player) then
+        -- Mover al jugador hacia la posición
         setElementPosition(player, targetX, targetY, targetZ)
+        outputChatBox("[CHIVA DEBUG] Posición ajustada, distancia: " .. string.format("%.2f", distance), 255, 255, 0)
+    else
+        outputChatBox("[CHIVA DEBUG] Jugador ya está cerca o en vehículo, distancia: " .. string.format("%.2f", distance), 255, 255, 0)
     end
     
-    -- Hacer que el jugador mire hacia el vehículo
-    local lookAtX = vx
-    local lookAtY = vy
-    local lookAngle = math.deg(math.atan2(lookAtY - targetY, lookAtX - targetX))
-    setPedRotation(player, lookAngle)
+    -- Hacer que el jugador mire hacia el vehículo (solo si no está en un vehículo)
+    if not getPedOccupiedVehicle(player) then
+        local lookAtX = vx
+        local lookAtY = vy
+        local lookAngle = math.deg(math.atan2(lookAtY - targetY, lookAtX - targetX))
+        setPedRotation(player, lookAngle)
+    end
     
     -- Congelar al jugador durante la animación
     toggleControl(player, "forwards", false)

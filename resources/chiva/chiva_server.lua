@@ -17,21 +17,19 @@ function mountPlayerInChiva(player, vehicle, seat)
         return false
     end
     
-    -- Verificar número máximo de pasajeros del vehículo
+    -- Verificar número máximo de pasajeros del vehículo (solo para logging)
     local maxPassengers = getVehicleMaxPassengers(vehicle)
-    outputServerLog("[CHIVA] Vehículo modelo 410 tiene " .. tostring(maxPassengers) .. " asientos de pasajeros")
+    outputServerLog("[CHIVA] Vehículo modelo 410 tiene " .. tostring(maxPassengers) .. " asientos reconocidos por MTA, pero el modelo personalizado tiene más")
     
     -- Si no se especifica asiento, encontrar el siguiente disponible
+    -- Para la chiva personalizada, usamos asientos 2-9 sin importar maxPassengers
     if not seat then
-        -- Usar solo los asientos que realmente existen en el vehículo
-        local availableSeats = {}
-        for s = 2, math.min(9, maxPassengers) do
-            table.insert(availableSeats, s)
-        end
+        -- Usar los asientos 2-9 de la chiva personalizada
+        local availableSeats = {2, 3, 4, 5, 6, 7, 8, 9}
         
         for _, s in ipairs(availableSeats) do
             local occupant = getVehicleOccupant(vehicle, s)
-            if not occupant then
+            if not occupant or occupant == false then
                 seat = s
                 break
             end
@@ -44,16 +42,17 @@ function mountPlayerInChiva(player, vehicle, seat)
         end
     end
     
-    -- Verificar que el asiento solicitado no exceda el máximo
-    if seat > maxPassengers then
-        outputChatBox("Este asiento no existe en este vehículo. Máximo: " .. maxPassengers, player, 255, 0, 0)
-        outputServerLog("[CHIVA] Error: Asiento " .. seat .. " excede el máximo (" .. maxPassengers .. ")")
+    -- NO validar contra maxPassengers porque el modelo personalizado tiene más asientos
+    -- Solo validar que el asiento esté en el rango válido (2-9)
+    if seat < 2 or seat > 9 then
+        outputChatBox("Asiento inválido. Usa asientos del 2 al 9.", player, 255, 0, 0)
+        outputServerLog("[CHIVA] Error: Asiento " .. seat .. " fuera del rango válido (2-9)")
         return false
     end
     
     -- Verificar que el asiento esté disponible
     local occupant = getVehicleOccupant(vehicle, seat)
-    if occupant then
+    if occupant and occupant ~= false then
         outputChatBox("Este asiento está ocupado.", player, 255, 0, 0)
         return false
     end
@@ -65,19 +64,18 @@ function mountPlayerInChiva(player, vehicle, seat)
         return false
     end
     
-    -- Verificar que el asiento sea válido para este vehículo
-    local maxPassengers = getVehicleMaxPassengers(vehicle)
-    outputServerLog("[CHIVA] Intentando montar a " .. getPlayerName(player) .. " en asiento " .. seat .. " (max pasajeros: " .. maxPassengers .. ")")
+    -- Verificar que el asiento esté en el rango válido (2-9 para pasajeros de la chiva)
+    outputServerLog("[CHIVA] Intentando montar a " .. getPlayerName(player) .. " en asiento " .. seat)
     
-    if seat > maxPassengers then
-        outputChatBox("Este asiento no existe en este vehículo. Máximo: " .. maxPassengers, player, 255, 0, 0)
-        outputServerLog("[CHIVA] Error: Asiento " .. seat .. " excede el máximo (" .. maxPassengers .. ")")
+    if seat < 2 or seat > 9 then
+        outputChatBox("Asiento inválido. Usa asientos del 2 al 9.", player, 255, 0, 0)
+        outputServerLog("[CHIVA] Error: Asiento " .. seat .. " fuera del rango válido (2-9)")
         return false
     end
     
     -- Verificar que el asiento esté realmente disponible
     local occupant = getVehicleOccupant(vehicle, seat)
-    if occupant then
+    if occupant and occupant ~= false then
         outputChatBox("Este asiento está ocupado por " .. (isElement(occupant) and getPlayerName(occupant) or "alguien") .. ".", player, 255, 0, 0)
         outputServerLog("[CHIVA] Error: Asiento " .. seat .. " ocupado")
         return false
