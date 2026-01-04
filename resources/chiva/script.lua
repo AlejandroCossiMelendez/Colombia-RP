@@ -13,30 +13,35 @@ end)
 
 local CHIVA_MODEL = 410  -- Modelo de la chiva
 
--- Configuración de asientos basada en las coordenadas reales de las puertas
+-- Configuración de asientos basada en offsets relativos al vehículo
 -- Seat 0 = Conductor, Seat 1 = Copiloto
 -- Seats 2-9 = Pasajeros
 -- LADO IZQUIERDO: Asientos 2, 3, 4, 5 (fila izquierda)
 -- LADO DERECHO: Asientos 6, 7, 8, 9 (fila derecha)
 
--- Coordenadas de referencia cuando el vehículo está en posición base (X: 1230.75, Y: -1709.25, Rot: 0)
-local REFERENCE_VEHICLE_X = 1230.75
-local REFERENCE_VEHICLE_Y = -1709.25
-local REFERENCE_VEHICLE_Z = 12.88
+-- Separación promedio entre puertas: ~0.95 unidades GTA
+-- Offsets calculados desde el centro del vehículo (basados en coordenadas de referencia)
+-- Vehículo de referencia estaba en: X: 1230.75, Y: -1709.25
 
 -- Posiciones relativas de las puertas desde el centro del vehículo
+-- offsetX: distancia hacia adelante/atrás (negativo = atrás del centro)
+-- offsetY: distancia hacia izquierda/derecha (negativo = izquierda, positivo = derecha)
 local CHIVA_SEATS_CONFIG = {
     -- Lado Izquierdo - Asientos 2, 3, 4, 5
-    {seat = 2, name = "Izquierda - Asiento 1", side = "left", offsetX = 1220.90 - REFERENCE_VEHICLE_X, offsetY = -1715.65 - REFERENCE_VEHICLE_Y},
-    {seat = 3, name = "Izquierda - Asiento 2", side = "left", offsetX = 1222.26 - REFERENCE_VEHICLE_X, offsetY = -1715.45 - REFERENCE_VEHICLE_Y},
-    {seat = 4, name = "Izquierda - Asiento 3", side = "left", offsetX = 1223.20 - REFERENCE_VEHICLE_X, offsetY = -1715.45 - REFERENCE_VEHICLE_Y},
-    {seat = 5, name = "Izquierda - Asiento 4", side = "left", offsetX = 1224.01 - REFERENCE_VEHICLE_X, offsetY = -1715.55 - REFERENCE_VEHICLE_Y},
+    -- Separación: ~0.95 unidades entre cada puerta
+    {seat = 2, name = "Izquierda - Asiento 1", side = "left", offsetX = -9.85, offsetY = -6.40},  -- Más atrás
+    {seat = 3, name = "Izquierda - Asiento 2", side = "left", offsetX = -8.49, offsetY = -6.20},
+    {seat = 4, name = "Izquierda - Asiento 3", side = "left", offsetX = -7.55, offsetY = -6.20},
+    {seat = 5, name = "Izquierda - Asiento 4", side = "left", offsetX = -6.74, offsetY = -6.30},  -- Más adelante
     
     -- Lado Derecho - Asientos 6, 7, 8, 9
-    {seat = 6, name = "Derecha - Asiento 1", side = "right", offsetX = 1221.39 - REFERENCE_VEHICLE_X, offsetY = -1712.24 - REFERENCE_VEHICLE_Y},
-    {seat = 7, name = "Derecha - Asiento 2", side = "right", offsetX = 1222.39 - REFERENCE_VEHICLE_X, offsetY = -1712.24 - REFERENCE_VEHICLE_Y},  -- Estimado
-    {seat = 8, name = "Derecha - Asiento 3", side = "right", offsetX = 1223.39 - REFERENCE_VEHICLE_X, offsetY = -1712.24 - REFERENCE_VEHICLE_Y},  -- Estimado
-    {seat = 9, name = "Derecha - Asiento 4", side = "right", offsetX = 1224.39 - REFERENCE_VEHICLE_X, offsetY = -1712.24 - REFERENCE_VEHICLE_Y},  -- Estimado
+    -- Separación: ~0.95 unidades entre cada puerta
+    -- Copiloto referencia: offsetX = -9.36, offsetY = -2.99 (calculado desde coordenadas)
+    -- Nota: offsetY positivo = derecha, negativo = izquierda (desde el centro del vehículo)
+    {seat = 6, name = "Derecha - Asiento 1", side = "right", offsetX = -9.36, offsetY = -2.99},  -- Copiloto referencia
+    {seat = 7, name = "Derecha - Asiento 2", side = "right", offsetX = -8.41, offsetY = -2.99},  -- +0.95 en X (más adelante)
+    {seat = 8, name = "Derecha - Asiento 3", side = "right", offsetX = -7.46, offsetY = -2.99},  -- +0.95 en X
+    {seat = 9, name = "Derecha - Asiento 4", side = "right", offsetX = -6.51, offsetY = -2.99},  -- +0.95 en X
 }
 
 -- Función para detectar la puerta más cercana y el asiento correspondiente
@@ -73,8 +78,8 @@ local function detectNearestDoorAndSeat(player, vehicle)
         local doorWorldX = vx + rotatedX
         local doorWorldY = vy + rotatedY
         
-        -- Calcular distancia desde el jugador a la puerta
-        local distance = getDistanceBetweenPoints3D(px, py, pz, doorWorldX, doorWorldY, pz)
+        -- Calcular distancia desde el jugador a la puerta (solo X e Y, Z es similar)
+        local distance = math.sqrt((px - doorWorldX)^2 + (py - doorWorldY)^2)
         
         if distance < minDistance then
             minDistance = distance
@@ -182,8 +187,8 @@ local function getNearbyChiva(player, maxDistance)
                 local doorWorldX = vx + rotatedX
                 local doorWorldY = vy + rotatedY
                 
-                -- Calcular distancia desde el jugador a la puerta
-                local distance = getDistanceBetweenPoints3D(px, py, pz, doorWorldX, doorWorldY, pz)
+                -- Calcular distancia desde el jugador a la puerta (solo X e Y)
+                local distance = math.sqrt((px - doorWorldX)^2 + (py - doorWorldY)^2)
                 
                 if distance <= maxDistance then
                     return vehicle
