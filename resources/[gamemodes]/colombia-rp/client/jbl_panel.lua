@@ -242,19 +242,39 @@ function renderLinkPanel()
 
     -- INPUT URL (más visible - siempre opaco)
     local inputY = y + 120*sy
-    dxDrawRounded(x + 30*sx, inputY, w - 60*sx, 40*sy, 4, tocolor(40, 40, 50, bgAlpha))
-    -- Borde del input para mejor visibilidad
-    dxDrawRounded(x + 30*sx - 1, inputY - 1, w - 60*sx + 2, 40*sy + 2, 4, tocolor(0, 191, 255, 100 * renderAlpha))
-    if isMouseInPosition(x + 30*sx, inputY, w - 60*sx, 40*sy) and getKeyState("mouse1") then
-        guiBringToFront(linkEditBox)
-        guiSetInputMode("no_binds")
+    local inputFocused = false
+    
+    -- Verificar si el input está enfocado
+    if linkEditBox and isElement(linkEditBox) then
+        inputFocused = guiGetInputEnabled() and isMouseInPosition(x + 30*sx, inputY, w - 60*sx, 40*sy)
     end
-    local txt = guiGetText(linkEditBox) or ""
+    
+    dxDrawRounded(x + 30*sx, inputY, w - 60*sx, 40*sy, 4, tocolor(40, 40, 50, bgAlpha))
+    -- Borde del input para mejor visibilidad (más brillante si está enfocado)
+    local borderColor = inputFocused and tocolor(0, 191, 255, 200 * renderAlpha) or tocolor(0, 191, 255, 100 * renderAlpha)
+    dxDrawRounded(x + 30*sx - 1, inputY - 1, w - 60*sx + 2, 40*sy + 2, 4, borderColor)
+    
+    -- Manejar clicks en el input
+    if isMouseInPosition(x + 30*sx, inputY, w - 60*sx, 40*sy) and getKeyState("mouse1") and getTickCount() - clickTick > 250 then
+        if linkEditBox and isElement(linkEditBox) then
+            guiBringToFront(linkEditBox)
+            guiSetInputMode("no_binds")
+            guiSetInputEnabled(true)
+        end
+        clickTick = getTickCount()
+    end
+    
+    -- Obtener texto del input
+    local txt = ""
+    if linkEditBox and isElement(linkEditBox) then
+        txt = guiGetText(linkEditBox) or ""
+    end
+    
     local placeholderColor = tocolor(150, 150, 160, alpha)
     local textColor = tocolor(255, 255, 255, alpha)
     dxDrawText(txt == "" and "Pega el enlace de la música aquí..." or txt, x + 40*sx, inputY, x + w - 40*sx, inputY + 40*sy, txt == "" and placeholderColor or textColor, 1, "default", "left", "center", true, false, true)
     -- Línea inferior del input (más visible)
-    dxDrawRectangle(x + 30*sx, inputY + 38*sy, w - 60*sx, 2, tocolor(0, 191, 255, alpha), true)
+    dxDrawRectangle(x + 30*sx, inputY + 38*sy, w - 60*sx, 2, borderColor, true)
 
     -- Barra de progreso
     local progress = 0
@@ -273,10 +293,24 @@ function renderLinkPanel()
     local btnW, btnH = 160*sx, 40*sy
     local btnText = isInVehicle and "▶ REPRODUCIR EN VEHÍCULO" or "▶ REPRODUCIR"
     if drawSimpleBtn(x + 40*sx, y + 240*sy, btnW, btnH, btnText, C.secundario, alpha) then
+        if not linkEditBox or not isElement(linkEditBox) then
+            outputChatBox("Error: El campo de texto no está disponible.", 255, 0, 0)
+            return
+        end
         local url = guiGetText(linkEditBox)
-        if url ~= "" then 
-            triggerServerEvent("jbl:playFromLink", localPlayer, url)
-            tituloCancion = isInVehicle and "Cargando música en vehículo..." or "Cargando música..."
+        url = url and tostring(url):gsub("^%s+", ""):gsub("%s+$", "") or ""  -- Limpiar espacios
+        if url == "" then 
+            outputChatBox("Por favor ingresa un link válido.", 255, 255, 0)
+            tituloCancion = "Ingresa un link..."
+        else
+            -- Validar que sea una URL válida
+            if not string.find(url, "http://") and not string.find(url, "https://") and not string.find(url, "%.mp3") and not string.find(url, "%.ogg") then
+                outputChatBox("El link debe ser una URL válida (http://, https://) o un archivo de audio (.mp3, .ogg)", 255, 255, 0)
+                tituloCancion = "Link inválido..."
+            else
+                triggerServerEvent("jbl:playFromLink", localPlayer, url)
+                tituloCancion = isInVehicle and "Cargando música en vehículo..." or "Cargando música..."
+            end
         end
     end
 
@@ -300,7 +334,15 @@ function showLinkPanel()
     guiSetInputEnabled(true)
     if isElement(linkEditBox) then destroyElement(linkEditBox) end
     linkEditBox = guiCreateEdit(-1000, -1000, 200, 50, "", false)
-    guiSetEnabled(linkEditBox, true)
+    if linkEditBox then
+        guiSetEnabled(linkEditBox, true)
+        guiSetVisible(linkEditBox, true)
+        -- Permitir pegar texto
+        guiSetProperty(linkEditBox, "AlwaysOnTop", "True")
+    else
+        outputChatBox("Error al crear el campo de texto.", 255, 0, 0)
+        return
+    end
     -- Asegurar que el evento se agregue
     if not getEventHandlers("onClientRender", root, renderLinkPanel) then
         addEventHandler("onClientRender", root, renderLinkPanel)
@@ -406,16 +448,43 @@ end)
 -- Evento para reproducir directamente desde URL (sistema mejorado)
 addEvent("jbl:ReproducirCliente", true)
 addEventHandler("jbl:ReproducirCliente", root, function(url, entidad)
+    if not url or url == "" then
+        outputChatBox("Error: URL vacía.", 255, 0, 0)
+        tituloCancion = "Error al reproducir"
+        return
+    end
+    
     if currentMusic and isElement(currentMusic) then 
         stopSound(currentMusic) 
+        currentMusic = nil
     end
+    
     if entidad and isElement(entidad) then
         local x, y, z = getElementPosition(entidad)
         local sound = playSound3D(url, x, y, z, true)
-        setSoundMaxDistance(sound, getElementType(entidad) == "vehicle" and 150 or 80)
-        attachElements(sound, entidad)
-        currentMusic = sound
-        tituloCancion = "Reproduciendo música..."
+        if sound and isElement(sound) then
+            setSoundMaxDistance(sound, getElementType(entidad) == "vehicle" and 150 or 80)
+            attachElements(sound, entidad)
+            currentMusic = sound
+            tituloCancion = "Reproduciendo música..."
+            outputChatBox("Música iniciada correctamente.", 0, 255, 0)
+        else
+            outputChatBox("Error: No se pudo reproducir la música. Verifica que la URL sea válida.", 255, 0, 0)
+            tituloCancion = "Error al reproducir"
+        end
+    else
+        -- Si no hay entidad, reproducir en posición del jugador
+        local x, y, z = getElementPosition(localPlayer)
+        local sound = playSound3D(url, x, y, z, true)
+        if sound and isElement(sound) then
+            setSoundMaxDistance(sound, 50)
+            currentMusic = sound
+            tituloCancion = "Reproduciendo música..."
+            outputChatBox("Música iniciada correctamente.", 0, 255, 0)
+        else
+            outputChatBox("Error: No se pudo reproducir la música. Verifica que la URL sea válida.", 255, 0, 0)
+            tituloCancion = "Error al reproducir"
+        end
     end
 end)
 

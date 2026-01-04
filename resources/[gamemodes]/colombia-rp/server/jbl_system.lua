@@ -159,13 +159,24 @@ addEventHandler("jbl:playFromLink", root, function(url)
     local player = source
     
     if not isElement(player) or getElementType(player) ~= "player" then
+        outputServerLog("[JBL] Error: Jugador inválido en jbl:playFromLink")
         return
     end
     
-    if not url or url == "" then
+    -- Limpiar y validar URL
+    if not url then
+        outputChatBox("Error: No se recibió ningún link.", player, 255, 0, 0)
+        return
+    end
+    
+    url = tostring(url):gsub("^%s+", ""):gsub("%s+$", "")  -- Limpiar espacios
+    
+    if url == "" then
         outputChatBox("Por favor ingresa un link válido.", player, 255, 0, 0)
         return
     end
+    
+    outputServerLog("[JBL] " .. getPlayerName(player) .. " intenta reproducir: " .. url)
     
     -- Verificar si el jugador está en un vehículo
     local vehicle = getPedOccupiedVehicle(player)
@@ -184,10 +195,13 @@ addEventHandler("jbl:playFromLink", root, function(url)
         }
         
         -- Reproducir música en el vehículo
-        triggerClientEvent(getRootElement(), "jbl:ReproducirCliente", root, url, vehicle)
-        
-        outputChatBox("Reproduciendo música en el vehículo...", player, 0, 255, 0)
-        outputServerLog("[JBL] " .. getPlayerName(player) .. " está reproduciendo música en vehículo desde link: " .. url)
+        if isElement(vehicle) then
+            triggerClientEvent(getRootElement(), "jbl:ReproducirCliente", root, url, vehicle)
+            outputChatBox("Reproduciendo música en el vehículo...", player, 0, 255, 0)
+            outputServerLog("[JBL] " .. getPlayerName(player) .. " está reproduciendo música en vehículo desde link: " .. url)
+        else
+            outputChatBox("Error: El vehículo no es válido.", player, 255, 0, 0)
+        end
         return
     end
     
@@ -205,6 +219,12 @@ addEventHandler("jbl:playFromLink", root, function(url)
     
     -- Obtener objeto JBL
     local jblObject = jblData.object
+    
+    if not isElement(jblObject) then
+        outputChatBox("Error: El objeto JBL no es válido.", player, 255, 0, 0)
+        outputServerLog("[JBL] Error: JBL object no válido para " .. getPlayerName(player))
+        return
+    end
     
     -- Reproducir directamente desde la URL (debe ser una URL de audio válida: .mp3, .ogg, etc.)
     jblData.music = url
