@@ -21,16 +21,16 @@ local CHIVA_MODEL = 410  -- Modelo de la chiva
 -- IMPORTANTE: Estos son offsets LOCALES, no coordenadas del mundo. attachElements los maneja automáticamente.
 local CHIVA_SEATS_CONFIG = {
     -- Lado Izquierdo - Asientos 2, 3, 4, 5
-    {seat = 2, name = "Izquierda - Asiento 1", side = "left", offsetX = 1.0, offsetY = -1.4, offsetZ = 0.9},
-    {seat = 3, name = "Izquierda - Asiento 2", side = "left", offsetX = 1.9, offsetY = -1.4, offsetZ = 0.9},
-    {seat = 4, name = "Izquierda - Asiento 3", side = "left", offsetX = 2.8, offsetY = -1.4, offsetZ = 0.9},
-    {seat = 5, name = "Izquierda - Asiento 4", side = "left", offsetX = 3.7, offsetY = -1.4, offsetZ = 0.9},
+    {seat = 2, name = "Izquierda - Asiento 1", side = "left", offsetX = 1.0, offsetY = -1.4, offsetZ = 0.6},
+    {seat = 3, name = "Izquierda - Asiento 2", side = "left", offsetX = 1.9, offsetY = -1.4, offsetZ = 0.6},
+    {seat = 4, name = "Izquierda - Asiento 3", side = "left", offsetX = 2.8, offsetY = -1.4, offsetZ = 0.6},
+    {seat = 5, name = "Izquierda - Asiento 4", side = "left", offsetX = 3.7, offsetY = -1.4, offsetZ = 0.6},
     
     -- Lado Derecho - Asientos 6, 7, 8, 9
-    {seat = 6, name = "Derecha - Asiento 1", side = "right", offsetX = 1.0, offsetY = 1.4, offsetZ = 0.9},
-    {seat = 7, name = "Derecha - Asiento 2", side = "right", offsetX = 1.9, offsetY = 1.4, offsetZ = 0.9},
-    {seat = 8, name = "Derecha - Asiento 3", side = "right", offsetX = 2.8, offsetY = 1.4, offsetZ = 0.9},
-    {seat = 9, name = "Derecha - Asiento 4", side = "right", offsetX = 3.7, offsetY = 1.4, offsetZ = 0.9},
+    {seat = 6, name = "Derecha - Asiento 1", side = "right", offsetX = 1.0, offsetY = 1.4, offsetZ = 0.6},
+    {seat = 7, name = "Derecha - Asiento 2", side = "right", offsetX = 1.9, offsetY = 1.4, offsetZ = 0.6},
+    {seat = 8, name = "Derecha - Asiento 3", side = "right", offsetX = 2.8, offsetY = 1.4, offsetZ = 0.6},
+    {seat = 9, name = "Derecha - Asiento 4", side = "right", offsetX = 3.7, offsetY = 1.4, offsetZ = 0.6},
 }
 
 
