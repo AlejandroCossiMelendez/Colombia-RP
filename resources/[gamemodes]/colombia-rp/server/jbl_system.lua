@@ -60,10 +60,21 @@ addEventHandler("jbl:activate", root, function()
     local attached = false
     
     -- Intentar usar la función attachElementToBone directamente (está en attach_func.lua)
-    -- Rotación ajustada: rx=20 (inclinación), ry=180 (voltear horizontalmente), rz=-170 (girar un poco más)
-    -- Ajuste fino de rz para orientar mejor la parte de la mano
+    -- 
+    -- ROTACIÓN - 3 EJES DISPONIBLES:
+    -- rx (pitch): Rotación en X - inclina hacia arriba/abajo (positivo = arriba, negativo = abajo)
+    -- ry (yaw): Rotación en Y - gira horizontalmente (positivo = derecha, negativo = izquierda)
+    -- rz (roll): Rotación en Z - rota sobre su propio eje (positivo = sentido horario, negativo = antihorario)
+    --
+    -- Valores actuales: rx=20, ry=170, rz=-170
+    -- También puedes usar setElementBoneRotationOffset después de adjuntar para ajustar
     if attachElementToBone then
         attached = attachElementToBone(jblObject, player, 12, 0.10, 0.12, 0.30, 20, 170, -170)
+        
+        -- Opcional: Ajustar rotación después de adjuntar usando setElementBoneRotationOffset
+        -- if attached and setElementBoneRotationOffset then
+        --     setElementBoneRotationOffset(jblObject, 20, 170, -170)  -- Ajustar aquí si necesitas
+        -- end
     end
     
     -- Si no está disponible directamente, intentar como recurso separado
@@ -72,6 +83,11 @@ addEventHandler("jbl:activate", root, function()
         if boneAttachResource and getResourceState(boneAttachResource) == "running" then
             if exports.bone_attach and exports.bone_attach.attachElementToBone then
                 attached = exports.bone_attach:attachElementToBone(jblObject, player, 12, 0.10, 0.12, 0.30, 20, 170, -170)
+                
+                -- También puedes ajustar después con el export
+                -- if attached and exports.bone_attach.setElementBoneRotationOffset then
+                --     exports.bone_attach:setElementBoneRotationOffset(jblObject, 20, 170, -170)
+                -- end
             end
         end
     end
