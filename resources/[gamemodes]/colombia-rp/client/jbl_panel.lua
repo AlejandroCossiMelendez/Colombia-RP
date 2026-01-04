@@ -14,6 +14,9 @@ local linkPanelAbierto = false
 local linkEditBox = nil
 local linkAnimAlpha = 1
 local tituloCancion = "Esperando música..."
+local linkInputText = ""  -- Texto del input personalizado
+local linkInputFocused = false  -- Si el input está enfocado
+local linkGUIChangedHandler = nil  -- Handler para sincronizar texto
 
 -- COLORES (mejorados para mejor visibilidad)
 local C = {
@@ -265,39 +268,60 @@ function renderLinkPanel()
 
     -- INPUT URL (más visible - siempre opaco)
     local inputY = y + 120*sy
-    local inputFocused = false
+    local inputW = w - 60*sx
+    local inputH = 40*sy
     
-    -- Verificar si el input está enfocado
-    if linkEditBox and isElement(linkEditBox) then
-        inputFocused = guiGetInputEnabled() and isMouseInPosition(x + 30*sx, inputY, w - 60*sx, 40*sy)
-    end
-    
-    dxDrawRounded(x + 30*sx, inputY, w - 60*sx, 40*sy, 4, tocolor(40, 40, 50, bgAlpha))
-    -- Borde del input para mejor visibilidad (más brillante si está enfocado)
-    local borderColor = inputFocused and tocolor(0, 191, 255, 200 * renderAlpha) or tocolor(0, 191, 255, 100 * renderAlpha)
-    dxDrawRounded(x + 30*sx - 1, inputY - 1, w - 60*sx + 2, 40*sy + 2, 4, borderColor)
-    
-    -- Manejar clicks en el input
-    if isMouseInPosition(x + 30*sx, inputY, w - 60*sx, 40*sy) and getKeyState("mouse1") and getTickCount() - clickTick > 250 then
+    -- Manejar clicks en el input para enfocarlo
+    if isMouseInPosition(x + 30*sx, inputY, inputW, inputH) and getKeyState("mouse1") and getTickCount() - clickTick > 250 then
+        linkInputFocused = true
+        guiSetInputMode("no_binds")
+        guiSetInputEnabled(true)
+        -- Enfocar el campo GUI para permitir pegar
         if linkEditBox and isElement(linkEditBox) then
             guiBringToFront(linkEditBox)
-            guiSetInputMode("no_binds")
-            guiSetInputEnabled(true)
+            guiSetEnabled(linkEditBox, true)
         end
         clickTick = getTickCount()
     end
     
-    -- Obtener texto del input
-    local txt = ""
-    if linkEditBox and isElement(linkEditBox) then
-        txt = guiGetText(linkEditBox) or ""
+    -- Si se hace click fuera del input, desenfocar
+    if getKeyState("mouse1") and getTickCount() - clickTick > 250 then
+        if not isMouseInPosition(x + 30*sx, inputY, inputW, inputH) then
+            linkInputFocused = false
+        end
     end
     
+    -- Sincronizar texto del GUI con nuestro sistema
+    if linkEditBox and isElement(linkEditBox) then
+        local guiText = guiGetText(linkEditBox) or ""
+        if guiText ~= linkInputText then
+            linkInputText = guiText
+        end
+    end
+    
+    -- Dibujar fondo del input
+    dxDrawRounded(x + 30*sx, inputY, inputW, inputH, 4, tocolor(40, 40, 50, bgAlpha))
+    
+    -- Borde del input para mejor visibilidad (más brillante si está enfocado)
+    local borderColor = linkInputFocused and tocolor(0, 191, 255, 200 * renderAlpha) or tocolor(0, 191, 255, 100 * renderAlpha)
+    dxDrawRounded(x + 30*sx - 1, inputY - 1, inputW + 2, inputH + 2, 4, borderColor)
+    
+    -- Mostrar cursor parpadeante si está enfocado
+    local showCursor = linkInputFocused and (getTickCount() % 1000 < 500)
+    local displayText = linkInputText
+    if showCursor then
+        displayText = displayText .. "|"
+    end
+    
+    -- Dibujar texto del input
     local placeholderColor = tocolor(150, 150, 160, alpha)
     local textColor = tocolor(255, 255, 255, alpha)
-    dxDrawText(txt == "" and "Pega el enlace de la música aquí..." or txt, x + 40*sx, inputY, x + w - 40*sx, inputY + 40*sy, txt == "" and placeholderColor or textColor, 1, "default", "left", "center", true, false, true)
+    local txt = displayText == "" and "Pega el enlace de la música aquí..." or displayText
+    local txtColor = linkInputText == "" and placeholderColor or textColor
+    dxDrawText(txt, x + 40*sx, inputY, x + w - 40*sx, inputY + inputH, txtColor, 1, "default", "left", "center", true, false, true)
+    
     -- Línea inferior del input (más visible)
-    dxDrawRectangle(x + 30*sx, inputY + 38*sy, w - 60*sx, 2, borderColor, true)
+    dxDrawRectangle(x + 30*sx, inputY + inputH - 2, inputW, 2, borderColor, true)
 
     -- Barra de progreso
     local progress = 0
@@ -316,12 +340,7 @@ function renderLinkPanel()
     local btnW, btnH = 160*sx, 40*sy
     local btnText = isInVehicle and "▶ REPRODUCIR EN VEHÍCULO" or "▶ REPRODUCIR"
     if drawSimpleBtn(x + 40*sx, y + 240*sy, btnW, btnH, btnText, C.secundario, alpha) then
-        if not linkEditBox or not isElement(linkEditBox) then
-            outputChatBox("Error: El campo de texto no está disponible.", 255, 0, 0)
-            return
-        end
-        local url = guiGetText(linkEditBox)
-        url = url and tostring(url):gsub("^%s+", ""):gsub("%s+$", "") or ""  -- Limpiar espacios
+        local url = linkInputText:gsub("^%s+", ""):gsub("%s+$", "")  -- Limpiar espacios
         if url == "" then 
             outputChatBox("Por favor ingresa un link válido.", 255, 255, 0)
             tituloCancion = "Ingresa un link..."
@@ -357,40 +376,124 @@ function showLinkPanel()
     
     linkPanelAbierto = true
     linkAnimAlpha = 1  -- Iniciar completamente visible
+    linkInputText = ""  -- Limpiar texto
+    linkInputFocused = false  -- No enfocado inicialmente
     
-    -- Crear el campo de texto primero
+    -- Crear campo GUI transparente en la posición del input para permitir pegar (Ctrl+V)
     if isElement(linkEditBox) then 
         destroyElement(linkEditBox) 
     end
-    linkEditBox = guiCreateEdit(-1000, -1000, 200, 50, "", false)
     
-    if not linkEditBox or not isElement(linkEditBox) then
-        outputChatBox("Error: No se pudo crear el campo de texto.", 255, 0, 0)
-        linkPanelAbierto = false
-        return
+    -- Calcular posición del input
+    screenW, screenH = guiGetScreenSize()
+    sx, sy = screenW / 1366, screenH / 768
+    local w, h = 550 * sx, 380 * sy
+    local x, y = (screenW - w) / 2, (screenH - h) / 2
+    local inputY = y + 120*sy
+    local inputW = w - 60*sx
+    local inputH = 40*sy
+    
+    -- Crear campo GUI transparente en la posición exacta del input
+    linkEditBox = guiCreateEdit(x + 30*sx, inputY, inputW, inputH, "", false)
+    if linkEditBox then
+        guiSetAlpha(linkEditBox, 0)  -- Completamente transparente
+        guiSetEnabled(linkEditBox, true)
+        guiSetVisible(linkEditBox, true)
+        guiSetProperty(linkEditBox, "AlwaysOnTop", "True")
+        
+        -- Handler para sincronizar el texto del GUI con nuestro sistema
+        linkGUIChangedHandler = function()
+            if linkEditBox and isElement(linkEditBox) then
+                linkInputText = guiGetText(linkEditBox) or ""
+            end
+        end
+        addEventHandler("onClientGUIChanged", linkEditBox, linkGUIChangedHandler, false)
     end
-    
-    guiSetEnabled(linkEditBox, true)
-    guiSetVisible(linkEditBox, true)
-    guiSetProperty(linkEditBox, "AlwaysOnTop", "True")
     
     -- Mostrar cursor y habilitar input
     showCursor(true)
     guiSetInputEnabled(true)
     
-    -- Remover el handler anterior si existe para evitar duplicados
+    -- Remover handlers anteriores si existen para evitar duplicados
     removeEventHandler("onClientRender", root, renderLinkPanel)
+    removeEventHandler("onClientCharacter", root, handleLinkInput)
+    removeEventHandler("onClientKey", root, handleLinkKey)
     
-    -- Agregar el handler de renderizado
+    -- Agregar handlers
     addEventHandler("onClientRender", root, renderLinkPanel)
+    addEventHandler("onClientCharacter", root, handleLinkInput)
+    addEventHandler("onClientKey", root, handleLinkKey)
     
-    outputChatBox("Panel de link abierto. Pega tu URL y presiona Reproducir.", 0, 255, 0)
+    outputChatBox("Panel de link abierto. Haz clic en el campo de texto y escribe o pega tu URL (Ctrl+V).", 0, 255, 0)
 end
 
 function cerrarLinkPanel()
     linkPanelAbierto = false
+    linkInputFocused = false
+    linkInputText = ""
     showCursor(false)
     guiSetInputMode("allow_binds")
+    guiSetInputEnabled(false)
+    
+    -- Destruir campo GUI
+    if linkEditBox and isElement(linkEditBox) then
+        if linkGUIChangedHandler then
+            removeEventHandler("onClientGUIChanged", linkEditBox, linkGUIChangedHandler)
+        end
+        destroyElement(linkEditBox)
+        linkEditBox = nil
+        linkGUIChangedHandler = nil
+    end
+    
+    -- Remover handlers
+    removeEventHandler("onClientRender", root, renderLinkPanel)
+    removeEventHandler("onClientCharacter", root, handleLinkInput)
+    removeEventHandler("onClientKey", root, handleLinkKey)
+end
+
+-- Manejar input de caracteres para el panel de link
+function handleLinkInput(character)
+    if not linkPanelAbierto or not linkInputFocused then return end
+    
+    -- Agregar carácter al texto
+    linkInputText = linkInputText .. character
+    
+    -- Sincronizar con el campo GUI para permitir pegar
+    if linkEditBox and isElement(linkEditBox) then
+        guiSetText(linkEditBox, linkInputText)
+    end
+end
+
+-- Manejar teclas especiales (backspace, enter, etc.)
+function handleLinkKey(button, press)
+    if not linkPanelAbierto or not linkInputFocused then return end
+    
+    if not press then return end
+    
+    if button == "backspace" then
+        -- Eliminar último carácter
+        linkInputText = string.sub(linkInputText, 1, -2)
+    elseif button == "enter" then
+        -- Reproducir música automáticamente al presionar Enter
+        if linkInputText ~= "" then
+            local url = linkInputText:gsub("^%s+", ""):gsub("%s+$", "")
+            if url ~= "" then
+                local vehicle = getPedOccupiedVehicle(localPlayer)
+                local isInVehicle = vehicle ~= false
+                triggerServerEvent("jbl:playFromLink", localPlayer, url)
+                tituloCancion = isInVehicle and "Cargando música en vehículo..." or "Cargando música..."
+            end
+        end
+    elseif button == "escape" then
+        -- Cerrar panel
+        cerrarLinkPanel()
+    elseif button == "v" and getKeyState("lctrl") or getKeyState("rctrl") then
+        -- Pegar desde portapapeles (Ctrl+V)
+        -- Intentar obtener el texto del portapapeles usando un método alternativo
+        -- Nota: MTA no tiene getClipboard() nativo, así que usamos un método de trabajo
+        -- El usuario puede pegar manualmente escribiendo o usando el método del sistema
+        outputChatBox("Usa Ctrl+V para pegar. Si no funciona, escribe la URL manualmente.", 255, 255, 0)
+    end
 end
 
 -- Activar/Desactivar JBL
