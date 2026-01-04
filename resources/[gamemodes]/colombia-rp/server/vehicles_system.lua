@@ -404,3 +404,19 @@ addEventHandler("onVehicleCreate", root, function()
     end
 end)
 
+-- Evento para reconfigurar Urus cuando un jugador entra al vehículo
+-- Esto asegura que el handling se aplique incluso si el modelo se carga después
+addEventHandler("onPlayerVehicleEnter", root, function(vehicle, seat)
+    if seat == 0 then  -- Solo si es el conductor
+        local vehicleId = getElementModel(vehicle)
+        if vehicleId == 560 then
+            -- Aplicar configuración con un pequeño delay para asegurar que el modelo esté cargado
+            setTimer(function()
+                if isElement(vehicle) and isElement(source) then
+                    configureUrusVehicle(vehicle)
+                end
+            end, 100, 1)
+        end
+    end
+end)
+
