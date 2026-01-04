@@ -160,6 +160,14 @@ function createAdminPanel()
         table.insert(adminButtons, curarBtn)
         buttonY = buttonY + buttonSpacing
         
+        -- Botón: Cambiar Skin
+        local cambiarSkinBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Cambiar Skin", false, adminWindow)
+        addEventHandler("onClientGUIClick", cambiarSkinBtn, function()
+            showChangeSkinInput()
+        end, false)
+        table.insert(adminButtons, cambiarSkinBtn)
+        buttonY = buttonY + buttonSpacing
+        
         -- Botón: Dar Item
         local darItemBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Dar Item", false, adminWindow)
         addEventHandler("onClientGUIClick", darItemBtn, function()
@@ -245,6 +253,14 @@ function createAdminPanel()
             showHealInput()
         end, false)
         table.insert(adminButtons, curarBtn)
+        buttonY = buttonY + buttonSpacing
+        
+        -- Botón: Cambiar Skin
+        local cambiarSkinBtn = guiCreateButton(20, buttonY, windowWidth - 40, buttonHeight, "Cambiar Skin", false, adminWindow)
+        addEventHandler("onClientGUIClick", cambiarSkinBtn, function()
+            showChangeSkinInput()
+        end, false)
+        table.insert(adminButtons, cambiarSkinBtn)
         buttonY = buttonY + buttonSpacing
         
         -- Botón: Dar Item
@@ -514,6 +530,122 @@ end
 -- Evento para recibir respuesta del servidor (curar)
 addEvent("admin:healResponse", true)
 addEventHandler("admin:healResponse", root, function(success, message)
+    if success then
+        outputChatBox(message, 0, 255, 0)
+    else
+        outputChatBox(message, 255, 0, 0)
+    end
+end)
+
+-- Función para mostrar el input de cambiar skin
+function showChangeSkinInput()
+    if inputWindow and isElement(inputWindow) then
+        destroyElement(inputWindow)
+    end
+    
+    currentAction = "cambiarSkin"
+    
+    local windowWidth = 350
+    local windowHeight = 180
+    local windowX = (screenW - windowWidth) / 2
+    local windowY = (screenH - windowHeight) / 2
+    
+    inputWindow = guiCreateWindow(windowX, windowY, windowWidth, windowHeight, "Cambiar Skin", false)
+    guiWindowSetSizable(inputWindow, false)
+    
+    local label1 = guiCreateLabel(10, 30, windowWidth - 20, 20, "ID del personaje:", false, inputWindow)
+    local idEdit = guiCreateEdit(10, 50, windowWidth - 20, 30, "", false, inputWindow)
+    guiEditSetMaxLength(idEdit, 10)
+    
+    local label2 = guiCreateLabel(10, 85, windowWidth - 20, 20, "ID del skin (0-311):", false, inputWindow)
+    local skinEdit = guiCreateEdit(10, 105, windowWidth - 20, 30, "", false, inputWindow)
+    guiEditSetMaxLength(skinEdit, 5)
+    
+    local acceptBtn = guiCreateButton(10, 145, (windowWidth - 30) / 2, 30, "Cambiar Skin", false, inputWindow)
+    addEventHandler("onClientGUIClick", acceptBtn, function()
+        local characterId = guiGetText(idEdit)
+        local skinId = guiGetText(skinEdit)
+        if characterId and characterId ~= "" and skinId and skinId ~= "" then
+            local id = tonumber(characterId)
+            local skin = tonumber(skinId)
+            if id and skin and skin >= 0 and skin <= 311 then
+                triggerServerEvent("admin:changeSkin", localPlayer, id, skin)
+                closeInputWindow()
+            else
+                outputChatBox("El ID debe ser un número válido y el skin debe estar entre 0 y 311.", 255, 0, 0)
+            end
+        else
+            outputChatBox("Debes ingresar un ID de personaje y un ID de skin.", 255, 0, 0)
+        end
+    end, false)
+    
+    local cancelBtn = guiCreateButton((windowWidth - 10) / 2 + 5, 145, (windowWidth - 30) / 2, 30, "Cancelar", false, inputWindow)
+    addEventHandler("onClientGUIClick", cancelBtn, function()
+        closeInputWindow()
+    end, false)
+end
+
+-- Evento para recibir respuesta del servidor (cambiar skin)
+addEvent("admin:changeSkinResponse", true)
+addEventHandler("admin:changeSkinResponse", root, function(success, message)
+    if success then
+        outputChatBox(message, 0, 255, 0)
+    else
+        outputChatBox(message, 255, 0, 0)
+    end
+end)
+
+-- Función para mostrar el input de cambiar skin
+function showChangeSkinInput()
+    if inputWindow and isElement(inputWindow) then
+        destroyElement(inputWindow)
+    end
+    
+    currentAction = "cambiarSkin"
+    
+    local windowWidth = 350
+    local windowHeight = 180
+    local windowX = (screenW - windowWidth) / 2
+    local windowY = (screenH - windowHeight) / 2
+    
+    inputWindow = guiCreateWindow(windowX, windowY, windowWidth, windowHeight, "Cambiar Skin", false)
+    guiWindowSetSizable(inputWindow, false)
+    
+    local label1 = guiCreateLabel(10, 30, windowWidth - 20, 20, "ID del personaje:", false, inputWindow)
+    local idEdit = guiCreateEdit(10, 50, windowWidth - 20, 30, "", false, inputWindow)
+    guiEditSetMaxLength(idEdit, 10)
+    
+    local label2 = guiCreateLabel(10, 85, windowWidth - 20, 20, "ID del skin (0-311):", false, inputWindow)
+    local skinEdit = guiCreateEdit(10, 105, windowWidth - 20, 30, "", false, inputWindow)
+    guiEditSetMaxLength(skinEdit, 5)
+    
+    local acceptBtn = guiCreateButton(10, 145, (windowWidth - 30) / 2, 30, "Cambiar Skin", false, inputWindow)
+    addEventHandler("onClientGUIClick", acceptBtn, function()
+        local characterId = guiGetText(idEdit)
+        local skinId = guiGetText(skinEdit)
+        if characterId and characterId ~= "" and skinId and skinId ~= "" then
+            local id = tonumber(characterId)
+            local skin = tonumber(skinId)
+            if id and skin and skin >= 0 and skin <= 311 then
+                triggerServerEvent("admin:changeSkin", localPlayer, id, skin)
+                closeInputWindow()
+            else
+                outputChatBox("El ID debe ser un número válido y el skin debe estar entre 0 y 311.", 255, 0, 0)
+            end
+        else
+            outputChatBox("Debes ingresar un ID de personaje y un ID de skin.", 255, 0, 0)
+        end
+    end, false)
+    
+    local cancelBtn = guiCreateButton((windowWidth - 10) / 2 + 5, 145, (windowWidth - 30) / 2, 30, "Cancelar", false, inputWindow)
+    addEventHandler("onClientGUIClick", cancelBtn, function()
+        closeInputWindow()
+    end, false)
+end
+
+-- Evento para recibir respuesta del servidor (cambiar skin)
+addEvent("admin:changeSkinResponse", true)
+addEventHandler("admin:changeSkinResponse", root, function(success, message)
     if success then
         outputChatBox(message, 0, 255, 0)
     else

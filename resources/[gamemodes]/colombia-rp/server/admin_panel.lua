@@ -339,6 +339,77 @@ addEventHandler("admin:healPlayer", root, function(characterId)
     outputServerLog("[ADMIN] " .. getPlayerName(source) .. " curó completamente a " .. displayName .. " (ID: " .. characterId .. ")")
 end)
 
+-- Evento para cambiar skin de un jugador (desde el panel)
+addEvent("admin:changeSkin", true)
+addEventHandler("admin:changeSkin", root, function(characterId, skinId)
+    if not isElement(source) or getElementType(source) ~= "player" then
+        return
+    end
+    
+    if not isPlayerAdminOrStaff(source) then
+        triggerClientEvent(source, "admin:changeSkinResponse", source, false, "No tienes permiso para usar esta función.")
+        return
+    end
+    
+    if not characterId or not tonumber(characterId) then
+        triggerClientEvent(source, "admin:changeSkinResponse", source, false, "ID de personaje inválido.")
+        return
+    end
+    
+    if not skinId or not tonumber(skinId) then
+        triggerClientEvent(source, "admin:changeSkinResponse", source, false, "ID de skin inválido.")
+        return
+    end
+    
+    characterId = tonumber(characterId)
+    skinId = tonumber(skinId)
+    
+    -- Validar rango de skin (0-311)
+    if skinId < 0 or skinId > 311 then
+        triggerClientEvent(source, "admin:changeSkinResponse", source, false, "El ID de skin debe estar entre 0 y 311.")
+        return
+    end
+    
+    -- Buscar jugador con ese ID de personaje
+    local target = nil
+    for _, p in ipairs(getElementsByType("player")) do
+        if getElementData(p, "character:selected") then
+            local pCharId = getElementData(p, "character:id")
+            if pCharId and tonumber(pCharId) == characterId then
+                target = p
+                break
+            end
+        end
+    end
+    
+    if not target then
+        triggerClientEvent(source, "admin:changeSkinResponse", source, false, "No se encontró ningún jugador con el ID de personaje " .. characterId .. ".")
+        return
+    end
+    
+    -- Cambiar el skin del jugador
+    setElementModel(target, skinId)
+    
+    -- Actualizar en la base de datos
+    local charId = getElementData(target, "character:id")
+    if charId then
+        local success = executeDatabase("UPDATE characters SET skin = ? WHERE id = ?", skinId, charId)
+        if not success then
+            triggerClientEvent(source, "admin:changeSkinResponse", source, false, "Error al actualizar el skin en la base de datos.")
+            return
+        end
+    end
+    
+    -- Notificar al jugador objetivo
+    local charName = getElementData(target, "character:name")
+    local charSurname = getElementData(target, "character:surname")
+    local displayName = (charName and charSurname) and (charName .. " " .. charSurname) or getPlayerName(target)
+    
+    triggerClientEvent(source, "admin:changeSkinResponse", source, true, "Has cambiado el skin de " .. displayName .. " (ID: " .. characterId .. ") a " .. skinId .. ".")
+    outputChatBox("Un administrador ha cambiado tu skin a " .. skinId .. ".", target, 0, 255, 0)
+    outputServerLog("[ADMIN] " .. getPlayerName(source) .. " cambió el skin de " .. displayName .. " (ID: " .. characterId .. ") a " .. skinId)
+end)
+
 -- Restaurar visibilidad al desconectar
 addEventHandler("onPlayerQuit", root, function()
     if getElementData(source, "admin:invisible") then
