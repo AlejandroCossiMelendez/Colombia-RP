@@ -367,10 +367,10 @@ addEventHandler('onClientResourceStart',resourceRoot,function ()
                 chivaPassengers[vehicle] = {}
             end
             chivaPassengers[vehicle][seat] = player
-    
-            -- Forzar animación sentada (el server ya hizo attach real)
+            
+            -- Reproducir animación de sentado para el jugador local
             setPedAnimation(player, "ped", "CAR_sit", -1, true, false, false, false)
-    
+            
             outputChatBox("Te has montado en la chiva (Asiento " .. seat .. "). Presiona F para bajarte.", 0, 255, 0)
         else
             outputChatBox("Error al montarte en la chiva.", 255, 0, 0)
@@ -383,7 +383,7 @@ addEventHandler('onClientResourceStart',resourceRoot,function ()
         local player = localPlayer
         if chivaPassengers[vehicle] and chivaPassengers[vehicle][seat] == player then
             chivaPassengers[vehicle][seat] = nil
-    
+            
             -- Detener animación
             setPedAnimation(player, nil)
             
@@ -406,14 +406,6 @@ addEventHandler('onClientResourceStart',resourceRoot,function ()
         if isElement(player) then
             -- Detener animación de sentado
             setPedAnimation(player, nil)
-        end
-    end)
-    
-    -- Limpiar cuando el recurso se detiene
-    addEventHandler("onClientResourceStop", resourceRoot, function()
-        if updateHandlerActive then
-            removeEventHandler("onClientPreRender", root, updateChivaPassengersPosition)
-            updateHandlerActive = false
         end
     end)
     
