@@ -186,31 +186,54 @@ end
 
 -- Renderizar panel de Link avanzado
 function renderLinkPanel()
-    if linkPanelAbierto then
-        if linkAnimAlpha < 1 then linkAnimAlpha = math.min(linkAnimAlpha + 0.1, 1) end
-    else
-        if linkAnimAlpha > 0 then linkAnimAlpha = math.max(linkAnimAlpha - 0.1, 0) else
+    -- Asegurar que las variables de pantalla estén actualizadas
+    screenW, screenH = guiGetScreenSize()
+    sx, sy = screenW / 1366, screenH / 768
+    
+    -- Si el panel no está abierto, cerrar y limpiar
+    if not linkPanelAbierto then
+        if linkAnimAlpha > 0 then 
+            linkAnimAlpha = math.max(linkAnimAlpha - 0.1, 0) 
+        else
             removeEventHandler("onClientRender", root, renderLinkPanel)
             if isElement(linkEditBox) then destroyElement(linkEditBox) end
+            linkEditBox = nil
             return
+        end
+    else
+        -- Si está abierto, asegurar que alpha sea 1
+        if linkAnimAlpha < 1 then 
+            linkAnimAlpha = math.min(linkAnimAlpha + 0.15, 1) 
         end
     end
     
-    -- Asegurar que el panel se renderice incluso si alpha es bajo
-    if linkAnimAlpha <= 0 and not linkPanelAbierto then return end
+    -- No renderizar si alpha es 0 y el panel está cerrado
+    if linkAnimAlpha <= 0 and not linkPanelAbierto then 
+        return 
+    end
     
     local w, h = 550 * sx, 380 * sy
     local x, y = (screenW - w) / 2, (screenH - h) / 2
     -- Cuando el panel está abierto, usar opacidad completa
     local renderAlpha = linkPanelAbierto and 1.0 or linkAnimAlpha
     local alpha = 255 * renderAlpha
+    
+    -- Debug: verificar que se esté renderizando
+    if linkPanelAbierto and linkAnimAlpha > 0.5 then
+        -- Esto asegura que el panel se vea
+    end
 
     -- Fondo oscuro semi-transparente para mejor visibilidad (más opaco)
-    dxDrawRectangle(0, 0, screenW, screenH, tocolor(0, 0, 0, 200 * renderAlpha), true)
+    dxDrawRectangle(0, 0, screenW, screenH, tocolor(0, 0, 0, math.max(200 * renderAlpha, 150)), true)
     
     -- Borde de Neón y Fondo Principal (MUY OPACO - siempre visible cuando abierto)
-    local borderAlpha = 200 * renderAlpha
-    local bgAlpha = 255 * renderAlpha
+    local borderAlpha = math.max(200 * renderAlpha, 150)
+    local bgAlpha = math.max(255 * renderAlpha, 200)
+    
+    -- Dibujar fondo sólido primero para asegurar visibilidad
+    dxDrawRectangle(x, y, w, h, tocolor(25, 25, 35, bgAlpha), true)
+    
+    -- Borde de neón
     dxDrawRounded(x - 2, y - 2, w + 4, h + 4, 6, tocolor(0, 191, 255, borderAlpha)) 
     -- Fondo principal sólido y opaco (siempre al 100%)
     dxDrawRounded(x, y, w, h, 6, tocolor(25, 25, 35, bgAlpha))
@@ -327,26 +350,41 @@ end
 
 -- Mostrar panel de Link avanzado
 function showLinkPanel()
-    if linkPanelAbierto then return end
+    if linkPanelAbierto then 
+        outputChatBox("El panel ya está abierto.", 255, 255, 0)
+        return 
+    end
+    
     linkPanelAbierto = true
     linkAnimAlpha = 1  -- Iniciar completamente visible
-    showCursor(true)
-    guiSetInputEnabled(true)
-    if isElement(linkEditBox) then destroyElement(linkEditBox) end
+    
+    -- Crear el campo de texto primero
+    if isElement(linkEditBox) then 
+        destroyElement(linkEditBox) 
+    end
     linkEditBox = guiCreateEdit(-1000, -1000, 200, 50, "", false)
-    if linkEditBox then
-        guiSetEnabled(linkEditBox, true)
-        guiSetVisible(linkEditBox, true)
-        -- Permitir pegar texto
-        guiSetProperty(linkEditBox, "AlwaysOnTop", "True")
-    else
-        outputChatBox("Error al crear el campo de texto.", 255, 0, 0)
+    
+    if not linkEditBox or not isElement(linkEditBox) then
+        outputChatBox("Error: No se pudo crear el campo de texto.", 255, 0, 0)
+        linkPanelAbierto = false
         return
     end
-    -- Asegurar que el evento se agregue
-    if not getEventHandlers("onClientRender", root, renderLinkPanel) then
-        addEventHandler("onClientRender", root, renderLinkPanel)
-    end
+    
+    guiSetEnabled(linkEditBox, true)
+    guiSetVisible(linkEditBox, true)
+    guiSetProperty(linkEditBox, "AlwaysOnTop", "True")
+    
+    -- Mostrar cursor y habilitar input
+    showCursor(true)
+    guiSetInputEnabled(true)
+    
+    -- Remover el handler anterior si existe para evitar duplicados
+    removeEventHandler("onClientRender", root, renderLinkPanel)
+    
+    -- Agregar el handler de renderizado
+    addEventHandler("onClientRender", root, renderLinkPanel)
+    
+    outputChatBox("Panel de link abierto. Pega tu URL y presiona Reproducir.", 0, 255, 0)
 end
 
 function cerrarLinkPanel()
