@@ -327,7 +327,7 @@ function configureUrusVehicle(vehicle)
     -- Configurar velocidad máxima a 300 km/h
     -- Nota: En MTA, maxVelocity está en m/s. 300 km/h = 83.33 m/s
     -- Pero usamos un valor más alto para contrarrestar limitaciones del modelo
-    setVehicleHandling(vehicle, "maxVelocity", 100.0)  -- Valor muy alto para forzar 300+ km/h
+    setVehicleHandling(vehicle, "maxVelocity", 300.0)  -- Valor muy alto para forzar 300+ km/h
     
     -- Configurar número de marchas (6 marchas para mejor rendimiento)
     setVehicleHandling(vehicle, "numberOfGears", 6)
@@ -337,7 +337,7 @@ function configureUrusVehicle(vehicle)
     setVehicleHandling(vehicle, "engineType", "petrol")
     
     -- Configurar handling para MUCHO mejor rendimiento (valores EXTREMADAMENTE aumentados)
-    setVehicleHandling(vehicle, "engineAcceleration", 100.0)  -- Aceleración EXTREMADAMENTE mejorada
+    setVehicleHandling(vehicle, "engineAcceleration", 300.0)  -- Aceleración EXTREMADAMENTE mejorada
     setVehicleHandling(vehicle, "engineInertia", 300.0)     -- Inercia del motor EXTREMADAMENTE alta (máxima potencia)
     setVehicleHandling(vehicle, "brakeDeceleration", 25.0)  -- Freno mejorado
     setVehicleHandling(vehicle, "tractionMultiplier", 2.5)   -- Tracción EXTREMADAMENTE mejorada
@@ -382,9 +382,9 @@ function configureUrusVehicle(vehicle)
         setTimer(function()
             if isElement(vehicle) then
                 -- Reforzar TODA la configuración de velocidad y rendimiento con valores altos
-                setVehicleHandling(vehicle, "maxVelocity", 100.0)
+                setVehicleHandling(vehicle, "maxVelocity", 300.0)
                 setVehicleHandling(vehicle, "numberOfGears", 6)
-                setVehicleHandling(vehicle, "engineAcceleration", 100.0)
+                setVehicleHandling(vehicle, "engineAcceleration", 300.0)
                 setVehicleHandling(vehicle, "engineInertia", 300.0)
                 setVehicleHandling(vehicle, "tractionMultiplier", 2.5)
                 setVehicleHandling(vehicle, "tractionLoss", 0.5)
@@ -400,9 +400,9 @@ function configureUrusVehicle(vehicle)
     setTimer(function()
         if isElement(vehicle) then
             -- Verificación final para asegurar que todo esté aplicado
-            setVehicleHandling(vehicle, "maxVelocity", 100.0)
+            setVehicleHandling(vehicle, "maxVelocity", 300.0)
             setVehicleHandling(vehicle, "numberOfGears", 6)
-            setVehicleHandling(vehicle, "engineAcceleration", 100.0)
+            setVehicleHandling(vehicle, "engineAcceleration", 300.0)
             setVehicleHandling(vehicle, "engineInertia", 300.0)
             -- Asegurar que el daño visual esté habilitado
             setVehicleDamageProof(vehicle, false)
@@ -456,9 +456,9 @@ addEventHandler("onPlayerVehicleEnter", root, function(vehicle, seat)
                     
                     -- Si el handling no es correcto, corregirlo con valores MUY altos
                     if currentMaxVel < 90 or currentGears < 6 or currentAccel < 90 or currentInertia < 250 then
-                        setVehicleHandling(vehicle, "maxVelocity", 100.0)
+                        setVehicleHandling(vehicle, "maxVelocity", 300.0)
                         setVehicleHandling(vehicle, "numberOfGears", 6)
-                        setVehicleHandling(vehicle, "engineAcceleration", 100.0)
+                        setVehicleHandling(vehicle, "engineAcceleration", 300.0)
                         setVehicleHandling(vehicle, "engineInertia", 300.0)
                         setVehicleHandling(vehicle, "tractionMultiplier", 2.5)
                         setVehicleHandling(vehicle, "tractionLoss", 0.3)
