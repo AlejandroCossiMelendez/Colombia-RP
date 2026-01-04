@@ -70,11 +70,15 @@ local function getNextAvailableSeat(vehicle, preferredSide)
         return nil
     end
     
+    -- Obtener número máximo de pasajeros del vehículo
+    local maxPassengers = getVehicleMaxPassengers(vehicle)
+    
     -- Primero buscar en el lado preferido
     if preferredSide then
         for _, seatConfig in ipairs(CHIVA_SEATS_CONFIG) do
-            if seatConfig.side == preferredSide then
-                local seat = seatConfig.seat
+            local seat = seatConfig.seat
+            -- Verificar que el asiento no exceda el máximo del vehículo
+            if seat <= maxPassengers and seatConfig.side == preferredSide then
                 local occupant = getVehicleOccupant(vehicle, seat)
                 if not occupant then
                     return seat
@@ -86,9 +90,12 @@ local function getNextAvailableSeat(vehicle, preferredSide)
     -- Si no hay disponibles en el lado preferido, buscar en cualquier lado
     for _, seatConfig in ipairs(CHIVA_SEATS_CONFIG) do
         local seat = seatConfig.seat
-        local occupant = getVehicleOccupant(vehicle, seat)
-        if not occupant then
-            return seat
+        -- Verificar que el asiento no exceda el máximo del vehículo
+        if seat <= maxPassengers then
+            local occupant = getVehicleOccupant(vehicle, seat)
+            if not occupant then
+                return seat
+            end
         end
     end
     
