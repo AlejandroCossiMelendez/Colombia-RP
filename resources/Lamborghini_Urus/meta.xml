@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="DON" type="misc" name="GOLFIMK8-560" description="GOLFIMK8-560" />
+     <script src="script.lua" type="client" />
+     <file src="washing.txd" />
+     <file src="washing.dff" />
+</meta>
