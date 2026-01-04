@@ -993,6 +993,8 @@ function showVehiclesPanel()
                 vehicleName = "Turbo Juan Valdez"
             elseif vehicleId == 561 then
                 vehicleName = "Infiniti FX50"
+            elseif vehiceleId == 419 then
+                vehicleName = "Supra GT86"
             end
 
             
