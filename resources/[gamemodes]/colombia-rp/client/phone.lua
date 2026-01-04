@@ -436,6 +436,16 @@ function whenWebBrowserReady()
     -- El navegador web está listo
     if webBrowserContent and isElement(webBrowserContent) then
         outputChatBox("[DEBUG] Navegador web listo", 0, 255, 0)
+        
+        -- Notificar al navegador del teléfono que el navegador web se abrió
+        if browserContent and isElement(browserContent) then
+            executeBrowserJavascript(browserContent, [[
+                const homeScreen = document.getElementById('browserHomeScreen');
+                if (homeScreen) {
+                    homeScreen.style.display = 'none';
+                }
+            ]])
+        end
     end
 end
 
@@ -458,6 +468,16 @@ function openWebBrowser(url)
         end
         guiSetVisible(webBrowser, true)
         webBrowserVisible = true
+        
+        -- Ocultar mensaje en el teléfono
+        if browserContent and isElement(browserContent) then
+            executeBrowserJavascript(browserContent, [[
+                const homeScreen = document.getElementById('browserHomeScreen');
+                if (homeScreen) {
+                    homeScreen.style.display = 'none';
+                }
+            ]])
+        end
         return
     end
     
@@ -485,6 +505,20 @@ function openWebBrowser(url)
     
     addEventHandler("onClientBrowserCreated", webBrowser, loadWebBrowser)
     addEventHandler("onClientBrowserDocumentReady", webBrowser, whenWebBrowserReady)
+    
+    -- Notificar inmediatamente al navegador del teléfono que se está abriendo
+    if browserContent and isElement(browserContent) then
+        setTimer(function()
+            if browserContent and isElement(browserContent) then
+                executeBrowserJavascript(browserContent, [[
+                    const homeScreen = document.getElementById('browserHomeScreen');
+                    if (homeScreen) {
+                        homeScreen.style.display = 'none';
+                    }
+                ]])
+            end
+        end, 500, 1) -- Esperar 500ms para que el navegador se cree
+    end
 end
 
 function closeWebBrowser()

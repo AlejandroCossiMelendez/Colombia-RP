@@ -1506,21 +1506,23 @@ function initBrowserApp() {
         console.log('[BROWSER] window.mta.triggerEvent disponible:', !!(window.mta && window.mta.triggerEvent));
         console.log('[BROWSER] window.openMTAWebBrowser disponible:', typeof window.openMTAWebBrowser);
         
+        // Mostrar mensaje temporal mientras se abre el navegador
+        const homeScreen = get('#browserHomeScreen');
+        if (homeScreen) {
+            homeScreen.style.display = 'flex';
+            homeScreen.innerHTML = `
+                <div class="browser-logo">🌐</div>
+                <h3>Abriendo en navegador...</h3>
+                <p>La página se abrirá en una ventana separada</p>
+            `;
+        }
+        
         // Intentar usar la función global primero
         if (typeof window.openMTAWebBrowser === 'function') {
             try {
                 window.openMTAWebBrowser(url);
                 console.log('[BROWSER] openMTAWebBrowser llamado exitosamente');
-                // Mostrar mensaje al usuario
-                const homeScreen = get('#browserHomeScreen');
-                if (homeScreen) {
-                    homeScreen.style.display = 'flex';
-                    homeScreen.innerHTML = `
-                        <div class="browser-logo">🌐</div>
-                        <h3>Abriendo en navegador...</h3>
-                        <p>La página se abrirá en una ventana separada</p>
-                    `;
-                }
+                // El mensaje se ocultará automáticamente cuando el navegador esté listo
                 return;
             } catch (e) {
                 console.error('[BROWSER] Error al llamar openMTAWebBrowser:', e);
@@ -1532,16 +1534,7 @@ function initBrowserApp() {
             try {
                 window.mta.triggerEvent('phone:browserNavigate', url);
                 console.log('[BROWSER] Evento triggerEvent llamado exitosamente');
-                // Mostrar mensaje al usuario
-                const homeScreen = get('#browserHomeScreen');
-                if (homeScreen) {
-                    homeScreen.style.display = 'flex';
-                    homeScreen.innerHTML = `
-                        <div class="browser-logo">🌐</div>
-                        <h3>Abriendo en navegador...</h3>
-                        <p>La página se abrirá en una ventana separada</p>
-                    `;
-                }
+                // El mensaje se ocultará automáticamente cuando el navegador esté listo
                 return;
             } catch (e) {
                 console.error('[BROWSER] Error al llamar triggerEvent:', e);
