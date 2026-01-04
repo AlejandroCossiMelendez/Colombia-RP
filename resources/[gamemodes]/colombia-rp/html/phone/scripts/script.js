@@ -1443,10 +1443,6 @@ function initBrowserApp() {
             browserHistoryIndex--;
         }
         
-        // Cargar URL en el iframe
-        browserFrame.src = formattedUrl;
-        browserUrlBar.value = formattedUrl;
-        
         // Ocultar pantalla de inicio
         if (browserHomeScreen) {
             browserHomeScreen.style.display = 'none';
@@ -1454,6 +1450,74 @@ function initBrowserApp() {
         
         // Actualizar botones de navegación
         updateBrowserButtons();
+        
+        // Intentar cargar en iframe primero
+        let iframeLoaded = false;
+        let loadTimeout;
+        
+        // Listener para detectar si el iframe carga
+        const onIframeLoad = function() {
+            iframeLoaded = true;
+            clearTimeout(loadTimeout);
+            browserFrame.removeEventListener('load', onIframeLoad);
+            browserFrame.removeEventListener('error', onIframeError);
+        };
+        
+        // Listener para detectar errores del iframe
+        const onIframeError = function() {
+            if (!iframeLoaded) {
+                clearTimeout(loadTimeout);
+                openInSecondaryBrowser(formattedUrl);
+                browserFrame.removeEventListener('load', onIframeLoad);
+                browserFrame.removeEventListener('error', onIframeError);
+            }
+        };
+        
+        browserFrame.addEventListener('load', onIframeLoad);
+        browserFrame.addEventListener('error', onIframeError);
+        
+        // Intentar cargar directamente
+        browserFrame.src = formattedUrl;
+        browserUrlBar.value = formattedUrl;
+        
+        // Si después de 2 segundos no carga, abrir navegador secundario
+        loadTimeout = setTimeout(function() {
+            if (!iframeLoaded) {
+                // Verificar si realmente no cargó (puede ser bloqueado por X-Frame-Options)
+                try {
+                    const iframeDoc = browserFrame.contentDocument || browserFrame.contentWindow.document;
+                    if (!iframeDoc || !iframeDoc.body || iframeDoc.body.innerHTML.trim() === '') {
+                        openInSecondaryBrowser(formattedUrl);
+                    }
+                } catch (e) {
+                    // Error de CORS/X-Frame-Options, abrir navegador secundario
+                    openInSecondaryBrowser(formattedUrl);
+                }
+            }
+            browserFrame.removeEventListener('load', onIframeLoad);
+            browserFrame.removeEventListener('error', onIframeError);
+        }, 2000);
+    }
+    
+    // Función para abrir URL en navegador secundario
+    function openInSecondaryBrowser(url) {
+        if (window.mta && window.mta.triggerEvent) {
+            window.mta.triggerEvent('phone:browserNavigate', url);
+            // Mostrar mensaje al usuario
+            const homeScreen = get('#browserHomeScreen');
+            if (homeScreen) {
+                homeScreen.style.display = 'flex';
+                homeScreen.innerHTML = `
+                    <div class="browser-logo">🌐</div>
+                    <h3>Abriendo en navegador...</h3>
+                    <p>La página se abrirá en una ventana separada</p>
+                `;
+            }
+        } else {
+            // Fallback: usar proxy de Google Translate
+            const proxyUrl = 'https://translate.google.com/translate?sl=auto&tl=es&u=' + encodeURIComponent(url);
+            browserFrame.src = proxyUrl;
+        }
     }
     
     // Función para actualizar estado de botones de navegación

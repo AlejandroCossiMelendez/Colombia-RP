@@ -389,3 +389,105 @@ addEventHandler("phone:callFailed", resourceRoot, function(reason)
     end
 end)
 
+-- Sistema de navegador web secundario para la app del navegador
+local webBrowser = nil
+local webBrowserContent = nil
+local webBrowserVisible = false
+
+function loadWebBrowser(url)
+    if source and isElement(source) and url then
+        loadBrowserURL(source, url)
+    end
+end
+
+function whenWebBrowserReady()
+    -- El navegador web está listo
+    if webBrowserContent and isElement(webBrowserContent) then
+        -- Navegador listo para usar
+    end
+end
+
+function openWebBrowser(url)
+    if not url or url == "" then
+        return
+    end
+    
+    -- Si ya existe, solo cambiar la URL
+    if webBrowser and isElement(webBrowser) then
+        if webBrowserContent and isElement(webBrowserContent) then
+            loadBrowserURL(webBrowserContent, url)
+        end
+        guiSetVisible(webBrowser, true)
+        webBrowserVisible = true
+        return
+    end
+    
+    -- Crear nuevo navegador web
+    local sw, sh = guiGetScreenSize()
+    local browserWidth = math.min(1200, sw - 100)
+    local browserHeight = math.min(800, sh - 100)
+    local browserX = (sw - browserWidth) / 2
+    local browserY = (sh - browserHeight) / 2
+    
+    webBrowser = guiCreateBrowser(browserX, browserY, browserWidth, browserHeight, true, true, false)
+    webBrowserContent = guiGetBrowser(webBrowser)
+    
+    if not webBrowser or not webBrowserContent then
+        outputChatBox("Error: No se pudo crear el navegador web", 255, 0, 0)
+        return
+    end
+    
+    webBrowserVisible = true
+    guiSetInputMode("no_binds_when_editing")
+    showCursor(true)
+    guiSetInputEnabled(true)
+    
+    addEventHandler("onClientBrowserCreated", webBrowser, function() loadWebBrowser(url) end)
+    addEventHandler("onClientBrowserDocumentReady", webBrowser, whenWebBrowserReady)
+end
+
+function closeWebBrowser()
+    if not webBrowserVisible then
+        return
+    end
+    
+    webBrowserVisible = false
+    
+    if webBrowser and isElement(webBrowser) then
+        guiSetVisible(webBrowser, false)
+        removeEventHandler("onClientBrowserCreated", webBrowser, loadWebBrowser)
+        removeEventHandler("onClientBrowserDocumentReady", webBrowser, whenWebBrowserReady)
+        
+        setTimer(function()
+            if webBrowser and isElement(webBrowser) then
+                destroyElement(webBrowser)
+                webBrowser = nil
+                webBrowserContent = nil
+            end
+        end, 50, 1)
+    end
+    
+    showCursor(false)
+    guiSetInputEnabled(false)
+    guiSetInputMode("allow_binds")
+end
+
+-- Evento desde el navegador del teléfono para abrir navegador web
+addEvent("phone:browserNavigate", true)
+addEventHandler("phone:browserNavigate", resourceRoot, function(url)
+    if url and type(url) == "string" then
+        openWebBrowser(url)
+    end
+end)
+
+-- Cerrar navegador web con ESC
+addEventHandler("onClientKey", root, function(key, press)
+    if not press then return end
+    
+    if key == "escape" and webBrowserVisible then
+        closeWebBrowser()
+        cancelEvent()
+        return
+    end
+end)
+
