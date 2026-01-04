@@ -1,18 +1,20 @@
 -- Generated using GM2MC ( GTA:SA Models To MTA:SA Converter ) by SoRa
+-- Modelo base: Coach (437) - Mejor para sistemas de asientos personalizados
 
 addEventHandler('onClientResourceStart',resourceRoot,function () 
 txd = engineLoadTXD( 'carro.txd' ) 
-engineImportTXD( txd, 410 ) 
-dff = engineLoadDFF('carro.dff', 410) 
-engineReplaceModel( dff, 410 )
+engineImportTXD( txd, 437 )  -- Coach (437) como modelo base
+dff = engineLoadDFF('carro.dff', 437) 
+engineReplaceModel( dff, 437 )
 end)
 
 -- ============================================
 -- SISTEMA DE ASIENTOS PERSONALIZADOS PARA CHIVA RUMBERA
--- Usa attachElements en lugar de asientos nativos del vehículo
+-- Usa actualización continua de posición en lugar de asientos nativos
+-- Modelo base: Coach (437) - Tiene más slots y mejor para RP serio
 -- ============================================
 
-local CHIVA_MODEL = 410  -- Modelo de la chiva
+local CHIVA_MODEL = 437  -- Coach (437) - Modelo base para chiva rumbera
 
 -- Configuración de asientos personalizados con offsets relativos al vehículo
 -- offsetX: distancia hacia adelante/atrás (negativo = atrás del centro)
