@@ -113,30 +113,40 @@ end
 -- Función para obtener el siguiente asiento disponible en un lado específico
 local function getNextAvailableSeat(vehicle, preferredSide, preferredSeat)
     if not vehicle or not isElement(vehicle) or getElementModel(vehicle) ~= CHIVA_MODEL then
+        outputChatBox("[CHIVA DEBUG] Vehículo inválido en getNextAvailableSeat", 255, 0, 0)
         return nil
     end
     
     -- Obtener número máximo de pasajeros del vehículo
     local maxPassengers = getVehicleMaxPassengers(vehicle)
+    outputChatBox("[CHIVA DEBUG] Máximo de pasajeros: " .. tostring(maxPassengers), 255, 255, 0)
+    
+    -- En MTA, los asientos van de 0 (conductor) a maxPassengers
+    -- Para la chiva, usaremos asientos 2-9 sin importar maxPassengers
+    -- porque el modelo personalizado puede tener más asientos
     
     -- Si hay un asiento preferido específico, intentar usarlo primero
     if preferredSeat then
-        if preferredSeat <= maxPassengers then
-            local occupant = getVehicleOccupant(vehicle, preferredSeat)
-            if not occupant then
-                return preferredSeat
-            end
+        outputChatBox("[CHIVA DEBUG] Intentando asiento preferido: " .. tostring(preferredSeat), 255, 255, 0)
+        local occupant = getVehicleOccupant(vehicle, preferredSeat)
+        if not occupant or occupant == false then
+            outputChatBox("[CHIVA DEBUG] Asiento preferido disponible: " .. tostring(preferredSeat), 0, 255, 0)
+            return preferredSeat
+        else
+            outputChatBox("[CHIVA DEBUG] Asiento preferido ocupado: " .. tostring(preferredSeat), 255, 255, 0)
         end
     end
     
     -- Primero buscar en el lado preferido
     if preferredSide then
+        outputChatBox("[CHIVA DEBUG] Buscando en lado: " .. tostring(preferredSide), 255, 255, 0)
         for _, seatConfig in ipairs(CHIVA_SEATS_CONFIG) do
             local seat = seatConfig.seat
-            -- Verificar que el asiento no exceda el máximo del vehículo
-            if seat <= maxPassengers and seatConfig.side == preferredSide then
+            if seatConfig.side == preferredSide then
                 local occupant = getVehicleOccupant(vehicle, seat)
-                if not occupant then
+                outputChatBox("[CHIVA DEBUG] Asiento " .. seat .. " ocupado: " .. tostring(occupant ~= false and occupant ~= nil), 255, 255, 0)
+                if not occupant or occupant == false then
+                    outputChatBox("[CHIVA DEBUG] Asiento disponible encontrado: " .. seat, 0, 255, 0)
                     return seat
                 end
             end
@@ -144,17 +154,17 @@ local function getNextAvailableSeat(vehicle, preferredSide, preferredSeat)
     end
     
     -- Si no hay disponibles en el lado preferido, buscar en cualquier lado
+    outputChatBox("[CHIVA DEBUG] Buscando en cualquier lado...", 255, 255, 0)
     for _, seatConfig in ipairs(CHIVA_SEATS_CONFIG) do
         local seat = seatConfig.seat
-        -- Verificar que el asiento no exceda el máximo del vehículo
-        if seat <= maxPassengers then
-            local occupant = getVehicleOccupant(vehicle, seat)
-            if not occupant then
-                return seat
-            end
+        local occupant = getVehicleOccupant(vehicle, seat)
+        if not occupant or occupant == false then
+            outputChatBox("[CHIVA DEBUG] Asiento disponible encontrado: " .. seat, 0, 255, 0)
+            return seat
         end
     end
     
+    outputChatBox("[CHIVA DEBUG] No se encontraron asientos disponibles", 255, 0, 0)
     return nil  -- No hay asientos disponibles
 end
 
@@ -223,19 +233,25 @@ local function mountPlayerInChiva(player, vehicle, seat)
         seat = getNextAvailableSeat(vehicle, playerSide, preferredSeat)
         
         if not seat then
+            outputChatBox("[CHIVA DEBUG] getNextAvailableSeat retornó nil", 255, 0, 0)
             outputChatBox("La chiva está llena. No hay asientos disponibles.", player, 255, 255, 0)
             return false
         end
         
         outputChatBox("[CHIVA DEBUG] Asiento asignado: " .. tostring(seat), 0, 255, 0)
+    else
+        outputChatBox("[CHIVA DEBUG] Usando asiento proporcionado: " .. tostring(seat), 0, 255, 0)
     end
     
     -- Verificar que el asiento esté disponible
     local occupant = getVehicleOccupant(vehicle, seat)
-    if occupant then
+    outputChatBox("[CHIVA DEBUG] Verificando asiento " .. seat .. ", ocupante: " .. tostring(occupant), 255, 255, 0)
+    if occupant and occupant ~= false then
         outputChatBox("Este asiento está ocupado.", player, 255, 0, 0)
         return false
     end
+    
+    outputChatBox("[CHIVA DEBUG] Verificando configuración del asiento " .. tostring(seat), 255, 255, 0)
     
     -- Obtener la configuración del asiento para ajustar la posición
     local seatConfig = nil
@@ -244,14 +260,19 @@ local function mountPlayerInChiva(player, vehicle, seat)
         if config.seat == seat then
             seatConfig = config
             seatSide = config.side
+            outputChatBox("[CHIVA DEBUG] Configuración encontrada para asiento " .. seat .. ", lado: " .. tostring(seatSide), 0, 255, 0)
             break
         end
     end
     
     -- Si no encontramos la configuración, detectar el lado
     if not seatSide then
+        outputChatBox("[CHIVA DEBUG] No se encontró configuración, detectando lado...", 255, 255, 0)
         seatSide, _ = detectNearestDoorAndSeat(player, vehicle)
+        outputChatBox("[CHIVA DEBUG] Lado detectado: " .. tostring(seatSide), 255, 255, 0)
     end
+    
+    outputChatBox("[CHIVA DEBUG] Calculando posición ajustada...", 255, 255, 0)
     
     -- Calcular posición ajustada (más hacia adentro)
     local vx, vy, vz = getElementPosition(vehicle)
@@ -263,6 +284,8 @@ local function mountPlayerInChiva(player, vehicle, seat)
     -- Ajustar offset para que sea más hacia adentro (reducir offsetY en 0.5-1.0 unidades)
     local offsetX = seatConfig and seatConfig.offsetX or 0
     local offsetY = seatConfig and (seatConfig.offsetY * 0.7) or 0  -- Reducir 30% para acercar más
+    
+    outputChatBox("[CHIVA DEBUG] Offset X: " .. tostring(offsetX) .. ", Y: " .. tostring(offsetY), 255, 255, 0)
     
     -- Rotar el offset según la rotación del vehículo
     local rotatedX = offsetX * cosAngle - offsetY * sinAngle
@@ -306,6 +329,8 @@ local function mountPlayerInChiva(player, vehicle, seat)
         sitAnim = "CAR_pullout_RHS"
     end
     
+    outputChatBox("[CHIVA DEBUG] Animación seleccionada: " .. openAnim, 255, 255, 0)
+    
     -- Función para restaurar controles
     local function restoreControls()
         if isElement(player) then
@@ -317,6 +342,8 @@ local function mountPlayerInChiva(player, vehicle, seat)
             toggleControl(player, "jump", true)
         end
     end
+    
+    outputChatBox("[CHIVA DEBUG] Iniciando animación...", 0, 255, 0)
     
     -- Reproducir animación de abrir puerta y sentarse
     -- Animación de abrir puerta de vehículo
