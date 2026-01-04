@@ -673,6 +673,11 @@ addEventHandler("admin:createVehicleOld", root, function(vehicleId)
         return
     end
     
+    -- Configurar vehículo especial si es Urus (modelo 560)
+    if vehicleId == 560 then
+        configureUrusVehicle(vehicle)
+    end
+    
     -- Configurar dimensiones e interior del vehículo (IMPORTANTE: debe coincidir con el admin)
     setElementDimension(vehicle, adminDimension)
     setElementInterior(vehicle, adminInterior)

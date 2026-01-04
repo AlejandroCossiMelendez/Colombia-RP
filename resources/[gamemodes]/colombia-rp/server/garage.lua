@@ -134,6 +134,11 @@ addEventHandler("garage:requestVehicle", root, function(vehicleId)
             local vehicle = createVehicle(vehModel, frontX, frontY, frontZ, 0, 0, rotation)
             
             if vehicle then
+                -- Configurar vehículo especial si es Urus (modelo 560)
+                if vehModel == 560 then
+                    configureUrusVehicle(vehicle)
+                end
+                
                 -- Configurar el vehículo
                 setElementDimension(vehicle, dimension)
                 setElementInterior(vehicle, interior)

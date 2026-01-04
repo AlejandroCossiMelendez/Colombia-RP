@@ -32,6 +32,13 @@ function generateUniquePlate()
     return plate
 end
 
+-- Función para configurar vehículo especial (Urus - Modelo 560)
+function configureSpecialVehicle(vehicle, vehicleId)
+    if vehicleId == 560 then
+        configureUrusVehicle(vehicle)
+    end
+end
+
 -- Función para crear un vehículo sin dueño
 function createVehicleWithoutOwner(vehicleId, x, y, z, rotZ, interior, dimension)
     local plate = generateUniquePlate()
@@ -41,6 +48,9 @@ function createVehicleWithoutOwner(vehicleId, x, y, z, rotZ, interior, dimension
     if not vehicle then
         return nil, "Error al crear el vehículo en el juego"
     end
+    
+    -- Configurar vehículo especial si es necesario
+    configureSpecialVehicle(vehicle, vehicleId)
     
     setElementDimension(vehicle, dimension)
     setElementInterior(vehicle, interior)
@@ -88,6 +98,9 @@ function createVehicleForPlayer(vehicleId, x, y, z, rotZ, interior, dimension, c
     if not vehicle then
         return nil, "Error al crear el vehículo en el juego"
     end
+    
+    -- Configurar vehículo especial si es necesario
+    configureSpecialVehicle(vehicle, vehicleId)
     
     setElementDimension(vehicle, dimension)
     setElementInterior(vehicle, interior)
@@ -298,5 +311,53 @@ addEventHandler("onResourceStart", resourceRoot, function()
         saveAllVehiclesToGarage()
         outputServerLog("[VEHICLES] Sistema de vehículos iniciado. Todos los vehículos están en el garaje.")
     end, 2000, 1)
+end)
+
+-- Función global para configurar Urus (disponible para otros scripts)
+function configureUrusVehicle(vehicle)
+    if not isElement(vehicle) or getElementType(vehicle) ~= "vehicle" then
+        return false
+    end
+    
+    local vehicleId = getElementModel(vehicle)
+    if vehicleId ~= 560 then
+        return false
+    end
+    
+    -- Configurar velocidad máxima a 300 km/h (aproximadamente 83.33 m/s)
+    setVehicleHandling(vehicle, "maxVelocity", 83.33)
+    
+    -- Habilitar daño visual (puertas, paneles, etc.)
+    setVehicleDamageProof(vehicle, false)
+    
+    -- Configurar handling para mejor rendimiento y daño visual
+    setVehicleHandling(vehicle, "engineAcceleration", 50.0)  -- Aceleración mejorada
+    setVehicleHandling(vehicle, "engineInertia", 50.0)      -- Inercia del motor
+    setVehicleHandling(vehicle, "brakeDeceleration", 10.0)   -- Freno mejorado
+    setVehicleHandling(vehicle, "tractionMultiplier", 1.2)    -- Tracción mejorada
+    
+    -- Asegurar que el daño visual funcione
+    setVehicleWheelStates(vehicle, 0, 0, 0, 0)  -- Ruedas en buen estado inicialmente
+    
+    -- Forzar actualización del daño visual después de un pequeño delay
+    setTimer(function()
+        if isElement(vehicle) then
+            -- Asegurar que el daño visual esté habilitado
+            setVehicleDamageProof(vehicle, false)
+            -- Forzar actualización del daño
+            local health = getElementHealth(vehicle)
+            setElementHealth(vehicle, health)  -- Esto fuerza la actualización visual
+        end
+    end, 100, 1)
+    
+    return true
+end
+
+-- Evento global para configurar Urus cuando se crea cualquier vehículo
+addEventHandler("onVehicleCreate", root, function()
+    local vehicleId = getElementModel(source)
+    if vehicleId == 560 then
+        configureUrusVehicle(source)
+    end
 end)
 
