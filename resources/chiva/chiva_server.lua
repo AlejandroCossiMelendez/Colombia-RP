@@ -2,7 +2,42 @@
 -- Sistema de asientos personalizados usando actualización continua de posición
 
 -- Tabla para rastrear qué jugadores están en qué asientos personalizados
-local chivaPassengers = {}  -- [vehicle] = {[seat] = {player = player, offsetX = x, offsetY = y, offsetZ = z, timer = timer}}
+local chivaPassengers = {}  -- [vehicle] = {[seat] = {player = player, offsetX = x, offsetY = y, offsetZ = z}}
+
+-- Timer para actualizar posición y rotación de pasajeros desde el servidor
+local function updatePassengersPositions()
+    for vehicle, seats in pairs(chivaPassengers) do
+        if isElement(vehicle) then
+            local vx, vy, vz = getElementPosition(vehicle)
+            local vrx, vry, vrz = getElementRotation(vehicle)
+            local angle = math.rad(vrz)
+            local cosAngle = math.cos(angle)
+            local sinAngle = math.sin(angle)
+            
+            for seat, seatData in pairs(seats) do
+                if seatData and seatData.player and isElement(seatData.player) then
+                    local player = seatData.player
+                    
+                    -- Rotar los offsets según la rotación del vehículo
+                    local rotatedX = seatData.offsetX * cosAngle - seatData.offsetY * sinAngle
+                    local rotatedY = seatData.offsetX * sinAngle + seatData.offsetY * cosAngle
+                    
+                    -- Calcular posición mundial del asiento
+                    local seatX = vx + rotatedX
+                    local seatY = vy + rotatedY
+                    local seatZ = vz + seatData.offsetZ
+                    
+                    -- Actualizar posición y rotación desde el servidor
+                    setElementPosition(player, seatX, seatY, seatZ)
+                    setPedRotation(player, vrz)
+                end
+            end
+        end
+    end
+end
+
+-- Iniciar timer de actualización en el servidor (cada 50ms = 20 veces por segundo)
+setTimer(updatePassengersPositions, 50, 0)
 
 -- Función para montar un jugador en la chiva usando attachElements
 function mountPlayerInChiva(player, vehicle, seat, offsetX, offsetY, offsetZ)

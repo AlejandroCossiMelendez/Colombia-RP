@@ -369,6 +369,30 @@ addEventHandler("chiva:mounted", root, function(vehicle, seat, success)
             chivaPassengers[vehicle] = {}
         end
         chivaPassengers[vehicle][seat] = player
+        
+        -- Obtener los offsets del asiento para el jugador local
+        local seatConfig = nil
+        for _, config in ipairs(CHIVA_SEATS_CONFIG) do
+            if config.seat == seat then
+                seatConfig = config
+                break
+            end
+        end
+        
+        if seatConfig then
+            -- Registrar offsets para actualización continua del jugador local
+            chivaPassengerOffsets[player] = {
+                vehicle = vehicle,
+                seat = seat,
+                offsetX = seatConfig.offsetX,
+                offsetY = seatConfig.offsetY,
+                offsetZ = seatConfig.offsetZ
+            }
+            
+            -- Reproducir animación de sentado para el jugador local
+            setPedAnimation(player, "ped", "CAR_sit", -1, true, false, false, false)
+        end
+        
         outputChatBox("Te has montado en la chiva (Asiento " .. seat .. "). Presiona F para bajarte.", 0, 255, 0)
     else
         outputChatBox("Error al montarte en la chiva.", 255, 0, 0)
@@ -381,6 +405,13 @@ addEventHandler("chiva:dismounted", root, function(vehicle, seat)
     local player = localPlayer
     if chivaPassengers[vehicle] and chivaPassengers[vehicle][seat] == player then
         chivaPassengers[vehicle][seat] = nil
+        
+        -- Remover de la tabla de offsets
+        chivaPassengerOffsets[player] = nil
+        
+        -- Detener animación
+        setPedAnimation(player, nil)
+        
         outputChatBox("Te has bajado de la chiva.", 0, 255, 0)
     end
 end)
@@ -424,13 +455,14 @@ function updateChivaPassengersPosition()
             local vx, vy, vz = getElementPosition(data.vehicle)
             local vrx, vry, vrz = getElementRotation(data.vehicle)
             
-            -- Convertir rotación a radianes
+            -- Convertir rotación Z a radianes (es la rotación horizontal del vehículo)
             local angle = math.rad(vrz)
             local cosAngle = math.cos(angle)
             local sinAngle = math.sin(angle)
             
             -- Rotar los offsets según la rotación del vehículo
-            -- offsetX es hacia adelante/atrás, offsetY es hacia izquierda/derecha
+            -- offsetX es hacia adelante/atrás (en el sistema local del vehículo)
+            -- offsetY es hacia izquierda/derecha (en el sistema local del vehículo)
             local rotatedX = data.offsetX * cosAngle - data.offsetY * sinAngle
             local rotatedY = data.offsetX * sinAngle + data.offsetY * cosAngle
             
@@ -443,7 +475,13 @@ function updateChivaPassengersPosition()
             setElementPosition(player, seatX, seatY, seatZ)
             
             -- Hacer que el jugador mire en la dirección del vehículo
+            -- Usar setPedRotation que es específico para peds y funciona mejor
             setPedRotation(player, vrz)
+            
+            -- Mantener animación de sentado activa
+            if not getPedAnimation(player) then
+                setPedAnimation(player, "ped", "CAR_sit", -1, true, false, false, false)
+            end
             
             -- Sincronizar interior y dimensión
             local vehicleInt = getElementInterior(data.vehicle)
@@ -462,14 +500,29 @@ function updateChivaPassengersPosition()
     end
 end
 
+-- Variable para controlar si el handler está activo
+local updateHandlerActive = false
+
 -- Iniciar el sistema de actualización continua
 addEventHandler("onClientResourceStart", resourceRoot, function()
-    addEventHandler("onClientPreRender", root, updateChivaPassengersPosition)
+    if not updateHandlerActive then
+        addEventHandler("onClientPreRender", root, updateChivaPassengersPosition)
+        updateHandlerActive = true
+    end
 end)
+
+-- También iniciar inmediatamente si el recurso ya está cargado
+if not updateHandlerActive then
+    addEventHandler("onClientPreRender", root, updateChivaPassengersPosition)
+    updateHandlerActive = true
+end
 
 -- Limpiar cuando el recurso se detiene
 addEventHandler("onClientResourceStop", resourceRoot, function()
-    removeEventHandler("onClientPreRender", root, updateChivaPassengersPosition)
+    if updateHandlerActive then
+        removeEventHandler("onClientPreRender", root, updateChivaPassengersPosition)
+        updateHandlerActive = false
+    end
 end)
 
 -- Limpiar tabla cuando el vehículo se destruye
