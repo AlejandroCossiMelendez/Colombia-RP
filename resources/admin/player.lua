@@ -894,8 +894,12 @@ end
 
 addCommandHandler({ "staffduty", "adminduty", "modduty", "helperduty" },
     function(player, commandName)
+        outputServerLog("[STAFFDUTY] Comando ejecutado por: " .. getPlayerName(player))
         local old = exports.players:getOption(player, "staffduty")
-        if hasObjectPermissionTo(player, 'command.modchat', false) then
+        outputServerLog("[STAFFDUTY] Estado anterior: " .. tostring(old))
+        local hasPermission = hasObjectPermissionTo(player, 'command.modchat', false)
+        outputServerLog("[STAFFDUTY] Tiene permisos command.modchat: " .. tostring(hasPermission))
+        if hasPermission then
             if exports.players:setOption(player, "staffduty", old ~= true or nil) then
                 exports.players:updateNametag(player)
                 

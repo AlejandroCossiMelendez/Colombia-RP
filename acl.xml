@@ -31,6 +31,8 @@
         <object name="resource.asistencia"></object>
         <object name="user.Console"></object>
         <object name="user.robert9876"></object>
+        <object name="user.cossiwebstudio"></object>
+        <object name="user.Luis_Cardenas"></object>
     </group>
     <group name="GameOperator">
         <acl name="GameOperator"></acl>
