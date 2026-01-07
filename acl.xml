@@ -3,8 +3,6 @@
         <acl name="Admin"></acl>
         <object name="user.Console"></object>
         <object name="user.robert9876"></object>
-        <object name="user.cossiwebstudio"></object>
-        <object name="user.Luis_Cardenas"></object>
     </group>
     <group name="GameOperator"></group>
     <group name="Desarrollador">
@@ -290,7 +288,6 @@
     <acl name="autoACL_pAttach-armas">
         <right name="function.fetchRemote" access="false" who="" pending="true" date=""></right>
     </acl>
-    <!-- ACLs para grupos de staff -->
     <acl name="Desarrollador">
         <right name="general.adminpanel" access="true"></right>
         <right name="general.modpanel" access="true"></right>
