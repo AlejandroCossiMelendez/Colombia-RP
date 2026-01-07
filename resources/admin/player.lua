@@ -899,8 +899,16 @@ addCommandHandler({ "staffduty", "adminduty", "modduty", "helperduty" },
         outputServerLog("[STAFFDUTY] Estado anterior: " .. tostring(old))
         local hasPermission = hasObjectPermissionTo(player, 'command.modchat', false)
         outputServerLog("[STAFFDUTY] Tiene permisos command.modchat: " .. tostring(hasPermission))
+        if not hasPermission then
+            outputChatBox("No tienes permisos para usar este comando. Necesitas el permiso 'command.modchat'.", player, 255, 0, 0)
+            outputServerLog("[STAFFDUTY] ERROR: " .. getPlayerName(player) .. " no tiene permisos command.modchat")
+            return
+        end
         if hasPermission then
-            if exports.players:setOption(player, "staffduty", old ~= true or nil) then
+            local newValue = old ~= true
+            outputServerLog("[STAFFDUTY] Intentando cambiar staffduty de " .. tostring(old) .. " a " .. tostring(newValue))
+            if exports.players:setOption(player, "staffduty", newValue) then
+                outputServerLog("[STAFFDUTY] setOption exitoso. Nuevo estado: " .. tostring(exports.players:getOption(player, "staffduty")))
                 exports.players:updateNametag(player)
                 
                 local playerName = getPlayerName(player):gsub("_", " ")
@@ -947,10 +955,20 @@ addCommandHandler({ "staffduty", "adminduty", "modduty", "helperduty" },
                 end	
 
                 for key, value in ipairs(getElementsByType("player")) do
-                    if value ~= player and groups[1].displayName ~= "Encubierto" and groups[1].displayName ~= "Admin Supremo" and groups[1].displayName ~= "Administrador" and groups[1].displayName ~= "Programador" then
+                    if value ~= player and groups and groups[1] and groups[1].displayName ~= "Encubierto" and groups[1].displayName ~= "Admin Supremo" and groups[1].displayName ~= "Administrador" and groups[1].displayName ~= "Programador" then
                         outputChatBox(message, value, old and 255 or 0, old and 191 or 255, 0)
                     end
                 end
+                
+                -- Mensaje de confirmación al jugador
+                if exports.players:getOption(player, "staffduty") == true then
+                    outputChatBox("Has entrado en servicio de staff.", player, 0, 255, 0)
+                else
+                    outputChatBox("Has salido de servicio de staff.", player, 255, 191, 0)
+                end
+            else
+                outputChatBox("Error al cambiar el estado de servicio. Intenta de nuevo.", player, 255, 0, 0)
+                outputServerLog("[STAFFDUTY] ERROR: setOption falló para " .. getPlayerName(player))
             end
         end
     end,
