@@ -14,17 +14,23 @@ function (player, user, password)
 end)
 
 function logindec()
-	local query = exports.sql:query_assoc_single("SELECT `userID`  FROM `wcf1_user` WHERE `lastSerial` OR `regSerial` LIKE '%s'", getPlayerSerial(client))
+	-- source es el jugador que disparó el evento
+	local player = source
+	if not player or not isElement(player) then
+		return
+	end
+	
+	local query = exports.sql:query_assoc_single("SELECT `userID`  FROM `wcf1_user` WHERE `lastSerial` OR `regSerial` LIKE '%s'", getPlayerSerial(player))
 	local serialRegistered = false
 	if query then
 		if query.userID then
 			serialRegistered = true
 		end
 	end
-    triggerClientEvent(source, "showLoginPanel", source)
+    triggerClientEvent(player, "showLoginPanel", player)
 end
 addEvent("onRequestLoginPanel", true)
-addEventHandler("onRequestLoginPanel", getRootElement(), logindec)
+addEventHandler("onRequestLoginPanel", root, logindec)
 
 -- Obtener el usuario vinculado al serial del equipo
 addEvent('strilgui.getUserBySerial', true)
