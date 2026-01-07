@@ -458,7 +458,6 @@ local function aclUpdate( player, saveAclIfChanged )
 							outputDebugString( "Warning: Group " .. tostring(value.groupName) .. " (ID: " .. tostring(value.groupID) .. ") has no aclGroup defined", 1 )
 						end
 					end
-					end
 					
 					-- remove the account
 					if player then
