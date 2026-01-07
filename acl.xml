@@ -6,11 +6,13 @@
         <object name="user.cossiwebstudio"></object>
         <object name="user.Luis_Cardenas"></object>
     </group>
-    <group name="GameOperator">
-        <acl name="GameOperator"></acl>
-    </group>
+    <group name="GameOperator"></group>
     <group name="Desarrollador">
         <acl name="Desarrollador"></acl>
+        <object name="user.Luis_Cardenas"></object>
+        <object name="user.cossiwebstudio"></object>
+        <object name="user.jeicordero"></object>
+        <object name="user.Dilan"></object>
     </group>
     <group name="Moderador">
         <acl name="Moderador"></acl>
@@ -61,10 +63,8 @@
         <acl name="autoACL_interiors"></acl>
         <object name="resource.interiors"></object>
     </group>
-
     <group name="Policia">
         <acl name="Policia"></acl>
-        <object name="user.Luis_Cardenas"></object>
         <object name="user.Juan1"></object>
         <object name="user.yessica"></object>
         <object name="user.kokushibo"></object>
@@ -72,11 +72,9 @@
         <object name="user.robert9876"></object>
         <object name="user.Miguel"></object>
     </group>
-
     <group name="Sura">
         <acl name="Sura"></acl>
     </group>
-
     <group name="Meca">
         <acl name="Meca"></acl>
         <object name="user.JuanchoSBK"></object>
@@ -84,7 +82,6 @@
         <object name="user.cata345"></object>
         <object name="user.Danielxz"></object>
     </group>
-
     <group name="Ejercito">
         <acl name="Ejercito"></acl>
         <object name="user.Dilon Baby"></object>
@@ -92,57 +89,40 @@
         <object name="user.JUANsanchez"></object>
         <object name="user.Cristian R"></object>
         <object name="user.Jeison_Cordoba"></object>
-        <object name="user.Dilan"></object>
         <object name="user.CRISTOPFER"></object>
     </group>
-
     <group name="MAFIARUSA">
         <acl name="MAFIARUSA"></acl>
-        <object name="user.Luis_Cardenas"></object>
         <object name="user.JuanchoSBK"></object>
         <object name="user.sebastian blood"></object>
         <object name="user.JUNIOR2024"></object>
         <object name="user.cloudfgrl"></object>
     </group>
-
     <group name="ELN">
         <acl name="ELN"></acl>
     </group>
-
     <group name="CDG">
         <acl name="CDG"></acl>
     </group>
-
     <group name="CDJ">
         <acl name="CDJ"></acl>
     </group>
-
     <group name="JEFESCLUBKYOTO">
         <acl name="JEFESCLUBKYOTO"></acl>
         <object name="user.Fab"></object>
-        <object name="user.Luis_Cardenas"></object>
     </group>
-
     <group name="KYOTOCLUB">
         <acl name="KYOTOCLUB"></acl>
     </group>
-
     <group name="CartelMedellin"></group>
     <group name="CartelCali"></group>
     <group name="Los13"></group>
-
-    <group name="autoGroup_JEIAC">
-        <acl name="autoACL_JEIAC"></acl>
-        <object name="resource.JEIAC"></object>
-    </group>
-
     <group name="TDA">
         <acl name="TDA"></acl>
         <object name="user.Johan_Hernandez"></object>
         <object name="user.Davinsito"></object>
         <object name="user.Estiwar_Osorio"></object>
     </group>
-
     <group name="autoGroup_nametag-capital">
         <acl name="autoACL_nametag-capital"></acl>
         <object name="resource.nametag-capital"></object>
@@ -419,7 +399,6 @@
         <right name="command.modchat" access="true"></right>
     </acl>
     <acl name="VIP"></acl>
-    <!-- ACLs para facciones -->
     <acl name="Policia"></acl>
     <acl name="Sura"></acl>
     <acl name="Meca"></acl>
