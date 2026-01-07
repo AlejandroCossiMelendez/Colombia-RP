@@ -1213,8 +1213,7 @@ CREATE TABLE `wcf1_user_to_groups` (
 --
 
 INSERT INTO `wcf1_user_to_groups` (`userID`, `groupID`) VALUES
-(49, 1),
-(50, 1);
+(52, 1);
 
 --
 -- Indexes for dumped tables

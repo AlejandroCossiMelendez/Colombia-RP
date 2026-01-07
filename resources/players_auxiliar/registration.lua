@@ -39,36 +39,74 @@ addEventHandler( "players:register", root,
 						-- see if that username is free at all
 						local info, errTest = exports.sql:query_assoc_single( "SELECT COUNT(userID) AS usercount FROM wcf1_user WHERE username = '%s'", username )
 						outputServerLog("[REGISTER] Resultado query: " .. tostring(info and info.usercount or "nil") .. ", Error: " .. tostring(errTest or "nil"))
-						local info2 = exports.sql:query_assoc( "SELECT regIP, lastIP, regSerial FROM wcf1_user" )
 						if not info then
+							outputServerLog("[REGISTER] ERROR: Query falló, no se pudo verificar usuario")
 							triggerClientEvent( source, "players:registrationResult", source, 1 )
-						elseif info.usercount == 0 then
-							ipReg = 0
-							for k, v in ipairs(info2) do
-								if v.regSerial == getPlayerSerial(source) then triggerClientEvent( source, "players:registrationResult", source, 5 ) return end
-								if tostring(v.regIP) == tostring(getPlayerIP(source)) then ipReg = ipReg + 1 end
-								if tostring(v.lastIP) == tostring(getPlayerIP(source)) and tostring(v.regIP) ~= tostring(v.lastIP) then ipReg = ipReg + 1 end
+							return
+						end
+						
+						if info.usercount > 0 then
+							outputServerLog("[REGISTER] Usuario ya existe, rechazando registro")
+							triggerClientEvent( source, "players:registrationResult", source, 3 )
+							return
+						end
+						
+						outputServerLog("[REGISTER] Usuario no existe, verificando IPs y Serial...")
+						local info2, err2 = exports.sql:query_assoc( "SELECT regIP, lastIP, regSerial FROM wcf1_user" )
+						if not info2 then
+							outputServerLog("[REGISTER] ERROR: No se pudo obtener lista de IPs/Serials: " .. tostring(err2))
+							triggerClientEvent( source, "players:registrationResult", source, 1 )
+							return
+						end
+						
+						outputServerLog("[REGISTER] Verificando " .. #info2 .. " registros existentes...")
+						local ipReg = 0
+						local playerSerial = getPlayerSerial(source)
+						local playerIP = getPlayerIP(source)
+						
+						for k, v in ipairs(info2) do
+							if v.regSerial == playerSerial then 
+								outputServerLog("[REGISTER] Serial ya registrado: " .. playerSerial)
+								triggerClientEvent( source, "players:registrationResult", source, 5 )
+								return 
 							end
-							if ipReg >= 2 then 
-								triggerClientEvent( source, "players:registrationResult", source, 6 )
-								return
+							if tostring(v.regIP) == tostring(playerIP) then 
+								ipReg = ipReg + 1 
+								outputServerLog("[REGISTER] IP encontrada en regIP: " .. tostring(playerIP))
 							end
-							local salt = ''
-							local chars = { 'a', 'b', 'c', 'd', 'e', 'f', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }
-							for i = 1, 40 do
-								salt = salt .. chars[ math.random( 1, #chars ) ]
+							if tostring(v.lastIP) == tostring(playerIP) and tostring(v.regIP) ~= tostring(v.lastIP) then 
+								ipReg = ipReg + 1 
+								outputServerLog("[REGISTER] IP encontrada en lastIP: " .. tostring(playerIP))
 							end
-							local userID, error = exports.sql:query_insertid( "INSERT INTO wcf1_user (username,salt,password) VALUES ('%s', '%s', SHA1(CONCAT('%s', SHA1(CONCAT('%s', '" .. hash("sha1", password) .. "')))))", username, salt, salt, salt )
-							if error then
-								outputDebugString(error)
-								triggerClientEvent( source, "players:registrationResult", source, 4 )
-							else
-								triggerClientEvent( source, "players:registrationResult", source, 0 ) -- Inicio de sesion automático.
-								exports.sql:query_free( "UPDATE wcf1_user SET regIP = '%s' WHERE username = '%s'", getPlayerIP(source), username )
-								exports.sql:query_free( "UPDATE wcf1_user SET regSerial = '%s' WHERE username = '%s'", getPlayerSerial(source), username )
-								outputChatBox ( "Bienvenido por primera vez a DownTown RolePlay.", source, 0, 255, 0 )
-								outputChatBox ( "Te recomendamos que utilices /duda para obtener asistencia", source, 0, 255, 0)
-							end 
+						end
+						
+						outputServerLog("[REGISTER] Conteo de IPs: " .. ipReg)
+						if ipReg >= 2 then 
+							outputServerLog("[REGISTER] Límite de IPs alcanzado, rechazando registro")
+							triggerClientEvent( source, "players:registrationResult", source, 6 )
+							return
+						end
+						
+						outputServerLog("[REGISTER] Generando salt...")
+						local salt = ''
+						local chars = { 'a', 'b', 'c', 'd', 'e', 'f', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+						for i = 1, 40 do
+							salt = salt .. chars[ math.random( 1, #chars ) ]
+						end
+						
+						outputServerLog("[REGISTER] Insertando usuario en BD...")
+						local userID, error = exports.sql:query_insertid( "INSERT INTO wcf1_user (username,salt,password) VALUES ('%s', '%s', SHA1(CONCAT('%s', SHA1(CONCAT('%s', '" .. hash("sha1", password) .. "')))))", username, salt, salt, salt )
+						if error then
+							outputServerLog("[REGISTER] ERROR al insertar usuario: " .. tostring(error))
+							triggerClientEvent( source, "players:registrationResult", source, 4 )
+						else
+							outputServerLog("[REGISTER] Usuario registrado exitosamente con userID: " .. tostring(userID))
+							triggerClientEvent( source, "players:registrationResult", source, 0 ) -- Inicio de sesion automático.
+							exports.sql:query_free( "UPDATE wcf1_user SET regIP = '%s' WHERE username = '%s'", playerIP, username )
+							exports.sql:query_free( "UPDATE wcf1_user SET regSerial = '%s' WHERE username = '%s'", playerSerial, username )
+							outputChatBox ( "Bienvenido por primera vez a DownTown RolePlay.", source, 0, 255, 0 )
+							outputChatBox ( "Te recomendamos que utilices /duda para obtener asistencia", source, 0, 255, 0)
+						end 
 						else
 							triggerClientEvent( source, "players:registrationResult", source, 3 )
 						end
