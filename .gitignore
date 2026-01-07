@@ -8,7 +8,7 @@ internal.db
 registry.db
 mtaserver.conf  # si contiene datos sensibles
 settings.xml
-acl.xml
+# acl.xml
 admin.xml
 banlist.xml
 vehiclecolors.conf
