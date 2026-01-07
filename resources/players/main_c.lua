@@ -83,6 +83,8 @@ function selectCharacter( id, name )
 		if id == -1 then
 			-- new character - abrir directamente la nueva interfaz
 			outputDebugString("[SELECTCHAR] Abriendo nueva interfaz de creación de personajes")
+			-- ocultar el panel de characters para que no quede debajo
+			exports.gui:hide( )
 			
 			-- Verificar si el recurso de la nueva interfaz está disponible
 			local newInterfaceResource = getResourceFromName("Interfaz-CreacionPJ") 
