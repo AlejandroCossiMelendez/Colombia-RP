@@ -280,9 +280,14 @@ local function aclUpdate( player, saveAclIfChanged )
 									else
 										setElementData(player, "account:gmduty", false)
 									end
-									if aclGroupAddObject( aclGetGroup( group2.aclGroup ), "user." .. info.username ) then
-										saveAcl = true
-										outputDebugString( "Added account " .. info.username .. " to " .. group2.aclGroup .. " ACL", 3 )
+									local aclGroup = aclGetGroup( group2.aclGroup )
+									if aclGroup then
+										if aclGroupAddObject( aclGroup, "user." .. info.username ) then
+											saveAcl = true
+											outputDebugString( "Added account " .. info.username .. " to " .. group2.aclGroup .. " ACL", 3 )
+										end
+									else
+										outputDebugString( "Warning: ACL group '" .. group2.aclGroup .. "' does not exist", 1 )
 									end
 								end
 							end
@@ -294,10 +299,15 @@ local function aclUpdate( player, saveAclIfChanged )
 				-- remove account from all ACL groups we use
 				local allGroups = getAllGroups()
 				for key, value in ipairs( allGroups ) do
-					if aclGroupRemoveObject( aclGetGroup( value.aclGroup ), "user." .. info.username ) then
-						saveAcl = true
-						outputDebugString( "Removed account " .. info.username .. " from " .. value.aclGroup .. " ACL", 3 )
-						outputChatBox( "No estás conectado como " .. value.displayName .. ".", player, 255, 0, 0 )
+					local aclGroup = aclGetGroup( value.aclGroup )
+					if aclGroup then
+						if aclGroupRemoveObject( aclGroup, "user." .. info.username ) then
+							saveAcl = true
+							outputDebugString( "Removed account " .. info.username .. " from " .. value.aclGroup .. " ACL", 3 )
+							outputChatBox( "No estás conectado como " .. value.displayName .. ".", player, 255, 0, 0 )
+						end
+					else
+						outputDebugString( "Warning: ACL group '" .. value.aclGroup .. "' does not exist", 1 )
 					end
 				end
 				
@@ -347,13 +357,18 @@ local function aclUpdate( player, saveAclIfChanged )
 										shouldBeDeleted = false
 										
 										-- make sure acl rights are set correctly
-										if aclGroupAddObject( aclGetGroup( group.aclGroup ), "user." .. accountName ) then
-											outputDebugString( "Added account " .. accountName .. " to ACL " .. group.aclGroup, 3 )
-											saveAcl = true
-											userChanged = true
-											if player then
-												outputChatBox( "Te has conectado como " .. group.displayName .. ".", player, 0, 255, 0 )
+										local aclGroup = aclGetGroup( group.aclGroup )
+										if aclGroup then
+											if aclGroupAddObject( aclGroup, "user." .. accountName ) then
+												outputDebugString( "Added account " .. accountName .. " to ACL " .. group.aclGroup, 3 )
+												saveAcl = true
+												userChanged = true
+												if player then
+													outputChatBox( "Te has conectado como " .. group.displayName .. ".", player, 0, 255, 0 )
+												end
 											end
+										else
+											outputDebugString( "Warning: ACL group '" .. group.aclGroup .. "' does not exist", 1 )
 										end
 									end
 								end
@@ -361,13 +376,18 @@ local function aclUpdate( player, saveAclIfChanged )
 								-- doesn't have it
 								if not hasGroup then
 									-- make sure acl rights are removed
-									if aclGroupRemoveObject( aclGetGroup( group.aclGroup ), "user." .. accountName ) then
-										outputDebugString( "Removed account " .. accountName .. " from ACL " .. group.aclGroup, 3 )
-										saveAcl = true
-										userChanged = true
-										if player then
-											outputChatBox( "No estás conectado como " .. group.displayName .. ".", player, 255, 0, 0 )
+									local aclGroup = aclGetGroup( group.aclGroup )
+									if aclGroup then
+										if aclGroupRemoveObject( aclGroup, "user." .. accountName ) then
+											outputDebugString( "Removed account " .. accountName .. " from ACL " .. group.aclGroup, 3 )
+											saveAcl = true
+											userChanged = true
+											if player then
+												outputChatBox( "No estás conectado como " .. group.displayName .. ".", player, 255, 0, 0 )
+											end
 										end
+									else
+										outputDebugString( "Warning: ACL group '" .. group.aclGroup .. "' does not exist", 1 )
 									end
 								end
 							end
@@ -398,9 +418,15 @@ local function aclUpdate( player, saveAclIfChanged )
 					-- remove account from all ACL groups we use
 					local allGroups = getAllGroups()
 					for key, value in ipairs( allGroups ) do
-						if aclGroupRemoveObject( aclGetGroup( value.aclGroup ), "user." .. accountName ) then
-							saveAcl = true
-							outputDebugString( "Removed account " .. accountName .. " from " .. value.aclGroup .. " ACL", 3 )
+						local aclGroup = aclGetGroup( value.aclGroup )
+						if aclGroup then
+							if aclGroupRemoveObject( aclGroup, "user." .. accountName ) then
+								saveAcl = true
+								outputDebugString( "Removed account " .. accountName .. " from " .. value.aclGroup .. " ACL", 3 )
+							end
+						else
+							outputDebugString( "Warning: ACL group '" .. value.aclGroup .. "' does not exist", 1 )
+						end
 							
 							if player then
 								outputChatBox( "No estás conectado como " .. value.displayName .. ".", player, 255, 0, 0 )
@@ -1499,10 +1525,15 @@ function addPlayerToFaction( player, factionACLGroup )
 		return false
 	end
 	
-	if aclGroupAddObject( aclGetGroup( factionACLGroup ), "user." .. p[ player ].username ) then
-		aclSave()
-		outputDebugString( "Added " .. p[ player ].username .. " to faction " .. factionACLGroup, 3 )
-		return true
+	local aclGroup = aclGetGroup( factionACLGroup )
+	if aclGroup then
+		if aclGroupAddObject( aclGroup, "user." .. p[ player ].username ) then
+			aclSave()
+			outputDebugString( "Added " .. p[ player ].username .. " to faction " .. factionACLGroup, 3 )
+			return true
+		end
+	else
+		outputDebugString( "Warning: ACL group '" .. factionACLGroup .. "' does not exist", 1 )
 	end
 	return false
 end
@@ -1513,10 +1544,15 @@ function removePlayerFromFaction( player, factionACLGroup )
 		return false
 	end
 	
-	if aclGroupRemoveObject( aclGetGroup( factionACLGroup ), "user." .. p[ player ].username ) then
-		aclSave()
-		outputDebugString( "Removed " .. p[ player ].username .. " from faction " .. factionACLGroup, 3 )
-		return true
+	local aclGroup = aclGetGroup( factionACLGroup )
+	if aclGroup then
+		if aclGroupRemoveObject( aclGroup, "user." .. p[ player ].username ) then
+			aclSave()
+			outputDebugString( "Removed " .. p[ player ].username .. " from faction " .. factionACLGroup, 3 )
+			return true
+		end
+	else
+		outputDebugString( "Warning: ACL group '" .. factionACLGroup .. "' does not exist", 1 )
 	end
 	return false
 end
@@ -1657,23 +1693,28 @@ local function factionACLUpdate( player, saveAclIfChanged )
 					end
 					
 					-- Si tiene la facción, agregarlo al ACL
-					if hasGroup then
-						if aclGroupAddObject( aclGetGroup( faction.aclGroup ), "user." .. info.username ) then
-							outputDebugString( "Added " .. info.username .. " to faction " .. faction.aclGroup, 3 )
-							saveAcl = true
-							if player then
-								outputChatBox( "Te has unido a " .. faction.displayName .. ".", player, 0, 255, 0 )
+					local aclGroup = aclGetGroup( faction.aclGroup )
+					if aclGroup then
+						if hasGroup then
+							if aclGroupAddObject( aclGroup, "user." .. info.username ) then
+								outputDebugString( "Added " .. info.username .. " to faction " .. faction.aclGroup, 3 )
+								saveAcl = true
+								if player then
+									outputChatBox( "Te has unido a " .. faction.displayName .. ".", player, 0, 255, 0 )
+								end
+							end
+						else
+							-- Si no tiene la facción, removerlo del ACL
+							if aclGroupRemoveObject( aclGroup, "user." .. info.username ) then
+								outputDebugString( "Removed " .. info.username .. " from faction " .. faction.aclGroup, 3 )
+								saveAcl = true
+								if player then
+									outputChatBox( "Has salido de " .. faction.displayName .. ".", player, 255, 200, 0 )
+								end
 							end
 						end
 					else
-						-- Si no tiene la facción, removerlo del ACL
-						if aclGroupRemoveObject( aclGetGroup( faction.aclGroup ), "user." .. info.username ) then
-							outputDebugString( "Removed " .. info.username .. " from faction " .. faction.aclGroup, 3 )
-							saveAcl = true
-							if player then
-								outputChatBox( "Has salido de " .. faction.displayName .. ".", player, 255, 200, 0 )
-							end
-						end
+						outputDebugString( "Warning: ACL group '" .. faction.aclGroup .. "' does not exist", 1 )
 					end
 				end
 			end
@@ -1711,23 +1752,28 @@ local function factionACLUpdate( player, saveAclIfChanged )
 						end
 						
 						-- Si tiene la facción, agregarlo al ACL
-						if hasGroup then
-							if aclGroupAddObject( aclGetGroup( faction.aclGroup ), "user." .. accountName ) then
-								outputDebugString( "Added account " .. accountName .. " to faction " .. faction.aclGroup, 3 )
-								saveAcl = true
-								if accountPlayer then
-									outputChatBox( "Te has unido a " .. faction.displayName .. ".", accountPlayer, 0, 255, 0 )
+						local aclGroup = aclGetGroup( faction.aclGroup )
+						if aclGroup then
+							if hasGroup then
+								if aclGroupAddObject( aclGroup, "user." .. accountName ) then
+									outputDebugString( "Added account " .. accountName .. " to faction " .. faction.aclGroup, 3 )
+									saveAcl = true
+									if accountPlayer then
+										outputChatBox( "Te has unido a " .. faction.displayName .. ".", accountPlayer, 0, 255, 0 )
+									end
+								end
+							else
+								-- Si no tiene la facción, removerlo del ACL
+								if aclGroupRemoveObject( aclGroup, "user." .. accountName ) then
+									outputDebugString( "Removed account " .. accountName .. " from faction " .. faction.aclGroup, 3 )
+									saveAcl = true
+									if accountPlayer then
+										outputChatBox( "Has salido de " .. faction.displayName .. ".", accountPlayer, 255, 200, 0 )
+									end
 								end
 							end
 						else
-							-- Si no tiene la facción, removerlo del ACL
-							if aclGroupRemoveObject( aclGetGroup( faction.aclGroup ), "user." .. accountName ) then
-								outputDebugString( "Removed account " .. accountName .. " from faction " .. faction.aclGroup, 3 )
-								saveAcl = true
-								if accountPlayer then
-									outputChatBox( "Has salido de " .. faction.displayName .. ".", accountPlayer, 255, 200, 0 )
-								end
-							end
+							outputDebugString( "Warning: ACL group '" .. faction.aclGroup .. "' does not exist", 1 )
 						end
 					end
 				end

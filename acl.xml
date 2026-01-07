@@ -165,6 +165,7 @@
         <object name="resource.camaras"></object>
     </group>
     <group name="Policia">
+        <acl name="Policia"></acl>
         <object name="user.Luis_Cardenas"></object>
         <object name="user.Juan1"></object>
         <object name="user.yessica"></object>
@@ -173,14 +174,18 @@
         <object name="user.robert9876"></object>
         <object name="user.Miguel"></object>
     </group>
-    <group name="Sura"></group>
+    <group name="Sura">
+        <acl name="Sura"></acl>
+    </group>
     <group name="Meca">
+        <acl name="Meca"></acl>
         <object name="user.JuanchoSBK"></object>
         <object name="user.leandro"></object>
         <object name="user.cata345"></object>
         <object name="user.Danielxz"></object>
     </group>
     <group name="Ejercito">
+        <acl name="Ejercito"></acl>
         <object name="user.Dilon Baby"></object>
         <object name="user.zubserou212"></object>
         <object name="user.JUANsanchez"></object>
@@ -190,20 +195,30 @@
         <object name="user.CRISTOPFER"></object>
     </group>
     <group name="MAFIARUSA">
+        <acl name="MAFIARUSA"></acl>
         <object name="user.Luis_Cardenas"></object>
         <object name="user.JuanchoSBK"></object>
         <object name="user.sebastian blood"></object>
         <object name="user.JUNIOR2024"></object>
         <object name="user.cloudfgrl"></object>
     </group>
-    <group name="ELN"></group>
-    <group name="CDG"></group>
-    <group name="CDJ"></group>
+    <group name="ELN">
+        <acl name="ELN"></acl>
+    </group>
+    <group name="CDG">
+        <acl name="CDG"></acl>
+    </group>
+    <group name="CDJ">
+        <acl name="CDJ"></acl>
+    </group>
     <group name="JEFESCLUBKYOTO">
+        <acl name="JEFESCLUBKYOTO"></acl>
         <object name="user.Fab"></object>
         <object name="user.Luis_Cardenas"></object>
     </group>
-    <group name="KYOTOCLUB"></group>
+    <group name="KYOTOCLUB">
+        <acl name="KYOTOCLUB"></acl>
+    </group>
     <group name="CartelMedellin"></group>
     <group name="CartelCali"></group>
     <group name="Los13"></group>
@@ -212,6 +227,7 @@
         <object name="resource.JEIAC"></object>
     </group>
     <group name="TDA">
+        <acl name="TDA"></acl>
         <object name="user.Johan_Hernandez"></object>
         <object name="user.Davinsito"></object>
         <object name="user.Estiwar_Osorio"></object>
@@ -1933,4 +1949,16 @@
         <right name="function.outputChatBox" access="true" who="Own_David(jeicorde3)" pending="false" date="25-09-28 03:27:32"></right>
         <right name="function.outputServerLog" access="true" who="Own_David(jeicorde3)" pending="false" date="25-09-28 03:27:32"></right>
     </acl>
+    <!-- ACLs para facciones -->
+    <acl name="Policia"></acl>
+    <acl name="Sura"></acl>
+    <acl name="Meca"></acl>
+    <acl name="Ejercito"></acl>
+    <acl name="MAFIARUSA"></acl>
+    <acl name="ELN"></acl>
+    <acl name="CDG"></acl>
+    <acl name="CDJ"></acl>
+    <acl name="JEFESCLUBKYOTO"></acl>
+    <acl name="KYOTOCLUB"></acl>
+    <acl name="TDA"></acl>
 </acl>
