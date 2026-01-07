@@ -9,6 +9,18 @@
     <group name="GameOperator">
         <acl name="GameOperator"></acl>
     </group>
+    <group name="Desarrollador">
+        <acl name="Desarrollador"></acl>
+    </group>
+    <group name="Moderador">
+        <acl name="Moderador"></acl>
+    </group>
+    <group name="Helper">
+        <acl name="Helper"></acl>
+    </group>
+    <group name="VIP">
+        <acl name="VIP"></acl>
+    </group>
     <group name="autoGroup_acpanel">
         <acl name="autoACL_acpanel"></acl>
         <object name="resource.acpanel"></object>
@@ -147,17 +159,6 @@
         <acl name="autoACL_pAttach-armas"></acl>
         <object name="resource.pAttach-armas"></object>
     </group>
-    <group name="Policia"></group>
-    <group name="Sura"></group>
-    <group name="Meca"></group>
-    <group name="Ejercito"></group>
-    <group name="MAFIARUSA"></group>
-    <group name="JEFESCLUBKYOTO"></group>
-    <group name="KYOTOCLUB"></group>
-    <group name="ELN"></group>
-    <group name="CDJ"></group>
-    <group name="CDG"></group>
-    <group name="TDA"></group>
     <acl name="Admin">
         <right name="general.adminpanel" access="true"></right>
         <right name="general.modpanel" access="true"></right>
@@ -308,6 +309,11 @@
     <acl name="autoACL_pAttach-armas">
         <right name="function.fetchRemote" access="false" who="" pending="true" date=""></right>
     </acl>
+    <!-- ACLs para grupos de staff -->
+    <acl name="Desarrollador"></acl>
+    <acl name="Moderador"></acl>
+    <acl name="Helper"></acl>
+    <acl name="VIP"></acl>
     <!-- ACLs para facciones -->
     <acl name="Policia"></acl>
     <acl name="Sura"></acl>
