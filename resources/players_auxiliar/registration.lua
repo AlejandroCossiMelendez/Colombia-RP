@@ -26,6 +26,8 @@ end
 addEvent( "players:register", true )
 addEventHandler( "players:register", root,
 	function( username, password )
+		outputServerLog("[REGISTER] Evento players:register recibido. Usuario: " .. tostring(username) .. ", Source: " .. tostring(getPlayerName(source)) .. ", Client: " .. tostring(client and getPlayerName(client) or "nil"))
+		
 		if (source == client) or not client then
 			if allowRegistration then
 				if username and password then
@@ -33,8 +35,10 @@ addEventHandler( "players:register", root,
 					password = trim( password )
 					-- client length checks are the same
 					if #username >= 3 and #password >= 8 then
+						outputServerLog("[REGISTER] Validación de longitud OK. Verificando usuario en BD...")
 						-- see if that username is free at all
 						local info, errTest = exports.sql:query_assoc_single( "SELECT COUNT(userID) AS usercount FROM wcf1_user WHERE username = '%s'", username )
+						outputServerLog("[REGISTER] Resultado query: " .. tostring(info and info.usercount or "nil") .. ", Error: " .. tostring(errTest or "nil"))
 						local info2 = exports.sql:query_assoc( "SELECT regIP, lastIP, regSerial FROM wcf1_user" )
 						if not info then
 							triggerClientEvent( source, "players:registrationResult", source, 1 )

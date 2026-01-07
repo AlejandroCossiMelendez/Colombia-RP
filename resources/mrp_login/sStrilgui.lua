@@ -3,6 +3,24 @@
 addEvent('strilgui.register', true)
 addEventHandler('strilgui.register', root, 
 function (player, account, password)
+	-- source es el jugador que disparó el evento desde el cliente
+	local player = source
+	if not player or not isElement(player) then
+		outputServerLog("[REGISTER] Error: Jugador inválido en strilgui.register")
+		return
+	end
+	
+	if not account or not password then
+		outputServerLog("[REGISTER] Error: Faltan datos de registro para " .. getPlayerName(player))
+		return
+	end
+	
+	outputServerLog("[REGISTER] Intento de registro: " .. account .. " por " .. getPlayerName(player))
+	
+	-- Disparar el evento players:register desde el servidor
+	-- triggerEvent desde el servidor hace que source sea el elemento pasado como segundo parámetro
+	-- El handler de players:register verifica (source == client) or not client
+	-- Como client no estará definido cuando se dispara desde el servidor, not client será true
 	triggerEvent( "players:register", player, account, password )
 end)
 
