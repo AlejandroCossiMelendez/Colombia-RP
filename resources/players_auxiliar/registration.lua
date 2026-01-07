@@ -106,9 +106,6 @@ addEventHandler( "players:register", root,
 							exports.sql:query_free( "UPDATE wcf1_user SET regSerial = '%s' WHERE username = '%s'", playerSerial, username )
 							outputChatBox ( "Bienvenido por primera vez a DownTown RolePlay.", source, 0, 255, 0 )
 							outputChatBox ( "Te recomendamos que utilices /duda para obtener asistencia", source, 0, 255, 0)
-						end 
-						else
-							triggerClientEvent( source, "players:registrationResult", source, 3 )
 						end
 					else
 						-- shouldn't happen
