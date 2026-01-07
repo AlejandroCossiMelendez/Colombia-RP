@@ -36,10 +36,19 @@ addCommandHandler( "restartall",
 
 
 function startAll( player )
+	-- Verificar permisos antes de intentar iniciar recursos
+	if player and not hasObjectPermissionTo( player, "command.modchat", false ) then
+		return
+	end
+	
 	for index, resource in ipairs ( getResources ( ) ) do
-		if getResourceState ( resource ) == "loaded" then
+		-- No intentar iniciar recursos protegidos o el recurso actual
+		local resourceName = getResourceName( resource )
+		if getResourceState ( resource ) == "loaded" 
+			and resourceName ~= getResourceName( getThisResource() )
+			and not isResourceProtected( resource ) then
 			if not startResource ( resource ) then
-				outputServerLog( "startall: Ha fallado el inicio de la resource '" .. getResourceName ( resource ) .. "' . Inténtalo manualmente y avisa a Jefferson." )
+				outputServerLog( "startall: Ha fallado el inicio de la resource '" .. resourceName .. "' . Inténtalo manualmente y avisa a Jefferson." )
 			end
 		end
 	end
@@ -48,5 +57,18 @@ function startAll( player )
 		--outputChatBox ( "Todos los recursos han sido iniciados.", player, 0, 255, 153 )
 	end
 end
---addCommandHandler("startall", startAll)
-addEventHandler("onResourceStart", getResourceRootElement(getThisResource()), startAll)
+
+-- Comando para iniciar todos los recursos manualmente (requiere permisos)
+addCommandHandler("startall", 
+	function( player )
+		if not hasObjectPermissionTo( player, "command.modchat", false ) then 
+			return 
+		end
+		startAll( player )
+	end,
+	true
+)
+
+-- Deshabilitado: inicio automático de todos los recursos al iniciar gresources
+-- Esto causaba demasiados intentos de inicio y warnings de permisos
+-- addEventHandler("onResourceStart", getResourceRootElement(getThisResource()), startAll)
