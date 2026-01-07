@@ -82,9 +82,40 @@ addEventHandler( "players:register", root,
 						
 						outputServerLog("[REGISTER] Conteo de IPs: " .. ipReg)
 						
-						-- Verificar si el jugador es staff (tiene permisos de modchat)
-						local isStaff = hasObjectPermissionTo(source, "command.modchat", false)
+						-- Verificar si el jugador es staff (tiene permisos de modchat o está logueado como staff)
+						local isStaff = false
+						if hasObjectPermissionTo(source, "command.modchat", false) then
+							isStaff = true
+							outputServerLog("[REGISTER] Staff detectado por permisos ACL")
+						elseif exports.players and exports.players.isLoggedIn and exports.players:isLoggedIn(source) then
+							-- Verificar si el jugador logueado tiene grupos de staff
+							local groups = exports.players:getGroups(source)
+							if groups then
+								for _, group in ipairs(groups) do
+									if group.groupID == 1 or group.groupID == 2 or group.groupID == 3 or group.groupID == 12 or group.groupID == 13 then
+										isStaff = true
+										outputServerLog("[REGISTER] Staff detectado por grupo: " .. tostring(group.groupName))
+										break
+									end
+								end
+							end
+						else
+							-- Si no está logueado, verificar si alguna cuenta existente desde esta IP es staff
+							outputServerLog("[REGISTER] Jugador no logueado, verificando si alguna cuenta desde esta IP es staff...")
+							local staffCheck, errStaff = exports.sql:query_assoc_single(
+								"SELECT COUNT(utg.userID) as staffCount FROM wcf1_user u " ..
+								"INNER JOIN wcf1_user_to_groups utg ON u.userID = utg.userID " ..
+								"WHERE (u.regIP = '%s' OR u.lastIP = '%s') AND utg.groupID IN (1, 2, 3, 12, 13)",
+								playerIP, playerIP
+							)
+							if staffCheck and staffCheck.staffCount and staffCheck.staffCount > 0 then
+								isStaff = true
+								outputServerLog("[REGISTER] Staff detectado: existe cuenta staff desde esta IP (count: " .. staffCheck.staffCount .. ")")
+							end
+						end
+						
 						local maxIPRegistrations = isStaff and 10 or 2  -- Staff puede tener hasta 10 cuentas, usuarios normales 2
+						outputServerLog("[REGISTER] Verificación staff: " .. tostring(isStaff) .. ", Límite de IPs: " .. maxIPRegistrations)
 						
 						if ipReg >= maxIPRegistrations then 
 							outputServerLog("[REGISTER] Límite de IPs alcanzado (" .. ipReg .. "/" .. maxIPRegistrations .. "), rechazando registro")
