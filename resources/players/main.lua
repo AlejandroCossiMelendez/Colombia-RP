@@ -315,7 +315,7 @@ local function aclUpdate( player, saveAclIfChanged )
 							outputDebugString( "Warning: ACL group '" .. tostring(value.aclGroup) .. "' does not exist for group " .. tostring(value.groupName) .. " (ID: " .. tostring(value.groupID) .. ")", 1 )
 						end
 					else
-						outputDebugString( "Warning: ACL group '" .. value.aclGroup .. "' does not exist", 1 )
+						outputDebugString( "Warning: Group " .. tostring(value.groupName) .. " (ID: " .. tostring(value.groupID) .. ") has no aclGroup defined", 1 )
 					end
 				end
 				
@@ -445,7 +445,7 @@ local function aclUpdate( player, saveAclIfChanged )
 								outputDebugString( "Warning: ACL group '" .. tostring(value.aclGroup) .. "' does not exist for group " .. tostring(value.groupName) .. " (ID: " .. tostring(value.groupID) .. ")", 1 )
 							end
 						else
-							outputDebugString( "Warning: ACL group '" .. value.aclGroup .. "' does not exist", 1 )
+							outputDebugString( "Warning: Group " .. tostring(value.groupName) .. " (ID: " .. tostring(value.groupID) .. ") has no aclGroup defined", 1 )
 						end
 							
 							if player then
