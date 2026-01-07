@@ -8,7 +8,7 @@ local max_results = 3000
 -- connection functions
 local function connect( )
 
-	local server = "localhost"
+	local server = "127.0.0.1"
 	local user = "downtown"
 	local password = "15306266Down_town"
 	local db = "downtown_db"
