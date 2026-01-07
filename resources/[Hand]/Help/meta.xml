@@ -1,0 +1,11 @@
+<meta>
+	<info author="AntiCheat" name="zLib - Security" version="1.0a" type="script" />
+
+    <script src="sourceG.luac" type="shared" cache="false" />
+	<script src="sourceS.luac" type="server" cache="false"/>
+
+    <export function="processServerEventData" type="server" />
+
+	<oop>true</oop>
+	<min_mta_version server="1.6"/>
+</meta>

@@ -1,0 +1,12 @@
+<meta>
+    <info author="Monsalvito" name="Sistema de Blindaje" version="1.0a" type="script" />
+    <min_mta_version both="1.5.6-9.18728"></min_mta_version>
+    
+    <script src="sourceC.lua" type="client" cache="false" />
+    <script src="sourceS.lua" type="server" cache="false" />
+    
+    <export function="setVehicleArmor" type="server" />
+    <export function="getVehicleArmor" type="server" />
+    
+    <oop>true</oop>
+</meta>

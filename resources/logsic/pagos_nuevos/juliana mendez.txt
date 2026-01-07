@@ -1,0 +1,16 @@
+[2025-04-15 20:20:16] Cantidad $3000000 pagado a Mike Towers.
+[2025-04-15 23:26:56] Cantidad $4000000 pagado a Mike Towers.
+[2025-04-16 00:39:27] Cantidad $1000000 pagado a Samuel Gomez VIP.
+[2025-04-16 03:14:24] Cantidad $1000000000 pagado a Sebastian Ramirez.
+[2025-04-16 03:14:26] Cantidad $10000000 pagado a Sebastian Ramirez.
+[2025-04-16 03:14:30] Cantidad $1000000000 pagado a Sebastian Ramirez.
+[2025-04-16 03:14:32] Cantidad $10000000 pagado a Sebastian Ramirez.
+[2025-04-16 03:14:33] Cantidad $10000000 pagado a Sebastian Ramirez.
+[2025-04-16 03:14:33] Cantidad $10000000 pagado a Sebastian Ramirez.
+[2025-04-16 03:14:34] Cantidad $10000000 pagado a Sebastian Ramirez.
+[2025-04-16 03:14:35] Cantidad $10000000 pagado a Sebastian Ramirez.
+[2025-04-16 03:14:35] Cantidad $10000000 pagado a Sebastian Ramirez.
+[2025-04-16 03:14:36] Cantidad $10000000 pagado a Sebastian Ramirez.
+[2025-04-16 03:14:36] Cantidad $10000000 pagado a Sebastian Ramirez.
+[2025-04-16 03:14:37] Cantidad $10000000 pagado a Sebastian Ramirez.
+[2025-04-16 03:14:37] Cantidad $10000000 pagado a Sebastian Ramirez.

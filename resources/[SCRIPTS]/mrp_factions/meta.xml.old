@@ -1,0 +1,17 @@
+<meta>
+    <info name="Medellin RP Factions" author="ZeDD &#xE349; TRtam" />
+
+    <!-- client -->
+    <script src="client/helpers/utils.luac" type="client" cache="false" />
+    <script src="client/helpers/AssetsManager.luac" type="client" cache="false" />
+    <script src="client/main.luac" type="client" cache="false" />
+
+    <!-- assets/fonts -->
+    <file src="assets/fonts/Roboto-Medium.ttf" />
+    <file src="assets/fonts/Roboto-Regular.ttf" />
+
+    <!-- exports/client -->
+    <export function="UpdateFaction" type="client" />
+    <export function="GetVisible" type="client" />
+    <export function="ToggleUI" type="client" />
+</meta>

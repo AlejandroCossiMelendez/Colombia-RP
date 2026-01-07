@@ -1,0 +1,23 @@
+<!--
+    Sistema de Chat Unificado para Facciones
+    Meta archivo principal que incluye todos los archivos necesarios
+-->
+<meta>
+    <info author="Sistema Automatizado" version="1.0" name="Chat Facciones Unificado" description="Sistema unificado para manejar el chat de todas las facciones usando configuración externa" />
+    
+    <!-- Script principal del servidor -->
+    <script src="server.lua" type="server" />
+    
+    <!-- Archivo de configuración -->
+    <file src="config.json" />
+    
+    <!-- Funciones exportadas para otros recursos -->
+    <export function="getFactionConfig" type="server" />
+    <export function="getFactionCommands" type="server" />
+    <export function="getFactionInfoById" type="server" />
+    
+    <!-- Permisos necesarios para comandos administrativos -->
+    <aclrequest>
+        <right name="general.adminpanel" access="false" />
+    </aclrequest>
+</meta>

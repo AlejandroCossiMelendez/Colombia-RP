@@ -1,0 +1,13 @@
+<meta>
+    <script src='client.lua' type='client' cache='false'/>
+    <script src='server.lua' type='server' cache='false'/>
+
+
+	<file src="data/background.png"/>
+	<file src="data/logoPolicia.png"/>
+	<file src="data/cuadroUtiles.png"/>
+	<file src="data/cuadroCargadotres.png"/>
+	<file src="data/cuadroDuty.png"/>
+	<file src="data/cuadroArmamento.png"/>
+	<file src="fonts/Orbitron-Regular.ttf"/>
+</meta>

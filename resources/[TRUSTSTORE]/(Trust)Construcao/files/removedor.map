@@ -1,0 +1,7 @@
+<map edf:definitions="editor_main">
+<removeWorldObject id="removeWorldObject (ebeachalpha5) (1)" radius="84.547569" interior="-1" model="17591" lodModel="0" posX="2606.3828" posY="-1341.8437" posZ="47.54688" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (nitelites_LAE2) (1)" radius="102.47381" interior="-1" model="17954" lodModel="0" posX="2577.2344" posY="-1350.3984" posZ="56.53906" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (ebeachalpha5) (2)" radius="70.532722" interior="-1" model="17591" lodModel="0" posX="2606.3828" posY="-1341.8437" posZ="47.54688" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (ebeachalpha5) (3)" radius="70.532722" interior="-1" model="17591" lodModel="0" posX="2606.3828" posY="-1341.8437" posZ="47.54688" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (LongBeBlok1_LAe) (1)" radius="94.262001" interior="-1" model="17524" lodModel="17730" posX="2606.8828" posY="-1350.5" posZ="51.07031" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+</map>

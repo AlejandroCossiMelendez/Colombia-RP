@@ -1,0 +1,10 @@
+<meta>
+    <script src="server.lua" type="server" />
+    <script src="client.lua" type="client" />
+
+    <!-- imagenenes de las notificaciones -->
+    <file src="assets/Notificacion.png" />
+    <file src="assets/policia.png" />
+    <file src="assets/sura.png" />
+    <file src="assets/mecanico.png" />
+</meta>

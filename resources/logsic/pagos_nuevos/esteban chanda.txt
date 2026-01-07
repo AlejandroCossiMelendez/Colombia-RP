@@ -1,0 +1,8 @@
+[2025-01-29 02:05:50] Cantidad $180000 pagado a Miguel Rodriguez O.
+[2025-01-29 02:06:46] Cantidad $1000000 pagado a Miguel Rodriguez O.
+[2025-01-29 19:12:47] Cantidad $1000000 pagado a Horacio Alzate.
+[2025-01-29 19:13:02] Cantidad $1000000 pagado a Carlos Gacha.
+[2025-01-29 20:57:59] Cantidad $12000000 pagado a Jhon Jhairo Velasquez.
+[2025-01-29 22:47:50] Cantidad $800000 pagado a David Herrera.
+[2025-01-29 22:58:56] Cantidad $10 pagado a Matias Valencia.
+[2025-01-29 23:00:17] Cantidad $1000 pagado a Matias Valencia.

@@ -1,0 +1,5 @@
+<meta>
+    <info author="TuNombre" type="script" name="Cambio de Hora" version="1.0" />
+    
+    <script src="hora.lua" type="server" />
+</meta>

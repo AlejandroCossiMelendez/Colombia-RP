@@ -1,0 +1,8 @@
+<meta>
+    <info author="Siriloooo" type="script" name="SirenasPDyEJC"/>
+    
+    <script src="client.lua" type="client"/>
+    <script src="server.lua" type="server"/>
+    
+    <file src="sounds/policia.mp3"/>
+</meta>

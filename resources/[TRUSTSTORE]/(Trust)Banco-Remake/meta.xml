@@ -1,0 +1,41 @@
+<meta>
+<!-- ╔══════════════════════════════════════════════════════════════════════╗ -->
+<!-- ║ ⚠️ ATENÇÃO (PT-BR) – NÃO MODIFIQUE ESTE ARQUIVO                       ║ -->
+<!-- ║ ⚠️ WARNING (EN)  – DO NOT MODIFY THIS FILE                            ║ -->
+<!-- ║ ⚠️ ATENCIÓN (ES) – NO MODIFICAR ESTE ARCHIVO                          ║ -->
+<!-- ╚══════════════════════════════════════════════════════════════════════╝ -->
+    <info author='KristianMapper' version='www.truststoremta.com' name='Trust Store OFICIAL'/>
+	<oop>true</oop>
+	<script src="Config.lua" type="shared" cache="false" />
+	<script src="source/Source.luac" type="shared" cache="false" />
+    <include resource="policia" />
+
+    <file src="files/model/banco.mtax_dff" cache="false"/>
+    <file src="files/model/cash.mtax_dff" cache="false"/>
+    <file src="files/model/porta.mtax_dff" cache="false"/>
+    <file src="files/model/serra.mtax_dff" cache="false"/>
+    <file src="files/model/vidro.mtax_dff" cache="false"/>
+    <file src="files/model/texturas.txd" cache="false"/>
+    <file src="files/model/banco.mtax_col" cache="false"/>
+    <file src="files/model/cash.mtax_col" cache="false"/>
+    <file src="files/model/porta.mtax_col" cache="false"/>
+    <file src="files/model/serra.mtax_col" cache="false"/>
+    <file src="files/model/vidro.mtax_col" cache="false"/>
+
+    <file src="files/font/font.ttf" />
+    <file src="files/gfx/cam.png" />
+    <file src="files/gfx/chat.png" />
+    <file src="files/gfx/estatica.png" />
+    <file src="files/gfx/info.png" />
+    <file src="files/gfx/progressbar.png" />
+    <file src="files/gfx/progressbarback.png" />
+    <file src="files/gfx/tablet.png" />
+    <file src="files/gfx/tablet2.png" />
+    <file src="files/gfx/user.png" />
+    <file src="files/gfx/vidro.png" />
+    <map src="files/removedor.map" dimension="-1"></map>
+    <file src="files/sfx/alarme.mp3" />
+    <file src="files/sfx/bomba.mp3" />
+    <file src="files/sfx/serra.mp3" />
+    <min_mta_version server='1.6.0' client='1.6.0' />
+</meta>

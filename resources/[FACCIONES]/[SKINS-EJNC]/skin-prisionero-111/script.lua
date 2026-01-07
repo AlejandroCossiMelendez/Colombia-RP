@@ -1,0 +1,6 @@
+addEventHandler('onClientResourceStart',resourceRoot,function () 
+txd = engineLoadTXD( 'ByRyzen.txd' ) 
+engineImportTXD( txd, 111 ) 
+dff = engineLoadDFF('ByRyzen.dff', 111) 
+engineReplaceModel( dff, 111 )
+end)

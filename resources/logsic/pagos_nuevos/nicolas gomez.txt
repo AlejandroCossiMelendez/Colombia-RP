@@ -1,0 +1,9 @@
+[2025-04-06 20:30:07] Cantidad $7000000 pagado a Jose Gutierrez.
+[2025-04-07 22:51:48] Cantidad $2000000 pagado a Leon Jaramillo.
+[2025-04-07 22:51:56] Cantidad $20000000 pagado a Leon Jaramillo.
+[2025-04-07 22:52:50] Cantidad $20000000 pagado a Leon Jaramillo.
+[2025-04-08 21:40:01] Cantidad $400000000 pagado a Juancho Sanchez.
+[2025-04-08 21:40:43] Cantidad $40000000 pagado a Juancho Sanchez.
+[2025-04-09 14:52:02] Cantidad $800000000 pagado a Luis Rojas.
+[2025-04-09 14:52:10] Cantidad $80000000 pagado a Luis Rojas.
+[2025-04-09 14:52:47] Cantidad $7000000 pagado a Luis Rojas.

@@ -1,0 +1,4 @@
+<meta>
+	<info author="GBscr" type="danger" version="1.0" />
+	<script src="danoweapon.lua" type="server" />
+</meta>

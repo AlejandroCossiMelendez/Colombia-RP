@@ -1,0 +1,70 @@
+<meta>
+<!-- ╔══════════════════════════════════════════════════════════════════════╗ -->
+<!-- ║ ⚠️ ATENÇÃO (PT-BR) – NÃO MODIFIQUE ESTE ARQUIVO                       ║ -->
+<!-- ║ ⚠️ WARNING (EN)  – DO NOT MODIFY THIS FILE                            ║ -->
+<!-- ║ ⚠️ ATENCIÓN (ES) – NO MODIFICAR ESTE ARCHIVO                          ║ -->
+<!-- ╚══════════════════════════════════════════════════════════════════════╝ -->
+    <info author='KristianMapper' version='www.truststoremta.com' name='Trust Store OFICIAL'/>
+	<oop>true</oop>
+	<script src="Config.lua" type="shared" cache="false" />
+	<script src="source/Source.luac" type="shared" cache="false" />
+
+    <file src="files/model/base.mtax_dff" cache="false"/>
+    <file src="files/model/portao.mtax_dff" cache="false"/>
+    <file src="files/model/texturas.txd" cache="false"/>
+    <file src="files/model/base.mtax_col" cache="false"/>
+    <file src="files/model/portao.mtax_col" cache="false"/>
+
+    <file src="files/gfx/bope/_110.png" />
+    <file src="files/gfx/bope/_21.png" />
+    <file src="files/gfx/bope/_27.png" />
+    <file src="files/gfx/bope/_29.png" />
+    <file src="files/gfx/bope/_31.png" />
+    <file src="files/gfx/eb/_110.png" />
+    <file src="files/gfx/eb/_21.png" />
+    <file src="files/gfx/eb/_27.png" />
+    <file src="files/gfx/eb/_29.png" />
+    <file src="files/gfx/eb/_31.png" />
+    <file src="files/gfx/fn/_110.png" />
+    <file src="files/gfx/fn/_21.png" />
+    <file src="files/gfx/fn/_27.png" />
+    <file src="files/gfx/fn/_29.png" />
+    <file src="files/gfx/fn/_31.png" />
+    <file src="files/gfx/pcesp/_110.png" />
+    <file src="files/gfx/pcesp/_21.png" />
+    <file src="files/gfx/pcesp/_27.png" />
+    <file src="files/gfx/pcesp/_29.png" />
+    <file src="files/gfx/pcesp/_31.png" />
+    <file src="files/gfx/pf/_110.png" />
+    <file src="files/gfx/pf/_21.png" />
+    <file src="files/gfx/pf/_27.png" />
+    <file src="files/gfx/pf/_29.png" />
+    <file src="files/gfx/pf/_31.png" />
+    <file src="files/gfx/pmerj/_110.png" />
+    <file src="files/gfx/pmerj/_21.png" />
+    <file src="files/gfx/pmerj/_27.png" />
+    <file src="files/gfx/pmerj/_29.png" />
+    <file src="files/gfx/pmerj/_31.png" />
+    <file src="files/gfx/pmesc/_110.png" />
+    <file src="files/gfx/pmesc/_21.png" />
+    <file src="files/gfx/pmesc/_27.png" />
+    <file src="files/gfx/pmesc/_29.png" />
+    <file src="files/gfx/pmesc/_31.png" />
+    <file src="files/gfx/pmesp/_110.png" />
+    <file src="files/gfx/pmesp/_21.png" />
+    <file src="files/gfx/pmesp/_27.png" />
+    <file src="files/gfx/pmesp/_29.png" />
+    <file src="files/gfx/pmesp/_31.png" />
+    <file src="files/gfx/pmmg/_110.png" />
+    <file src="files/gfx/pmmg/_21.png" />
+    <file src="files/gfx/pmmg/_27.png" />
+    <file src="files/gfx/pmmg/_29.png" />
+    <file src="files/gfx/pmmg/_31.png" />
+    <file src="files/gfx/rota/_110.png" />
+    <file src="files/gfx/rota/_21.png" />
+    <file src="files/gfx/rota/_27.png" />
+    <file src="files/gfx/rota/_29.png" />
+    <file src="files/gfx/rota/_31.png" />
+    <map src="files/removedor.map" dimension="-1"></map>
+    <min_mta_version server='1.6.0' client='1.6.0' />
+</meta>

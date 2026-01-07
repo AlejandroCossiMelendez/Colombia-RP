@@ -1,0 +1,4 @@
+<meta>
+	<info author="[MM]EVIS" name="Weapon Sustained" version="1.6.9" type="script" description="weapon sustained script" />
+	<script src="c_Armas.lua" type="client"/>
+</meta>

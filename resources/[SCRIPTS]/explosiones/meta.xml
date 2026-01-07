@@ -1,0 +1,4 @@
+<meta>
+    <info author="TuNombre" version="1.0" type="script" />
+    <script src="client.lua" type="client" />
+</meta>

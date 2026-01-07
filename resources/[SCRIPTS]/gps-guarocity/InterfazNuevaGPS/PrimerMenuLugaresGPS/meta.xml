@@ -1,0 +1,16 @@
+<meta>
+    <script src='useful.lua' type='client' cache='false'/>
+    <script src='client.lua' type='client' cache='false'/>
+
+	<file src="data/BGEXTERIOR.png"/>
+	<file src="data/BotonTrabajos.png"/>
+	<file src="data/BotonTiendas.png"/>
+	<file src="data/BotonIlegales.png"/>
+	<file src="data/BotonRopa.png"/>
+	<file src="data/BotonLegales.png"/>
+	<file src="data/BotonOtros.png"/>
+	<file src="data/BotonConcesionario.png"/>
+	<file src="data/BotonLugares.png"/>
+	<file src="data/Header.png"/>
+	<file src="data/IconoCerrar.png"/>
+</meta>

@@ -1,0 +1,19 @@
+[2025-03-29 23:12:16] Cantidad $4000000 pagado a Thiago Cardona.
+[2025-03-30 21:44:07] Cantidad $100000000 pagado a Juan Fernando VIP.
+[2025-03-31 22:27:37] Cantidad $5000000 pagado a Samuel Gomez VIP.
+[2025-04-01 06:20:54] Cantidad $900000000 pagado a Marlon Mendez.
+[2025-04-01 06:22:58] Cantidad $900000000 pagado a Thiago Cardona.
+[2025-04-01 06:58:52] Cantidad $900000000 pagado a Marlon Mendez.
+[2025-04-01 06:59:53] Cantidad $900000000 pagado a Marlon Mendez.
+[2025-04-01 07:00:08] Cantidad $900000000 pagado a Marlon Mendez.
+[2025-04-01 07:00:21] Cantidad $900000000 pagado a Marlon Mendez.
+[2025-04-01 07:00:35] Cantidad $900000000 pagado a Marlon Mendez.
+[2025-04-01 07:35:43] Cantidad $900000000 pagado a Marlon Mendez.
+[2025-04-01 07:35:57] Cantidad $900000000 pagado a Marlon Mendez.
+[2025-04-01 23:43:31] Cantidad $2000000 pagado a Darwin Watterson.
+[2025-04-02 07:03:25] Cantidad $900000000 pagado a Marlon Mendez.
+[2025-04-02 07:04:34] Cantidad $900000000 pagado a Marlon Mendez.
+[2025-04-02 07:04:50] Cantidad $130000000 pagado a Marlon Mendez.
+[2025-04-02 07:43:36] Cantidad $900000000 pagado a Marlon Mendez.
+[2025-04-02 07:45:35] Cantidad $900000000 pagado a Marlon Mendez.
+[2025-04-02 07:58:50] Cantidad $900000000 pagado a LOLO LOLOOO.

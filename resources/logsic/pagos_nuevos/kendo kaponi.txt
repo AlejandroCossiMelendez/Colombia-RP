@@ -1,0 +1,9 @@
+[2025-03-30 23:23:32] Cantidad $300000 pagado a Thiago Cardona.
+[2025-04-01 19:23:14] Cantidad $2000000 pagado a Juancho Sanchez.
+[2025-04-01 19:23:40] Cantidad $4000000 pagado a Juancho Sanchez.
+[2025-04-01 19:24:05] Cantidad $7000000 pagado a Juancho Sanchez.
+[2025-04-01 19:26:17] Cantidad $30000000 pagado a Juancho Sanchez.
+[2025-04-02 02:55:54] Cantidad $200000000 pagado a Darwin Steven.
+[2025-04-02 20:02:20] Cantidad $30000000 pagado a Juancho Sanchez.
+[2025-04-02 20:02:40] Cantidad $6000000 pagado a Juancho Sanchez.
+[2025-04-02 21:19:34] Cantidad $1000000 pagado a Juancho Sanchez.

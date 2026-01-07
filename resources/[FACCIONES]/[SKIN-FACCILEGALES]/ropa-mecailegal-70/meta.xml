@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="cocoa" type="misc" name="mc1" description="mc1" />
+     <script src="script.lua" type="client" />
+     <file src="mc1.txd" />
+     <file src="mc1.dff" />
+</meta>

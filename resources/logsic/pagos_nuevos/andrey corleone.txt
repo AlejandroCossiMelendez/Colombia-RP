@@ -1,0 +1,4 @@
+[2025-01-22 03:00:51] Cantidad $115000000 pagado a Jose Ramirez.
+[2025-01-22 05:16:02] Cantidad $36000000 pagado a Thomas Corleone.
+[2025-01-25 20:50:24] Cantidad $1000000 pagado a Stiven Ramos.
+[2025-01-25 20:50:28] Cantidad $1000000 pagado a Sebxstian Gaviria.

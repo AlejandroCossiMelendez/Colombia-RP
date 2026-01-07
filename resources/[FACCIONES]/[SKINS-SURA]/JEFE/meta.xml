@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="Samu" type="misc" name="Skinmedico" description="Skinmedico" />
+     <script src="script.lua" type="client" />
+     <file src="bartolo.txd" />
+     <file src="bartolo.dff" />
+</meta>

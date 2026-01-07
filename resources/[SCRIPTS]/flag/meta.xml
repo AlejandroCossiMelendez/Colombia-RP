@@ -1,0 +1,8 @@
+﻿<meta>
+    <file src="flag.dff"></file>
+    <file src="flag.txd"></file>
+    <file src="flag.fx"></file>
+    <file src="flag.png"></file>
+    <file src="noise.jpg"></file>
+    <script src="flag.lua" type="client"></script>
+</meta>

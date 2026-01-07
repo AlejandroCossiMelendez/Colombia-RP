@@ -1,0 +1,16 @@
+<meta>
+    <info author = 'WelinCpde' name = 'System Velo'/>
+    <script src = 'Velo_U.lua' type = 'client' cache = 'false'/>
+    <script src = 'Velo_C.lua' type = 'client' cache = 'false'/>
+    <script src = 'Velo_G.lua' type = 'shared' cache = 'false'/>
+
+    <file src = 'assets/speedBar.png'/>
+    <file src = 'assets/engine.png'/>
+    <file src = 'assets/belt.png'/>
+    <file src = 'assets/lights.png'/>
+    <file src = 'assets/fuel.png'/>
+    <file src = 'assets/car.png'/>
+
+    <file src = 'assets/fonts/black.ttf'/>
+    <file src = 'assets/fonts/medium.ttf'/>
+</meta>

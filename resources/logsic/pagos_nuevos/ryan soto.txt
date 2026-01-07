@@ -1,0 +1,6 @@
+[2025-04-14 01:09:36] Cantidad $1000000 pagado a [AY] Watterson.
+[2025-04-18 00:12:22] Cantidad $126790024 pagado a Samuel Ortega.
+[2025-04-18 03:23:13] Cantidad $60000000 pagado a Paiva Gonzales.
+[2025-04-18 03:25:30] Cantidad $1000000 pagado a Paiva Gonzales.
+[2025-04-18 06:16:00] Cantidad $20000000 pagado a Julian Mendoza.
+[2025-04-18 18:34:15] Cantidad $1000000 pagado a Julian Macias.

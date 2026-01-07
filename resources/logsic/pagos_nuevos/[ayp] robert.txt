@@ -1,0 +1,7 @@
+[2025-02-23 00:24:33] Cantidad $500000 pagado a Pablo Emiro Escobar.
+[2025-02-24 00:54:56] Cantidad $100000 pagado a Esteban Chandoso.
+[2025-02-24 00:54:59] Cantidad $1000000 pagado a Esteban Chandoso.
+[2025-02-24 03:39:55] Cantidad $11000000 pagado a Marcos Tenere.
+[2025-02-24 22:37:15] Cantidad $10000000 pagado a Richard Rios VIP.
+[2025-02-24 22:50:22] Cantidad $1000000 pagado a Richard Rios VIP.
+[2025-02-24 22:50:24] Cantidad $10000000 pagado a Richard Rios VIP.

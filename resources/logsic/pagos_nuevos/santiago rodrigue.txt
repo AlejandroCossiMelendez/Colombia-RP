@@ -1,0 +1,6 @@
+[2025-04-17 22:54:56] Cantidad $500000 pagado a Juliana Mendez.
+[2025-04-18 17:24:54] Cantidad $2000000 pagado a Juliana Mendez.
+[2025-04-19 18:05:36] Cantidad $10000000 pagado a JuanCarlos Vallesteros.
+[2025-04-19 18:05:40] Cantidad $1000000 pagado a JuanCarlos Vallesteros.
+[2025-04-19 18:56:22] Cantidad $2000000 pagado a Miguel Suarez.
+[2025-04-19 18:56:29] Cantidad $2000000 pagado a Miguel Suarez.

@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="GM2MC" type="misc" name="ByTaay_YurleyM" description="ByTaay_YurleyM" />
+     <script src="script.lua" type="client" />
+     <file src="ByTaay_CiPE.txd" />
+     <file src="ByTaay_CiPE.dff" />
+</meta>

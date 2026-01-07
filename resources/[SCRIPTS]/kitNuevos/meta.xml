@@ -1,0 +1,17 @@
+<meta>
+    <info author="La Capital Roleplay" name="Kit de Bienvenida" version="1.0" />
+    <description>Sistema de kit de bienvenida para nuevos jugadores</description>
+    
+    <script src="server.lua" type="server" />
+    <script src="client.lua" type="client" />
+    
+    <!-- Archivos de recursos -->
+    <file src="images/logo.png" />
+    <file src="fonts/Montserrat-ExtraBold.ttf" />
+    <file src="fonts/Montserrat-SemiBold.ttf" />
+    <file src="fonts/Montserrat-Regular.ttf" />
+    
+    <!-- Exportaciones -->
+    <export function="verificarKit" type="server" />
+    <export function="darKitBienvenida" type="server" />
+</meta>

@@ -1,0 +1,4 @@
+<meta>
+    <info author="Siriloooo" name="Sacar Muerto" description="Saca a los jugadores con poca vida de los vehículos" version="1.0.0" />
+    <script src="server.lua" type="server" />
+</meta>

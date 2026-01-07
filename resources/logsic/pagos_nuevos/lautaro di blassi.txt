@@ -1,0 +1,4 @@
+[2025-04-27 20:31:20] Cantidad $2000000 pagado a Mike Towers.
+[2025-04-27 20:31:22] Cantidad $200000 pagado a Mike Towers.
+[2025-04-27 21:54:35] Cantidad $3000000 pagado a Santiago Rodrigue.
+[2025-04-27 21:54:38] Cantidad $300000 pagado a Santiago Rodrigue.

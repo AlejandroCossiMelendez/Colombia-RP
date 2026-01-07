@@ -1,0 +1,35 @@
+🎨 FUENTES PERSONALIZADAS HD - INSTRUCCIONES
+
+📁 COLOCA AQUÍ LOS SIGUIENTES ARCHIVOS .TTF:
+
+✅ Roboto-Medium.ttf
+   - Descarga: fonts.google.com/specimen/Roboto
+   - Busca "Medium" en la lista de pesos
+   - Descarga solo el archivo Medium.ttf y renómbralo
+
+✅ Orbitron-Bold.ttf  
+   - Descarga: fonts.google.com/specimen/Orbitron
+   - Busca "Bold" en la lista de pesos
+   - Descarga solo el archivo Bold.ttf y renómbralo
+
+✅ JetBrainsMono-Regular.ttf
+   - Descarga: jetbrains.com/mono
+   - Busca la versión "Regular" 
+   - Descarga solo el archivo Regular.ttf y renómbralo
+
+📋 NOMBRES EXACTOS REQUERIDOS:
+   fonts/Roboto-Medium.ttf
+   fonts/Orbitron-Bold.ttf  
+   fonts/JetBrainsMono-Regular.ttf
+
+🎮 DESPUÉS DE COLOCAR LAS FUENTES:
+   - Ingresa al juego
+   - Usa: /recargarfuentes
+   - Usa: /fuenteshd para verificar
+
+⚠️ IMPORTANTE:
+   - Los nombres deben ser EXACTOS
+   - Si no tienes las fuentes, el sistema funciona igual con fuentes por defecto
+   - Las fuentes HD son opcionales, solo mejoran la calidad visual
+
+🚀 ¡Disfruta de la experiencia HD!

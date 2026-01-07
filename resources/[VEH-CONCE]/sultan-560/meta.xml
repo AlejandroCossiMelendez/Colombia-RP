@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="cabe" type="misc" name="Lander" description="Lander" />
+     <script src="script.lua" type="client" />
+     <file src="car.txd" />
+     <file src="car.dff" />
+</meta>

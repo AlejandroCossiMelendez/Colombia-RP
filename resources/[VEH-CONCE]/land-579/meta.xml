@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="" type="" name="cruiser" description="cruiser" />
+     <script src="script.lua" type="client" />
+     <file src="cruiser.txd" />
+     <file src="cruiser.dff" />
+</meta>

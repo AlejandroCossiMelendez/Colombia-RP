@@ -1,0 +1,4 @@
+[2025-03-24 19:24:52] Cantidad $60000000 pagado a Samuel Gomez VIP.
+[2025-03-24 19:28:10] Cantidad $12000000 pagado a Samuel Gomez VIP.
+[2025-03-25 16:27:49] Cantidad $50000000 pagado a Warrent Mintu.
+[2025-03-27 15:53:51] Cantidad $20000000 pagado a Andres Martinez.

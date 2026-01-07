@@ -1,0 +1,9 @@
+<meta>
+  
+	
+	<script src="server.lua" type="server"></script>
+	<script src="files/progressoBar.lua" type="client" cache="false" />
+	<script src="client.lua" type="client" cache="false" />
+	
+
+</meta>

@@ -1,0 +1,26 @@
+[2025-02-23 00:46:54] Cantidad $1400000 pagado a Gustavo Garcia VIP.
+[2025-02-23 01:00:46] Cantidad $100000000 pagado a Diego Eduardo.
+[2025-02-23 01:01:06] Cantidad $100000000 pagado a Diego Eduardo.
+[2025-02-23 01:01:07] Cantidad $100000000 pagado a Diego Eduardo.
+[2025-02-23 01:01:08] Cantidad $100000000 pagado a Diego Eduardo.
+[2025-02-23 01:01:09] Cantidad $100000000 pagado a Diego Eduardo.
+[2025-02-23 01:01:41] Cantidad $10000000 pagado a Diego Eduardo.
+[2025-02-23 01:09:29] Cantidad $20000000 pagado a Ricardo Monte.
+[2025-02-23 01:09:30] Cantidad $2000000 pagado a Ricardo Monte.
+[2025-02-23 18:14:02] Cantidad $3000000 pagado a Ricardo Monte.
+[2025-02-23 19:53:46] Cantidad $35000000 pagado a Pedro Motoa.
+[2025-02-23 19:53:47] Cantidad $3500000 pagado a Pedro Motoa.
+[2025-02-23 21:33:22] Cantidad $1000000 pagado a Junior Alexandel.
+[2025-02-24 17:18:33] Cantidad $25000000 pagado a [DIOS] Herber.
+[2025-02-24 18:32:45] Cantidad $20000000 pagado a Juan Londono.
+[2025-02-24 20:19:34] Cantidad $10000000 pagado a Jesus Gonzales.
+[2025-02-24 20:30:40] Cantidad $10000000 pagado a Jesus Gonzales.
+[2025-02-24 20:30:42] Cantidad $1000000 pagado a Jesus Gonzales.
+[2025-02-24 20:30:49] Cantidad $1000000 pagado a Jesus Gonzales.
+[2025-02-24 20:35:42] Cantidad $2000000 pagado a Maikel Leone.
+[2025-02-24 20:35:45] Cantidad $200000 pagado a Maikel Leone.
+[2025-02-25 02:28:29] Cantidad $500000000 pagado a Juan Fernando.
+[2025-02-25 02:28:31] Cantidad $50000000 pagado a Juan Fernando.
+[2025-02-26 03:52:33] Cantidad $900000000 pagado a Santiago Galvis.
+[2025-02-26 03:52:35] Cantidad $90000000 pagado a Santiago Galvis.
+[2025-02-26 03:52:36] Cantidad $9000000 pagado a Santiago Galvis.

@@ -1,0 +1,33 @@
+<meta>
+    <script src='client.lua' type='client' cache='false'/>
+    <script src='server.lua' type='server' cache='false'/>
+
+	<!-- Imagen principal del scoreboard -->
+	<file src="data/TODO.png"/>
+	
+	<!-- Fuentes -->
+	<file src="fonts/Orbitron-Medium.ttf"/>
+	
+	<!-- Archivos heredados (mantenidos para compatibilidad) -->
+	<file src="data/BG-PRINCIPAL.png"/>
+	<file src="data/BG-JUGADORES-ONLINE.png"/>
+	<file src="data/BG-INTERIOR-USUARIO.png"/>
+	<file src="data/POLICE-RECT.png"/>
+	<file src="data/MILITARY-RECT.png"/>
+	<file src="data/MEDIC-RECT.png"/>
+	<file src="data/MECHANIC-RECT.png"/>
+	<file src="data/TRANSIT-RECT.png"/>
+	<file src="data/MECHANIC-ILEGAL-RECT.png"/>
+	<file src="data/HEADER-INTERIOR-USUARIO.png"/>
+	<file src="data/HEADER.png"/>
+	<file src="data/LOGOSERVER.png"/>
+	<file src="data/ICON-MILITARY.png"/>
+	<file src="data/ICON-MEDIC.png"/>
+	<file src="data/ICON-MECHANIC.png"/>
+	<file src="data/ICON-TRANSIT.png"/>
+	<file src="data/ICON-MECHANIC-ILEGAL.png"/>
+	<file src="data/ICON-PING.png"/>
+	<file src="data/ICON-JUGADORES-ONLINE.png"/>
+	<file src="data/ICON-HORA.png"/>
+	<file src="data/ICON-POLICE.png"/>
+</meta>

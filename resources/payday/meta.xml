@@ -1,0 +1,5 @@
+<meta>
+    <info name="payday" author="Jefferson" version="1.3" description="Sistema económico GuaroCity RP" type="script" />
+    <script src="payday.lua" />
+    <export function="darPayday" type="server" />
+</meta>

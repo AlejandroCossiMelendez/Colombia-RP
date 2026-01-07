@@ -1,0 +1,8 @@
+<meta>
+    <info author="Panda" name="fleeca" version="1.5.6" type="script" />
+    <script src="script.lua" type="client" cache="false" />
+	<file src="atm.dff" />
+	<file src="atm.col" />
+	<file src="atm.txd" />
+</meta>
+

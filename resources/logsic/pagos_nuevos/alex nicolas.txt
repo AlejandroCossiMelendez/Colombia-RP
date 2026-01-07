@@ -1,0 +1,7 @@
+[2025-04-10 22:39:57] Cantidad $1500000 pagado a Roger Jirado.
+[2025-04-11 23:00:43] Cantidad $40000000 pagado a Armando Meza.
+[2025-04-12 23:52:44] Cantidad $20000000 pagado a Roberto Cardenas.
+[2025-04-12 23:52:50] Cantidad $20000000 pagado a Roberto Cardenas.
+[2025-04-12 23:53:27] Cantidad $20000000 pagado a Roberto Cardenas.
+[2025-04-13 02:26:21] Cantidad $4000000 pagado a Mike Towers.
+[2025-04-13 20:16:51] Cantidad $3000000 pagado a David Valderrama.

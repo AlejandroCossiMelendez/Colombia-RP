@@ -1,0 +1,8 @@
+<meta>
+    <info name="Discord Rich Presence" author="ZeDD" />
+    <min_mta_version client="1.6.0-9.22278.0"/>
+    <!-- OOP -->
+    <oop>true</oop>
+    <!-- Shared -->
+    <script src="presence.lua" type="shared" cache="false" />
+</meta>

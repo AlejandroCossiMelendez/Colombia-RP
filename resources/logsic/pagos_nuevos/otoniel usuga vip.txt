@@ -1,0 +1,6 @@
+[2025-04-02 23:23:04] Cantidad $10000000 pagado a Jairo Cuchilla.
+[2025-04-03 04:34:23] Cantidad $30000000 pagado a Carlos Ibanez.
+[2025-04-03 04:39:32] Cantidad $3000000 pagado a Carlos Ibanez.
+[2025-04-03 21:58:59] Cantidad $1000000 pagado a Juancho Sanchez.
+[2025-04-03 22:01:02] Cantidad $20000000 pagado a Juancho Sanchez.
+[2025-04-03 22:02:56] Cantidad $200000 pagado a Juancho Sanchez.

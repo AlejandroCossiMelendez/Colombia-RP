@@ -1,0 +1,5 @@
+﻿<meta>
+	<file src="ByMELZ.txd" />
+	<file src="ByMELZ.dff" />
+	<script type="client" src="script.lua" />
+</meta>

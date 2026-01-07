@@ -1,0 +1,5 @@
+<meta>
+<info name='n-sei' type='misc' />
+<script src='texturem.lua' type='client' />
+<file src='cityhall_tr_lan.txd' />
+</meta>

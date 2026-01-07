@@ -1,0 +1,4 @@
+<meta>
+	<info author="FasTriX" description="WWW.youtube.com/fastrix" type="misc" version="2" />
+	<script src="conteo.lua" type="server" />
+</meta>

@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="DodgeCharger" type="misc" name="DodgeCharger" description="DodgeCharger" />
+     <script src="script.lua" type="client" />
+     <file src="mt10.txd" />
+     <file src="mt10.dff" />
+</meta>

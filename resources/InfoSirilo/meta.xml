@@ -1,0 +1,31 @@
+<meta>
+
+    <script src = 'shared.lua' type = 'shared' />
+    <script src = 'client.lua' type = 'client' cache = 'false' />
+    <script src = 'server.lua' type = 'server' />
+
+    <file src = 'assets/images/type.png' />
+
+    <file src = 'assets/images/adminduty.png' />
+    <file src = 'assets/images/error.png' />
+    <file src = 'assets/images/help.png' />
+    <file src = 'assets/images/info.png' />
+    <file src = 'assets/images/success.png' />
+    <file src = 'assets/images/warning.png' />
+    <file src = 'assets/images/bot.png' />
+    <file src = 'assets/images/detran.png' />
+
+    <file src = 'assets/sounds/adminduty.mp3' />
+    <file src = 'assets/sounds/error.wav' />
+    <file src = 'assets/sounds/help.mp3' />
+    <file src = 'assets/sounds/info.mp3' />
+    <file src = 'assets/sounds/success.mp3' />
+    <file src = 'assets/sounds/warning.mp3' />
+
+    <file src = 'assets/fonts/medium.ttf' />
+    <file src = 'assets/fonts/semibold.ttf' />
+
+    <export function = 'addBoxSiri' type = 'server' />
+    <export function = 'addBoxSiri' type = 'client' />
+
+</meta>

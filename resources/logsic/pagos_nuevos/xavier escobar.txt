@@ -1,0 +1,4 @@
+[2025-03-25 03:08:40] Cantidad $100000 pagado a Maicol Mendez.
+[2025-03-27 18:31:48] Cantidad $90000000 pagado a Yonaikel Palestino.
+[2025-03-27 18:32:00] Cantidad $9000000 pagado a Yonaikel Palestino.
+[2025-03-27 23:39:31] Cantidad $30000000 pagado a Menor Junior.

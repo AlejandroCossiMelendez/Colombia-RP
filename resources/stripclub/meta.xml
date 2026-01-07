@@ -1,0 +1,10 @@
+<meta>
+    <info author="TuNombre" version="1.0" type="script" name="Strip Club"/>
+    
+    <!-- Permisos para ejecutar el script -->
+    <script src="strip_club.lua" type="server"/>
+
+    <!-- Permisos para que los administradores usen comandos (si agregas comandos) -->
+    <aclrequest allow="true" name="Moderator" />
+    <aclrequest allow="true" name="Admin" />
+</meta>

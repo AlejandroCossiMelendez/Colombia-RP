@@ -1,0 +1,21 @@
+[2025-03-27 20:12:17] Cantidad $700 pagado a Richard Rios VIP.
+[2025-03-29 23:23:59] Cantidad $100000 pagado a Thiago Cardona.
+[2025-03-29 23:25:42] Cantidad $1000 pagado a Thiago Cardona.
+[2025-03-29 23:25:46] Cantidad $1000 pagado a Thiago Cardona.
+[2025-03-29 23:25:46] Cantidad $1000 pagado a Thiago Cardona.
+[2025-03-29 23:25:47] Cantidad $1000 pagado a Thiago Cardona.
+[2025-03-29 23:25:48] Cantidad $1000 pagado a Thiago Cardona.
+[2025-03-29 23:25:49] Cantidad $1000 pagado a Thiago Cardona.
+[2025-03-29 23:25:49] Cantidad $1000 pagado a Thiago Cardona.
+[2025-03-29 23:25:51] Cantidad $1000 pagado a Thiago Cardona.
+[2025-03-30 05:14:01] Cantidad $50000 pagado a Don Tussi Vashk.
+[2025-03-30 05:32:29] Cantidad $250000 pagado a Leon Jaramillo.
+[2025-03-30 05:32:33] Cantidad $2500000 pagado a Leon Jaramillo.
+[2025-03-30 05:32:37] Cantidad $2500000 pagado a Leon Jaramillo.
+[2025-03-30 05:32:39] Cantidad $250000000 pagado a Leon Jaramillo.
+[2025-03-30 05:32:58] Cantidad $250000000 pagado a Leon Jaramillo.
+[2025-03-30 05:32:59] Cantidad $250000000 pagado a Leon Jaramillo.
+[2025-03-30 05:33:00] Cantidad $250000000 pagado a Leon Jaramillo.
+[2025-03-30 05:33:14] Cantidad $25000000000 pagado a Leon Jaramillo.
+[2025-03-30 05:33:24] Cantidad $500000000000 pagado a Leon Jaramillo.
+[2025-03-30 05:33:29] Cantidad $5000000 pagado a Leon Jaramillo.

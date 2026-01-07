@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <meta>
     <script src="interiorpositions.lua" />
-    
+    <file src="fonts/Roboto-Regular.ttf" type="client" />
     <script src="interiors.lua" />
     <script src="interiors_c.lua" type="client" size="6722" />
     

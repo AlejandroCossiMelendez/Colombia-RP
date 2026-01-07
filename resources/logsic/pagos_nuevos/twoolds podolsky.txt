@@ -1,0 +1,2 @@
+[2025-01-27 05:01:39] Cantidad $1000000000 pagado a Miguel Salazar.
+[2025-01-27 05:01:42] Cantidad $100000000 pagado a Miguel Salazar.

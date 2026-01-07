@@ -1,0 +1,4 @@
+[2025-09-14 09:38:27] Cantidad $5000000 pagado a Juan Volkov.
+[2025-09-14 09:50:42] Cantidad $5000000 pagado a Juan Volkov.
+[2025-09-14 10:16:48] Cantidad $6700000 pagado a Apoly Real.
+[2025-09-15 06:52:17] Cantidad $45000000 pagado a El Ruso.

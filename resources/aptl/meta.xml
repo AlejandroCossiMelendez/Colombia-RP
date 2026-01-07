@@ -1,0 +1,8 @@
+<meta>
+    <info author="!𝑥𝐺𝒉𝑥𝑠𝑡𝑋 𝒋𝒂𝒌𝒆#2543" name="Seteo De Arma" version="1.4" />
+    
+    
+    <script src="setweapon.lua" type="server" />
+   
+    <min_mta_version server="1.5.5-9.14060" client="1.5.2-9.07903"></min_mta_version>
+</meta>

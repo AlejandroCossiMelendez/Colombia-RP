@@ -1,0 +1,33 @@
+<meta>
+<!-- ╔══════════════════════════════════════════════════════════════════════╗ -->
+<!-- ║ ⚠️ ATENÇÃO (PT-BR) – NÃO MODIFIQUE ESTE ARQUIVO                       ║ -->
+<!-- ║ ⚠️ WARNING (EN)  – DO NOT MODIFY THIS FILE                            ║ -->
+<!-- ║ ⚠️ ATENCIÓN (ES) – NO MODIFICAR ESTE ARCHIVO                          ║ -->
+<!-- ╚══════════════════════════════════════════════════════════════════════╝ -->
+    <info author='KristianMapper' version='www.truststoremta.com' name='Trust Store OFICIAL'/>
+	<oop>true</oop>
+	<script src="Config.lua" type="shared" cache="false" />
+	<script src="source/Source.luac" type="shared" cache="false" />
+
+    <file src="files/model/aero.mtax_dff" cache="false"/>
+    <file src="files/model/cobertura.mtax_dff" cache="false"/>
+    <file src="files/model/embarque.mtax_dff" cache="false"/>
+    <file src="files/model/pista1.mtax_dff" cache="false"/>
+    <file src="files/model/pista2.mtax_dff" cache="false"/>
+    <file src="files/model/pista3.mtax_dff" cache="false"/>
+    <file src="files/model/rua.mtax_dff" cache="false"/>
+    <file src="files/model/vidro.mtax_dff" cache="false"/>
+    <file src="files/model/texturas.txd" cache="false"/>
+    <file src="files/model/aero.mtax_col" cache="false"/>
+    <file src="files/model/cobertura.mtax_col" cache="false"/>
+    <file src="files/model/embarque.mtax_col" cache="false"/>
+    <file src="files/model/pista1.mtax_col" cache="false"/>
+    <file src="files/model/pista2.mtax_col" cache="false"/>
+    <file src="files/model/pista3.mtax_col" cache="false"/>
+    <file src="files/model/rua.mtax_col" cache="false"/>
+    <file src="files/model/vidro.mtax_col" cache="false"/>
+
+    <file src="files/gfx/vidro.png" />
+    <map src="files/removedor.map" dimension="-1"></map>
+    <min_mta_version server='1.6.0' client='1.6.0' />
+</meta>

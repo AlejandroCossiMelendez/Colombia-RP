@@ -1,0 +1,12 @@
+[2025-05-25 23:19:28] Cantidad $100000000 pagado a Cristian Ortega.
+[2025-05-25 23:35:01] Cantidad $300000000 pagado a THIAGO DURAN.
+[2025-05-25 23:39:49] Cantidad $1000000000 pagado a THIAGO DURAN.
+[2025-05-25 23:39:54] Cantidad $1000000000 pagado a THIAGO DURAN.
+[2025-05-25 23:39:58] Cantidad $1000000000 pagado a THIAGO DURAN.
+[2025-05-25 23:40:05] Cantidad $1000000000 pagado a THIAGO DURAN.
+[2025-05-25 23:40:09] Cantidad $1000000000 pagado a THIAGO DURAN.
+[2025-05-26 00:00:12] Cantidad $100000000 pagado a Mateo Escobar.
+[2025-05-26 00:13:42] Cantidad $100000000 pagado a Nicolay Levtri.
+[2025-05-26 00:38:59] Cantidad $100000000 pagado a Gustavo Escobar.
+[2025-05-26 00:39:14] Cantidad $100000000 pagado a Mateo Escobar.
+[2025-05-26 00:43:36] Cantidad $150000000 pagado a Gustavo Escobar.

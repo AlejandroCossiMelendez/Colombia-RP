@@ -1,0 +1,2 @@
+[2025-03-24 17:36:02] Cantidad $400000000 pagado a Juan Cielo.
+[2025-03-27 15:55:23] Cantidad $20000000 pagado a Miguel Melchor.

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<meta>
+    <!-- Información del recurso -->
+    <info 
+        name="Sistema de Cámaras CCTV" 
+        description="Sistema completo de cámaras de seguridad para servidores roleplay" 
+        author="Sistema CCTV MTA" 
+        version="2.0" 
+        type="script" 
+    />
+    
+    <!-- Archivos del lado del servidor -->
+    <script src="server.lua" type="server" />
+    
+    <!-- Archivos del lado del cliente -->
+    <script src="client.lua" type="client" />
+    
+    <!-- Archivo de configuración -->
+    <file src="config.lua" />
+    
+    <!-- Archivos de recursos (imágenes, fuentes, etc.) -->
+    <!-- Los archivos de imágenes son opcionales - el sistema funciona sin ellos -->
+    <!-- <file src="data/Rectangle 1.png" /> -->
+    <!-- <file src="data/flechaArriba.png" /> -->
+    <!-- <file src="data/flechaIzquierda.png" /> -->
+    <!-- <file src="data/flechaDerecha.png" /> -->
+    <!-- <file src="utils/font.ttf" /> -->
+    <!-- <file src="utils/medium.ttf" /> -->
+    
+    <!-- Archivos de documentación -->
+    <file src="README.md" />
+    
+    <!-- Funciones exportadas para otros recursos -->
+    <export function="getSystemStats" type="server" />
+    <export function="isPlayerAuthorized" type="server" />
+    <export function="getCameraLocations" type="server" />
+    <export function="reloadSystemConfig" type="server" />
+    
+    <!-- Configuración de recursos requeridos/opcionales -->
+    <min_mta_version server="1.5.7" client="1.5.7" />
+    
+    <!-- Configuración de ACL -->
+    <aclrequest>
+        <right name="general.ModifyOtherObjects" access="false" />
+        <right name="general.http" access="false" />
+        <right name="function.fileCreate" access="true" />
+        <right name="function.fileOpen" access="true" />
+        <right name="function.fileWrite" access="true" />
+        <right name="function.fileRead" access="true" />
+    </aclrequest>
+    
+    <!-- Configuración de sincronización -->
+    <sync_map_objects>true</sync_map_objects>
+    
+    <!-- Configuración de descarga -->
+    <download_priority_group>0</download_priority_group>
+</meta>

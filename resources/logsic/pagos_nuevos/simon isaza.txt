@@ -1,0 +1,3 @@
+[2025-01-21 21:01:05] Cantidad $5500000 pagado a Jose Ramirez.
+[2025-01-21 21:29:28] Cantidad $1500000 pagado a Pinina Vasquez.
+[2025-01-21 21:54:57] Cantidad $1500000 pagado a Jose Ramirez.

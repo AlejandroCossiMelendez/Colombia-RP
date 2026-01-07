@@ -1,0 +1,6 @@
+addEventHandler('onClientResourceStart',resourceRoot,function () 
+txd = engineLoadTXD( 'BYOnly.txd' ) 
+engineImportTXD( txd, 587 ) 
+dff = engineLoadDFF('BYOnly.dff', 587) 
+engineReplaceModel( dff, 587 )
+end)

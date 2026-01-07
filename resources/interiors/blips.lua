@@ -1,22 +1,33 @@
 local function createBlip2(x, y, z, icon)
-	createBlip( x, y, z, icon, 2, 255, 255, 255, 255, 0, 80 )
+	createBlip( x, y, z, icon, 2, 255, 255, 255, 255, 0, 200 )
 end
        
 
 ------- Facciones y lugares públicos
 
-createBlip2(2424.27, 68.5, 26.03, 30) -- LSPD 
-createBlip2(1241.18, 325.98, 19.76, 22) -- LSMD
-createBlip2(2259.7, -75.85, 26.02, 40) -- Ayuntamiento 
-createBlip2(2438.18, -54.91, 26.01, 35) -- Noticias
-createBlip2(1209.32, 254.06, 19.68, 19) -- Justicia
-createBlip2(2557.95, 71.85, 26.01, 27) -- Taller 
-createBlip2(1763.26, 125.36, 34.32, 55) -- Concesionario publico 
-createBlip2(2320.57, 188.71, 26.01, 53) -- Autoescuela 
-createBlip2(1897.58, 382.55, 20.62, 51) -- TTL 
-createBlip2(1295.79, 287.84, 19.55, 45) -- Ropa 1 
-createBlip2(2333.97, 18.74, 26.48, 45) -- Ropa 2 
-createBlip2(1367.29, 248.48, 19.57, 29) -- Pizzeria MG
-createBlip2(2333.51, 75.02, 26.62, 29) -- Pizzeria PC
-createBlip2(2303.71, 14.4, 26.48, 48) -- Disco
-createBlip2(1267.18, 224.86, 19.66, 54) -- Gym MG
+createBlip2(-303.015625, 1517.171875, 80.36092376709, 30) -- prision
+createBlip2(1011.3671875, -1020.1259765625, 32.1015625, 26) -- MECA LS
+createBlip2(2840.1376953125, -2434.212890625, 14.599788665771, 37) -- Barco
+createBlip2(1569.7445068359, -1675.1071777344, 13.710624694824, 30) -- PD
+createBlip2(1475.330078125, -1659.0498046875, 13.54628944397, 56) -- Parque principal
+createBlip2(1873.62109375, -1685.5712890625, 13.946837425232, 56) -- Parque secundario
+createBlip2(2101.8115234375, -1806.3583984375, 13.5546875, 29) -- PIZZA
+createBlip2(1096.8466796875, -1690.212890625, 13.769689559937, 53) --AUTO ESCUELA
+createBlip2(1226.5830078125, -1451.23828125, 13.75156211853, 56) --PARQUEADERO
+createBlip2(1181.6474609375, -1341.6728515625, 13.632832527161, 22) --SURA 
+createBlip2(1703.5997314453, -2286.615234375, 13.377690315247, 5) --AEROPUERTO
+createBlip2(1668.712890625, -1347.408203125, 17.596994400024, 52) -- BANCO
+createBlip2(1929.18359375, -1775.1357421875, 13.546875, 52) -- Gasolinera24
+createBlip2(1030.5241699219, -924.43994140625, 42.640384674072, 52) -- Gasolinera24 
+createBlip2(2514.1064453125, -959.01171875, 82.170379638672, 37) -- Favela
+createBlip2(996.51306152344, -1603.1376953125, 13.421924591064, 45) -- Tienda de Ropa
+createBlip2(1348.681640625, -368.9453125, 3.1250495910645, 37) -- Bunker
+createBlip2(1272.93359375, -789.1181640625, 87.312461853027, 24) -- Mansion Madd Dogg
+createBlip2(840.95703125, -1739.3056640625, 13.699687957764, 22) -- Farmacia
+createBlip2(802.6669921875, -1617.3681640625, 13.3828125, 10) -- Burger King  
+createBlip2(1316.8916015625, -885.892578125, 39.578125, 17) -- Walmart
+createBlip2(1760.01953125, -1123.060546875, 25.079999923706, 55) -- Conce
+createBlip2(2610.751953125, -1296.748046875, 116.15623474121, 37) -- Construccion abandonada
+createBlip2(2733.0310058594, -1734.4654541016, 9.2525005340576, 48) -- Construccion abandonada
+createBlip2(2026.5178222656, -1309.109375, 23.997859954834, 21) -- kyoto club
+

@@ -1,0 +1,61 @@
+<meta>
+    <oop>true</oop>
+    <script src = 'Client.lua' type = 'client' cache = 'false'/>	
+    <script src = 'Config.lua'  type = 'shared' cache = 'false'/>
+    <script src = 'Server.lua' type = 'server' cache = 'false'/>
+    <file   src = 'files/gfx/1.png'/> 
+    <file   src = 'files/gfx/2.png'/> 
+    <file   src = 'files/gfx/3.png'/> 
+    <file   src = 'files/gfx/4.png'/> 
+    <file   src = 'files/gfx/5.png'/> 
+    <file   src = 'files/gfx/6.png'/> 
+    <file   src = 'files/gfx/7.png'/> 
+    <file   src = 'files/gfx/8.png'/> 
+    <file   src = 'files/gfx/9.png'/> 
+    <file   src = 'files/gfx/10.png'/> 
+    <file   src = 'files/gfx/11.png'/> 
+    <file   src = 'files/gfx/12.png'/> 
+    <file   src = 'files/gfx/13.png'/> 
+    <file   src = 'files/gfx/14.png'/> 
+    <file   src = 'files/gfx/15.png'/> 
+    <file   src = 'files/gfx/16.png'/> 
+    <file   src = 'files/gfx/17.png'/> 
+    <file   src = 'files/gfx/18.png'/> 
+    <file   src = 'files/gfx/19.png'/> 
+    <file   src = 'files/gfx/20.png'/> 
+    <file   src = 'files/gfx/21.png'/> 
+    <file   src = 'files/gfx/22.png'/> 
+    <file   src = 'files/gfx/23.png'/> 
+    <file   src = 'files/gfx/24.png'/> 
+    <file   src = 'files/gfx/25.png'/>   
+    <file   src = 'files/gfx/26.png'/>   
+    <file   src = 'files/gfx/27.png'/>   
+    <file   src = 'files/gfx/28.png'/>   
+    <file   src = 'files/gfx/29.png'/>   
+    <file   src = 'files/gfx/30.png'/>   
+    <file   src = 'files/gfx/31.png'/>   
+    <file   src = 'files/gfx/32.png'/>   
+    <file   src = 'files/gfx/33.png'/>   
+    <file   src = 'files/gfx/34.png'/>   
+    <file   src = 'files/gfx/35.png'/>   
+    <file   src = 'files/gfx/36.png'/>   
+    <file   src = 'files/gfx/37.png'/>   
+    <file   src = 'files/gfx/38.png'/>   
+    <file   src = 'files/gfx/39.png'/>   
+    <file   src = 'files/gfx/40.png'/>   
+    <file   src = 'files/gfx/41.png'/>   
+    <file   src = 'files/gfx/42.png'/>   
+    <file   src = 'files/gfx/43.png'/>   
+    <file   src = 'files/gfx/44.png'/>   
+    <file   src = 'files/gfx/45.png'/>   
+    <file   src = 'files/gfx/46.png'/>   
+    <file   src = 'files/gfx/47.png'/>   
+    <file   src = 'files/gfx/48.png'/>   
+    <file   src = 'files/gfx/49.png'/>   
+    <file   src = 'files/gfx/50.png'/>   
+    <file   src = 'files/gfx/51.png'/>   
+    <file   src = 'files/gfx/52.png'/>   		
+    <file   src = 'files/fonts/Montserrat-SemiBold.ttf'/> 
+    <file   src = 'files/fonts/Montserrat-Bold.ttf'/> 
+    <min_mta_version server="1.5.4-9.11413" />	
+</meta>

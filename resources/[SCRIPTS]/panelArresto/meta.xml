@@ -1,0 +1,37 @@
+<meta>
+    <script src='client.lua' type='client' cache='false'/>
+    <script src='contador_client.lua' type='client' cache='false'/>
+    <script src='server.lua' type='server' cache='false'/>
+
+    <!-- Agregar la fuente -->
+    <file src="fonts/Jua-Regular.ttf"/>
+
+	<file src="data/FondoTablet.png"/>
+	<file src="data/fondoContenido.png"/>
+	<file src="data/cuadroCodigos.png"/>
+	<file src="data/cuandroTextoID.png"/>
+	<file src="data/botonAtribuir.png"/>
+	<file src="data/cuadroPenales.png"/>
+	<file src="data/botonCerrar.png"/>
+	<file src="data/botonTablet.png"/>
+	<file src="data/botonArrestar.png"/>
+	<file src="data/cuadroInformacion.png"/>
+	<file src="data/logopolicia.png"/>
+	<file src="data/bateria.png"/>
+	<file src="data/wifiIcon.png"/>
+	
+	<!-- Imágenes adicionales que estaban faltantes -->
+	<file src="data/ARRESTAR.png"/>
+	<file src="data/ATRIBUIR.png"/>
+	<file src="data/bg.png"/>
+	<file src="data/CERRAR.png"/>
+	<file src="data/CODIGOS PENALES.png"/>
+	<file src="data/ID DE LA PERSONA.png"/>
+	<file src="data/INFORMACION.png"/>
+	<file src="data/lineaCodigos.png"/>
+	<file src="data/lineaID.png"/>
+	<file src="data/lineaProcedimientos.png"/>
+	<file src="data/lineaTexto.png"/>
+	<file src="data/PANEL DE ARRESTOS.png"/>
+	<file src="data/PROCEDIMIENTOS.png"/>
+</meta>

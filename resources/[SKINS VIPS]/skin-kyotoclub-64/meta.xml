@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="TH" type="misc" name="PF, feito por TH#4378. Loja: BR Store, discord: discord.gg/brstore" description="By:TH" />
+     <script src="script.lua" type="client" />
+     <file src="ByAkemi.txd" />
+     <file src="ByAkemi.dff" />
+</meta>

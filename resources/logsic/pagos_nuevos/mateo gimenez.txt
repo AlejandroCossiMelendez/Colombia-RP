@@ -1,0 +1,3 @@
+[2025-01-30 01:15:42] Cantidad $10000 pagado a Carlos Alba.
+[2025-01-30 01:15:55] Cantidad $10000 pagado a Habibi Lamas.
+[2025-01-30 01:16:50] Cantidad $10000 pagado a Carlos Alba.

@@ -1,0 +1,6 @@
+[2025-09-12 10:03:14] Cantidad $2000000 pagado a Camila Rose.
+[2025-09-12 13:03:23] Cantidad $2500000 pagado a El Chilly.
+[2025-09-12 13:03:37] Cantidad $2500000 pagado a John Wick.
+[2025-09-13 10:01:14] Cantidad $500000 pagado a Lil Naay.
+[2025-09-14 10:10:19] Cantidad $5000000 pagado a Carlos Ledher.
+[2025-09-14 10:11:04] Cantidad $5000000 pagado a Apoly Real.

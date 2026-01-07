@@ -1,0 +1,23 @@
+<meta>
+	<info author="Puma" name="ActosOnOff" version="3.0" type="script" description="Sistema avanzado de control de AK-47"/>
+    <script src="client.lua" type="client" cache="false"/>
+    <script src="server.lua" type="server" cache="false"/>
+    
+    <!-- Definir eventos para mejor documentación -->
+    <export function="getAKState" type="server"/>
+    <export function="getAKLastChange" type="server"/>
+    <export function="getAKStats" type="server"/>
+    
+    <!-- Configuración -->
+    <min_mta_version server="1.5.8" client="1.5.8"/>
+    
+    <!-- Descripción detallada -->
+    <description>
+        Sistema avanzado para controlar el uso de AK-47 en el servidor.
+        Comandos disponibles:
+        - /akon: Activa el uso de AK-47 (solo policía)
+        - /akoff: Desactiva el uso de AK-47 (solo policía)
+        - /akstatus: Muestra el estado actual
+        - /akinfo: Muestra información en el cliente
+    </description>
+</meta>

@@ -1,0 +1,3 @@
+[2025-09-11 10:35:46] Cantidad $4500000 pagado a Juan Cardona.
+[2025-09-11 10:47:06] Cantidad $27000000 pagado a Juan Cardona.
+[2025-09-12 09:10:43] Cantidad $30000000 pagado a El Ruso.

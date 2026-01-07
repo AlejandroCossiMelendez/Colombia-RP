@@ -1,0 +1,13 @@
+<meta>
+    <script src='useful.lua' type='client' cache='false'/>
+    <script src='client.lua' type='client' cache='false'/>
+
+	<file src="data/BGEXTERIOR2.png"/>
+	<file src="data/Header2.png"/>
+	<file src="data/IconoCerrar.png"/>
+	<file src="data/BGINTERNO-LUGARES.png"/>
+	<file src="data/BGINTERNO-INFORMACION.png"/>
+	<file src="data/CampoTituloLugar.png"/>
+	<file src="data/BotorMarcarGPS.png"/>
+	<file src="data/BotonVolver.png"/>
+</meta>

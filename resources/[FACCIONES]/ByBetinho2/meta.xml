@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="ByBetinho2" type="misc" name="[ByBetinho2]" description="[ByBetinho2]" />
+     <script src="script.lua" type="client" />
+     <file src="ByBetinho2.txd" />
+     <file src="ByBetinho2.dff" />
+</meta>

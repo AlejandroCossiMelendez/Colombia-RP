@@ -1,0 +1,3 @@
+[2025-03-19 00:20:33] Cantidad $20000000 pagado a Jose Gutierrez.
+[2025-03-19 03:31:49] Cantidad $1000000 pagado a David Gonzalez.
+[2025-03-19 03:35:50] Cantidad $800000 pagado a David Gonzalez.

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="premier" type="misc" name="Lander" description="Lander" />
+     <script src="script.lua" type="client" />
+     <file src="premier.txd" />
+     <file src="premier.dff" />
+</meta>

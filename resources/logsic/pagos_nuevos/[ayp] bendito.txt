@@ -1,0 +1,2 @@
+[2025-02-27 01:01:59] Cantidad $2000000 pagado a Jorge Perla.
+[2025-02-27 01:02:01] Cantidad $200000 pagado a Jorge Perla.

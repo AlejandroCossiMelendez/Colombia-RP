@@ -1,0 +1,8 @@
+<meta>
+    <info author="mambokings" type="script" description="Matar de un tiro en la cabeza" version="0.2" />
+    <script src="client.lua" type="client" />
+    <script src="server.lua" type="server" />
+    <file src="blood_1.png"></file>
+    <file src="blood_2.png"></file>
+    <file src="blood_pool.png"></file>
+</meta>

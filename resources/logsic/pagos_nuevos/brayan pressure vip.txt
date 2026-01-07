@@ -1,0 +1,14 @@
+[2025-03-07 02:38:21] Cantidad $8000000 pagado a Wilson Tampico.
+[2025-03-07 02:42:42] Cantidad $15000000 pagado a Wilson Tampico.
+[2025-03-07 02:45:02] Cantidad $15000000 pagado a Wilson Tampico.
+[2025-03-07 02:47:16] Cantidad $15000000 pagado a Wilson Tampico.
+[2025-03-07 02:50:06] Cantidad $8000000 pagado a Wilson Tampico.
+[2025-03-07 02:53:32] Cantidad $30000000 pagado a Wilson Tampico.
+[2025-03-07 02:55:31] Cantidad $8000000 pagado a Wilson Tampico.
+[2025-03-07 03:02:28] Cantidad $15000000 pagado a Wilson Tampico.
+[2025-03-07 03:07:39] Cantidad $15000000 pagado a Wilson Tampico.
+[2025-03-07 03:10:59] Cantidad $30000000 pagado a Wilson Tampico.
+[2025-03-07 03:12:07] Cantidad $15000000 pagado a Wilson Tampico.
+[2025-03-07 03:13:30] Cantidad $15000000 pagado a Wilson Tampico.
+[2025-03-07 03:15:03] Cantidad $8000000 pagado a Wilson Tampico.
+[2025-03-07 03:17:43] Cantidad $8000000 pagado a Wilson Tampico.

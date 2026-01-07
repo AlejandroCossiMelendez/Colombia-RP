@@ -1,0 +1,8 @@
+<map edf:definitions="editor_main">
+    <removeWorldObject id="removeWorldObject (mission_11_SFS) (1)" radius="40.266251" interior="-1" model="10998" lodModel="11043" posX="-2194.3828" posY="-96.22656" posZ="46.0625" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (gzbuild2_law) (2)" radius="26.138033" interior="-1" model="6098" lodModel="6076" posX="836.58594" posY="-1743.2969" posZ="19.60938" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (vgsEbuild03_lvs) (1)" radius="40.924007" interior="-1" model="8565" lodModel="8723" posX="2497.375" posY="1101.5469" posZ="15.35938" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (balcony01_lvs) (1)" radius="18.671379" interior="-1" model="8573" lodModel="0" posX="2518.0781" posY="1102.4219" posZ="16.24219" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (shpfrnt01_lvs) (1)" radius="19.813005" interior="-1" model="8574" lodModel="0" posX="2516.3516" posY="1101.5469" posZ="11.53906" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+
+</map>

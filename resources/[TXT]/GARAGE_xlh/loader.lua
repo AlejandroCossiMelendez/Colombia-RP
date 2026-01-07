@@ -1,0 +1,41 @@
+
+local files = {
+	{ "garage.txd.pcrypt", 6099 },
+	{ "garage.dff.pcrypt", 6099  },
+	{ "garage.col.pcrypt", 6099  },
+    { "monitor.txd.pcrypt", 1790 },
+    { "monitor.dff.pcrypt", 1790 },
+    { "monitor.col.pcrypt", 1790 },
+}
+
+
+local cor = coroutine.create(function()
+    for i = 1, #files do
+        local file  = files[i][1]
+        local model = files[i][2]
+
+        pDecrypt(file, function(data)
+            loadModel(file, data, model)
+        end)
+        coroutine.yield()
+    end
+
+    files = nil
+    collectgarbage()
+end)
+
+function loadModel(file, data, model)
+    local ext = file:match("^.+(%..+)%..+$")
+
+    if ext == ".dff" then
+        engineReplaceModel(engineLoadDFF(data), model)
+    elseif ext == ".txd" then
+        engineImportTXD(engineLoadTXD(data), model)
+    elseif ext == ".col" then
+        engineReplaceCOL(engineLoadCOL(data), model)
+    end
+
+    coroutine.resume(cor)
+end
+
+coroutine.resume(cor)

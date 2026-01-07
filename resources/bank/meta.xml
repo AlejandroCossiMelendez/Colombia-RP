@@ -1,0 +1,7 @@
+<meta>
+    <script src="bank.lua" type="server" />
+    <script src="sbanco_c.lua" type="client" />
+    <file src="alarmabanco.mp3" />
+    <export function="getDinero" />
+    
+</meta>

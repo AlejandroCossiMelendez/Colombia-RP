@@ -1,0 +1,25 @@
+<meta>
+<info author="Edit-Damage" version="1.3" name="HELP MANAGER" description="Help Manager 1.3" type="script"/>
+	<script src="client.lua" type="client" />
+
+	<config src="cmd.xml" type="client" />
+	<config src="member.xml" type="client" />
+	<config src="other.xml" type="client" />
+	<config src="server.xml" type="client" />
+	<file src="open.wav"/>
+	<!-- Fuentes locales -->
+	<file src="NuevaInterfaz/fonts/Poppins-SemiBold.ttf"/>
+	<!-- Nueva interfaz assets -->
+	<file src="NuevaInterfaz/data/BGEXTERIOR.png"/>
+	<file src="NuevaInterfaz/data/BGINTERIOR.png"/>
+	<file src="NuevaInterfaz/data/Header.png"/>
+	<file src="NuevaInterfaz/data/IconoCerrar.png"/>
+	<file src="NuevaInterfaz/data/barraPestanas.png"/>
+	<file src="NuevaInterfaz/data/BotonBienvenida.png"/>
+	<file src="NuevaInterfaz/data/BotonConceptos.png"/>
+	<file src="NuevaInterfaz/data/BotonReglas.png"/>
+	<file src="NuevaInterfaz/data/BotonInformacion.png"/>
+	<file src="NuevaInterfaz/data/LineaInferiorBarraPestanas.png"/>
+
+
+</meta>

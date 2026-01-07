@@ -1,0 +1,17 @@
+<meta>
+    <info author="Sistema de Vehículos Faccionarios" type="script" name="Faction Vehicles Panel" version="2.0" />
+    
+    <script src="client.lua" type="client" />
+    <script src="server.lua" type="server" />
+    
+    <!-- Archivos de imágenes -->
+    <file src="Assets/background.png" />
+    <file src="Assets/item.png" />
+    <file src="Assets/button.png" />
+    <file src="Assets/icon.png" />
+    <file src="Assets/available.png" />
+    <file src="Assets/notavailable.png" />
+    
+    <!-- Exportaciones -->
+    <export function="dxGetLibrary" type="client"/>
+</meta>

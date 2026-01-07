@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="DomiMvp" type="misc" name="MECANICO" description="MECANICO" />
+     <script src="script.lua" type="client" />
+     <file src="MECANICO.txd" />
+     <file src="MC.dff" />
+</meta>

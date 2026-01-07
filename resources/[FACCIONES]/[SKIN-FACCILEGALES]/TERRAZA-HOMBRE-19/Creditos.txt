@@ -1,0 +1,10 @@
+Author: CaiqueS
+
+Discord da Dark Store: https://discord.gg/qGJRfPN5Zh
+
+Instalação
+
+MTA: Renomeie o dff e txd para o modelo desejado, e para mudar o id abra o arquivo "script" e mude o numero 0 para o id desejado.
+SAMP: Apenas renomeie o dff e txd para o modelo desejado. 
+
+Se for postar a skin ou editar deixe os creditos.

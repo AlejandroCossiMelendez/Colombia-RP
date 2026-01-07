@@ -1,0 +1,3 @@
+[2025-02-20 02:42:49] Cantidad $1 pagado a Juan Fernando.
+[2025-02-20 18:30:38] Cantidad $20500000 pagado a Juan Fernando.
+[2025-02-23 22:03:26] Cantidad $10000000 pagado a Ricardo Monte.

@@ -1,0 +1,4 @@
+[2025-04-24 23:27:35] Cantidad $5000 pagado a Mateo Smith.
+[2025-04-24 23:27:38] Cantidad $50000 pagado a Mateo Smith.
+[2025-04-24 23:27:46] Cantidad $50000 pagado a Mateo Smith.
+[2025-04-24 23:27:49] Cantidad $500000 pagado a Mateo Smith.

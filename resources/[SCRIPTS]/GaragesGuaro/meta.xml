@@ -1,0 +1,29 @@
+<meta>
+    <info author="MonsalvitoGood" version="1.0.2" name="Garaje" description="Sistema de Garajes | Para Tu server bruh" type="script" />
+    <min_mta_version both="1.5.6-9.18728"></min_mta_version>
+    <include resource="dxLibrary" />
+    <script src="sourceG.lua" type="shared" cache="false" />
+    <script src="interfazGaraje.lua" type="client" cache="false" />
+    <script src="sourceS.lua" type="server" cache="false" />
+    
+    <!-- Imágenes originales -->
+
+    <file src="Imagenes/garaje.png" cache="false" />
+    <!-- Imágenes de la nueva interfaz (nuevadata) -->
+    <file src="nuevadata/BGEXTERNO.png" cache="false" />
+    <file src="nuevadata/BGINTERNO.png" cache="false" />
+    <file src="nuevadata/Header.png" cache="false" />
+    <file src="nuevadata/Encabezado.png" cache="false" />
+    <file src="nuevadata/FilaHorizonInformacion.png" cache="false" />
+    <file src="nuevadata/BotonSacarVehiculo.png" cache="false" />
+    <file src="nuevadata/BotonGuardarVehiculo.png" cache="false" />
+    <file src="nuevadata/LineaInferiorEncabezado.png" cache="false" />
+    <file src="nuevadata/ICONOGARAGE2.png" cache="false" />
+    <file src="nuevadata/ICONOGARAGE1.png" cache="false" />
+    
+    <!-- Fuentes -->
+    <file src="fonts/Orbitron-Bold.ttf" cache="false" />
+    <file src="fonts/Poppins-Medium.ttf" cache="false" />
+    <file src="fonts/Poppins-SemiBold.ttf" cache="false" />
+    <file src="fonts/Poppins-Bold.ttf" cache="false" />
+</meta>

@@ -1,0 +1,5 @@
+[2025-05-01 18:49:18] Cantidad $8000000 pagado a Nicolay Levtri VIP.
+[2025-05-01 20:22:27] Cantidad $1500000 pagado a Sebas Levtri VIP.
+[2025-05-01 20:22:57] Cantidad $150000000 pagado a Sebas Levtri VIP.
+[2025-05-01 20:23:23] Cantidad $150000000 pagado a Sebas Levtri VIP.
+[2025-05-01 20:41:59] Cantidad $15000000 pagado a Nicolay Levtri VIP.

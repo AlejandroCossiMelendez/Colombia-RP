@@ -1,0 +1,82 @@
+[2025-08-30 20:05:56] Vehículo ID 349, borrado por Owner_Cordero.
+
+[2025-08-30 20:06:09] Vehículo ID 350, borrado por Owner_Cordero.
+
+[2025-08-30 20:25:04] Vehículo ID 299, borrado por Owner_Cordero.
+
+[2025-09-01 02:12:35] Vehículo ID 357, borrado por Owner_EcuDev.
+
+[2025-09-01 02:13:50] Vehículo ID 360, borrado por Owner_EcuDev.
+
+[2025-09-01 02:33:41] Vehículo ID 355, borrado por Owner_EcuDev.
+
+[2025-09-01 06:33:55] Vehículo ID 353, borrado por Owner_EcuDev.
+
+[2025-09-01 08:46:12] Vehículo ID 364, borrado por David_Diaz.
+
+[2025-09-01 08:46:29] Vehículo ID 363, borrado por David_Diaz.
+
+[2025-09-01 08:53:51] Vehículo ID 365, borrado por David_Diaz.
+
+[2025-09-03 14:20:34] Vehículo ID 405, borrado por Own_Corde.
+
+[2025-09-03 14:27:50] Vehículo ID 406, borrado por Own_Corde.
+
+[2025-09-04 03:50:28] Vehículo ID 326, borrado por Owner_Cordero.
+
+[2025-09-04 03:50:31] Vehículo ID 327, borrado por Owner_Cordero.
+
+[2025-09-04 03:50:34] Vehículo ID 330, borrado por Owner_Cordero.
+
+[2025-09-04 03:50:42] Vehículo ID 328, borrado por Owner_Cordero.
+
+[2025-09-04 03:50:45] Vehículo ID 329, borrado por Owner_Cordero.
+
+[2025-09-04 03:50:52] Vehículo ID 331, borrado por Owner_Cordero.
+
+[2025-09-04 03:50:59] Vehículo ID 325, borrado por Owner_Cordero.
+
+[2025-09-11 08:16:33] Vehículo ID 415, borrado por Owner_EcuDev.
+
+[2025-09-11 09:15:57] Vehículo ID 428, borrado por Owner_Cordero.
+
+[2025-09-11 09:16:09] Vehículo ID 429, borrado por Owner_Cordero.
+
+[2025-09-11 09:32:17] Vehículo ID 432, borrado por Owner_EcuDev.
+
+[2025-09-11 09:46:10] Vehículo ID 449, borrado por Owner_EcuDev.
+
+[2025-09-11 09:56:47] Vehículo ID 456, borrado por Owner_EcuDev.
+
+[2025-09-12 07:52:55] Vehículo ID 492, borrado por Owner_EcuDev.
+
+[2025-09-12 09:03:39] Vehículo ID 509, borrado por Owner_EcuDev.
+
+[2025-09-12 17:04:06] Vehículo ID 523, borrado por Own_David.
+
+[2025-09-14 08:25:13] Vehículo ID 576, borrado por Owner_Cordero.
+
+[2025-09-14 08:28:25] Vehículo ID 579, borrado por Owner_Cordero.
+
+[2025-09-14 08:52:12] Vehículo ID 583, borrado por Owner_Cordero.
+
+[2025-09-14 08:55:17] Vehículo ID 590, borrado por Owner_Cordero.
+
+[2025-09-14 08:56:20] Vehículo ID 595, borrado por Owner_EcuDev.
+
+[2025-09-14 08:56:22] Vehículo ID 594, borrado por Owner_EcuDev.
+
+[2025-09-14 08:58:06] Vehículo ID 603, borrado por Owner_EcuDev.
+
+[2025-09-21 08:26:14] Vehículo ID 705, borrado por Own_David.
+
+[2025-09-25 09:46:04] Vehículo ID 726, borrado por Owner_Cordero.
+
+[2025-09-25 09:51:39] Vehículo ID 730, borrado por Owner_Cordero.
+
+[2025-09-25 10:07:02] Vehículo ID 734, borrado por Owner_Cordero.
+
+[2025-09-25 10:43:20] Vehículo ID 728, borrado por EDM_John_Wick.
+
+[2025-10-03 09:05:19] Vehículo ID 799, borrado por Owner_EcuDev.
+

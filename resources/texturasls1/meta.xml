@@ -1,0 +1,18 @@
+<meta>
+    <info author="TuNombre" version="1.0" type="script" name="Replace All TXD"/>
+
+    <script src="replace_all.lua" type="client"/>
+
+    <file src="barrio1_lae2.txd"/>
+    <file src="furniture_lae2.txd"/>
+    <file src="lae2bridge.txd"/>
+    <file src="lae2roads.txd"/>
+    <file src="landcoast_lae2.txd"/>
+    <file src="landlae2.txd"/>
+    <file src="lanriver.txd"/>
+    <file src="lngblok_lae2.txd"/>
+    <file src="stormdrain.txd"/>
+    <file src="stormdrain_las2.txd"/>
+    <file src="stormdrain2_las2.txd"/>
+    <file src="sunset1_lan2.txd"/>
+</meta>

@@ -1,0 +1,12 @@
+<map edf:definitions="editor_main">
+   <removeWorldObject id="removeWorldObject (smallshop_10_SFS07) (1)" radius="29.495436" interior="0" model="10392" lodModel="10507" posX="-2339.8594" posY="-53.90625" posZ="40.29688" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (mission_14_SFS) (1)" radius="28.22707" interior="0" model="10391" lodModel="10508" posX="-2338.7578" posY="-32.96875" posZ="42.63281" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (vgelwbld16_lvs) (1)" radius="24.449594" interior="0" model="8688" lodModel="8719" posX="2588.0234" posY="1166.9766" posZ="15.82813" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (vgsEbuild04_lvs) (1)" radius="36.221287" interior="0" model="8567" lodModel="8716" posX="2554.9063" posY="1166.9688" posZ="14.26563" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (vgsSstairs04_lvs) (1)" radius="7.4140825" interior="0" model="8615" lodModel="0" posX="2545.75" posY="1162.3047" posZ="15.99219" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (vgsSstairs02_lvs) (1)" radius="5.956676" interior="0" model="8572" lodModel="0" posX="2556.5938" posY="1149.7969" posZ="12.03125" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (lamppost3) (1)" radius="6.6149273" interior="0" model="1226" lodModel="0" posX="-2341.7891" posY="-66.22656" posZ="38.1875" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (lamppost3) (2)" radius="6.6149273" interior="0" model="1226" lodModel="0" posX="-2367.8828" posY="-33.625" posZ="38.1875" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (filler01_laW) (1)" radius="31.701639" interior="-1" model="6036" lodModel="6073" posX="1003.8906" posY="-1598.0391" posZ="17.84375" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+
+</map>

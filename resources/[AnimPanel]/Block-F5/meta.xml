@@ -1,0 +1,15 @@
+<meta>
+    <!-- Definir el nombre y tipo del recurso -->
+    <info name="BloquearF5" type="script" />
+    
+    <!-- Especificar el autor y descripci�n del recurso -->
+    <script src="block.lua" type="server" />
+    <author>Nombre del autor</author>
+    <description>Script para bloquear la tecla F5 cuando el jugador est� muerto en MTA.</description>
+
+    <!-- Dependencia de recursos (si es necesario) -->
+    <!-- <include resource="nombre_del_recurso" /> -->
+    
+    <!-- Archivo de metadatos generado autom�ticamente -->
+
+</meta>

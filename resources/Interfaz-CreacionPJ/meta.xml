@@ -1,0 +1,48 @@
+<meta>
+    <script src='useful.lua' type='client' cache='false'/>
+    <script src='client.lua' type='client' cache='false'/>
+    <script src='server.lua' type='server' cache='false'/>
+    
+    <export function="verifyCharacterName" type="server" />
+    <export function="showCreateCharacterInterface" type="client" />
+    <export function="hideCreateCharacterInterface" type="client" />
+
+	<file src="fonts/Inter-Bold.ttf"/>
+	<file src="fonts/Inter-Medium.ttf"/>
+	<file src="fonts/Inter-Regular.ttf"/>
+	<file src="fonts/Inter-SemiBold.ttf"/>
+	<file src="fonts/Oswald-Bold.ttf"/>
+	<file src="fonts/Poppins-ExtraBold.ttf"/>
+
+	<file src="data/BG-PRINCIPAL-1.png"/>
+	<file src="data/HEADER-TITULO-CAPITAL-RP-1.png"/>
+	<file src="data/INPUT-NOMBRECOMPLETO.png"/>
+	<file src="data/INPUTCIRCLE-EDAD.png"/>
+	<file src="data/BOTON-CLARO.png"/>
+	<file src="data/BOTON-MORENO.png"/>
+	<file src="data/SLIDER-EDAD.png"/>
+	<file src="data/SLIDERCOLOR-EDAD.png"/>
+	<file src="data/CIRCLESLIDER-EDAD.png"/>
+	<file src="data/BOTONSELECT-HOMBRE.png"/>
+	<file src="data/BOTONSELECT-MUJER.png"/>
+	<file src="data/BOTON-CREAR-PERSONAJE.png"/>
+	<file src="data/BOTONCIRCLE-CERRARPANEL.png"/>
+	<file src="data/BG-MOVIMIENTO-CAMARA.png"/>
+	<file src="data/CIRCLE-FLECHA-IZQUIERDA.png"/>
+	<file src="data/CIRCLE-RESET.png"/>
+	<file src="data/CIRCLE-FLECHA-DERECHA.png"/>
+	<file src="data/ICON-FLECHA-DERECHA.png"/>
+	<file src="data/ICON-RESET.png"/>
+	<file src="data/ICON-FLECHA-IZQUIERDA.png"/>
+	<file src="data/BG-INFORMACION-PERSONAJE.png"/>
+	
+	<!-- Hover Images -->
+	<file src="data/HOVERBOTON-CREAR-PERSONAJE.png"/>
+	<file src="data/HOVERBOTON-CLARO.png"/>
+	<file src="data/HOVERBOTON-MORENO.png"/>
+	<file src="data/HOVERBOTONSELECT-MUJER.png"/>
+	<file src="data/HOVERBOTONSELECT-HOMBRE.png"/>
+	<file src="data/HOVERCIRCLE-FLECHA-DERECHA.png"/>
+	<file src="data/HOVERCIRCLE-FLECHA-IZQUIERDA.png"/>
+	<file src="data/HOVERCIRCLE-RESET.png"/>
+</meta>

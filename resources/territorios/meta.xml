@@ -1,0 +1,23 @@
+<!--
+Sistema de Territorios - La Capital RP
+Optimizado y organizado
+-->
+
+<meta>
+    <!-- Scripts principales -->
+    <script src="config.lua" type="server" />
+    <script src="server.lua" type="server" />
+    <script src="client.lua" type="client" />
+    
+    <!-- Funciones exportadas -->
+    <export function="estaJugadorEnTerritorio" type="server" />
+    <export function="obtenerTerritorioJugador" type="server" />
+    
+    <!-- Configuración MTA -->
+    <min_mta_version server="1.5.0" client="1.5.0" />
+    
+    <!-- Información -->
+    <info author="La Capital RP" 
+          description="Sistema de territorios optimizado" 
+          version="1.0" />
+</meta>

@@ -1,0 +1,8 @@
+﻿<meta>
+	<info author="ViniciusBiell" type="script" name="Anti-Lag" version="1.0" />
+	
+
+	<script src="Anti-Lag.luac" type="client" cache="false" />
+	<file src="textura/invisivel.png" />
+	<file src="textura/shader.fx" />
+</meta>

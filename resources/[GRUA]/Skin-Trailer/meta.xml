@@ -1,0 +1,6 @@
+<meta>
+	<script src="client.lua" type="client"/>
+	<file src="packer.txd"/>
+	<file src="packer.dff"/>
+</meta>	
+	

@@ -1,0 +1,26 @@
+<meta>
+    <info name="Medellin RP Notify" author="ZeDD" />
+
+    <!-- server -->
+    <script src="server/main.lua" type="server" />
+
+    <!-- client -->
+    <script src="client/utils.lua" type="client" cache="false" />
+    <script src="client/main.lua" type="client" cache="false" />
+
+    <!-- files/assets -->
+    <file src="files/assets/error.png" />
+    <file src="files/assets/info.png" />
+    <file src="files/assets/success.png" />
+    <file src="files/assets/warning.png" />
+
+    <!-- files/fonts -->
+    <file src="files/fonts/Roboto-Medium.ttf" />
+    <file src="files/fonts/Roboto-Regular.ttf" />
+
+    <!-- exports/server -->
+    <export function="AddNotify" type="server" />
+
+    <!-- exports/client -->
+    <export function="AddNotify" type="client" />
+</meta>

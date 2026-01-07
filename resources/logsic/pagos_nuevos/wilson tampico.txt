@@ -1,0 +1,3 @@
+[2025-03-07 02:10:24] Cantidad $1500000 pagado a Santiago Tampico.
+[2025-03-07 02:10:51] Cantidad $500000 pagado a Santiago Tampico.
+[2025-03-08 00:53:21] Cantidad $30000000 pagado a Santiago Tampico.

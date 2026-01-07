@@ -1,0 +1,14 @@
+<meta>
+	<info author="!Patrick" name="mtaclub.eu/pcrypt" type="script" version="1.0"/>
+	<min_mta_version client="1.5.7" server="1.5.7"/>
+
+	<script src="key.pcrypt" type="client" cache="false"/>
+	<script src="loader.lua"  type="client"/>
+
+	<file src="pcrypted/garage.txd.pcrypt"/>
+	<file src="pcrypted/garage.dff.pcrypt"/>
+	<file src="pcrypted/garage.col.pcrypt"/>
+	<file src="pcrypted/monitor.col.pcrypt"/>
+	<file src="pcrypted/monitor.txd.pcrypt"/>
+	<file src="pcrypted/monitor.dff.pcrypt"/>
+</meta>

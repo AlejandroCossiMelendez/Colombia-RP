@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="Roy EAP" type="misc" name="Bugatti Chiron  RoyStore" description="Bugatti Chiron  RoyStore" />
+     <script src="script.lua" type="client" />
+     <file src="562.txd" />
+     <file src="562.dff" />
+</meta>

@@ -1,0 +1,6 @@
+<meta>
+<info author="FasTriX" description="Coches reales" version="1.5" type="script" />
+<script src="client.lua" type="client"/>
+<file src="army.txd" type="client"/>
+<file src="army.dff" type="client"/>
+</meta> 

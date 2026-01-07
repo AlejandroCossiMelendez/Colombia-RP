@@ -1,0 +1,14 @@
+<meta>
+    <info author="Kuzya" version="1.0" type="script"/>
+    <script src="server.lua" type="server"/>
+    <script src="client.lua" type="client"/>
+    <file src="2.ifp"/>
+    <file src="1.ifp"/>
+|   <file src="3.ifp"/>
+    <file src="4.ifp"/>
+    <file src="5.ifp"/>
+    <file src="6.ifp"/>
+    <file src="7.ifp"/>
+    <file src="8.ifp"/>
+    <file src="9.ifp"/>
+</meta>

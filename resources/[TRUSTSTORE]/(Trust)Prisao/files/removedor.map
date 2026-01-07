@@ -1,0 +1,18 @@
+<map edf:definitions="editor_main">
+   <removeWorldObject id="removeWorldObject (des_rockgp2_23) (1)" radius="20.514622" interior="0" model="16145" lodModel="16727" posX="-362.46875" posY="1314.6563" posZ="29.42188" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (des_telefenc) (1)" radius="234.65431" interior="0" model="16136" lodModel="0" posX="-350.0625" posY="1594.3438" posZ="75.3125" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (des_rockgp2_21) (1)" radius="68.614059" interior="0" model="16141" lodModel="16725" posX="-166.05469" posY="1395.7891" posZ="12.71094" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (des_rockgp2_22) (1)" radius="75.408989" interior="0" model="16142" lodModel="16726" posX="-268.82031" posY="1335.6563" posZ="55.30469" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (des_rockgp2_20) (1)" radius="81.128654" interior="0" model="16140" lodModel="16721" posX="-422.50781" posY="1554.9531" posZ="34.42188" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (des_rockgp2_19) (1)" radius="13.832232" interior="0" model="16139" lodModel="16722" posX="-372.44531" posY="1495.9609" posZ="61.90625" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (des_bigtelescope) (1)" radius="58.108315" interior="0" model="16613" lodModel="16614" posX="-346.67187" posY="1595.0781" posZ="79.66406" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (des_teleshed2_) (1)" radius="26.449255" interior="0" model="16137" lodModel="16615" posX="-389.76562" posY="1515.1641" posZ="74.55469" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (des_teleshed2_01) (1)" radius="34.988697" interior="0" model="16138" lodModel="16616" posX="-326.69531" posY="1541.3906" posZ="74.55469" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (des_telecafe) (1)" radius="37.460808" interior="0" model="16143" lodModel="16751" posX="-324.14844" posY="1302.2266" posZ="52.66406" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (des_bigtelescope) (1)" radius="143.67494" interior="0" model="16613" lodModel="16614" posX="-346.67187" posY="1595.0781" posZ="79.66406" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (des_teleshed2_01) (1)" radius="34.988697" interior="0" model="16138" lodModel="16616" posX="-326.69531" posY="1541.3906" posZ="74.55469" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (des_telefenc) (1)" radius="52.046116" interior="0" model="16136" lodModel="0" posX="-350.0625" posY="1594.3438" posZ="75.3125" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (des_teleshed2_) (1)" radius="26.449255" interior="0" model="16137" lodModel="16615" posX="-389.76562" posY="1515.1641" posZ="74.55469" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (des_rockgp2_19) (1)" radius="32.700821" interior="0" model="16139" lodModel="16722" posX="-372.44531" posY="1495.9609" posZ="61.90625" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+    <removeWorldObject id="removeWorldObject (des_telecafe) (1)" radius="37.460808" interior="0" model="16143" lodModel="16751" posX="-324.14844" posY="1302.2266" posZ="52.66406" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+</map>

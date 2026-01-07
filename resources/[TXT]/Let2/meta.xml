@@ -1,0 +1,6 @@
+<meta>  
+<info author='JAIRITODEV' description='' version='1.0' type='script' />  
+<script src='script.lua' type='client' />  
+<file src='billbrd01_lan2.txd' type='client' />  
+
+</meta>

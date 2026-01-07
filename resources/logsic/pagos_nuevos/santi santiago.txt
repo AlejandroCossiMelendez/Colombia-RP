@@ -1,0 +1,2 @@
+[2025-01-21 21:46:26] Cantidad $700000 pagado a Jose Ramirez.
+[2025-01-21 22:00:20] Cantidad $1500000 pagado a Jose Ramirez.

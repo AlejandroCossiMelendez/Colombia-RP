@@ -1,0 +1,14 @@
+<meta>
+    <info author="ModManager" name="Skins La Cosa Nostra" description="Skins de la mafia para IDs 72, 73 y 49" version="1.0" type="script" />
+    
+    <!-- Script principal -->
+    <script src="client.lua" type="client" />
+    
+    <!-- Archivos de modelos y texturas -->
+    <file src="mafboss.dff" />
+    <file src="mafboss.txd" />
+    <file src="shmycr.dff" />
+    <file src="shmycr.txd" />
+    <file src="vmaff1.dff" />
+    <file src="vmaff1.txd" />
+</meta>

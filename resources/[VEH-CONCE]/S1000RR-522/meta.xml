@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="By2N" type="misc" name="S1000RR" description="S1000RR" />
+     <script src="script.lua" type="client" />
+     <file src="bf400.txd" />
+     <file src="bf400.dff" />
+</meta>

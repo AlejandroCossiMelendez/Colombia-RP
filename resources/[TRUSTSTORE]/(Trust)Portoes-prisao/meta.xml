@@ -1,0 +1,14 @@
+<meta>
+<!-- PT ATENÇÃO: Não modifique este arquivo. Qualquer alteração fará o resource parar de funcionar e ele não voltará, mesmo se a mudança for desfeita. -->
+<!-- ENG WARNING: Do not modify this file. Any change will cause the resource to stop working and it will not return, even if the change is undone. -->
+<!-- ESP ATENCIÓN: No modifiques este archivo. Cualquier cambio hará que el resource deje de funcionar y no volverá, incluso si se revierte el cambio. -->
+
+    <info author="KristianMapper" version="www.truststoremta.com" name="Trust Store OFICIAL"/>
+	<info author="Trust Store e gusta__" name="Portoes Prisao" type="script" version="1.0"/>
+    <min_mta_version server="1.6.0" />
+    <oop>true</oop>
+	
+	<script src="config.lua"  type="shared"/>
+	<script src="portoes.lua"  type="server"/>
+
+</meta>

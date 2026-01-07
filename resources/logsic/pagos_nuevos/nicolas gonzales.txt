@@ -1,0 +1,4 @@
+[2025-03-01 20:49:22] Cantidad $230000000 pagado a Juan Arboledo.
+[2025-03-01 20:49:24] Cantidad $230000000 pagado a Juan Arboledo.
+[2025-03-01 20:49:26] Cantidad $23000000 pagado a Juan Arboledo.
+[2025-03-01 20:53:30] Cantidad $10000000 pagado a Juan Arboledo.

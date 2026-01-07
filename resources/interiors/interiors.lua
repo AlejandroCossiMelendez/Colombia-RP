@@ -59,7 +59,7 @@ local function createBlipEx( outside, inside )
 	
 	local name, i = getInteriorIDAt( x, y, z, interior )
 	if i and i.blip then
-		return createBlipAttachedTo( outside, i.blip, 2, 255, 255, 255, 255, 0, 50 )
+		return createBlipAttachedTo( outside, i.blip, 2, 255, 255, 255, 255, 0, 150 )
 	end
 end
 
@@ -120,29 +120,59 @@ addEventHandler( "onResourceStart", resourceRoot,
 	end
 )
 
-addCommandHandler( "createinterior",
-	function( player, commandName, id, price, type, ... )
-		if id and tonumber( price ) and tonumber( type ) and ( ... ) then
-			local name = table.concat( { ... }, " " )
-			local interior = interiorPositions[ id:lower( ) ]
-			if interior then
-				local x, y, z = getElementPosition( player )
-				local insertid = exports.sql:query_insertid( "INSERT INTO interiors (outsideX, outsideY, outsideZ, outsideInterior, outsideDimension, insideX, insideY, insideZ, insideInterior, interiorName, interiorType, interiorPrice, dropoffX, dropoffY, dropoffZ) VALUES (" .. table.concat( { x, y, z, getElementInterior( player ), getElementDimension( player ), interior.x, interior.y, interior.z, interior.interior, '"%s"', tonumber( type ), tonumber( price ), x, y, z }, ", " ) .. ")", name )
-				if insertid then
-					loadInterior( insertid, x, y, z, 0, 0, 0, getElementInterior( player ), getElementDimension( player ), interior.x, interior.y, interior.z, 0, 0, 0, interior.interior, name, tonumber( price ), 0, tonumber( type ), 0, false, x, y, z, 0, 0, 0, 0)
-					outputChatBox( "Interior creado. (ID " .. insertid .. ")", player, 0, 255, 0 )
-				else
-					outputChatBox( "MySQL-Query error.", player, 255, 0, 0 )
-				end
-			else
-				outputChatBox( "El interior " .. id:lower( ) .. " no existe.", player, 255, 0, 0 )
-			end
-		else
-			outputChatBox( "Syntax: /" .. commandName .. " [id] [precio] [tipo 0=Generico 1=Casa 2=Negocio 3=Alquiler] [Nombre]", player, 255, 255, 255 )
-		end
-	end,
-	true
+addCommandHandler("createinterior",
+    function(player, commandName, id, price, type, ...)
+        if id and tonumber(price) and tonumber(type) and (...) then
+            local name = table.concat({ ... }, " ")
+            local interior = interiorPositions[id:lower()]
+            if interior then
+                local x, y, z = getElementPosition(player)
+                local insertid = exports.sql:query_insertid(
+                    "INSERT INTO interiors (outsideX, outsideY, outsideZ, outsideInterior, outsideDimension, insideX, insideY, insideZ, insideInterior, interiorName, interiorType, interiorPrice, dropoffX, dropoffY, dropoffZ) VALUES (" ..
+                    table.concat({ x, y, z, getElementInterior(player), getElementDimension(player), interior.x, interior.y, interior.z, interior.interior, '"%s"', tonumber(type), tonumber(price), x, y, z }, ", ") .. ")", name)
+
+                if insertid then
+                    loadInterior(insertid, x, y, z, 0, 0, 0, getElementInterior(player), getElementDimension(player), 
+                                 interior.x, interior.y, interior.z, 0, 0, 0, interior.interior, name, tonumber(price), 
+                                 0, tonumber(type), 0, false, x, y, z, 0, 0, 0, 0)
+
+                    outputChatBox("Interior creado. (ID " .. insertid .. ")", player, 0, 255, 0)
+
+                    -- Log en Discord
+                    local logMessage = {
+                        title = "Creación de Interior",
+                        description = 
+                            "> **Administrador:** " .. getPlayerName(player):gsub("_", " ") .. "\n" ..
+                            "> **ID Interior:** " .. insertid .. "\n" ..
+                            "> **Nombre:** " .. name .. "\n" ..
+                            "> **Precio:** $" .. price .. "\n" ..
+                            "> **Tipo:** " .. type .. "\n" ..
+                            "> **Posición:** X: " .. x .. ", Y: " .. y .. ", Z: " .. z,
+                        color = 3447003,
+                        footer = {
+                            text = "Registro de creación de interiores",
+                            icon_url = "https://imgur.com/Fbx9o6X"
+                        },
+                        timestamp = "now"
+                    }
+
+                    exports.discord_webhooks:sendToURL(
+                        "https://discord.com/api/webhooks/1407943530998927360/MoozMZUYdTTupZLVbLaegxW88PJrAidI4MUzEjn7HbE4UdH-R843DOc3KHFYEibrWoOs",
+                        logMessage
+                    )
+                else
+                    outputChatBox("MySQL-Query error.", player, 255, 0, 0)
+                end
+            else
+                outputChatBox("El interior " .. id:lower() .. " no existe.", player, 255, 0, 0)
+            end
+        else
+            outputChatBox("Syntax: /" .. commandName .. " [id] [precio] [tipo 0=Generico 1=Casa 2=Negocio 3=Alquiler] [Nombre]", player, 255, 255, 255)
+        end
+    end,
+    true
 )
+
 
 addCommandHandler( { "deleteinterior", "delinterior" },
 	function( player, commandName, interiorID )
@@ -152,7 +182,7 @@ addCommandHandler( { "deleteinterior", "delinterior" },
 			if interior then
 				if exports.sql:query_free( "DELETE FROM interiors WHERE interiorID = " .. interiorID ) then
 					outputChatBox( "Has borrado el interior " .. interiorID .. ".", player, 0, 255, 153 )
-					exports.logs:addLogMessage("delint", "El staff "..getPlayerName(player).." ha eliminado el interior ID "..tostring(interiorID))
+					exports.logsic:addLogMessage("delint", "El staff "..getPlayerName(player).." ha eliminado el interior ID "..tostring(interiorID))
 					-- teleport all players who're inside to the exit
 					for key, value in ipairs( getElementsByType( "player" ) ) do
 						if exports.players:isLoggedIn( value ) and getElementDimension( value ) == interiorID then
@@ -582,7 +612,7 @@ addCommandHandler( { "sellinterior", "venderpropiedad" , "venderint" },
 					setElementData( interior.outside, "price", interior.price ) 
 					setElementData( interior.outside, "characterID", 0 )
 					removeElementData( interior.outside, "characterName" )
-					exports.logs:addLogMessage("sellint", "Interior ID "..tostring(interiorID).. " vendido ("..getPlayerName(player)..")")
+					exports.logsic:addLogMessage("sellint", "Interior ID "..tostring(interiorID).. " vendido ("..getPlayerName(player)..")")
 					-- for now: destroy the person's key
 					local result = exports.sql:query_assoc("SELECT interiorID, idasociado FROM interiors WHERE idasociado = "..interiorID)
 					for key2, value2 in ipairs (result) do
@@ -804,13 +834,13 @@ addEventHandler( "onColShapeHit", resourceRoot,
 	function( element, matching )
 		if matching and getElementType( element ) == "player" then
 			if p[ element ] then
-				unbindKey( element, "p", "down", enterInterior, p[ element ] )
+				unbindKey( element, "e", "down", enterInterior, p[ element ] )
 				unbindKey( element, "k", "down", lockInterior, p[ element ] )
 				
 			end
 			
 			p[ element ] = source
-			bindKey( element, "p", "down", enterInterior, p[ element ] )
+			bindKey( element, "e", "down", enterInterior, p[ element ] )
 			bindKey( element, "k", "down", lockInterior, p[ element ] )
 			setElementData( element, "interiorMarker", true, false )
 		end
@@ -820,7 +850,7 @@ addEventHandler( "onColShapeHit", resourceRoot,
 addEventHandler( "onColShapeLeave", resourceRoot,
 	function( element, matching )
 		if getElementType( element ) == "player" and p[ element ] then
-			unbindKey( element, "p", "down", enterInterior, p[ element ] )
+			unbindKey( element, "e", "down", enterInterior, p[ element ] )
 			unbindKey( element, "k", "down", lockInterior, p[ element ] )
 			removeElementData( element, "interiorMarker", true, false )
 			p[ element ] = nil
@@ -935,7 +965,7 @@ function precintarInterior (thePlayer, commandName, id)
 			exports.sql:query_free("UPDATE interiors SET precintado = 1 WHERE interiorID = "..id)
 			outputChatBox ( "Has precintado el interior con ID "..id..".", thePlayer, 0, 255, 0 )
 			interior.precintado = 1
-			exports.logs:addLogMessage("int_precintos", "Interior ID "..tostring(id).." precintado por "..getPlayerName(thePlayer)..".")
+			exports.logsic:addLogMessage("int_precintos", "Interior ID "..tostring(id).." precintado por "..getPlayerName(thePlayer)..".")
 		else
 			outputChatBox("Síntaxis: /"..tostring(commandName).." [interiorID]", thePlayer, 255, 255, 255)
 		end
@@ -952,7 +982,7 @@ function quitarPrecintoInterior (thePlayer, commandName, id)
 		if id and interior then
 			exports.sql:query_free("UPDATE interiors SET precintado = 0 WHERE interiorID = "..tonumber(id))
 			outputChatBox ( "Has quitado el precinto del interior con ID "..id..".", thePlayer, 0, 255, 0 )
-			exports.logs:addLogMessage("int_precintos", "Interior ID "..tostring(id).." desprecintado por "..getPlayerName(thePlayer)..".")
+			exports.logsic:addLogMessage("int_precintos", "Interior ID "..tostring(id).." desprecintado por "..getPlayerName(thePlayer)..".")
 			interior.precintado = 0
 		else
 			outputChatBox("Síntaxis: /quitarprecinto [interiorID]", thePlayer, 255, 255, 255)
@@ -1056,7 +1086,7 @@ function intGenerico (thePlayer, commandName, interiorID)
 			exports.sql:query_free("UPDATE interiors SET interiorType = 0 WHERE interiorID = "..interiorID)
 			exports.sql:query_free("UPDATE interiors SET characterID = 0 WHERE interiorID = "..interiorID)
 			outputChatBox("Has cambiado el interior con el ID "..interiorID.." al tipo 0 (generico).", thePlayer, 0, 255, 0)
-			exports.logs:addLogMessage("intgenerico", getPlayerName(thePlayer).." ha cambiado a genérico el interior ID "..tostring(interiorID)..". Antiguo cID del titular: "..tostring(interior.characterID))
+			exports.logsic:addLogMessage("intgenerico", getPlayerName(thePlayer).." ha cambiado a genérico el interior ID "..tostring(interiorID)..". Antiguo cID del titular: "..tostring(interior.characterID))
 			interior.characterID = 0
 			interior.type = 0
 		else
@@ -1421,7 +1451,7 @@ end
 				-- exports.sql:query_free("UPDATE `interiors` SET `insideDimension` = '"..tostring(intIDActual).."' WHERE `insideDimension` = "..tostring(sql.interiorID))
 				-- exports.sql:query_free("UPDATE `interiors` SET `idasociado` = '"..tostring(intIDActual).."' WHERE `idasociado` = "..tostring(sql.interiorID))
 				-- exports.sql:query_free("UPDATE `interiors` SET `interiorID` = '"..tostring(intIDActual).."' WHERE `interiorID` = "..tostring(sql.interiorID))
-				-- exports.logs:addLogMessage("recolocacion-ints", "Viejo ID: "..tostring(sql.interiorID).. " - Nuevo ID: "..tostring(intIDActual))
+				-- exports.logsic:addLogMessage("recolocacion-ints", "Viejo ID: "..tostring(sql.interiorID).. " - Nuevo ID: "..tostring(intIDActual))
 				-- intIDActual = intIDActual+1
 			-- end
 		-- end

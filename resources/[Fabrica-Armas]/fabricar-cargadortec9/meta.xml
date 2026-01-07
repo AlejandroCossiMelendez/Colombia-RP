@@ -1,0 +1,8 @@
+<meta>
+    <script src="interior.lua" type="server" cache="false"/>
+    <script src="client.lua" type="client" cache="false"/>
+
+    <file src="Roboto.ttf" />
+    <file src="RobotoBold.ttf" />
+    <file src="tec9.png" />
+</meta>

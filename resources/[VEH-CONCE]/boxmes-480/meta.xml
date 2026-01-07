@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="By2N" type="misc" name="BoxterGTS2016" description="BoxterGTS2016" />
+     <script src="script.lua" type="client" />
+     <file src="comet.txd" />
+     <file src="comet.dff" />
+</meta>

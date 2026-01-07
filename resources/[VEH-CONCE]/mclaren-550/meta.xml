@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="MclarrenP1" type="misc" name="MclarrenP1" description="MclarrenP1" />
+     <script src="replace.lua" type="client" />
+     <file src="MclarrenP1.txd" />
+     <file src="MclarrenP1.dff" />
+</meta>

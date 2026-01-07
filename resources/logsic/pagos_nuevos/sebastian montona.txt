@@ -1,0 +1,4 @@
+[2025-04-15 04:30:06] Cantidad $3500000 pagado a Stevan Montana.
+[2025-04-15 04:30:44] Cantidad $350000000 pagado a Stevan Montana.
+[2025-04-15 04:31:03] Cantidad $350000000 pagado a Stevan Montana.
+[2025-04-15 04:31:20] Cantidad $30000000 pagado a Stevan Montana.

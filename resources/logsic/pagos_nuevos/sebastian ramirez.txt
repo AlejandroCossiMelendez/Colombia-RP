@@ -1,0 +1,3 @@
+[2025-09-11 10:00:51] Cantidad $83000000 pagado a Owner EcuDev.
+[2025-09-12 06:49:14] Cantidad $5000000 pagado a Juan Cardona.
+[2025-09-12 10:05:39] Cantidad $9620800 pagado a El Ruso.

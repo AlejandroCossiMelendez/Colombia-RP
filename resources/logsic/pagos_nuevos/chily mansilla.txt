@@ -1,0 +1,9 @@
+[2025-03-29 05:34:57] Cantidad $1900000 pagado a Thiago Cardona.
+[2025-03-29 11:30:46] Cantidad $1000 pagado a Braian Mansilla.
+[2025-03-30 07:44:07] Cantidad $1700000 pagado a Braian Mansilla.
+[2025-03-30 07:44:37] Cantidad $300000 pagado a Braian Mansilla.
+[2025-03-30 07:44:48] Cantidad $100000 pagado a Braian Mansilla.
+[2025-03-30 08:23:07] Cantidad $40000000 pagado a Braian Mansilla.
+[2025-03-31 00:41:59] Cantidad $1000000 pagado a Esteban Chanda VIP.
+[2025-04-01 01:23:02] Cantidad $1000000 pagado a Thiago Cardona.
+[2025-04-01 03:37:06] Cantidad $44496965 pagado a Braian Mansilla.

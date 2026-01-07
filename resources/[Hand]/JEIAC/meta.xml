@@ -1,0 +1,34 @@
+<meta>
+    <info author="Jeicordero AC - Clean Version" type="script" description="Anticheat simplificado - Anti-VPN, Anti-Spoofer, Anti-Executor" version="2.0" />
+    
+    <oop>true</oop>
+    <min_mta_version client="1.5.4-9.11413" server="1.5.4-9.11413" />
+
+    <!-- Scripts principales (ORDEN IMPORTANTE) -->
+    <script src="gSchootz.lua" type="shared" cache="false" />
+    <script src="cSchootz.lua" type="client" cache="false" />
+    <script src="sSchootz.lua" type="server" cache="false" />
+    
+    <!-- Base de datos SQLite se crea automáticamente -->
+    
+    <!-- Prioridad alta de descarga -->
+    <download_priority_group>9999</download_priority_group>
+    
+    <!-- Dependencias -->
+    <include resource="discord_webhooks" />
+    
+    <!-- ACL Rights necesarios -->
+    <aclrequest>
+        <right name="general.http" access="true" />
+        <right name="function.dbConnect" access="true" />
+        <right name="function.dbExec" access="true" />
+        <right name="function.dbQuery" access="true" />
+        <right name="function.dbPoll" access="true" />
+        <right name="function.addBan" access="true" />
+        <right name="function.fetchRemote" access="true" />
+        <right name="function.fileCreate" access="true" />
+        <right name="function.fileWrite" access="true" />
+        <right name="function.fileRead" access="true" />
+        <right name="function.fileClose" access="true" />
+    </aclrequest>
+</meta>

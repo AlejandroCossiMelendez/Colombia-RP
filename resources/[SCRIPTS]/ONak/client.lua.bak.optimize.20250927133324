@@ -1,0 +1,133 @@
+-- Sistema de Control de AK-47 - Cliente
+-- Desarrollado por Puma, optimizado por Claude
+
+-- Configuración
+local CONFIG = {
+    POSICION = {
+        X = 0.15,
+        Y = 0.95
+    },
+    TEXTO = {
+        PREFIJO = "| AK-47: ",
+        ESTADOS = {
+            ACTIVADO = "ON",
+            DESACTIVADO = "OFF",
+            DESCONOCIDO = "N/A"
+        }
+    },
+    COLORES = {
+        ACTIVADO = {5, 255, 0, 255},      -- Verde brillante
+        DESACTIVADO = {255, 0, 0, 255},   -- Rojo
+        DESCONOCIDO = {255, 255, 255, 255}, -- Blanco
+        CONTORNO = {0, 0, 0, 255},        -- Negro
+        SOMBRA = {50, 50, 50, 255}        -- Gris oscuro
+    },
+    FUENTE = "arial",
+    ESCALA = 1.20
+}
+
+-- Variables locales
+local screenW, screenH = guiGetScreenSize()
+local estadoAK = nil -- nil = desconocido, true = activado, false = desactivado
+local ultimoOperador = nil
+
+-- Función para crear color a partir de tabla
+local function crearColor(colorTable)
+    return tocolor(colorTable[1], colorTable[2], colorTable[3], colorTable[4])
+end
+
+-- Función para dibujar texto con efectos
+local function dibujarTextoConEfectos(texto, x, y, escala, fuente, color)
+    -- Contorno
+    local colorContorno = crearColor(CONFIG.COLORES.CONTORNO)
+    dxDrawText(texto, x - 1, y - 1, _, _, colorContorno, escala, fuente, "left", "top", false, false, false, true, true)
+    dxDrawText(texto, x + 1, y - 1, _, _, colorContorno, escala, fuente, "left", "top", false, false, false, true, true)
+    dxDrawText(texto, x - 1, y + 1, _, _, colorContorno, escala, fuente, "left", "top", false, false, false, true, true)
+    dxDrawText(texto, x + 1, y + 1, _, _, colorContorno, escala, fuente, "left", "top", false, false, false, true, true)
+    
+    -- Sombra
+    local colorSombra = crearColor(CONFIG.COLORES.SOMBRA)
+    dxDrawText(texto, x + 2, y + 2, _, _, colorSombra, escala, fuente, "left", "top", false, false, false, true, true)
+    
+    -- Texto principal
+    dxDrawText(texto, x, y, _, _, color, escala, fuente, "left", "top", false, false, false, true, true)
+end
+
+-- Renderizado del estado de AK-47
+addEventHandler("onClientRender", root, function()
+    -- Determinar texto y color según estado
+    local texto = CONFIG.TEXTO.PREFIJO
+    local colorTabla
+    
+    if estadoAK == nil then
+        texto = texto .. CONFIG.TEXTO.ESTADOS.DESCONOCIDO
+        colorTabla = CONFIG.COLORES.DESCONOCIDO
+    elseif estadoAK == true then
+        texto = texto .. CONFIG.TEXTO.ESTADOS.ACTIVADO
+        colorTabla = CONFIG.COLORES.ACTIVADO
+    else -- estadoAK == false
+        texto = texto .. CONFIG.TEXTO.ESTADOS.DESACTIVADO
+        colorTabla = CONFIG.COLORES.DESACTIVADO
+    end
+    
+    -- Posición y estilo
+    local x, y = screenW * CONFIG.POSICION.X, screenH * CONFIG.POSICION.Y
+    local color = crearColor(colorTabla)
+    
+    -- Dibujar indicador
+    dibujarTextoConEfectos(texto, x, y, CONFIG.ESCALA, CONFIG.FUENTE, color)
+end)
+
+-- Eventos
+addEvent("ak47:actualizarEstado", true)
+addEventHandler("ak47:actualizarEstado", root, function(estado, operador)
+    -- Asegurarse de que el estado no sea nil
+    if estado ~= nil then
+        estadoAK = estado
+        if operador then
+            ultimoOperador = operador
+        end
+        
+        -- Debug para verificar que se recibe correctamente
+        outputDebugString("Estado AK-47 actualizado: " .. tostring(estado))
+    end
+end)
+
+-- Mantener compatibilidad con eventos antiguos
+addEvent("ActosOnPuma", true)
+addEventHandler("ActosOnPuma", root, function()
+    estadoAK = true
+end)
+
+addEvent("ActosOffPuma", true)
+addEventHandler("ActosOffPuma", root, function()
+    estadoAK = false
+end)
+
+-- Comando para verificar estado localmente
+addCommandHandler("akinfo", function()
+    local estadoTexto = "DESCONOCIDO"
+    if estadoAK == true then
+        estadoTexto = "ACTIVADO"
+    elseif estadoAK == false then
+        estadoTexto = "DESACTIVADO"
+    end
+    
+    outputChatBox("Estado actual de AK-47: " .. estadoTexto, 255, 255, 0)
+end)
+
+-- Inicialización
+addEventHandler("onClientResourceStart", resourceRoot, function()
+    -- Solicitar estado actual al servidor inmediatamente
+    triggerServerEvent("ak47:solicitarEstado", localPlayer)
+    
+    -- Solicitar nuevamente después de un breve retraso (por si acaso)
+    setTimer(function()
+        triggerServerEvent("ak47:solicitarEstado", localPlayer)
+    end, 2000, 1)
+    
+    -- Y una tercera vez para estar seguros
+    setTimer(function()
+        triggerServerEvent("ak47:solicitarEstado", localPlayer)
+    end, 5000, 1)
+end)

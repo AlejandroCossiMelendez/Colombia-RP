@@ -1,0 +1,4 @@
+[2025-03-05 18:07:21] Cantidad $6000000000 pagado a Luis Rojas.
+[2025-03-05 18:07:23] Cantidad $600000000 pagado a Luis Rojas.
+[2025-03-06 01:24:32] Cantidad $525000000 pagado a Gustavo Garcia VIP.
+[2025-03-07 03:31:44] Cantidad $5000000 pagado a Jose Ramirez VIP.

@@ -1,0 +1,19 @@
+[2025-04-13 21:56:03] Cantidad $500000 pagado a [AYP] Valderrama.
+[2025-04-13 22:28:41] Cantidad $900000 pagado a Juan Escobar Bravos.
+[2025-04-14 22:39:06] Cantidad $1500000 pagado a Mike Towers.
+[2025-04-15 20:34:17] Cantidad $900000 pagado a Yhony Kalahsnikov.
+[2025-04-15 20:41:15] Cantidad $4000000 pagado a Mike Towers.
+[2025-04-15 20:43:13] Cantidad $2000000 pagado a Mike Towers.
+[2025-04-16 02:47:22] Cantidad $16000000 pagado a JuanCarlos Vallesteros.
+[2025-04-16 02:48:13] Cantidad $16000000 pagado a JuanCarlos Vallesteros.
+[2025-04-16 02:48:45] Cantidad $16000000 pagado a JuanCarlos Vallesteros.
+[2025-04-16 02:49:56] Cantidad $16000000 pagado a JuanCarlos Vallesteros.
+[2025-04-16 02:51:24] Cantidad $16000000 pagado a JuanCarlos Vallesteros.
+[2025-04-16 02:52:05] Cantidad $16000000 pagado a JuanCarlos Vallesteros.
+[2025-04-16 02:53:59] Cantidad $16000000 pagado a JuanCarlos Vallesteros.
+[2025-04-16 02:55:41] Cantidad $16000000 pagado a JuanCarlos Vallesteros.
+[2025-04-16 02:56:54] Cantidad $16000000 pagado a JuanCarlos Vallesteros.
+[2025-04-16 02:57:09] Cantidad $1000000 pagado a JuanCarlos Vallesteros.
+[2025-04-16 02:57:26] Cantidad $1000000 pagado a JuanCarlos Vallesteros.
+[2025-04-16 02:57:39] Cantidad $1000000 pagado a JuanCarlos Vallesteros.
+[2025-04-16 02:57:52] Cantidad $2000000 pagado a JuanCarlos Vallesteros.

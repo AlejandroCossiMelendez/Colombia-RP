@@ -1,0 +1,5 @@
+[2025-03-24 01:54:30] Cantidad $21000000 pagado a Juan Chocha VIP.
+[2025-03-24 01:58:51] Cantidad $25000000 pagado a Juan Chocha VIP.
+[2025-03-24 01:59:24] Cantidad $3000000 pagado a Jaycob Cruz.
+[2025-03-24 20:35:46] Cantidad $10000000 pagado a Juan Fernando VIP.
+[2025-03-24 20:37:58] Cantidad $280000000 pagado a Javier Jaramillo.

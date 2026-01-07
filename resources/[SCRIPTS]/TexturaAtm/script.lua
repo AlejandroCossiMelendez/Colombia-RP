@@ -1,0 +1,7 @@
+txd = engineLoadTXD ( "atm.txd" )
+engineImportTXD ( txd, 2942 ) 
+col = engineLoadCOL ( "atm.col" ) 
+engineReplaceCOL ( col, 2942 ) 
+dff = engineLoadDFF ( "atm.dff", 0 ) 
+engineReplaceModel ( dff, 2942,true ) 
+setOcclusionsEnabled( false )

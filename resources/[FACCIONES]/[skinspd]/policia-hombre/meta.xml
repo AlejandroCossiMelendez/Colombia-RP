@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="Shiny" type="misc" name="mystic" description="AB$" />
+     <script src="script.lua" type="client" />
+     <file src="ByShiny.txd" />
+     <file src="ByShiny.dff" />
+</meta>

@@ -1,0 +1,2 @@
+[2025-05-04 02:57:48] Cantidad $10000 pagado a Jose Gutierrez.
+[2025-05-04 02:57:50] Cantidad $100000 pagado a Jose Gutierrez.

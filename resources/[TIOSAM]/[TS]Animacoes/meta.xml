@@ -1,0 +1,38 @@
+<meta>
+    <oop>true</oop>  
+    <script src = 'Client.lua' type = 'client' cache = 'false' />	
+    <script src = 'Config.lua' type = 'shared' cache = 'false' />
+    <script src = 'Server.lua' type = 'server' cache = 'false' />
+
+    <file src = 'files/dances.png' />
+    <file src = 'files/info.png' />
+    <file src = 'files/interactions.png' />
+    <file src = 'files/object.png' />
+    <file src = 'files/others.png' />
+    <file src = 'files/selected.png' />
+    <file src = 'files/social.png' />
+    <file src = 'files/walk_style.png' />
+    <file src = 'files/font.ttf' />
+
+    <file src = 'ifp/abdominal.ifp' />
+    <file src = 'ifp/breakdance1.ifp' />
+    <file src = 'ifp/breakdance2.ifp' />
+    <file src = 'ifp/continencia.ifp' />
+    <file src = 'ifp/flexao.ifp' />
+    <file src = 'ifp/fortnite1.ifp' />
+    <file src = 'ifp/fortnite2.ifp' />
+    <file src = 'ifp/fortnite3.ifp' />
+    <file src = 'ifp/newAnims.ifp' />
+    <file src = 'ifp/render.ifp' />
+    <file src = 'ifp/sex.ifp' />
+
+    <file src="object/prancheta.txd" />
+	<file src="object/prancheta.dff" />
+	<file src="object/maleta.txd" />
+	<file src="object/maleta.dff" />
+	<file src="object/umbrella.txd" />
+	<file src="object/umbrella.dff" />
+	<file src="object/camera.txd" />
+	<file src="object/camera.dff" />
+    <min_mta_version server="1.5.4-9.11413" />       
+</meta>

@@ -1,0 +1,10 @@
+<meta>
+	<info author="BY_SEPILLIN" name="BY_SEPILLIN" type="script" version="1.0"/>
+	<min_mta_version client="1.5.7" server="1.5.7"/>
+
+	<script src="key.pcrypt" type="client" cache="false"/>
+	<script src="loader.lua"  type="client"/>
+
+	<file src="pcrypted/by_sepillin.txd.pcrypt"/>
+	<file src="pcrypted/by_sepillin.dff.pcrypt"/>
+</meta>

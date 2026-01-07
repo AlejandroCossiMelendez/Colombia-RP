@@ -1,0 +1,15 @@
+<meta>
+
+<script src="client.lua" type="client" />
+<script src="server.lua" type="server" />
+
+<!-- Archivos de sonido -->
+<file src="correcto.mp3"/>
+<file src="incorrecto.mp3"/>
+
+<!-- Fuentes personalizadas opcionales -->
+<file src="fonts/Roboto-Medium.ttf" />
+<file src="fonts/Orbitron-Bold.ttf" />
+<file src="fonts/JetBrainsMono-Regular.ttf" />
+
+</meta>

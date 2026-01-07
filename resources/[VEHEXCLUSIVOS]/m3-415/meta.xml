@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="Chichi" type="misc" name="Bmw" description="Bmw" />
+     <script src="script.lua" type="client" />
+     <file src="hotrina.txd" />
+     <file src="hotrina.dff" />
+</meta>

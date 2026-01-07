@@ -1,0 +1,6 @@
+addEventHandler('onClientResourceStart',resourceRoot,function () 
+txd = engineLoadTXD("LamborghiniHurucan.txd")
+engineImportTXD(txd, 451) 
+dff = engineLoadDFF("LamborghiniHurucan.dff", 451)
+engineReplaceModel(dff, 451)
+end)

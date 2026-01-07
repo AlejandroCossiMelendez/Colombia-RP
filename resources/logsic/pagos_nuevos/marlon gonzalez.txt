@@ -1,0 +1,7 @@
+[2025-03-14 23:00:40] Cantidad $3000000 pagado a Jesus Gomez.
+[2025-03-14 23:39:53] Cantidad $20000000 pagado a Pablo Emilio Escobar.
+[2025-03-16 02:41:28] Cantidad $1000000 pagado a Dilbort Cami.
+[2025-03-16 03:20:39] Cantidad $1000000 pagado a Dilbort Cami.
+[2025-03-17 00:37:44] Cantidad $900000 pagado a Dilbort Cami.
+[2025-03-17 01:18:54] Cantidad $3000000 pagado a Luisca Mosquera.
+[2025-03-17 04:51:36] Cantidad $50000000 pagado a [Dev]David.

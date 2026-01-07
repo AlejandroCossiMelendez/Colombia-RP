@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="ByCoringa" type="misc" name="ByCoringa" description="ByCoringa" />
+     <script src="script.lua" type="client" />
+     <file src="army.txd" />
+     <file src="army.dff" />
+</meta>

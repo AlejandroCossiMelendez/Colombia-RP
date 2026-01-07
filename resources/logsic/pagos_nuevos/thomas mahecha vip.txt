@@ -1,0 +1,4 @@
+[2025-03-15 17:30:17] Cantidad $10000000 pagado a Edgar Garay.
+[2025-03-17 23:45:59] Cantidad $40000000 pagado a Stiward Agudelo.
+[2025-03-17 23:46:15] Cantidad $4000000 pagado a Stiward Agudelo.
+[2025-03-18 00:21:22] Cantidad $1500000 pagado a Roger Jirado.

@@ -1,0 +1,4 @@
+[2025-02-27 03:37:31] Cantidad $100000 pagado a Juan Balleteros.
+[2025-03-01 03:09:58] Cantidad $20000000 pagado a Juancho Ramirez.
+[2025-03-01 03:21:50] Cantidad $20000000 pagado a Juancho Ramirez.
+[2025-03-01 03:27:44] Cantidad $30000000 pagado a Juancho Ramirez.

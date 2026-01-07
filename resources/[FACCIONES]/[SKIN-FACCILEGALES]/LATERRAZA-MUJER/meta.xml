@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="RoyStore36" type="misc" name="RoyStore36" description="RoyStore36" />
+     <script src="script.lua" type="client" />
+     <file src="RoyStore36.txd" />
+     <file src="RoyStore36.dff" />
+</meta>

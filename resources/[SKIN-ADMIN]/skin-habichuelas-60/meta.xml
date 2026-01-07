@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="bydzz" type="misc" name="bydzz3" description="bydzz3" />
+     <script src="script.lua" type="client" />
+     <file src="bydzz.txd" />
+     <file src="bydzz.dff" />
+</meta>

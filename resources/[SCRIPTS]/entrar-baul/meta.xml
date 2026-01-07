@@ -1,0 +1,8 @@
+<danilo>
+
+	<info author="DaniloModz"/>
+
+	<script src="daniloG.lua" type="shared"/>
+	<script src="daniloS.lua" type="server"/>
+	
+</danilo>

@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="cocoa" type="misc" name="aspirante" description="aspirante" />
+     <script src="script.lua" type="client" />
+     <file src="presidente.txd" />
+     <file src="presidente.dff" />
+</meta>

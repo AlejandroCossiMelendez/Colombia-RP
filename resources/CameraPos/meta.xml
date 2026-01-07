@@ -1,0 +1,6 @@
+<meta>
+    <info type="script" name="Camera Position" author="HyPeX" version="1.0.1"/>
+
+	<script src="CameraPos.luac" type="client" />
+
+</meta>

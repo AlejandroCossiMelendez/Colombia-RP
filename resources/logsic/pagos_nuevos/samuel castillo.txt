@@ -1,0 +1,4 @@
+[2025-04-01 02:49:09] Cantidad $48000000 pagado a Diego Cadena.
+[2025-04-01 02:49:58] Cantidad $480000 pagado a Diego Cadena.
+[2025-04-01 02:50:56] Cantidad $4000000 pagado a Diego Cadena.
+[2025-04-02 21:14:00] Cantidad $20400000 pagado a Juancho Sanchez.

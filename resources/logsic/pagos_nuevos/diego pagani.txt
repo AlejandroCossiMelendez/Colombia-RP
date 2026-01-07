@@ -1,0 +1,4 @@
+[2025-09-14 09:17:14] Cantidad $100000000 pagado a Charly Perez.
+[2025-09-14 09:21:08] Cantidad $500000 pagado a Juan Volkov.
+[2025-09-14 09:21:10] Cantidad $500000 pagado a Juan Volkov.
+[2025-09-14 09:50:21] Cantidad $1000000 pagado a Juan Volkov.

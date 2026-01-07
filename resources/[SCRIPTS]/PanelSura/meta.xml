@@ -1,0 +1,6 @@
+<meta>
+    <info author="MonsalveGod" version="1.0" type="script" name="Panel de sura" />
+    <script src="mainC.luac" type="client"  />
+    <script src="config.lua" type="shared" />
+    <script src="mainS.luac" type="server" />
+</meta>

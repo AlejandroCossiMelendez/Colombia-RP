@@ -1,0 +1,4 @@
+[2025-03-30 02:21:48] Cantidad $900000 pagado a Chily Mansilla.
+[2025-03-30 14:05:56] Cantidad $1000000 pagado a Nacho Olivera.
+[2025-03-30 14:33:14] Cantidad $80000000 pagado a Nacho Olivera.
+[2025-04-01 01:19:20] Cantidad $170000000 pagado a Jader Dior.

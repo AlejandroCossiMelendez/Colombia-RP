@@ -1,0 +1,7 @@
+﻿<xml>
+    <script src="cFulano.lua" type="client" cache="false" />
+    <script src="sFulano.lua" type="server" />
+	
+    <file src="files/invisible.txd" />
+	<file src="files/invisible.dff" />
+</xml>

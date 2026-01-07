@@ -1,0 +1,29 @@
+<!--
+Copyright (c) 2025 Community Service System
+Sistema de Trabajo Comunitario para MTA:SA - Versión Optimizada
+
+Versión de producción sin elementos de debug
+Optimizado para máximo rendimiento y seguridad
+-->
+
+<meta>
+    <info author="Sistema Comunitario" name="Community Service" version="1.0-OPTIMIZED" />
+    
+    <!-- Dependencias del recurso -->
+    <include resource="sql" />
+    <include resource="players" />
+    
+    <!-- Scripts optimizados -->
+    <script src="server.lua" type="server" />
+    <script src="client.lua" type="client" />
+    
+    <!-- Exports esenciales para otros recursos -->
+    <export function="assignCommunityService" type="server" />
+    <export function="getCommunityServiceStatus" type="server" />
+    <export function="completeCommunityService" type="server" />
+    <export function="isPlayerInCommunityService" type="server" />
+    <export function="addTrashToPlayer" type="server" />
+    
+    <!-- Versión mínima requerida -->
+    <min_mta_version server="1.5.5-9.14060" client="1.5.2-9.07903"></min_mta_version>
+</meta>

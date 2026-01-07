@@ -1,0 +1,4 @@
+[2025-02-20 20:41:56] Cantidad $3200000 pagado a Juan Fernando.
+[2025-02-20 20:46:04] Cantidad $3200000 pagado a Juan Fernando.
+[2025-02-20 20:49:43] Cantidad $3200000 pagado a Juan Fernando.
+[2025-02-20 22:09:33] Cantidad $1200000 pagado a Juan Fernando.

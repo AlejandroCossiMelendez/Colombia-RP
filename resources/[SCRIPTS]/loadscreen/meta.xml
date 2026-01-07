@@ -1,0 +1,27 @@
+<meta>
+    <info name="La Nueva Granada Loading Screen" author="ZeDD" />
+    <download_priority_group>9999</download_priority_group>
+    <!-- Utils -->
+    <script src="UtilsManager.lua" type="client" cache="false" />
+    <!-- Serverside -->
+    <script src="Server/TransferBox.lua" type="server" />
+    <!-- Clientside -->
+    <script src="Client/LoadingScreen.lua" type="client" cache="false" />
+    <!-- Assets -->
+    <file src="Files/Assets/background.png" />
+    <file src="Files/Assets/discord.png" />
+    <file src="Files/Assets/gradient.png" />
+    <file src="Files/Assets/left.png" />
+    <file src="Files/Assets/news.png" />
+    <file src="Files/Assets/picture.png" />
+    <file src="Files/Assets/tiktok.png" />
+    <file src="Files/Assets/twitch.png" />
+
+    <file src="Files/Assets/Sequences/1.png" />
+    <file src="Files/Assets/Sequences/2.png" />
+    <file src="Files/Assets/Sequences/3.png" />
+    <file src="Files/Assets/Sequences/4.png" />
+    <!-- Fonts -->
+    <file src="Files/Fonts/Font-Medium.ttf" />
+    <file src="Files/Fonts/Font-Regular.ttf" />
+</meta>

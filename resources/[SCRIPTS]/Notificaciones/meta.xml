@@ -1,0 +1,12 @@
+<meta>
+	<info author="AndresTVz" type="script" name="notifications" version="0.1.0" />
+	<script src="client.lua" type="client" cache="false"/>
+	<script src="shared.lua" type="shared" cache="false"/>
+	<script src="server.lua" type="server" cache="false"/>
+	<file src="img/edge.png"/>
+	<file src="img/startedge.png"/>
+	<file src="img/arlrdbd.ttf"/>
+	<file src="sound.mp3"/>
+	<export function="dxGetNotifications" type="shared" />
+	<export function="addNotification" type="shared" />
+</meta>

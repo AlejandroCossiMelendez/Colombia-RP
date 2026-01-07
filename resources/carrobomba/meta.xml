@@ -1,0 +1,8 @@
+<meta>
+	<info author="CapitalRP" name="carrobomba" version="1.0" type="script" />
+	<script src="server.lua" type="server" />
+	<script src="client.lua" type="client" />
+	<export function="attemptEngineStart" type="server" />
+	<export function="useIED" type="server" />
+	<export function="isVehicleBombArmed" type="server" />
+</meta>

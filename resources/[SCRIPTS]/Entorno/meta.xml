@@ -1,0 +1,6 @@
+<meta>
+    <info author="ShadowSSW " name="Entorno" description="Entorno para todos" version="1.0" type="script" />
+
+	<script src="entorno.lua" type="server" />
+	
+</meta>

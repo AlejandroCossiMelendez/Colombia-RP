@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="KAZIDE" type="misc" name="ByKAZIDE" description="ByKAZIDE" />
+     <script src="script.lua" type="client" />
+     <file src="ByKAZIDE.txd" />
+     <file src="ByKAZIDE.dff" />
+</meta>

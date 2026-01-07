@@ -1,0 +1,27 @@
+<meta>
+<!-- ╔══════════════════════════════════════════════════════════════════════╗ -->
+<!-- ║ ⚠️ ATENÇÃO (PT-BR) – NÃO MODIFIQUE ESTE ARQUIVO                       ║ -->
+<!-- ║ ⚠️ WARNING (EN)  – DO NOT MODIFY THIS FILE                            ║ -->
+<!-- ║ ⚠️ ATENCIÓN (ES) – NO MODIFICAR ESTE ARCHIVO                          ║ -->
+<!-- ╚══════════════════════════════════════════════════════════════════════╝ -->
+    <info author='KristianMapper' version='www.truststoremta.com' name='Trust Store OFICIAL'/>
+	<oop>true</oop>
+	<script src="Config.lua" type="shared" cache="false" />
+	<script src="source/Source.luac" type="shared" cache="false" />
+
+    <file src="files/model/elevador.mtax_dff" cache="false"/>
+    <file src="files/model/pred-lod.mtax_dff" cache="false"/>
+    <file src="files/model/pred.mtax_dff" cache="false"/>
+    <file src="files/model/predio-org-lod.mtax_dff" cache="false"/>
+    <file src="files/model/predio-org.mtax_dff" cache="false"/>
+    <file src="files/model/texturas-lod.txd" cache="false"/>
+    <file src="files/model/texturas.txd" cache="false"/>
+    <file src="files/model/elevador.mtax_col" cache="false"/>
+    <file src="files/model/pred-lod.mtax_col" cache="false"/>
+    <file src="files/model/pred.mtax_col" cache="false"/>
+    <file src="files/model/predio-org.mtax_col" cache="false"/>
+
+    <map src="files/removedor.map" dimension="-1"></map>
+    <file src="files/sfx/elevador.mp3" />
+    <min_mta_version server='1.6.0' client='1.6.0' />
+</meta>

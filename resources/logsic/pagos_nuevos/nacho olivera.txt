@@ -1,0 +1,5 @@
+[2025-03-29 11:19:33] Cantidad $80 pagado a Chily Mansilla.
+[2025-03-29 11:29:10] Cantidad $100000 pagado a Chily Mansilla.
+[2025-03-30 22:53:50] Cantidad $5000000 pagado a Thiago Cardona.
+[2025-03-30 22:56:07] Cantidad $100000000 pagado a Thiago Cardona.
+[2025-03-30 22:56:15] Cantidad $10000000 pagado a Thiago Cardona.

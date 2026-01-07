@@ -1,0 +1,130 @@
+{
+  "factions": [
+    {
+      "id": 11,
+      "command": "cdc",
+      "name": "CARTEL DE CALI",
+      "message_format": "#000000[#FFFFFFCARTEL #9a9a9aDE #ab760cCALI]#FFFFFF: {message}",
+      "error_message": "No puedes usar esto si no perteneces a la mafia"
+    },
+    {
+      "id": 12,
+      "command": "cdg",
+      "name": "LOS TRECE",
+      "message_format": "#000000[#FFFFFFLOS #2791F5TRECE]#FFFFFF: {message}",
+      "error_message": "No puedes usar esto si no perteneces a la mafia"
+    },
+    {
+      "id": 5,
+      "command": "cdm",
+      "name": "CARTEL DE MEDELLIN",
+      "message_format": "#000000[#FFFFFFCARTEL #de3737DE #f72323MEDELLIN]#FFFFFF: {message}",
+      "error_message": "No puedes usar esto si no perteneces a la mafia",
+      "extra_commands": [
+        {
+          "command": "mercadocdm",
+          "message_format": "#000000[#FF4D4DM#FF3333E#FF1A1AR#FF0000C#E60000A#CC0000D#B30000O #990000N#B30000E#CC0000G#E60000R#FF0000O]#FFFFFF: {message}"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "command": "cds",
+      "name": "CARTEL DE SINALOA",
+      "message_format": "#000000[#FFFFFFCARTEL #cc8400DE #e6cc00SINALOA]#FFFFFF: {message}",
+      "error_message": "No puedes usar esto si no perteneces a la mafia"
+    },
+    {
+      "id": 10,
+      "command": "mrusa",
+      "name": "MAFIA RUSA",
+      "message_format": "#000000[#FFFFFF★ #e60000MAFIA RUSA #FFFFFF★]#FFFFFF: {message}",
+      "error_message": "No puedes usar esto si no perteneces a la mafia"
+    },
+    {
+      "id": 15,
+      "command": "mcm",
+      "name": "MEDIOS DE COMUNICACION",
+      "message_format": "#000000[#FFFFFF★ #ff9900MEDIOS #3366ccDE #ff9900COMUNICACION #FFFFFF★]#FFFFFF: {message}",
+      "error_message": "No puedes usar esto si no perteneces a los medios"
+    },
+    {
+      "id": 3,
+      "command": "meca",
+      "name": "MECANICOS",
+      "message_format": "#000000[#FFFFFF★ #ff6600MECA #999999NICOS #FFFFFF★]#FFFFFF: {message}",
+      "error_message": "No puedes usar esto si no eres mecánico"
+    },
+    {
+      "id": 7,
+      "command": "mlibre",
+      "name": "MERCADO LIBRE",
+      "message_format": "#ffdb15[#009ee3MERCADO #ffdb15LIBRE]#FFFFFF {message}",
+      "error_message": "No puedes usar esto si no perteneces a Mercado Libre"
+    },
+    {
+      "id": 1,
+      "command": "pd",
+      "name": "POLICIA NACIONAL",
+      "message_format": "#FFFFFF[#2ca42c★POLICIA #21610BNACIO#1B2A0ANAL★#FFFFFF] {message}.",
+      "error_message": "No puedes usar esto si no eres policía"
+    },
+    {
+      "id": 9,
+      "command": "poker",
+      "name": "POKER",
+      "message_format": "#ffdb15[#cc0000★ #F59F27PO#4A4942KER ★#ffdb15] {message}",
+      "error_message": "No puedes usar esto si no trabajas en el casino"
+    },
+    {
+      "id": 2,
+      "command": "sura",
+      "name": "SURA",
+      "message_format": "#FFFFFF[#0eb2e2SURA#FFFFFF] {message}.",
+      "error_message": "No puedes usar esto si no trabajas en SURA"
+    },
+    {
+      "id": 8,
+      "command": "terpel",
+      "name": "TERPEL",
+      "message_format": "#ffdb15[#cc0000TERPEL#ffdb15] {message}",
+      "error_message": "No puedes usar esto si no trabajas en TERPEL"
+    },
+    {
+      "id": 17,
+      "command": "transito",
+      "name": "POLICIA DE TRANSITO",
+      "message_format": "#000000[#FFFFFF★ #ffcc00POLICIA #3366ccDE #ffcc00TRANSITO #FFFFFF★]#FFFFFF: {message}",
+      "error_message": "No puedes usar esto si no eres policía de tránsito"
+    },
+    {
+      "id": 12,
+      "command": "trece",
+      "name": "LOS TRECE",
+      "message_format": "#000000[#FFFFFFLOS #2791F5TRECE]#FFFFFF: {message}",
+      "error_message": "No puedes usar esto si no perteneces a la mafia"
+    },
+    {
+      "id": 4,
+      "command": "ejn",
+      "name": "EJERCITO NACIONAL",
+      "message_format": "#FFFFFF[#088A08★EJERCITO #21610BNACIO#1B2A0ANAL★#FFFFFF] {message}.",
+      "error_message": "No puedes usar esto si no eres del ejército"
+    },
+     {
+      "id": 17,
+      "command": "320",
+      "name": "LA 320",
+      "message_format": "#FFFFFF[#178264★LA 320★#FFFFFF] {message}.",
+      "error_message": "No puedes usar esto si no eres de LA 320"
+    },
+     {
+      "id": 18,
+      "command": "LFG",
+      "name": "LA FAMILIA GUCCI",
+      "message_format": "#FFFFFF[#C2B12F★LA FAMILIA GUCCI★#FFFFFF] {message}.",
+      "error_message": "No puedes usar esto si no eres de LA FAMILIA GUCCI"
+    }
+
+  ]
+}

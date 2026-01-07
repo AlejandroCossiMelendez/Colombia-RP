@@ -1,0 +1,19 @@
+<map edf:definitions="editor_main">
+<removeWorldObject id="removeWorldObject (garage01_LAwN) (1)" radius="31.438435" interior="-1" model="5774" lodModel="5962" posX="1053.9375" posY="-1010.3984" posZ="38.67969" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (spray01_LAwN) (1)" radius="45.177643" interior="-1" model="5886" lodModel="5974" posX="1005.25" posY="-1011.2109" posZ="36.375" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (garagDoor1_LAwN) (1)" radius="5.0575686" interior="-1" model="5779" lodModel="0" posX="1041.3516" posY="-1025.9297" posZ="32.67188" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (lawnspraydoor1) (1)" radius="4.9156475" interior="-1" model="5856" lodModel="0" posX="1024.9844" posY="-1029.3516" posZ="33.19531" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (sjmpalmbigpv) (1)" radius="12.400197" interior="-1" model="716" lodModel="0" posX="1015.7813" posY="-1028.8437" posZ="29.48438" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (telgrphpole02) (1)" radius="8.5308437" interior="-1" model="1308" lodModel="0" posX="1070.4219" posY="-1029.5234" posZ="29.96875" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (lamppost1) (1)" radius="6.0116315" interior="-1" model="1297" lodModel="0" posX="1030.8359" posY="-1034.7969" posZ="33.8125" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (standardTra_LAwN) (2)" radius="61.318489" interior="-1" model="5776" lodModel="0" posX="1024.4688" posY="-1001.0391" posZ="46.83594" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (lounge_towel_up) (1)" radius="3.236866" interior="-1" model="1646" lodModel="0" posX="1008.1094" posY="-1018.5469" posZ="41.96094" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (lounge_towel_up) (2)" radius="3.236866" interior="-1" model="1646" lodModel="0" posX="1008.1094" posY="-1007.75" posZ="41.96094" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (lounge_towel_up) (3)" radius="3.236866" interior="-1" model="1646" lodModel="0" posX="1004.1953" posY="-1001.3594" posZ="41.96094" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (lounge_towel_up) (4)" radius="3.236866" interior="-1" model="1646" lodModel="0" posX="992.20313" posY="-1008.8516" posZ="41.96094" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (lounge_towel_up) (5)" radius="3.236866" interior="-1" model="1646" lodModel="0" posX="992.20313" posY="-1015.4062" posZ="41.96094" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (lounge_towel_up) (6)" radius="3.236866" interior="-1" model="1646" lodModel="0" posX="998.65625" posY="-1024.375" posZ="41.96094" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (lounge_towel_up) (7)" radius="3.236866" interior="-1" model="1646" lodModel="0" posX="980.01563" posY="-1017.2422" posZ="41.96094" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (lounge_towel_up) (8)" radius="3.236866" interior="-1" model="1646" lodModel="0" posX="975.85938" posY="-1017.2422" posZ="41.96094" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+<removeWorldObject id="removeWorldObject (road_lawn16) (1)" radius="77.691849" interior="-1" model="5807" lodModel="5910" posX="1041.9922" posY="-1039.2969" posZ="30.19531" rotX="0" rotY="0" rotZ="0"></removeWorldObject>
+</map>

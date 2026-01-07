@@ -1,0 +1,8 @@
+<meta>
+	<info type="misc" name="Car replacement for: " author="[M]ister" description="" version="1.3" />
+        <file src="Lambo.txd" />
+	<file src="Lambo.dff" />
+	<script type="client" src="replace.lua" />
+
+	<!-- generated with http://mods-mta.blogspot.com/ -->
+</meta>

@@ -166,13 +166,13 @@ interiorPositions =
 	dormitorio =   { x =  1731.38, y =  256.69, z = 7106.42, interior = 18},
 	perrera =   { x =  -1624.88, y =  -634.4, z = 15.04, interior = 6},
 	
-	-- Mapeados de facciones --
-	ayuntamiento =        { x = 595.89, y = -19.83, z = -40.27, interior = 3},
+	-- Mapeados de facciones -- 
+	ayuntamiento =        { x = 390.494140625, y = 173.8505859375, z = 1008.3828125, interior = 3},
 	hospital =        { x = -286.04, y = 1056.26, z = 508.42, interior = 5, price = 0 },
 	radio =        { x =  1368.5703125, y = 436.5205078125, z = -51.092185974121, interior = 3},
 	radio2 =        { x =  3728.703125, y = -1683.7919921875, z = 584.06872558594, interior = 3},
 	repartos  = { x = -1231.05, y =  -26.91, z = 14.22, interior = 1, price = 0 },
-	oficina = { x = -1308.5068359375, y = -11.51171875, z = 14.21875, interior = 3},
+	oficina = { x = -1308.5068359375, y = -11.51171875, z = 14.21875, interior = -1},
 	discoteca = { x =  -1356.1416015625, y = -32.5654296875, z = 14.307812690735, interior = 3},
 	banco = { x =  1755.943359375, y = -2587.6298828125, z = 66.51831817627, interior = 3},
 	banco2 = { x = -296.63494873047, y = 1482.3851318359, z = 1071.1059570312, interior = 14},
@@ -182,4 +182,13 @@ interiorPositions =
 	pdint2 = { x = 1523.07, y = 1565.08, z = -11.02, interior = 10},
 	corte = { x = 1695.49, y = -2519.19, z = 44.53, interior = 3},        
 	clubmotero = { x = 2584.73, y = -2445.97, z = 13.7, interior = 3, price = 0 },
-}
+	armasilegal = { x = 2542.83228, y = -1303.79382, z = 1025.07031, interior = 2},
+	cargadoresilegal = { x = 2216.10693, y = -1150.45508, z = 1025.79688, interior = 15},
+	barco = { x = 420.69635, y = 2548.97949, z = 33.87812, interior = 10},
+	ejercito = { x = 198.01378, y = -9.51287, z = 1011.20935, interior = 5},
+	pasilloguaronea = { x = 346.43143, y = 352.18433, z = 993.40002, interior = 6},
+	guaronea = { x = -222.90720, y = -7.30895,  z = 992.20001, interior = 17},
+	concesionario = { x = -97.42383, y = -30.28999,  z = 988.25000, interior = 3},
+	pdguaro = { x = 377.03619, y = -137.23689,  z = 993.18909, interior = 5},
+	ayunta = { x = 359.8916015625, y = 145.8828125,  z = 1007.2450561523, interior = 3},  
+} 

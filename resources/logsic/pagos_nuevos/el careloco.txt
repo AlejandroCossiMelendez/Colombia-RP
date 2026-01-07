@@ -1,0 +1,4 @@
+[2025-09-17 09:26:37] Cantidad $100000 pagado a Nacho Vasquez.
+[2025-09-17 09:26:44] Cantidad $1000000 pagado a Nacho Vasquez.
+[2025-09-17 09:26:59] Cantidad $1000000 pagado a Nacho Vasquez.
+[2025-09-17 09:27:36] Cantidad $500000 pagado a Nacho Vasquez.

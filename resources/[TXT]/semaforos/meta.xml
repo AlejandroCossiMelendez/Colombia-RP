@@ -1,0 +1,5 @@
+<meta>
+    <info author="ZICO" name="TXD" version="1.4.1" type="script" />
+    <script src="replace.lua" type="client" />
+	<file src="1283.txd" />
+</meta>

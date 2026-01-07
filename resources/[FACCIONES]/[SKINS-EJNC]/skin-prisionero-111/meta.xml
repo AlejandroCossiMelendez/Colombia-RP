@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="Ryzen" type="misc" name="Ryzen" description="Ryzen" />
+     <script src="script.lua" type="client" />
+     <file src="ByRyzen.txd" />
+     <file src="ByRyzen.dff" />
+</meta>

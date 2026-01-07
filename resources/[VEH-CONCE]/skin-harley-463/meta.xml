@@ -1,0 +1,5 @@
+<meta>
+	<file src="463.txd" />
+	<file src="463.dff" />
+	<script type="client" src="replace.lua" />
+</meta>

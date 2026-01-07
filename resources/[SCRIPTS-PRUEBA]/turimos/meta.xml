@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="LamborghiniHurucan" type="misc" name="LamborghiniHurucan" description="LamborghiniHurucan" />
+     <script src="replace.lua" type="client" />
+     <file src="LamborghiniHurucan.txd" />
+     <file src="LamborghiniHurucan.dff" />
+</meta>

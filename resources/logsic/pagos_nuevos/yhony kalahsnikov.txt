@@ -1,0 +1,4 @@
+[2025-04-15 20:46:43] Cantidad $5000000 pagado a Juan Aguiar.
+[2025-04-15 20:46:59] Cantidad $500000 pagado a Juan Aguiar.
+[2025-04-17 03:03:00] Cantidad $2600000 pagado a Jostyn Steven.
+[2025-04-18 00:35:02] Cantidad $500000 pagado a Carlos Baker.

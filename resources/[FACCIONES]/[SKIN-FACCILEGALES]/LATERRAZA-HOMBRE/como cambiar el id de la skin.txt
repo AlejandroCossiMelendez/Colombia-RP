@@ -1,0 +1,10 @@
+Para cambiar el id de la skin vas a abrir "loader.lua" y en las primeras lineas de codigo donde aparece:
+
+local files = {
+	{ "pecxdo.txd.pcrypt", 0 },
+	{ "pecxdo.dff.pcrypt", 0 },
+}
+
+
+cambiaras esos dos numeros
+

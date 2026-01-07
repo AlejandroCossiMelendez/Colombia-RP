@@ -1,0 +1,3 @@
+[2025-04-04 22:31:19] Cantidad $1000000000 pagado a Jairo Cuchilla.
+[2025-04-04 22:31:29] Cantidad $100000000 pagado a Jairo Cuchilla.
+[2025-04-07 23:27:34] Cantidad $18000000 pagado a Santiago Ramos.

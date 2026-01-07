@@ -1,0 +1,5 @@
+<meta>
+    <info author="TuNombre" type="script" name="Gates System" version="1.0"/>
+    
+    <script src="gates.lua" type="server"/>
+</meta>

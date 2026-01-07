@@ -1,0 +1,2 @@
+[2025-02-26 02:32:02] Cantidad $20000000 pagado a Juan Londono.
+[2025-02-26 02:47:44] Cantidad $40000000 pagado a Juan Londono.

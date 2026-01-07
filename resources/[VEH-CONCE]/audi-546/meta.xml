@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="cabe" type="misc" name="CAN-AM" description="CAN-AM" />
+     <script src="script.lua" type="client" />
+     <file src="intruder.txd" />
+     <file src="intruder.dff" />
+</meta>

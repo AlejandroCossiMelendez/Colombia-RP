@@ -1,0 +1,8 @@
+[2025-04-11 21:46:49] Cantidad $119000000 pagado a Samuel Ortega.
+[2025-04-13 00:31:51] Cantidad $1000000 pagado a Samuel Ortega.
+[2025-04-14 23:37:40] Cantidad $17000000 pagado a Heitor Rojaz.
+[2025-04-14 23:39:33] Cantidad $170000000 pagado a Heitor Rojaz.
+[2025-04-15 22:39:11] Cantidad $4000000 pagado a Yhony Kalahsnikov.
+[2025-04-15 22:39:20] Cantidad $2000000 pagado a Brahian Gallego.
+[2025-04-15 22:52:20] Cantidad $3000000 pagado a Brahian Gallego.
+[2025-04-15 22:52:43] Cantidad $1000000 pagado a Yhony Kalahsnikov.

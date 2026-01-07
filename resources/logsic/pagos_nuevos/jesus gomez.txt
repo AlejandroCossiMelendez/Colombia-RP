@@ -1,0 +1,5 @@
+[2025-03-14 03:49:13] Cantidad $60000000 pagado a Juan Fernando VIP.
+[2025-03-14 03:49:44] Cantidad $30000000 pagado a Juan Fernando VIP.
+[2025-03-16 02:56:35] Cantidad $64000000000 pagado a Cristian Ortega VIP.
+[2025-03-16 03:04:52] Cantidad $550000000 pagado a Cristian Ortega VIP.
+[2025-03-16 03:14:28] Cantidad $150000000 pagado a Cristian Ortega VIP.

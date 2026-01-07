@@ -1,0 +1,8 @@
+<meta>
+    <info author="Tigosempre27" name="HAND_VEHICLE" description="Altera as Caracteristica dos Veiculos EX: Velocidade" version="1.0.0" />
+    <script src="script.lua" type="server" cache="false" />
+    <export function="loadHandling" type="server" />
+	
+	<!--Prioeridade de Download (Opcional) Quanto maior o valor sera o mais rapido a realizar o download para o Cliente-->
+    <download_priority_group>50</download_priority_group>
+</meta>

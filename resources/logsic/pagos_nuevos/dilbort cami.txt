@@ -1,0 +1,9 @@
+[2025-03-01 22:15:59] Cantidad $90000000 pagado a Luis Rojas.
+[2025-03-02 03:59:10] Cantidad $1000000 pagado a Juan Londono.
+[2025-03-02 04:00:37] Cantidad $10000000 pagado a Juan Londono.
+[2025-03-02 04:18:11] Cantidad $50000000 pagado a Juan Londono.
+[2025-03-02 04:26:38] Cantidad $2000000 pagado a Juan Londono.
+[2025-03-02 04:49:36] Cantidad $60000000 pagado a Juan Fernando VIP.
+[2025-03-02 04:56:17] Cantidad $28000000 pagado a Juan Fernando VIP.
+[2025-03-02 23:48:14] Cantidad $4000000 pagado a Karl Langerfeld VIP.
+[2025-03-02 23:59:39] Cantidad $350000000 pagado a Karl Langerfeld VIP.

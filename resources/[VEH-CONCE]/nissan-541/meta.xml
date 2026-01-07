@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<meta>
+     <info author="bullet" type="misc" name="Lander" description="Lander" />
+     <script src="script.lua" type="client" />
+     <file src="bullet.txd" />
+     <file src="bullet.dff" />
+</meta>

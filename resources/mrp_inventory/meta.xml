@@ -1,0 +1,26 @@
+<meta>
+    <info name="Medellin RP Inventory" author="ZeDD" />
+
+    <!-- settings -->
+    <script src="settings.lua" type="shared" cache="false" />
+
+    <!-- server -->
+    <script src="server/main.lua" type="server" />
+
+    <!-- client -->
+    <script src="client/utils.lua" type="client" cache="false" />
+    <script src="client/main.lua" type="client" cache="false" />
+
+    <!-- files/assets -->
+    <file src="files/assets/inventory.png" />
+    <file src="files/assets/logo.png" />
+    <file src="files/assets/target_inventory.png" />
+
+    <!-- files/fonts -->
+    <file src="files/fonts/Roboto-Medium.ttf" />
+    <file src="files/fonts/Roboto-Regular.ttf" />
+
+    <!-- exports/client -->
+    <export function="ShowMaleteroItems" type="client" />
+    <export function="ShowMochilaItems" type="client" />
+</meta>

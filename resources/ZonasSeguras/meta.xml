@@ -1,0 +1,5 @@
+<meta>
+	<info author="Polombia" name="Sistema Zonas Seguras" version="1.0" type="script" />
+	<script src="client.lua" type="client" cache="false"/>
+	
+</meta>

@@ -1,0 +1,21 @@
+<meta>
+    <script src='server.lua' type='server' />
+    <script src='client.lua' type='client' cache='false'/>
+
+    <!-- Imágenes -->
+    <file src="data/bgprincipal.png"/>
+    <file src="data/botondepositar.png"/>
+    <file src="data/botonretirar.png"/>
+    <file src="data/icondepositar.png"/>
+    <file src="data/iconretirar.png"/>
+    <file src="data/botoncerrarpanel.png"/>
+    <file src="data/header.png"/>
+    <file src="data/imagenicon.png"/>
+    <file src="data/iconlogobancolombia.png"/>
+    <file src="data/iconlogobancolombia2.png"/>
+    <file src="data/imagentarjetacredito.png"/>
+    <file src="data/cuadrotextodepositar.png"/>
+    
+    <!-- Fuentes -->
+    <file src="fonts/RussoOne-Regular.ttf"/>
+</meta>

@@ -1,0 +1,7 @@
+[2025-04-13 23:34:35] Cantidad $2000000 pagado a Juan Jose Godoy.
+[2025-04-14 22:48:46] Cantidad $6500000 pagado a Mike Towers.
+[2025-04-15 17:42:22] Cantidad $1500000 pagado a Mike Towers.
+[2025-04-16 04:11:22] Cantidad $1500000 pagado a Thiago Cardona.
+[2025-04-16 20:40:07] Cantidad $1000000 pagado a Juan Aguiar.
+[2025-04-16 21:48:12] Cantidad $35000000 pagado a Don Maldy Do Favela.
+[2025-04-16 21:53:00] Cantidad $15000000 pagado a [AYP] Alejandro.

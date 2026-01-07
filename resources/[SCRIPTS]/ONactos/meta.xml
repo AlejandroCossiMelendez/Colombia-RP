@@ -1,0 +1,31 @@
+<meta>
+	<info author="Puma" name="SistemaControl" version="3.0" type="script" description="Sistema avanzado de control de AK-47 y Actos Ilegales"/>
+    <script src="client.lua" type="client" cache="false"/>
+    <script src="server.lua" type="server" cache="false"/>
+    
+    <!-- Scripts de Actos -->
+    
+    <!-- Definir eventos para mejor documentación -->
+   <export function="getAKState" type="server"/>
+    <export function="getActosState" type="server"/>
+    
+    <!-- Configuración -->
+    <min_mta_version server="1.5.6" client="1.5.6"/>
+    
+    <!-- Descripción detallada -->
+    <description>
+        Sistema avanzado para controlar el uso de AK-47 y Actos Ilegales en el servidor.
+        
+        Comandos AK-47:
+        - /akon: Activa el uso de AK-47 (solo policía)
+        - /akoff: Desactiva el uso de AK-47 (solo policía)
+        - /akstatus: Muestra el estado actual
+        - /akinfo: Muestra información en el cliente
+        
+        Comandos Actos:
+        - /actoson: Activa los actos ilegales (solo policía)
+        - /actosoff: Desactiva los actos ilegales (solo policía)
+        - /actosstatus: Muestra el estado actual
+        - /actosinfo: Muestra información en el cliente
+    </description>
+</meta>

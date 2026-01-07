@@ -1,0 +1,32 @@
+<meta>
+    <info author="joshu" version="1.0" name="arp_gps" />
+    <script src="shared.lua" type="shared" />
+    <script src="client.lua" type="client" />
+    <script src="client/gps_interface.lua" type="client" />
+    
+    <!-- Fuente personalizada -->
+    <file src="Poppins-SemiBold.ttf" />
+    
+    <!-- Recursos del primer menu -->
+    <file src="InterfazNuevaGPS/PrimerMenuLugaresGPS/data/BGEXTERIOR.png"/>
+    <file src="InterfazNuevaGPS/PrimerMenuLugaresGPS/data/BotonTrabajos.png"/>
+    <file src="InterfazNuevaGPS/PrimerMenuLugaresGPS/data/BotonTiendas.png"/>
+    <file src="InterfazNuevaGPS/PrimerMenuLugaresGPS/data/BotonIlegales.png"/>
+    <file src="InterfazNuevaGPS/PrimerMenuLugaresGPS/data/BotonRopa.png"/>
+    <file src="InterfazNuevaGPS/PrimerMenuLugaresGPS/data/BotonLegales.png"/>
+    <file src="InterfazNuevaGPS/PrimerMenuLugaresGPS/data/BotonOtros.png"/>
+    <file src="InterfazNuevaGPS/PrimerMenuLugaresGPS/data/BotonConcesionario.png"/>
+    <file src="InterfazNuevaGPS/PrimerMenuLugaresGPS/data/BotonLugares.png"/>
+    <file src="InterfazNuevaGPS/PrimerMenuLugaresGPS/data/Header.png"/>
+    <file src="InterfazNuevaGPS/PrimerMenuLugaresGPS/data/IconoCerrar.png"/>
+    
+    <!-- Recursos del segundo menu -->
+    <file src="InterfazNuevaGPS/SegundoMenuLugaresInformacionGPS/data/BGEXTERIOR2.png"/>
+    <file src="InterfazNuevaGPS/SegundoMenuLugaresInformacionGPS/data/Header2.png"/>
+    <file src="InterfazNuevaGPS/SegundoMenuLugaresInformacionGPS/data/IconoCerrar.png"/>
+    <file src="InterfazNuevaGPS/SegundoMenuLugaresInformacionGPS/data/BGINTERNO-LUGARES.png"/>
+    <file src="InterfazNuevaGPS/SegundoMenuLugaresInformacionGPS/data/BGINTERNO-INFORMACION.png"/>
+    <file src="InterfazNuevaGPS/SegundoMenuLugaresInformacionGPS/data/CampoTituloLugar.png"/>
+    <file src="InterfazNuevaGPS/SegundoMenuLugaresInformacionGPS/data/BotorMarcarGPS.png"/>
+    <file src="InterfazNuevaGPS/SegundoMenuLugaresInformacionGPS/data/BotonVolver.png"/>
+</meta>

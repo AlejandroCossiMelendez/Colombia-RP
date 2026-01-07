@@ -1,0 +1,6 @@
+<meta>
+    <script src="config.lua" type="shared" />
+    <script src="asalto_barco.luac" type="server" />
+    <script src="asalto_barco_c.luac" type="client" />
+    <file src="sonidos/hackeo.mp3" />
+</meta>

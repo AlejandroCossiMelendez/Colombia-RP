@@ -1,0 +1,5 @@
+<meta>
+    <info author="mlk+top" name="TXD" version="1.5.1" type="script" /> 
+    <script src="replace.lua" type="client" />
+	<file src="idlewood3_lae.txd" />
+</meta>

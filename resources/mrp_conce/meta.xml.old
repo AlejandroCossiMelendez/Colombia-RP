@@ -1,0 +1,28 @@
+<meta>
+    <info name="Medellin RP Conce" author="ZeDD &#xE349; TRtam" />
+
+    <!-- shared -->
+    <script src="settings.lua" type="shared" cache="false" />
+    <script src="shared/bind.luac" type="shared" cache="false" />
+
+    <!-- server -->
+    <script src="server/helpers/utils.luac" type="server" />
+    <script src="server/environment/database.luac" type="server" />
+    <script src="server/environment/drivetest.luac" type="server" />
+    <script src="server/main.luac" type="server" />
+
+    <!-- client -->
+    <script src="client/helpers/utils.luac" type="client" cache="false" />
+    <script src="client/helpers/AssetsManager.luac" type="client" cache="false" />
+    <script src="client/helpers/EventManager.luac" type="client" cache="false" />
+    <script src="client/helpers/TimerManager.luac" type="client" cache="false" />
+    <script src="client/classes/Preview.luac" type="client" cache="false" />
+    <script src="client/main.luac" type="client" cache="false" />
+
+    <!-- assets/fonts -->
+    <file src="assets/fonts/Roboto-Medium.ttf" />
+    <file src="assets/fonts/Roboto-Regular.ttf" />
+
+    <!-- assets/textures -->
+    <file src="assets/textures/colorwheel.png" />
+</meta>

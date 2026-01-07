@@ -1,0 +1,13 @@
+addCommandHandler("sorteoCapital", function (source)
+	local randomPlayer = getRandomPlayer ( )
+
+	outputChatBox(" ", root, 255, 255, 255, true)
+	outputChatBox(" ", root, 255, 255, 255, true)
+	outputChatBox("#23ffe8⊱⋅ #FFFFFF──────────────────────────────────────────── #4EEE94⋅⊰ ", root, 255, 255, 255, true)
+	outputChatBox(" ", root, 255, 255, 255, true)
+	outputChatBox("               #f3f203El Jugador #FFFFFF"..getPlayerName ( randomPlayer ).." #f3f203FUE EL GANADOR DEL SORTEO", root, 255, 255, 255, true)
+	outputChatBox(" ", root, 255, 255, 255, true)
+	outputChatBox("#23ffe8⊱⋅ #FFFFFF─────────────────────────────────────────── #4EEE94⋅⊰ ", root, 255, 255, 255, true)
+	outputChatBox(" ", root, 255, 255, 255, true)
+	outputChatBox(" ", root, 255, 255, 255, true)
+end)

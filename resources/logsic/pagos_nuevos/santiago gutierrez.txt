@@ -1,0 +1,9 @@
+[2025-03-30 20:51:06] Cantidad $1000000 pagado a Tito Bandido.
+[2025-04-01 03:59:20] Cantidad $20000000 pagado a Davinsito.
+[2025-04-01 03:59:30] Cantidad $20000000 pagado a Davinsito.
+[2025-04-01 04:00:39] Cantidad $20000000 pagado a Davinsito.
+[2025-04-01 04:00:53] Cantidad $20000000 pagado a Davinsito.
+[2025-04-01 04:05:26] Cantidad $30000000 pagado a Brayan Volkov VIP.
+[2025-04-01 21:44:02] Cantidad $5000000 pagado a Juancho Sanchez.
+[2025-04-02 19:58:29] Cantidad $5000000 pagado a Richard Rios VIP.
+[2025-04-02 22:08:02] Cantidad $20000000 pagado a Jader Dior.

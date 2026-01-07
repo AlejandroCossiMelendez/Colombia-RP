@@ -1,0 +1,32 @@
+<meta>
+    <info author="La Capital Roleplay" version="1.0" name="Nametag Profesional" description="Sistema de nametags profesional con /yo para La Capital Roleplay" />
+    
+    <!-- Scripts principales -->
+    <script src="config.lua" type="shared" />
+    <script src="client.lua" type="client" />
+    <script src="server.lua" type="server" />
+    
+    <!-- Fuentes personalizadas Roboto (activadas) -->
+    <file src="fuentes/Roboto-Regular.ttf" />
+    <file src="fuentes/Roboto-Bold.ttf" />
+    
+    <!-- Configuración de derechos -->
+    <aclrequest>
+        <right name="function.setElementData" access="true" />
+        <right name="function.getElementData" access="true" />
+        <right name="function.outputChatBox" access="true" />
+        <right name="function.outputServerLog" access="true" />
+    </aclrequest>
+    
+    <!-- Configuración del recurso -->
+    <settings>
+        <setting name="*distancia_maxima" value="10" />
+        <setting name="*mostrar_salud" value="true" />
+        <setting name="*efectos_visuales" value="true" />
+        <setting name="*cooldown_yo" value="3" />
+    </settings>
+    
+    <!-- Exportaciones para otros recursos -->
+    <export function="obtenerYoJugador" type="server" />
+    <export function="establecerYoJugador" type="server" />
+</meta>

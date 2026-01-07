@@ -1,0 +1,3 @@
+<map edf:definitions="editor_main">
+    <object id="object (chip_stack08) (1)" breakable="false" interior="5" alpha="255" dimension="31" model="1902" scale="1" doublesided="true" collisions="true" posX="212.8" posY="-10.3" posZ="1013.1" rotX="0" rotY="0" rotZ="90"></object>
+</map>

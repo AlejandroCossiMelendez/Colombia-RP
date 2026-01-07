@@ -1,0 +1,3 @@
+[2025-05-03 23:11:04] Cantidad $24000000 pagado a Juan Londono.
+[2025-05-04 00:03:12] Cantidad $15000000 pagado a Sebas Vazquez.
+[2025-05-04 02:05:52] Cantidad $2000000 pagado a Fernando Santos.
