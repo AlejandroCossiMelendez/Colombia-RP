@@ -47,6 +47,7 @@ function updateCharacters( characters )
 					end,
 				onClick = function( key )
 						if key == 1 then
+							outputDebugString("[CHARACTERS] Click en personaje: ID=" .. tostring(characterID) .. ", Title=" .. tostring(title))
 							exports.players:selectCharacter( characterID, title )
 						end
 					end,

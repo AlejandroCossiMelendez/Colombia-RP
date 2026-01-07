@@ -75,13 +75,30 @@ addCommandHandler( "changechar",
 bindKey( "pause", "down", "changechar" )
 
 function selectCharacter( id, name )
+	outputDebugString("[SELECTCHAR] selectCharacter llamado: ID=" .. tostring(id) .. ", Name=" .. tostring(name))
 	if loggedIn and (getElementData(getLocalPlayer(), "muerto") == true or getElementData(getLocalPlayer(), "tazed") == true or getElementData(getLocalPlayer(), "accidente") == true) then 
 		outputChatBox("¡Te recordamos que NO puedes evadir rol!", 255, 0, 0)
 		triggerServerEvent("onMensajeStaff", getLocalPlayer(), "¡ALERTA URGENTE! POSIBLE EVASIÓN DE ROL DE ["..getElementData(getLocalPlayer(), "playerid").."] "..getPlayerName(getLocalPlayer()):gsub("_", " ").."!", 255, 0, 0)
 	else
 		if id == -1 then
-			-- new character
-			exports.gui:show( 'create_character', true )
+			-- new character - abrir directamente la nueva interfaz
+			outputDebugString("[SELECTCHAR] Abriendo nueva interfaz de creación de personajes")
+			
+			-- Verificar si el recurso de la nueva interfaz está disponible
+			local newInterfaceResource = getResourceFromName("Interfaz-CreacionPJ") 
+			if newInterfaceResource and getResourceState(newInterfaceResource) == "running" then
+				-- Usar export function
+				if exports["Interfaz-CreacionPJ"] and exports["Interfaz-CreacionPJ"].showCreateCharacterInterface then
+					outputDebugString("[SELECTCHAR] Llamando a showCreateCharacterInterface via export")
+					exports["Interfaz-CreacionPJ"]:showCreateCharacterInterface()
+				else
+					outputDebugString("[SELECTCHAR] Export no disponible, usando event")
+					triggerEvent("showNewCharacterInterface", localPlayer)
+				end
+			else
+				outputDebugString("[SELECTCHAR] Recurso no disponible, usando ventana antigua")
+				exports.gui:show( 'create_character', true )
+			end
 		elseif id == -2 then
 			-- logout
 			exports.gui:hide( )

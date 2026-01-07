@@ -50,14 +50,30 @@ end
 
 -- FUNCIÓN PARA ABRIR LA NUEVA INTERFAZ
 local function openNewInterface()
+    outputDebugString("[CREATECHAR] openNewInterface llamado")
     hide() -- Cerrar la interfaz antigua
     
     -- Verificar si el recurso de la nueva interfaz está disponible
     local newInterfaceResource = getResourceFromName("Interfaz-CreacionPJ") 
-    if newInterfaceResource and getResourceState(newInterfaceResource) == "running" then
-        -- Usar export function
-        exports["Interfaz-CreacionPJ"]:showCreateCharacterInterface()
+    outputDebugString("[CREATECHAR] Recurso Interfaz-CreacionPJ: " .. tostring(newInterfaceResource and "existe" or "no existe"))
+    if newInterfaceResource then
+        local state = getResourceState(newInterfaceResource)
+        outputDebugString("[CREATECHAR] Estado del recurso: " .. tostring(state))
+        if state == "running" then
+            -- Usar export function
+            outputDebugString("[CREATECHAR] Llamando a showCreateCharacterInterface via export")
+            if exports["Interfaz-CreacionPJ"] and exports["Interfaz-CreacionPJ"].showCreateCharacterInterface then
+                exports["Interfaz-CreacionPJ"]:showCreateCharacterInterface()
+            else
+                outputDebugString("[CREATECHAR] ERROR: Export function no disponible, usando event")
+                triggerEvent("showNewCharacterInterface", localPlayer)
+            end
+        else
+            outputDebugString("[CREATECHAR] Recurso no está running, usando event")
+            triggerEvent("showNewCharacterInterface", localPlayer)
+        end
     else
+        outputDebugString("[CREATECHAR] Recurso no encontrado, usando event")
         -- Fallback: usar event
         triggerEvent("showNewCharacterInterface", localPlayer)
     end
