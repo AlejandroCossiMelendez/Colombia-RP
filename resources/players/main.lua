@@ -33,6 +33,38 @@ end
 
 -- Import Groups
 -- CONTRA PRIORITY MAS BAJO, QUIERE DECIR QUE TIENE MAS PRIORIDAD
+
+-- Funciones wrapper seguras para ACL
+local function safeAclGroupAddObject(aclGroupName, objectName)
+	if not aclGroupName or not objectName then
+		outputDebugString("Warning: safeAclGroupAddObject called with invalid parameters: aclGroupName=" .. tostring(aclGroupName) .. ", objectName=" .. tostring(objectName), 1)
+		return false
+	end
+	
+	local aclGroup = aclGetGroup(aclGroupName)
+	if not aclGroup then
+		outputDebugString("Warning: ACL group '" .. tostring(aclGroupName) .. "' does not exist when trying to add object '" .. tostring(objectName) .. "'", 1)
+		return false
+	end
+	
+	return aclGroupAddObject(aclGroup, objectName)
+end
+
+local function safeAclGroupRemoveObject(aclGroupName, objectName)
+	if not aclGroupName or not objectName then
+		outputDebugString("Warning: safeAclGroupRemoveObject called with invalid parameters: aclGroupName=" .. tostring(aclGroupName) .. ", objectName=" .. tostring(objectName), 1)
+		return false
+	end
+	
+	local aclGroup = aclGetGroup(aclGroupName)
+	if not aclGroup then
+		outputDebugString("Warning: ACL group '" .. tostring(aclGroupName) .. "' does not exist when trying to remove object '" .. tostring(objectName) .. "'", 1)
+		return false
+	end
+	
+	return aclGroupRemoveObject(aclGroup, objectName)
+end
+
 local groups = {
 	{ groupName = "Developers", groupID = 1, aclGroup = "Desarrollador", displayName = "Desarrollador", nametagColor = { 0, 0, 0 }, priority = 2 },
 	{ groupName = "MTA Administrators", groupID = 2, aclGroup = "Admin", displayName = "Administrador", nametagColor = { 207, 41, 41 }, priority = 1 },
@@ -281,14 +313,9 @@ local function aclUpdate( player, saveAclIfChanged )
 										setElementData(player, "account:gmduty", false)
 									end
 									if group2.aclGroup then
-										local aclGroup = aclGetGroup( group2.aclGroup )
-										if aclGroup then
-											if aclGroupAddObject( aclGroup, "user." .. info.username ) then
-												saveAcl = true
-												outputDebugString( "Added account " .. info.username .. " to " .. group2.aclGroup .. " ACL", 3 )
-											end
-										else
-											outputDebugString( "Warning: ACL group '" .. tostring(group2.aclGroup) .. "' does not exist for group " .. tostring(group2.groupName) .. " (ID: " .. tostring(group2.groupID) .. ")", 1 )
+										if safeAclGroupAddObject( group2.aclGroup, "user." .. info.username ) then
+											saveAcl = true
+											outputDebugString( "Added account " .. info.username .. " to " .. group2.aclGroup .. " ACL", 3 )
 										end
 									else
 										outputDebugString( "Warning: Group " .. tostring(group2.groupName) .. " (ID: " .. tostring(group2.groupID) .. ") has no aclGroup defined", 1 )
@@ -304,15 +331,10 @@ local function aclUpdate( player, saveAclIfChanged )
 				local allGroups = getAllGroups()
 				for key, value in ipairs( allGroups ) do
 					if value.aclGroup then
-						local aclGroup = aclGetGroup( value.aclGroup )
-						if aclGroup then
-							if aclGroupRemoveObject( aclGroup, "user." .. info.username ) then
-								saveAcl = true
-								outputDebugString( "Removed account " .. info.username .. " from " .. value.aclGroup .. " ACL", 3 )
-								outputChatBox( "No estás conectado como " .. value.displayName .. ".", player, 255, 0, 0 )
-							end
-						else
-							outputDebugString( "Warning: ACL group '" .. tostring(value.aclGroup) .. "' does not exist for group " .. tostring(value.groupName) .. " (ID: " .. tostring(value.groupID) .. ")", 1 )
+						if safeAclGroupRemoveObject( value.aclGroup, "user." .. info.username ) then
+							saveAcl = true
+							outputDebugString( "Removed account " .. info.username .. " from " .. value.aclGroup .. " ACL", 3 )
+							outputChatBox( "No estás conectado como " .. value.displayName .. ".", player, 255, 0, 0 )
 						end
 					else
 						outputDebugString( "Warning: Group " .. tostring(value.groupName) .. " (ID: " .. tostring(value.groupID) .. ") has no aclGroup defined", 1 )
@@ -366,18 +388,13 @@ local function aclUpdate( player, saveAclIfChanged )
 										
 										-- make sure acl rights are set correctly
 										if group.aclGroup then
-											local aclGroup = aclGetGroup( group.aclGroup )
-											if aclGroup then
-												if aclGroupAddObject( aclGroup, "user." .. accountName ) then
-													outputDebugString( "Added account " .. accountName .. " to ACL " .. group.aclGroup, 3 )
-													saveAcl = true
-													userChanged = true
-													if player then
-														outputChatBox( "Te has conectado como " .. group.displayName .. ".", player, 0, 255, 0 )
-													end
+											if safeAclGroupAddObject( group.aclGroup, "user." .. accountName ) then
+												outputDebugString( "Added account " .. accountName .. " to ACL " .. group.aclGroup, 3 )
+												saveAcl = true
+												userChanged = true
+												if player then
+													outputChatBox( "Te has conectado como " .. group.displayName .. ".", player, 0, 255, 0 )
 												end
-											else
-												outputDebugString( "Warning: ACL group '" .. tostring(group.aclGroup) .. "' does not exist for group " .. tostring(group.groupName) .. " (ID: " .. tostring(group.groupID) .. ")", 1 )
 											end
 										else
 											outputDebugString( "Warning: Group " .. tostring(group.groupName) .. " (ID: " .. tostring(group.groupID) .. ") has no aclGroup defined", 1 )
@@ -389,18 +406,13 @@ local function aclUpdate( player, saveAclIfChanged )
 								if not hasGroup then
 									-- make sure acl rights are removed
 									if group.aclGroup then
-										local aclGroup = aclGetGroup( group.aclGroup )
-										if aclGroup then
-											if aclGroupRemoveObject( aclGroup, "user." .. accountName ) then
-												outputDebugString( "Removed account " .. accountName .. " from ACL " .. group.aclGroup, 3 )
-												saveAcl = true
-												userChanged = true
-												if player then
-													outputChatBox( "No estás conectado como " .. group.displayName .. ".", player, 255, 0, 0 )
-												end
+										if safeAclGroupRemoveObject( group.aclGroup, "user." .. accountName ) then
+											outputDebugString( "Removed account " .. accountName .. " from ACL " .. group.aclGroup, 3 )
+											saveAcl = true
+											userChanged = true
+											if player then
+												outputChatBox( "No estás conectado como " .. group.displayName .. ".", player, 255, 0, 0 )
 											end
-										else
-											outputDebugString( "Warning: ACL group '" .. tostring(group.aclGroup) .. "' does not exist for group " .. tostring(group.groupName) .. " (ID: " .. tostring(group.groupID) .. ")", 1 )
 										end
 									else
 										outputDebugString( "Warning: Group " .. tostring(group.groupName) .. " (ID: " .. tostring(group.groupID) .. ") has no aclGroup defined", 1 )
@@ -435,23 +447,17 @@ local function aclUpdate( player, saveAclIfChanged )
 					local allGroups = getAllGroups()
 					for key, value in ipairs( allGroups ) do
 						if value.aclGroup then
-							local aclGroup = aclGetGroup( value.aclGroup )
-							if aclGroup then
-								if aclGroupRemoveObject( aclGroup, "user." .. accountName ) then
-									saveAcl = true
-									outputDebugString( "Removed account " .. accountName .. " from " .. value.aclGroup .. " ACL", 3 )
+							if safeAclGroupRemoveObject( value.aclGroup, "user." .. accountName ) then
+								saveAcl = true
+								outputDebugString( "Removed account " .. accountName .. " from " .. value.aclGroup .. " ACL", 3 )
+								if player then
+									outputChatBox( "No estás conectado como " .. value.displayName .. ".", player, 255, 0, 0 )
 								end
-							else
-								outputDebugString( "Warning: ACL group '" .. tostring(value.aclGroup) .. "' does not exist for group " .. tostring(value.groupName) .. " (ID: " .. tostring(value.groupID) .. ")", 1 )
 							end
 						else
 							outputDebugString( "Warning: Group " .. tostring(value.groupName) .. " (ID: " .. tostring(value.groupID) .. ") has no aclGroup defined", 1 )
 						end
-							
-							if player then
-								outputChatBox( "No estás conectado como " .. value.displayName .. ".", player, 255, 0, 0 )
-							end
-						end
+					end
 					end
 					
 					-- remove the account
