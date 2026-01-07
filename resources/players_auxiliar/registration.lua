@@ -81,10 +81,19 @@ addEventHandler( "players:register", root,
 						end
 						
 						outputServerLog("[REGISTER] Conteo de IPs: " .. ipReg)
-						if ipReg >= 2 then 
-							outputServerLog("[REGISTER] Límite de IPs alcanzado, rechazando registro")
+						
+						-- Verificar si el jugador es staff (tiene permisos de modchat)
+						local isStaff = hasObjectPermissionTo(source, "command.modchat", false)
+						local maxIPRegistrations = isStaff and 10 or 2  -- Staff puede tener hasta 10 cuentas, usuarios normales 2
+						
+						if ipReg >= maxIPRegistrations then 
+							outputServerLog("[REGISTER] Límite de IPs alcanzado (" .. ipReg .. "/" .. maxIPRegistrations .. "), rechazando registro")
 							triggerClientEvent( source, "players:registrationResult", source, 6 )
 							return
+						end
+						
+						if isStaff then
+							outputServerLog("[REGISTER] Staff detectado, permitiendo registro (límite: " .. maxIPRegistrations .. ")")
 						end
 						
 						outputServerLog("[REGISTER] Generando salt...")
