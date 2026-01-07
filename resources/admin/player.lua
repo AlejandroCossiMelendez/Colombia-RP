@@ -904,75 +904,73 @@ addCommandHandler({ "staffduty", "adminduty", "modduty", "helperduty" },
             outputServerLog("[STAFFDUTY] ERROR: " .. getPlayerName(player) .. " no tiene permisos command.modchat")
             return
         end
-        if hasPermission then
-            local newValue = old ~= true
-            outputServerLog("[STAFFDUTY] Intentando cambiar staffduty de " .. tostring(old) .. " a " .. tostring(newValue))
-            if exports.players:setOption(player, "staffduty", newValue) then
-                outputServerLog("[STAFFDUTY] setOption exitoso. Nuevo estado: " .. tostring(exports.players:getOption(player, "staffduty")))
-                exports.players:updateNametag(player)
-                
-                local playerName = getPlayerName(player):gsub("_", " ")
-                local userID = exports.players:getUserID(player)
-                local discordColor = old and 16711680 or 65280
-                local dutyStatus = old and "Salida del Servicio" or "Ingreso en el Servicio"
-                local currentTime = getRealTime().timestamp
+        local newValue = old ~= true
+        outputServerLog("[STAFFDUTY] Intentando cambiar staffduty de " .. tostring(old) .. " a " .. tostring(newValue))
+        if exports.players:setOption(player, "staffduty", newValue) then
+            outputServerLog("[STAFFDUTY] setOption exitoso. Nuevo estado: " .. tostring(exports.players:getOption(player, "staffduty")))
+            exports.players:updateNametag(player)
+            
+            local playerName = getPlayerName(player):gsub("_", " ")
+            local userID = exports.players:getUserID(player)
+            local discordColor = old and 16711680 or 65280
+            local dutyStatus = old and "Salida del Servicio" or "Ingreso en el Servicio"
+            local currentTime = getRealTime().timestamp
 
-                if not old then
-                    setElementData(player, "staffDutyStartTime", currentTime)
-                    
-                    local discordMessage = {
-                        title = dutyStatus .. " Staff",
-                        description = string.format("> [ + ] Nombre: **%s**\n> [ + ] UserID: **%d**\n", playerName, userID),
-                        color = discordColor,
-                        footer = {
-                            text = "By Jeicordero",
-                            icon_url = "https://imgur.com/n3378F1"
-                        },
-                        timestamp = "now"
-                    }
-
-                    exports.discord_webhooks:sendToURL(
-                        "https://discord.com/api/webhooks/1407618304301863014/Xsm5ZzSaay8aGOVC0WzMsuTvpogDr8TmvGByJm6mO2qB_eQ1QoSKCoH1vtnIv0SyE238",
-                        discordMessage
-                    )
-                    
-                else
-                    guardarTiempoDeServicio(player)
-                end
-
-                local message = playerName .. " " .. (old and "está ahora fuera" or "está ahora") .. " de servicio (" .. exports.players:getID(player) .. ")."
-                local groups = exports.players:getGroups(player)
-                triggerEvent("onAvisarDudas", player, player)
+            if not old then
+                setElementData(player, "staffDutyStartTime", currentTime)
                 
-                if groups and #groups >= 1 then
-                    message = groups[1].displayName .. " " .. message
-                end
-                
-                if exports.players:getOption(player, "staffduty") == true then
-                    setElementData(player, "account:gmduty", true)
-                else
-                    setElementData(player, "account:gmduty", false)
-                end	
+                local discordMessage = {
+                    title = dutyStatus .. " Staff",
+                    description = string.format("> [ + ] Nombre: **%s**\n> [ + ] UserID: **%d**\n", playerName, userID),
+                    color = discordColor,
+                    footer = {
+                        text = "By Jeicordero",
+                        icon_url = "https://imgur.com/n3378F1"
+                    },
+                    timestamp = "now"
+                }
 
-                for key, value in ipairs(getElementsByType("player")) do
-                    if value ~= player and groups and groups[1] and groups[1].displayName ~= "Encubierto" and groups[1].displayName ~= "Admin Supremo" and groups[1].displayName ~= "Administrador" and groups[1].displayName ~= "Programador" then
-                        outputChatBox(message, value, old and 255 or 0, old and 191 or 255, 0)
-                    end
-                end
+                exports.discord_webhooks:sendToURL(
+                    "https://discord.com/api/webhooks/1407618304301863014/Xsm5ZzSaay8aGOVC0WzMsuTvpogDr8TmvGByJm6mO2qB_eQ1QoSKCoH1vtnIv0SyE238",
+                    discordMessage
+                )
                 
-                -- Mensaje de confirmación al jugador
-                if exports.players:getOption(player, "staffduty") == true then
-                    outputChatBox("Has entrado en servicio de staff.", player, 0, 255, 0)
-                else
-                    outputChatBox("Has salido de servicio de staff.", player, 255, 191, 0)
-                end
             else
-                outputChatBox("Error al cambiar el estado de servicio. Intenta de nuevo.", player, 255, 0, 0)
-                outputServerLog("[STAFFDUTY] ERROR: setOption falló para " .. getPlayerName(player))
+                guardarTiempoDeServicio(player)
             end
+
+            local message = playerName .. " " .. (old and "está ahora fuera" or "está ahora") .. " de servicio (" .. exports.players:getID(player) .. ")."
+            local groups = exports.players:getGroups(player)
+            triggerEvent("onAvisarDudas", player, player)
+            
+            if groups and #groups >= 1 then
+                message = groups[1].displayName .. " " .. message
+            end
+            
+            if exports.players:getOption(player, "staffduty") == true then
+                setElementData(player, "account:gmduty", true)
+            else
+                setElementData(player, "account:gmduty", false)
+            end	
+
+            for key, value in ipairs(getElementsByType("player")) do
+                if value ~= player and groups and groups[1] and groups[1].displayName ~= "Encubierto" and groups[1].displayName ~= "Admin Supremo" and groups[1].displayName ~= "Administrador" and groups[1].displayName ~= "Programador" then
+                    outputChatBox(message, value, old and 255 or 0, old and 191 or 255, 0)
+                end
+            end
+            
+            -- Mensaje de confirmación al jugador
+            if exports.players:getOption(player, "staffduty") == true then
+                outputChatBox("Has entrado en servicio de staff.", player, 0, 255, 0)
+            else
+                outputChatBox("Has salido de servicio de staff.", player, 255, 191, 0)
+            end
+        else
+            outputChatBox("Error al cambiar el estado de servicio. Intenta de nuevo.", player, 255, 0, 0)
+            outputServerLog("[STAFFDUTY] ERROR: setOption falló para " .. getPlayerName(player))
         end
     end,
-    true
+    false
 )
 
 addEventHandler("onCharacterLogin", root, function()
