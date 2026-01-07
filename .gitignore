@@ -13,6 +13,8 @@ admin.xml
 banlist.xml
 vehiclecolors.conf
 
+resources/logsic/login.txt
+resources/mrp_conce/mrp_conce.db
 # Backups y dumps
 backups/
 dumps/
