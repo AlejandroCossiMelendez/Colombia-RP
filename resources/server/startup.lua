@@ -80,6 +80,201 @@ addCommandHandler("startscripts", function(player)
 	end
 end)
 
+-- Comando para iniciar múltiples recursos: /start recurso1 recurso2 recurso3
+addCommandHandler("start", function(player, commandName, ...)
+	-- Solo permite a jugadores con permisos adecuados o a la consola
+	if player and not hasObjectPermissionTo(player, "function.startResource", false) then
+		outputChatBox("No tienes permisos para usar este comando.", player, 255, 0, 0)
+		return
+	end
+
+	local resources = {...}
+	if #resources == 0 then
+		if player then
+			outputChatBox("Sintaxis: /start [recurso1] [recurso2] [recurso3] ...", player, 255, 255, 255)
+			outputChatBox("Ejemplo: /start gobierno factions sql", player, 255, 255, 255)
+		else
+			outputServerLog("Sintaxis: start [recurso1] [recurso2] [recurso3] ...")
+		end
+		return
+	end
+
+	local started, skipped, failed = {}, {}, {}
+	
+	for _, resName in ipairs(resources) do
+		local res = getResourceFromName(resName)
+		if res then
+			local state = getResourceState(res)
+			if state == "running" then
+				table.insert(skipped, resName)
+			else
+				if startResource(res) then
+					table.insert(started, resName)
+				else
+					table.insert(failed, resName)
+				end
+			end
+		else
+			table.insert(failed, resName)
+		end
+	end
+
+	local function msg(txt, color)
+		if player then
+			outputChatBox(txt, player, color[1], color[2], color[3])
+		else
+			outputServerLog(txt)
+		end
+	end
+
+	if #started > 0 then
+		msg("[start] Iniciados: " .. table.concat(started, ", "), {0,255,0})
+	end
+	if #skipped > 0 then
+		msg("[start] Ya estaban corriendo: " .. table.concat(skipped, ", "), {255,255,0})
+	end
+	if #failed > 0 then
+		msg("[start] Fallaron / no encontrados: " .. table.concat(failed, ", "), {255,0,0})
+	end
+	
+	if #started == 0 and #skipped == 0 and #failed == 0 then
+		msg("[start] No se especificaron recursos válidos.", {255,255,0})
+	end
+	
+	-- Mostrar panel al jugador si hay resultados
+	if player and (#started > 0 or #skipped > 0 or #failed > 0) then
+		triggerClientEvent(player, "resource:showPanel", player, "start", started, skipped, failed)
+	end
+end)
+
+-- Comando para detener múltiples recursos: /stop recurso1 recurso2 recurso3
+addCommandHandler("stop", function(player, commandName, ...)
+	-- Solo permite a jugadores con permisos adecuados o a la consola
+	if player and not hasObjectPermissionTo(player, "function.stopResource", false) then
+		outputChatBox("No tienes permisos para usar este comando.", player, 255, 0, 0)
+		return
+	end
+
+	local resources = {...}
+	if #resources == 0 then
+		if player then
+			outputChatBox("Sintaxis: /stop [recurso1] [recurso2] [recurso3] ...", player, 255, 255, 255)
+			outputChatBox("Ejemplo: /stop gobierno factions sql", player, 255, 255, 255)
+		else
+			outputServerLog("Sintaxis: stop [recurso1] [recurso2] [recurso3] ...")
+		end
+		return
+	end
+
+	local stopped, skipped, failed = {}, {}, {}
+	
+	for _, resName in ipairs(resources) do
+		local res = getResourceFromName(resName)
+		if res then
+			local state = getResourceState(res)
+			if state == "stopped" or state == "loaded" then
+				table.insert(skipped, resName)
+			elseif state == "running" then
+				if stopResource(res) then
+					table.insert(stopped, resName)
+				else
+					table.insert(failed, resName)
+				end
+			else
+				table.insert(failed, resName)
+			end
+		else
+			table.insert(failed, resName)
+		end
+	end
+
+	local function msg(txt, color)
+		if player then
+			outputChatBox(txt, player, color[1], color[2], color[3])
+		else
+			outputServerLog(txt)
+		end
+	end
+
+	if #stopped > 0 then
+		msg("[stop] Detenidos: " .. table.concat(stopped, ", "), {255,165,0})
+	end
+	if #skipped > 0 then
+		msg("[stop] Ya estaban detenidos: " .. table.concat(skipped, ", "), {255,255,0})
+	end
+	if #failed > 0 then
+		msg("[stop] Fallaron / no encontrados: " .. table.concat(failed, ", "), {255,0,0})
+	end
+	
+	if #stopped == 0 and #skipped == 0 and #failed == 0 then
+		msg("[stop] No se especificaron recursos válidos.", {255,255,0})
+	end
+	
+	-- Mostrar panel al jugador si hay resultados
+	if player and (#stopped > 0 or #skipped > 0 or #failed > 0) then
+		triggerClientEvent(player, "resource:showPanel", player, "stop", stopped, skipped, failed)
+	end
+end)
+
+-- Comando para reiniciar múltiples recursos: /restart recurso1 recurso2 recurso3
+addCommandHandler("restart", function(player, commandName, ...)
+	-- Solo permite a jugadores con permisos adecuados o a la consola
+	if player and not hasObjectPermissionTo(player, "function.restartResource", false) then
+		outputChatBox("No tienes permisos para usar este comando.", player, 255, 0, 0)
+		return
+	end
+
+	local resources = {...}
+	if #resources == 0 then
+		if player then
+			outputChatBox("Sintaxis: /restart [recurso1] [recurso2] [recurso3] ...", player, 255, 255, 255)
+			outputChatBox("Ejemplo: /restart gobierno factions sql", player, 255, 255, 255)
+		else
+			outputServerLog("Sintaxis: restart [recurso1] [recurso2] [recurso3] ...")
+		end
+		return
+	end
+
+	local restarted, failed = {}, {}
+	
+	for _, resName in ipairs(resources) do
+		local res = getResourceFromName(resName)
+		if res then
+			if restartResource(res) then
+				table.insert(restarted, resName)
+			else
+				table.insert(failed, resName)
+			end
+		else
+			table.insert(failed, resName)
+		end
+	end
+
+	local function msg(txt, color)
+		if player then
+			outputChatBox(txt, player, color[1], color[2], color[3])
+		else
+			outputServerLog(txt)
+		end
+	end
+
+	if #restarted > 0 then
+		msg("[restart] Reiniciados: " .. table.concat(restarted, ", "), {0,255,255})
+	end
+	if #failed > 0 then
+		msg("[restart] Fallaron / no encontrados: " .. table.concat(failed, ", "), {255,0,0})
+	end
+	
+	if #restarted == 0 and #failed == 0 then
+		msg("[restart] No se especificaron recursos válidos.", {255,255,0})
+	end
+	
+	-- Mostrar panel al jugador si hay resultados
+	if player and (#restarted > 0 or #failed > 0) then
+		triggerClientEvent(player, "resource:showPanel", player, "restart", restarted, {}, failed)
+	end
+end)
+
 addEventHandler( "onResourceStart", resourceRoot,
 	function( )
 		setGameType( "CapitalRoleplay" )
