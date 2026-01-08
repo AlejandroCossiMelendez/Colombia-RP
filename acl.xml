@@ -452,10 +452,34 @@
         <right name="command.tempveh" access="true"></right>
         <right name="command.vehsf" access="true"></right>
         <right name="command.createint" access="true"></right>
+        <right name="command.createinterior" access="true"></right>
         <right name="command.deleteint" access="true"></right>
+        <right name="command.deleteinterior" access="true"></right>
+        <right name="command.delinterior" access="true"></right>
         <right name="command.getint" access="true"></right>
+        <right name="command.getinterior" access="true"></right>
         <right name="command.setintprice" access="true"></right>
+        <right name="command.setinteriorprice" access="true"></right>
+        <right name="command.setinterior" access="true"></right>
+        <right name="command.setinteriorinside" access="true"></right>
+        <right name="command.setinteriorinsideveh" access="true"></right>
+        <right name="command.setinterioroutsideveh" access="true"></right>
+        <right name="command.setinteriorname" access="true"></right>
+        <right name="command.setinteriorowner" access="true"></right>
         <right name="command.nearbyints" access="true"></right>
+        <right name="command.gotointerior" access="true"></right>
+        <right name="command.trasladarinterior" access="true"></right>
+        <right name="command.precintarinterior" access="true"></right>
+        <right name="command.quitarprecinto" access="true"></right>
+        <right name="command.asociarinteriores" access="true"></right>
+        <right name="command.intgenerico" access="true"></right>
+        <right name="command.comprarint" access="true"></right>
+        <right name="command.sellinterior" access="true"></right>
+        <right name="command.venderpropiedad" access="true"></right>
+        <right name="command.venderint" access="true"></right>
+        <right name="command.puntoreparto" access="true"></right>
+        <right name="command.timbre" access="true"></right>
+        <right name="command.mirilla" access="true"></right>
         <right name="command.createperiodico" access="true"></right>
         <right name="command.nearbyperiodicos" access="true"></right>
         <right name="command.deleteperiodico" access="true"></right>
