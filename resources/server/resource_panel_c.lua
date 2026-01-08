@@ -27,6 +27,8 @@ function showResourcePanel(commandType, successList, skippedList, failedList)
 		titleText = "Resultados: Detener Recursos"
 	elseif commandType == "restart" then
 		titleText = "Resultados: Reiniciar Recursos"
+	elseif commandType == "status" then
+		titleText = "Estado de Recursos Importantes"
 	end
 	
 	panelWindow = guiCreateWindow(windowX, windowY, windowWidth, windowHeight, titleText, false)

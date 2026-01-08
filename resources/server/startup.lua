@@ -275,6 +275,110 @@ addCommandHandler("restart", function(player, commandName, ...)
 	end
 end)
 
+-- Comando para ver el estado de un recurso específico
+addCommandHandler("resinfo", function(player, commandName, resName)
+	-- Solo permite a jugadores con permisos adecuados o a la consola
+	if player and not hasObjectPermissionTo(player, "function.startResource", false) then
+		outputChatBox("No tienes permisos para usar este comando.", player, 255, 0, 0)
+		return
+	end
+
+	if not resName then
+		if player then
+			outputChatBox("Sintaxis: /resinfo [nombre_recurso]", player, 255, 255, 255)
+			outputChatBox("Ejemplo: /resinfo factions", player, 255, 255, 255)
+		else
+			outputServerLog("Sintaxis: resinfo [nombre_recurso]")
+		end
+		return
+	end
+
+	local res = getResourceFromName(resName)
+	if res then
+		local state = getResourceState(res)
+		local name = getResourceName(res)
+		
+		local function msg(txt, color)
+			if player then
+				outputChatBox(txt, player, color[1], color[2], color[3])
+			else
+				outputServerLog(txt)
+			end
+		end
+		
+		msg("=== Información del Recurso: " .. name .. " ===", {255,255,255})
+		msg("Estado: " .. state, 
+			state == "running" and {0,255,0} or 
+			state == "stopped" and {255,165,0} or 
+			{255,255,0})
+		
+		if state ~= "running" then
+			msg("El recurso NO está corriendo. Usa /start " .. name .. " para iniciarlo.", {255,0,0})
+		end
+	else
+		local function msg(txt, color)
+			if player then
+				outputChatBox(txt, player, color[1], color[2], color[3])
+			else
+				outputServerLog(txt)
+			end
+		end
+		msg("Recurso '" .. resName .. "' no encontrado.", {255,0,0})
+	end
+end)
+
+-- Comando para ver el estado de múltiples recursos comunes
+addCommandHandler("resstatus", function(player, commandName)
+	-- Solo permite a jugadores con permisos adecuados o a la consola
+	if player and not hasObjectPermissionTo(player, "function.startResource", false) then
+		outputChatBox("No tienes permisos para usar este comando.", player, 255, 0, 0)
+		return
+	end
+
+	local importantResources = {"factions", "sql", "players", "gobierno", "server"}
+	local running = {}
+	local stopped = {}
+	local failed = {}
+	
+	for _, resName in ipairs(importantResources) do
+		local res = getResourceFromName(resName)
+		if res then
+			local state = getResourceState(res)
+			if state == "running" then
+				table.insert(running, resName)
+			else
+				table.insert(stopped, resName .. " (" .. state .. ")")
+			end
+		else
+			table.insert(failed, resName)
+		end
+	end
+	
+	local function msg(txt, color)
+		if player then
+			outputChatBox(txt, player, color[1], color[2], color[3])
+		else
+			outputServerLog(txt)
+		end
+	end
+	
+	msg("=== Estado de Recursos Importantes ===", {255,255,255})
+	if #running > 0 then
+		msg("✓ Corriendo: " .. table.concat(running, ", "), {0,255,0})
+	end
+	if #stopped > 0 then
+		msg("✗ Detenidos: " .. table.concat(stopped, ", "), {255,0,0})
+	end
+	if #failed > 0 then
+		msg("✗ No encontrados: " .. table.concat(failed, ", "), {255,0,0})
+	end
+	
+	-- Mostrar panel al jugador
+	if player then
+		triggerClientEvent(player, "resource:showPanel", player, "status", running, {}, stopped)
+	end
+end)
+
 addEventHandler( "onResourceStart", resourceRoot,
 	function( )
 		setGameType( "CapitalRoleplay" )
