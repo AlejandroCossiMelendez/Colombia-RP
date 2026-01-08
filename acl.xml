@@ -369,6 +369,35 @@
         <right name="command.deletescreenshot" access="true"></right>
         <right name="command.deleteallscreenshot" access="true"></right>
         <right name="command.modchat" access="true"></right>
+        <right name="command.revivir" access="true"></right>
+        <right name="command.reconectar" access="true"></right>
+        <right name="command.desbug" access="true"></right>
+        <right name="command.mandarls" access="true"></right>
+        <right name="command.get" access="true"></right>
+        <right name="command.goto" access="true"></right>
+        <right name="command.setname" access="true"></right>
+        <right name="command.pagostaff" access="true"></right>
+        <right name="command.unfreeze" access="true"></right>
+        <right name="command.sethealth" access="true"></right>
+        <right name="command.sethp" access="true"></right>
+        <right name="command.capitaldatos" access="true"></right>
+        <right name="command.fecha" access="true"></right>
+        <right name="command.staffduty" access="true"></right>
+        <right name="command.adminduty" access="true"></right>
+        <right name="command.modduty" access="true"></right>
+        <right name="command.helperduty" access="true"></right>
+        <right name="command.verhorastaff" access="true"></right>
+        <right name="command.limpiarhorasstaff" access="true"></right>
+        <right name="command.sumarhorastaff" access="true"></right>
+        <right name="command.cambiarclave" access="true"></right>
+        <right name="command.idiomas" access="true"></right>
+        <right name="command.checkperms" access="true"></right>
+        <right name="command.adminactivo" access="true"></right>
+        <right name="command.staffon" access="true"></right>
+        <right name="command.low" access="true"></right>
+        <right name="command.genero" access="true"></right>
+        <right name="command.color" access="true"></right>
+        <right name="command.edad" access="true"></right>
         <right name="general.ModifyOtherObjects" access="true"></right>
         <right name="general.http" access="true"></right>
         <right name="function.dbConnect" access="true"></right>
