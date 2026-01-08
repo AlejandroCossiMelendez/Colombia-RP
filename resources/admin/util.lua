@@ -66,6 +66,39 @@ function gotopos (player, commandName, x, y, z, dim, int)
 	end
 end
 addCommandHandler("gotopos", gotopos)
+
+function setdimension (player, commandName, dimension)
+	if not hasObjectPermissionTo(player, "command.acceptreport", false) then 
+		return outputChatBox("Acceso denegado.", player, 255, 0, 0)
+	end
+	
+	if not exports.players:getOption(player, "staffduty") then
+		return outputChatBox("Debes estar de servicio (/staffduty) para usar este comando.", player, 255, 0, 0)
+	end
+	
+	if dimension then
+		dimension = tonumber(dimension)
+		if dimension then
+			local x, y, z = getElementPosition(player)
+			local interior = getElementInterior(player)
+			local oldDimension = getElementDimension(player)
+			
+			setElementDimension(player, dimension)
+			
+			outputChatBox("Dimensión cambiada de " .. oldDimension .. " a " .. dimension .. ".", player, 0, 255, 0)
+			outputChatBox("Posición: " .. string.format("%.2f, %.2f, %.2f", x, y, z), player, 255, 255, 255)
+			outputChatBox("Interior: " .. interior .. " | Dimensión: " .. dimension, player, 255, 255, 255)
+		else
+			outputChatBox("La dimensión debe ser un número.", player, 255, 0, 0)
+		end
+	else
+		outputChatBox("Sintaxis: /setdimension [dimensión]", player, 255, 255, 255)
+		outputChatBox("Ejemplo: /setdimension 5", player, 255, 255, 0)
+		outputChatBox("Tu dimensión actual es: " .. getElementDimension(player), player, 0, 255, 255)
+	end
+end
+addCommandHandler("setdimension", setdimension)
+addCommandHandler("setdim", setdimension)
  
 function elementClicked( theButton, theState, thePlayer )
     if theButton == "left" and theState == "down" and getElementData(thePlayer, "tid") == true then -- if left mouse button was pressed down

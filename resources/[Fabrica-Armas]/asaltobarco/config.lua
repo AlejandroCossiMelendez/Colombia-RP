@@ -4,7 +4,7 @@ CONFIG = {
         y = 2548.6342773438,
         z = 24.542186737061,
         interior = 10,
-        dimension = 2,
+        dimension = 3,
         color = {r = 255, g = 0, b = 0, a = 100}
     },
     TIEMPOS = {

@@ -480,6 +480,19 @@
         <right name="command.puntoreparto" access="true"></right>
         <right name="command.timbre" access="true"></right>
         <right name="command.mirilla" access="true"></right>
+        <right name="command.acceptreport" access="true"></right>
+        <right name="command.getpos" access="true"></right>
+        <right name="command.gotopos" access="true"></right>
+        <right name="command.setdimension" access="true"></right>
+        <right name="command.setdim" access="true"></right>
+        <right name="command.horas" access="true"></right>
+        <right name="command.objetos" access="true"></right>
+        <right name="command.dobjetos" access="true"></right>
+        <right name="command.carogallego" access="true"></right>
+        <right name="command.mping" access="true"></right>
+        <right name="command.id" access="true"></right>
+        <right name="command.bs81" access="true"></right>
+        <right name="command.bs82" access="true"></right>
         <right name="command.createperiodico" access="true"></right>
         <right name="command.nearbyperiodicos" access="true"></right>
         <right name="command.deleteperiodico" access="true"></right>
