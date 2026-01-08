@@ -1276,6 +1276,30 @@ function consultaIdiomas(player)
 	end
 end
 addCommandHandler("idiomas", consultaIdiomas)
+
+-- Comando de depuración para verificar permisos
+addCommandHandler("checkperms", function(player)
+    local account = getPlayerAccount(player)
+    if not account then
+        outputChatBox("No tienes cuenta asociada.", player, 255, 0, 0)
+        return
+    end
+    
+    local accountName = getAccountName(account)
+    local isInDesarrollador = isObjectInACLGroup("user."..accountName, aclGetGroup("Desarrollador"))
+    local hasModchat = hasObjectPermissionTo(player, "command.modchat", false)
+    local isLoggedIn = exports.players:isLoggedIn(player)
+    local staffDuty = exports.players:getOption(player, "staffduty")
+    
+    outputChatBox("=== VERIFICACIÓN DE PERMISOS ===", player, 255, 255, 0)
+    outputChatBox("Nombre de cuenta: " .. accountName, player, 255, 255, 255)
+    outputChatBox("Está en grupo Desarrollador: " .. tostring(isInDesarrollador), player, isInDesarrollador and 0 or 255, isInDesarrollador and 255 or 0, 0)
+    outputChatBox("Tiene command.modchat: " .. tostring(hasModchat), player, hasModchat and 0 or 255, hasModchat and 255 or 0, 0)
+    outputChatBox("Está logueado: " .. tostring(isLoggedIn), player, 255, 255, 255)
+    outputChatBox("Está en staffduty: " .. tostring(staffDuty), player, 255, 255, 255)
+    
+    outputServerLog("[CHECKPERMS] " .. getPlayerName(player) .. " - Cuenta: " .. accountName .. " - En Desarrollador: " .. tostring(isInDesarrollador) .. " - Modchat: " .. tostring(hasModchat))
+end)
 	
 -- function darIdioma(player, cmd, otherPlayer, codigo)
 	-- if player and hasObjectPermissionTo(player, "command.kick", false) then
