@@ -1467,7 +1467,7 @@ end
 
 --
 local tempIDCounter = 0
-addCommandHandler( { "temporaryvehicle", "tempvehicle", "vehicle" },
+addCommandHandler( { "temporaryvehicle", "tempvehicle", "vehicle", "veh" },
 	function( player, commandName, ... )
 		model = table.concat( { ... }, " " )
 		model = getVehicleModelFromName( model ) or tonumber( model )

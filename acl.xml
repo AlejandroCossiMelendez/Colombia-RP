@@ -445,6 +445,11 @@
         <right name="command.nearbyshops" access="true"></right>
         <right name="command.delveh" access="true"></right>
         <right name="command.veh" access="true"></right>
+        <right name="command.vehicle" access="true"></right>
+        <right name="command.temporaryvehicle" access="true"></right>
+        <right name="command.temporaryveh" access="true"></right>
+        <right name="command.tempvehicle" access="true"></right>
+        <right name="command.tempveh" access="true"></right>
         <right name="command.vehsf" access="true"></right>
         <right name="command.createint" access="true"></right>
         <right name="command.deleteint" access="true"></right>
