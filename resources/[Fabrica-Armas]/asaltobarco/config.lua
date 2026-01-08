@@ -21,8 +21,8 @@ CONFIG = {
         ILEGALES = {5, 10, 11, 12},
         POLICIA = 1,
         EJERCITO = 4,
-        MIN_POLICIAS = 3,
-        MIN_ILEGALES = 3
+        MIN_POLICIAS = 1,
+        MIN_ILEGALES = 1
     },
     ITEMS = {
         PORTATIL = {id = 91, nombre = "Portátil de Hackeo"},

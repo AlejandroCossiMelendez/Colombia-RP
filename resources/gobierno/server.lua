@@ -16,16 +16,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]
  
 function getFactions (player)
-	if exports.factions:isPlayerInFaction(player, 5) or hasObjectPermissionTo(player, "command.acceptreport", false) then
+	if exports.factions:isPlayerInFaction(player, 5) or hasObjectPermissionTo(player, "command.acceptreport", false) or hasObjectPermissionTo(player, "command.factions", false) then
 		outputChatBox("~~Lista de Empresas~~", player, 255, 255, 255)
 		for k, v in ipairs(exports.sql:query_assoc("SELECT factionID FROM factions")) do
 			outputChatBox("Nº"..tostring(v.factionID).." Nombre: "..tostring(exports.factions:getFactionName(v.factionID))..".", player, 0, 255, 0)
 		end
 		outputChatBox("Utiliza /empresa [factionID] para obtener datos de dicha empresa.", player, 255, 255, 255)
+	else
+		outputChatBox("No tienes permisos para usar este comando.", player, 255, 0, 0)
 	end
 end
-addCommandHandler("factions", getFactions)
-addCommandHandler("empresas", getFactions)
+addCommandHandler("factions", getFactions, true)
+addCommandHandler("empresas", getFactions, true)
 
 function darPresupuesto (player, cmd, facID, cantidad)
 	if not exports.factions:isFactionOwner(player, 5) == true then return end
@@ -60,17 +62,21 @@ end
 addCommandHandler("quitarpresupuesto", takePresupuesto)
 
 function solicitarDatosFaccion (player, cmd, facID)
-	if exports.factions:isPlayerInFaction(player, 5) or hasObjectPermissionTo(player, "command.acceptreport", false) then
+	if exports.factions:isPlayerInFaction(player, 5) or hasObjectPermissionTo(player, "command.acceptreport", false) or hasObjectPermissionTo(player, "command.factions", false) then
 		if facID then
 			outputChatBox("~~Datos de la Empresa ID "..tostring(facID).."~~", player, 255, 255, 255)
 			outputChatBox("Nombre: "..exports.factions:getFactionName(tonumber(facID))..".", player, 0, 255, 0)
 			outputChatBox("Presupuesto: $"..tostring(exports.factions:getFactionPresupuesto(tonumber(facID)))..".", player, 0, 255, 0)
+		else
+			outputChatBox("Sintaxis: /"..cmd.." [factionID]", player, 255, 255, 255)
 		end
+	else
+		outputChatBox("No tienes permisos para usar este comando.", player, 255, 0, 0)
 	end
 end
 
-addCommandHandler("empresa", solicitarDatosFaccion)
-addCommandHandler("faction", solicitarDatosFaccion)
+addCommandHandler("empresa", solicitarDatosFaccion, true)
+addCommandHandler("faction", solicitarDatosFaccion, true)
 
 
 -- tendido electrico de fort carson.

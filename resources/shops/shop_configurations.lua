@@ -257,9 +257,9 @@ shop_configurations =
     {
         name = "Hacker Ilegal",
         skin = 47,
-            { itemID = 90, itemValue = 1, name = "Carga Demolicion C4", description = "C4 PARA EXPLOTAR LA PUERTA DEL BARCO", price = 5000000 },
-			{ itemID = 91, itemValue = 1, name = "Portatil Hackeo", description = "PORTATIL PARA HACKEAR CARGAMENTO DEL BARCO", price = 15000000 },
-			{ itemID = 92, itemValue = 1, name = "USB HACKEO", description = "USB PARA HACKEAR EL CARGAMENTO DEL BARCO", price = 10000000 },
+            { itemID = 90, itemValue = 1, name = "Carga Demolicion C4", description = "C4 PARA EXPLOTAR LA PUERTA DEL BARCO", price = 1 },
+			{ itemID = 91, itemValue = 1, name = "Portatil Hackeo", description = "PORTATIL PARA HACKEAR CARGAMENTO DEL BARCO", price = 1 },
+			{ itemID = 92, itemValue = 1, name = "USB HACKEO", description = "USB PARA HACKEAR EL CARGAMENTO DEL BARCO", price = 1 },
 	},
 
 	partescolt =
